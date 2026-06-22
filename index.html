@@ -48,6 +48,65 @@
       pointer-events: none;
     }
 
+    /* ── Topnav ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: rgba(12,12,20,0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topnav-brand {
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .topnav-brand:hover { opacity: 0.7; }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00fff7;
+      flex-shrink: 0;
+    }
+
     .hero-label {
       display: inline-block;
       font-family: 'Orbitron', monospace;
@@ -449,6 +508,17 @@
   </style>
 </head>
 <body>
+
+  <!-- Topnav -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <span class="topnav-brand">LIVE TOOL</span>
+      <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+        <span class="topnav-site-dot"></span>
+        donnma.com
+      </a>
+    </div>
+  </nav>
 
   <!-- Hero -->
   <header class="hero">
