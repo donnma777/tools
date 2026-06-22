@@ -1,43 +1,52 @@
-# live-tool
+# どんまうんど-Tools
 
-OBS Studio などの配信で使える配信オーバーレイのテーマ集です。
+配信者向けのツールやアセットを無料公開しているリポジトリです。
 
-## 内容
+- サイト: https://tools.donnma.com/
+- 公式サイト: https://donnma.com/
+- BOOTH: https://donnma.booth.pm/item_lists/nevT9GeV
 
-- `overlay/cyberpunk-gaming/`
-  - `cyberpunk-gaming.html`
-  - `説明書.html`
-- `overlay/gaming/`
-  - `gaming.html`
-  - `説明書.html`
-- `overlay/gaming_girly_neon/`
-  - `gaming_girly_neon.html`
-  - `説明書.html`
-- `overlay/sweet_lolita_rose/`
-  - `sweet_lolita_rose.html`
-  - `説明書.html`
-- `overlay/wa/`
-  - `wa.html`
-  - `説明書.html`
+---
 
-## 使い方
+## 配信オーバーレイ (OBS Studio)
 
-1. お好みのテーマフォルダーを選びます。
-2. HTML ファイルをブラウザで開くか、OBS Studio の「ブラウザソース」に読み込みます。
-3. 解像度は 1920x1080 を想定しています。
-4. `説明書.html` にテーマごとの使い方やカスタマイズ方法が記載されています。
+OBS Studio のブラウザソースで使える配信オーバーレイのテーマ集です。
+解像度は 1920×1080 を想定しています。
 
-## 特徴
+| テーマ | フォルダ |
+|--------|----------|
+| GAMING | `overlay/gaming/` |
+| CYBERPUNK VAPORWAVE | `overlay/cyberpunk-gaming/` |
+| GAMING GIRLY NEON | `overlay/gaming_girly_neon/` |
+| SWEET LOLITA ROSE | `overlay/sweet_lolita_rose/` |
+| 和 WA | `overlay/wa/` |
 
-- すべてのデザインは配信向けオーバーレイとして作成されています。
-- ドラッグ＆ドロップで自由にレイアウト調整が可能なケースがあります。
-- 複数のテーマが含まれているため、配信の雰囲気に合わせて使い分けできます。
+各フォルダにオーバーレイ本体と `説明書.html` が入っています。
 
-## 注意
+### 使い方
 
-- ファイルのパスに日本語が含まれている場合、環境によっては動作に影響が出る可能性があります。
-- OBS のブラウザソース利用時は、`Local file` または `ローカルファイル` を選択してください。
+1. お好みのテーマフォルダを選ぶ
+2. OBS Studio の「ブラウザソース」でHTMLファイルを読み込む
+3. HTMLファイル冒頭の `CONFIG` を編集してテキスト・カラーをカスタマイズ
+4. `説明書.html` で詳細な使い方を確認する
 
-## 免責
+---
 
-- このリポジトリは配信用のオーバーレイ素材として提供されるもので、使用による問題について作者は責任を負いません。
+## Plugin & Extension
+
+### Smart Access Control
+
+WordPressプラグイン。クローラー・User-Agent・IPアドレスを組み合わせてアクセスを精密に制御します。AIクローラーやスクレイピングツールの許可/拒否、AIへの画像非表示などに対応。
+
+- 解説: https://donnma.com/public-app-smart-access-control-v4-0-0/
+- GitHub: https://github.com/donnma777/smart-access-control
+
+### 便利ツール拡張機能まとめ
+
+Chrome拡張機能をまとめたリポジトリ。広告ブロック・強制ダークモード・スクリーンショットを単体または統合版で提供。
+
+- GitHub: https://github.com/donnma777/feature-browser-benri-tools
+
+---
+
+© 2026 [donnma.com](https://donnma.com/)
