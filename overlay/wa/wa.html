@@ -1,0 +1,3016 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="OBS Studio用和風ローズ配信オーバーレイ。落ち着いた和の雰囲気あるデザインで1920×1080対応。ドラッグ＆ドロップで自由にカスタマイズ可能。配信者donnma制作。">
+    <meta property="og:title" content="OBS配信オーバーレイ 和風 WA テーマ | donnma">
+    <meta property="og:description" content="OBS Studio用和風ローズ配信オーバーレイ。落ち着いた和の雰囲気あるデザインで1920×1080対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://donnma.com/overlay/wa/">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@donnma777">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <title>配信画面 - 和 WA</title>
+
+    <script>
+        /**
+         * =====================================================
+         *  ★ カスタマイズ設定 ★
+         *  ここを編集するだけでデザインや文字を変更できます。
+         * =====================================================
+         */
+        const CONFIG = {
+
+            // -----------------------------------------------
+            // 【カラー設定】
+            // -----------------------------------------------
+            color: {
+                /** メインカラー（枠線・テキスト・光彩などに使われます） */
+                accent: '#b5627e',
+
+                /** LIVEバッジの背景色 */
+                liveBadge: '#8b3a56',
+
+                /** 画面の背景色 */
+                background: '#faf6f0',
+
+                /** コメント・メモのテキスト色 */
+                bodyText: '#5a3a4a',
+            },
+
+            // -----------------------------------------------
+            // 【テキスト設定】
+            // -----------------------------------------------
+            text: {
+                /** LIVEバッジに表示する文字 */
+                liveBadge: '配信中',
+
+                /** メッセージ欄のプレースホルダー */
+                messagePlaceholder: 'メッセージを入力...',
+
+                /** TITLEボックスのタイトル */
+                titleBoxHeader: '演目',
+
+                /** TITLEボックスの本文 */
+                titleBoxContent: 'タイトル',
+
+                /** COMMENTボックスのタイトル */
+                commentBoxHeader: '声',
+
+                /** MEMOボックスのタイトル */
+                memoBoxHeader: '覚書',
+
+                /** MEMOボックスの初期テキスト */
+                memoBoxContent: '空白ダブルクリックでメニュー選択可能',
+
+                /** MEMOボックスのプレースホルダー */
+                memoPlaceholder: '覚書を入力...',
+            },
+
+            // -----------------------------------------------
+            // 【プロフィール設定】
+            // -----------------------------------------------
+            profile: [
+                'donnma(どんま)',
+                'WEB: donnma.com',
+                'X: @donnma777',
+            ],
+
+            // -----------------------------------------------
+            // 【アニメーション設定】
+            // -----------------------------------------------
+            animation: {
+                /** プロフィールの切替間隔（ミリ秒）*/
+                profileInterval: 3000,
+
+                /** コーナー装飾の点滅周期（秒）*/
+                cornerPulseDuration: '3s',
+
+                /** ネオンテキストの点滅周期（秒）*/
+                neonPulseDuration: '4s',
+            },
+
+            // -----------------------------------------------
+            // 【レイアウト設定】
+            // -----------------------------------------------
+            layout: {
+                /** 配信画面の幅（px）*/
+                width: 1920,
+
+                /** 配信画面の高さ（px）*/
+                height: 1080,
+            },
+
+            // -----------------------------------------------
+            // 【機能制御】
+            // -----------------------------------------------
+            features: {
+                /** 設定の保存をコード上で無効化する */
+                /** falseに設定すると保存機能が無効になります */
+                saveConfigEnabled: true,
+                /** ページを開いたとき保存済み設定を自動で読み込む */
+                /** false にすると「保存を読み込む」を手動で押す必要があります */
+                autoLoad: true,
+            },
+        };
+        /**
+         * =====================================================
+         *  ここより下は基本的に編集不要です。
+         * =====================================================
+         */
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            overflow: hidden;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.25;
+            }
+        }
+
+        .blinking-icon {
+            animation: blink 2.4s infinite ease-in-out;
+            margin-right: 8px;
+        }
+
+        #capture-area {
+            position: relative;
+        }
+
+        /* ---- コーナー装飾 ---- */
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            animation: cornerPulse var(--corner-pulse-duration) infinite ease-in-out;
+        }
+
+        .corner::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--color-accent);
+            border-radius: 50%;
+        }
+
+        .corner-tl {
+            top: 10px;
+            left: 10px;
+            border-top: 1px solid var(--color-accent);
+            border-left: 1px solid var(--color-accent);
+        }
+
+        .corner-tl::after {
+            top: -2px;
+            left: -2px;
+        }
+
+        .corner-tr {
+            top: 10px;
+            right: 10px;
+            border-top: 1px solid var(--color-accent);
+            border-right: 1px solid var(--color-accent);
+        }
+
+        .corner-tr::after {
+            top: -2px;
+            right: -2px;
+        }
+
+        .corner-bl {
+            bottom: 10px;
+            left: 10px;
+            border-bottom: 1px solid var(--color-accent);
+            border-left: 1px solid var(--color-accent);
+        }
+
+        .corner-bl::after {
+            bottom: -2px;
+            left: -2px;
+        }
+
+        .corner-br {
+            bottom: 10px;
+            right: 10px;
+            border-bottom: 1px solid var(--color-accent);
+            border-right: 1px solid var(--color-accent);
+        }
+
+        .corner-br::after {
+            bottom: -2px;
+            right: -2px;
+        }
+
+        /* ---- 上部バー ---- */
+        .live-badge {
+            height: 54px;
+            padding: 0 22px;
+            display: flex;
+            align-items: center;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+            border-radius: 2px;
+        }
+
+        .live-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-family: 'Noto Serif JP', serif;
+            font-weight: 700;
+            font-size: 17px;
+            min-width: 60px;
+            width: 5ch;
+            text-align: center;
+        }
+
+        .profile-container {
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 252, 248, 0.85);
+            border: 1px solid var(--color-accent);
+            padding: 0 28px;
+            min-width: 280px;
+            overflow: hidden;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .profile-container:hover {
+            background: rgba(255, 250, 245, 0.96);
+        }
+
+        #profile-display-area, .profile-display-area {
+            white-space: nowrap;
+            font-size: 17px;
+            font-weight: 600;
+            font-family: 'Noto Serif JP', serif;
+            color: var(--color-accent);
+            pointer-events: none;
+            animation: neonPulse var(--neon-pulse-duration) infinite ease-in-out;
+        }
+
+        /* ---- プロフィール編集ポップアップ ---- */
+        #profile-editor {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(60, 30, 40, 0.5);
+            z-index: 1000;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 100px;
+        }
+
+        #profile-editor.open {
+            display: flex;
+        }
+
+        .editor-popup {
+            background: #fdf8f4;
+            border: 1px solid var(--color-accent);
+            border-radius: 4px;
+            padding: 24px 28px;
+            width: 480px;
+            box-shadow: 0 8px 32px rgba(181, 98, 126, 0.18);
+        }
+
+        .editor-title {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 16px;
+            letter-spacing: 2px;
+        }
+
+        .editor-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .editor-item input {
+            flex: 1;
+            height: 38px;
+            border: 1px solid rgba(181, 98, 126, 0.4);
+            border-radius: 2px;
+            padding: 0 14px;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 14px;
+            color: #3d2b1f;
+            outline: none;
+            background: #fffaf6;
+        }
+
+        .editor-item input:focus {
+            border-color: var(--color-accent);
+            background: #fff;
+        }
+
+        .btn-remove {
+            width: 30px;
+            height: 30px;
+            border-radius: 2px;
+            background: #c04060;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: flex-end;
+        }
+
+        .btn-add {
+            height: 36px;
+            padding: 0 18px;
+            background: transparent;
+            border: 1px solid var(--color-accent);
+            color: var(--color-accent);
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .btn-add:hover {
+            background: rgba(181, 98, 126, 0.08);
+        }
+
+        .btn-save {
+            height: 36px;
+            padding: 0 22px;
+            background: var(--color-accent);
+            border: none;
+            color: #fff;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .btn-save:hover {
+            filter: brightness(0.9);
+        }
+
+        /* ---- 情報バー ---- */
+        .info-base {
+            height: 54px;
+            display: flex;
+            align-items: center;
+            padding: 0 18px;
+            font-weight: 600;
+            font-size: 17px;
+            background: rgba(255, 252, 248, 0.82);
+            border: 1px solid rgba(181, 98, 126, 0.3);
+            color: #3d2b1f;
+            border-radius: 2px;
+        }
+
+        .input-text {
+            border: none;
+            background: transparent;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 17px;
+            font-weight: 600;
+            color: #3d2b1f;
+            outline: none;
+            width: 100%;
+            text-align: center;
+        }
+
+        .clock-container {
+            width: 340px;
+            flex-shrink: 0;
+            gap: 16px;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--color-accent);
+            display: flex;
+            justify-content: center;
+        }
+
+        #date {
+            font-size: 14px;
+            opacity: 0.75;
+        }
+
+        /* ---- ボックスパーツ ---- */
+        .box {
+            position: absolute;
+            background: rgba(253, 248, 244, 0.93);
+            border: 1px solid rgba(181, 98, 126, 0.35);
+            min-width: 200px;
+            border-radius: 2px;
+        }
+
+        .box-del-btn {
+            display: none !important;
+        }
+
+        .box::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--color-accent);
+            border-radius: 2px 0 0 2px;
+        }
+
+        .header {
+            background: rgba(181, 98, 126, 0.07);
+            border-bottom: 1px solid rgba(181, 98, 126, 0.28);
+            padding: 0 14px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            cursor: move;
+            user-select: none;
+        }
+
+        .header-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-accent);
+            letter-spacing: 2px;
+            width: 100%;
+        }
+
+        .window-btns {
+            display: flex;
+            gap: 5px;
+            flex-shrink: 0;
+            align-items: center;
+        }
+
+        .btn {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(181, 98, 126, 0.2);
+            border: 1px solid rgba(181, 98, 126, 0.45);
+        }
+
+        .box-menu-toggle {
+            cursor: pointer;
+            background: rgba(181, 98, 126, 0.1);
+            border: 1px solid rgba(181, 98, 126, 0.4);
+            color: var(--color-accent);
+            font-size: 10px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 20px;
+            height: 20px;
+            z-index: 50;
+            border-radius: 2px;
+        }
+
+        .box:hover .box-menu-toggle,
+        .box-menu-toggle:hover {
+            display: flex;
+        }
+
+        .box-menu-toggle:hover {
+            background: rgba(181, 98, 126, 0.28);
+        }
+
+        .content {
+            padding: 12px 14px;
+        }
+
+        textarea {
+            overflow: hidden;
+        }
+
+        .title-input {
+            width: auto;
+            min-width: 200px;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #3d2b1f;
+            outline: none;
+            resize: none;
+            display: block;
+            padding: 8px 16px;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
+
+        .text-input-box {
+            width: 100%;
+            min-height: 200px;
+            border: none;
+            background: transparent;
+            color: var(--color-body-text);
+            font-family: 'Noto Sans JP', sans-serif;
+            font-weight: 400;
+            font-size: 15px;
+            outline: none;
+            resize: none;
+            display: block;
+            line-height: 1.8;
+        }
+
+        .comment-box {
+            width: 340px;
+        }
+
+        .memo-box {
+            width: 340px;
+        }
+
+        .memo-box .text-input-box,
+        .plain-box .text-input-box {
+            color: #3d2b1f;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        /* ---- パーツ追加メニュー ---- */
+        #part-menu {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            background: #fdf8f4;
+            border: 1px solid rgba(181, 98, 126, 0.5);
+            box-shadow: 0 8px 28px rgba(181, 98, 126, 0.18);
+            min-width: 240px;
+            max-width: min(92vw, 640px);
+            width: auto;
+            padding: 6px 0;
+            box-sizing: border-box;
+            gap: 0;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        #part-menu.open {
+            display: grid;
+        }
+
+        .part-menu-title {
+            grid-column: 1 / -1;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--color-accent);
+            letter-spacing: 2px;
+            padding: 8px 16px 6px;
+            opacity: 0.75;
+            border-bottom: 1px solid rgba(181, 98, 126, 0.2);
+            margin-bottom: 4px;
+        }
+
+        .part-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #3d2b1f;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+            min-width: 0;
+        }
+
+        .part-menu-item:hover {
+            background: rgba(181, 98, 126, 0.08);
+            color: var(--color-accent);
+        }
+
+        .part-menu-section {
+            grid-column: 1 / -1;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--color-accent);
+            letter-spacing: 1px;
+            padding: 6px 16px 3px;
+            opacity: 0.65;
+            border-top: 1px solid rgba(181, 98, 126, 0.15);
+            margin-top: 4px;
+        }
+
+        .part-menu-icon {
+            font-size: 15px;
+            width: 20px;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        /* ---- 画像ボックス ---- */
+        .image-box {
+            min-width: 220px;
+            min-height: 180px;
+            width: auto;
+        }
+
+        .image-drop-area {
+            width: 100%;
+            min-height: 160px;
+            height: 100%;
+            border: 2px dashed rgba(181, 98, 126, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(181, 98, 126, 0.55);
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .image-drop-area:hover,
+        .image-drop-area.dragover {
+            border-color: var(--color-accent);
+            background: rgba(181, 98, 126, 0.04);
+            color: var(--color-accent);
+        }
+
+        .image-drop-area img {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        .image-drop-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .image-drop-hint {
+            font-size: 26px;
+            margin-bottom: 6px;
+        }
+
+        /* ---- 背景パーツ ---- */
+        .bg-koshi {
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(181, 98, 126, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(181, 98, 126, 0.1) 1px, transparent 1px);
+            background-size: 48px 48px;
+            opacity: 0.8;
+            z-index: 0;
+        }
+
+        .bg-take {
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            background-image:
+                repeating-linear-gradient(90deg,
+                    rgba(70, 110, 55, 0.08) 0px,
+                    rgba(70, 110, 55, 0.13) 3px,
+                    transparent 3px,
+                    transparent 58px),
+                repeating-linear-gradient(0deg,
+                    transparent 0px,
+                    transparent 76px,
+                    rgba(70, 110, 55, 0.06) 76px,
+                    rgba(70, 110, 55, 0.07) 78px);
+            opacity: 0.9;
+            z-index: 0;
+        }
+
+        .bg-sakura {
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 25% 20%, rgba(234, 180, 198, 0.3) 0%, transparent 45%),
+                radial-gradient(ellipse at 78% 72%, rgba(210, 155, 180, 0.22) 0%, transparent 40%),
+                radial-gradient(ellipse at 52% 48%, rgba(255, 215, 230, 0.18) 0%, transparent 55%);
+            z-index: 0;
+            opacity: 0.9;
+        }
+
+        .bg-part {
+            z-index: 0;
+        }
+
+        .float-part {
+            z-index: 100;
+        }
+
+        .bg-part .box-menu-toggle {
+            display: flex !important;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 101;
+        }
+
+        /* ---- テキスト入力ボックス ドラッグバー ---- */
+        .plain-drag-bar {
+            height: 7px;
+            cursor: move;
+            border-radius: 2px 2px 0 0;
+            background: var(--color-accent);
+            opacity: 0.18;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .plain-drag-bar:hover {
+            opacity: 0.35;
+        }
+
+        /* ---- 長押しドラッグ ---- */
+        @keyframes longPressGlow {
+            0% {
+                box-shadow: 0 0 0 0 transparent;
+            }
+
+            100% {
+                box-shadow: 0 0 0 6px rgba(181, 98, 126, 0.4);
+            }
+        }
+
+        .box-long-pressing {
+            animation: longPressGlow 0.2s ease forwards;
+        }
+
+        .box-long-dragging {
+            box-shadow: 0 0 0 2px var(--color-accent);
+            opacity: 0.88;
+            cursor: grabbing !important;
+        }
+
+        /* ---- 使い方モーダル ---- */
+        #help-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(60, 30, 40, 0.55);
+            z-index: 4000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #help-modal.open {
+            display: flex;
+        }
+
+        .help-popup {
+            background: #fdf8f4;
+            border: 1px solid var(--color-accent);
+            padding: 28px 32px 22px;
+            width: 520px;
+            max-width: 92vw;
+            box-shadow: 0 8px 32px rgba(181, 98, 126, 0.2);
+            border-radius: 4px;
+        }
+
+        .help-title {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--color-accent);
+            letter-spacing: 2px;
+            margin-bottom: 18px;
+        }
+
+        .help-body {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .help-section {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--color-accent);
+            letter-spacing: 2px;
+            opacity: 0.7;
+            margin-top: 14px;
+            margin-bottom: 2px;
+            border-bottom: 1px solid rgba(181, 98, 126, 0.2);
+            padding-bottom: 3px;
+        }
+
+        .help-row {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            padding: 4px 0;
+        }
+
+        .help-key {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--color-accent);
+            background: rgba(181, 98, 126, 0.07);
+            border: 1px solid rgba(181, 98, 126, 0.25);
+            padding: 2px 8px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-width: 140px;
+            text-align: center;
+            border-radius: 2px;
+        }
+
+        .help-desc {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            color: #5a3a4a;
+            line-height: 1.6;
+        }
+
+        .help-close-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .help-close-btn {
+            height: 34px;
+            padding: 0 24px;
+            background: var(--color-accent);
+            border: none;
+            color: #fff;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .help-close-btn:hover {
+            filter: brightness(0.9);
+        }
+
+        /* ---- パーツメニュートグル ---- */
+        .part-menu-toggle {
+            display: none;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 501;
+            width: 18px;
+            height: 18px;
+            background: rgba(181, 98, 126, 0.12);
+            border: 1px solid rgba(181, 98, 126, 0.4);
+            color: var(--color-accent);
+            font-size: 11px;
+            line-height: 18px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .live-badge:hover .part-menu-toggle,
+        .profile-container:hover .part-menu-toggle,
+        .info-base:hover .part-menu-toggle,
+        .float-part:hover .part-menu-toggle {
+            display: block;
+        }
+
+        .part-menu-toggle:hover {
+            background: rgba(181, 98, 126, 0.28);
+        }
+
+        /* ---- ホバーメニュー ---- */
+        .hover-menu {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            background: #fdf8f4;
+            border: 1px solid rgba(181, 98, 126, 0.5);
+            box-shadow: 0 4px 16px rgba(181, 98, 126, 0.15);
+            padding: 6px;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 150px;
+            border-radius: 4px;
+        }
+
+        .hover-menu.open {
+            display: flex;
+        }
+
+        .hover-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 8px;
+            background: transparent;
+            border: none;
+            color: #3d2b1f;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            white-space: nowrap;
+            width: 100%;
+            border-radius: 2px;
+        }
+
+        .hover-menu-btn:hover {
+            background: rgba(181, 98, 126, 0.08);
+            color: var(--color-accent);
+        }
+
+        .hover-menu-btn.danger {
+            color: rgba(180, 50, 50, 0.8);
+        }
+
+        .hover-menu-btn.danger:hover {
+            background: rgba(180, 50, 50, 0.08);
+            color: #b43232;
+        }
+
+        .hover-menu-sep {
+            height: 1px;
+            background: rgba(181, 98, 126, 0.15);
+            margin: 2px 0;
+        }
+
+        .hover-menu-fs {
+            display: none;
+            padding: 4px 8px;
+            gap: 4px;
+            flex-direction: column;
+        }
+
+        .hover-menu-fs.open {
+            display: flex;
+        }
+
+        .hover-menu-fs-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hover-menu-fs-input {
+            width: 52px;
+            background: rgba(181, 98, 126, 0.06);
+            border: 1px solid rgba(181, 98, 126, 0.4);
+            color: var(--color-accent);
+            font-family: 'Noto Serif JP', serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            padding: 3px;
+            border-radius: 2px;
+        }
+
+        .hover-menu-fs-apply {
+            padding: 3px 8px;
+            background: var(--color-accent);
+            border: none;
+            color: #fff;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .hover-menu-tc {
+            display: none;
+            padding: 4px 8px;
+        }
+
+        .hover-menu-tc.open {
+            display: block;
+        }
+
+        .hover-menu-tc-input {
+            width: 36px;
+            height: 24px;
+            border: none;
+            padding: 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            background: transparent;
+        }
+
+        .hover-menu-rot {
+            display: none;
+            padding: 4px 8px;
+        }
+
+        .hover-menu-rot.open {
+            display: block;
+        }
+
+        .hover-menu-rot-presets {
+            display: flex;
+            gap: 2px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        .hover-menu-fc,
+        .hover-menu-bc {
+            display: none;
+            padding: 4px 8px;
+        }
+
+        .hover-menu-fc.open,
+        .hover-menu-bc.open {
+            display: block;
+        }
+
+        .hover-menu-fc-input,
+        .hover-menu-bc-input {
+            width: 36px;
+            height: 24px;
+            border: none;
+            padding: 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            background: transparent;
+        }
+
+        .hover-menu-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-bottom: 6px;
+        }
+
+        .hover-menu-swatch {
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            padding: 0;
+            flex-shrink: 0;
+            transition: transform 0.12s;
+        }
+
+        .hover-menu-swatch:hover {
+            transform: scale(1.25);
+            border-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .hover-menu-color-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hover-menu-hex-input {
+            width: 68px;
+            font-family: monospace;
+            font-size: 11px;
+            padding: 2px 5px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.85);
+            color: #333;
+        }
+
+        .ticker-wrap {
+            overflow: visible;
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 252, 248, 0.85);
+            border: 1.5px solid var(--color-accent, #b5627e);
+            border-radius: 4px;
+            height: 40px;
+            min-width: 200px;
+            cursor: move;
+        }
+
+        .ticker-inner {
+            overflow: hidden;
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            border-radius: 4px;
+        }
+
+        .ticker-track {
+            display: flex;
+            animation: tickerScroll 18s linear infinite;
+            will-change: transform;
+            color: var(--color-accent, #b5627e);
+            font-size: 16px;
+        }
+
+        .ticker-txt {
+            white-space: nowrap;
+            padding-right: 80px;
+            color: inherit;
+            font-size: inherit;
+            letter-spacing: 0.05em;
+        }
+
+        @keyframes tickerScroll {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        .ticker-edit-inp {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            z-index: 100;
+            background: rgba(255, 252, 248, 0.97);
+            color: var(--color-accent, #b5627e);
+            border: 2px solid var(--color-accent, #b5627e);
+            padding: 0 8px;
+            font-size: 14px;
+        }
+
+        .ticker-resize-grip {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 14px;
+            height: 14px;
+            cursor: se-resize;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .hover-menu-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-bottom: 4px;
+        }
+
+        .hover-menu-preset {
+            padding: 2px 6px;
+            background: transparent;
+            border: 1px solid rgba(181, 98, 126, 0.25);
+            color: rgba(181, 98, 126, 0.7);
+            font-family: 'Noto Serif JP', serif;
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .hover-menu-preset:hover {
+            background: rgba(181, 98, 126, 0.08);
+            color: var(--color-accent);
+        }
+
+        /* ---- 図形パーツ ---- */
+        .shape-box {
+            --color-accent: rgba(181, 98, 126, 0.7);
+            background: rgba(253, 248, 244, 0.7);
+            border: 2px solid rgba(181, 98, 126, 0.4) !important;
+            border-radius: 4px;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            overflow: visible;
+        }
+
+        .shape-box::before {
+            display: none !important;
+        }
+
+        .shape-circle {
+            border-radius: 50% !important;
+        }
+
+        /* 図形サブメニュー */
+        .part-menu-has-sub {
+            position: relative;
+        }
+
+        .part-menu-sub {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: -4px;
+            background: #fdf8f4;
+            border: 1px solid rgba(181, 98, 126, 0.45);
+            border-radius: 4px;
+            box-shadow: 0 4px 16px rgba(181, 98, 126, 0.12);
+            min-width: 150px;
+            padding: 4px 0;
+            z-index: 10001;
+            white-space: nowrap;
+        }
+
+        .part-menu-has-sub:hover .part-menu-sub {
+            display: block;
+        }
+
+        /* ---- リサイズハンドル ---- */
+        .resize-handle {
+            position: absolute;
+            z-index: 20;
+            display: none;
+            background: var(--color-accent);
+            opacity: 0.7;
+            border-radius: 2px;
+        }
+
+        .resize-handle.nw {
+            top: -4px;
+            left: -4px;
+            width: 10px;
+            height: 10px;
+            cursor: nw-resize;
+        }
+
+        .resize-handle.n {
+            top: -4px;
+            left: 10px;
+            right: 10px;
+            height: 8px;
+            cursor: n-resize;
+        }
+
+        .resize-handle.ne {
+            top: -4px;
+            right: -4px;
+            width: 10px;
+            height: 10px;
+            cursor: ne-resize;
+        }
+
+        .resize-handle.e {
+            right: -4px;
+            top: 10px;
+            bottom: 10px;
+            width: 8px;
+            cursor: e-resize;
+        }
+
+        .resize-handle.se {
+            bottom: -4px;
+            right: -4px;
+            width: 10px;
+            height: 10px;
+            cursor: se-resize;
+        }
+
+        .resize-handle.s {
+            bottom: -4px;
+            left: 10px;
+            right: 10px;
+            height: 8px;
+            cursor: s-resize;
+        }
+
+        .resize-handle.sw {
+            bottom: -4px;
+            left: -4px;
+            width: 10px;
+            height: 10px;
+            cursor: sw-resize;
+        }
+
+        .resize-handle.w {
+            left: -4px;
+            top: 10px;
+            bottom: 10px;
+            width: 8px;
+            cursor: w-resize;
+        }
+
+        .resize-handle:hover {
+            background: rgba(181, 98, 126, 0.3);
+            border-radius: 2px;
+        }
+
+        .resizable:hover .resize-handle,
+        .resizable.resizing .resize-handle {
+            display: block;
+        }
+
+        /* ---- ストップウォッチ ---- */
+        .sw-box {
+            min-width: 0;
+        }
+
+        .sw-box .sw-inner {
+            padding: 10px 20px 14px;
+            font-family: 'Noto Serif JP', serif;
+            font-weight: 700;
+            color: var(--color-accent);
+            text-align: center;
+        }
+
+        .sw-box .sw-time {
+            font-size: 30px;
+            letter-spacing: 2px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hdr-float-time, .hdr-float-date {
+            display: inline-block;
+        }
+        .clock-time, .clock-date, .hdr-float-time, .hdr-float-date {
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum" 1;
+        }
+
+        .sw-box .sw-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .sw-box .sw-btn {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 5px 12px;
+            border: 1px solid var(--color-accent);
+            background: transparent;
+            color: var(--color-accent);
+            cursor: pointer;
+            transition: background 0.15s;
+            border-radius: 2px;
+        }
+
+        .sw-box .sw-btn:hover {
+            background: rgba(181, 98, 126, 0.1);
+        }
+
+        .sw-box .sw-btn.running {
+            background: rgba(181, 98, 126, 0.1);
+        }
+
+        .sw-box .sw-btn-reset {
+            border-color: rgba(180, 50, 50, 0.5);
+            color: rgba(180, 50, 50, 0.75);
+        }
+
+        .sw-box .sw-btn-reset:hover {
+            background: rgba(180, 50, 50, 0.1);
+        }
+
+        /* ---- カウンター ---- */
+        .counter-box {
+            min-width: 0;
+        }
+
+        .counter-box .counter-inner {
+            padding: 10px 20px 14px;
+            font-family: 'Noto Serif JP', serif;
+            font-weight: 700;
+            color: var(--color-accent);
+            text-align: center;
+        }
+
+        .counter-box .counter-value {
+            font-size: 46px;
+            letter-spacing: 4px;
+            line-height: 1;
+            min-width: 3ch;
+            display: inline-block;
+        }
+
+        .counter-box .counter-label {
+            font-size: 10px;
+            opacity: 0.55;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .counter-box .counter-step-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin: 8px 0 6px;
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .counter-box .counter-step-input {
+            width: 50px;
+            background: transparent;
+            border: 1px solid rgba(181, 98, 126, 0.4);
+            color: var(--color-accent);
+            font-family: 'Noto Serif JP', serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        .counter-box .counter-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 4px;
+        }
+
+        .counter-box .counter-btn {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 6px 14px;
+            border: 1px solid var(--color-accent);
+            background: transparent;
+            color: var(--color-accent);
+            cursor: pointer;
+            transition: background 0.15s;
+            min-width: 44px;
+            border-radius: 2px;
+        }
+
+        .counter-box .counter-btn:hover {
+            background: rgba(181, 98, 126, 0.1);
+        }
+
+        .counter-box .counter-btn-minus {
+            border-color: rgba(180, 50, 50, 0.55);
+            color: rgba(180, 50, 50, 0.75);
+        }
+
+        .counter-box .counter-btn-minus:hover {
+            background: rgba(180, 50, 50, 0.1);
+        }
+
+        .counter-box .counter-btn-reset {
+            border-color: rgba(100, 80, 90, 0.25);
+            color: rgba(100, 80, 90, 0.5);
+            font-size: 11px;
+        }
+
+        .counter-box .counter-btn-reset:hover {
+            background: rgba(100, 80, 90, 0.08);
+            color: rgba(100, 80, 90, 0.8);
+        }
+
+        /* ---- 独立時計 ---- */
+        .clock-box {
+            min-width: 0;
+        }
+
+        .clock-box .clock-inner {
+            padding: 10px 20px;
+            font-family: 'Noto Serif JP', serif;
+            font-weight: 700;
+            color: var(--color-accent);
+            text-align: center;
+        }
+
+        .clock-box .clock-time {
+            font-size: 30px;
+            letter-spacing: 2px;
+        }
+
+        .clock-box .clock-date {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="capture-area">
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+
+        <div class="live-badge" id="init-live" style="position:absolute;top:20px;left:20px;cursor:move;">
+            <span class="blinking-icon">●</span>
+            <input type="text" class="live-input" id="live-badge-text">
+        </div>
+
+        <div class="profile-container" id="profile-container" title="ダブルクリックで編集"
+            style="position:absolute;top:20px;left:190px;cursor:move;">
+            <div id="profile-display-area" class="profile-display-area"></div>
+        </div>
+
+        <div class="info-base" id="init-message" style="position:absolute;top:20px;left:485px;right:375px;cursor:move;">
+            <input type="text" class="input-text" id="message-input">
+        </div>
+
+        <div class="info-base clock-container" id="init-clock"
+            style="position:absolute;top:20px;right:20px;width:340px;cursor:move;">
+            <span id="date" class="hdr-float-date">0000/00/00</span>
+            <span id="clock" class="hdr-float-time">00:00:00</span>
+        </div>
+
+        <div class="box" style="bottom:20px;left:490px;" id="title-box">
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" id="title-box-header">
+                <div class="window-btns">
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                </div>
+            </div>
+            <div class="content"><textarea class="title-input" rows="1" id="title-box-content"></textarea></div>
+        </div>
+
+        <div class="box comment-box" style="top:100px;right:20px;" id="comment-box">
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" id="comment-box-header">
+                <div class="window-btns">
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                </div>
+            </div>
+            <div class="content"><textarea class="text-input-box" placeholder=""></textarea></div>
+        </div>
+
+        <div class="box memo-box" style="top:580px;right:20px;" id="memo-box">
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" id="memo-box-header">
+                <div class="window-btns">
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                </div>
+            </div>
+            <div class="content"><textarea class="text-input-box" id="memo-box-content"></textarea></div>
+        </div>
+    </div>
+
+    <!-- パーツ追加メニュー -->
+    <div id="part-menu">
+        <div class="part-menu-title">// パーツを追加</div>
+        <div class="part-menu-section">─ ヘッダーパーツ</div>
+        <div class="part-menu-item" data-part="hdr-live"><span class="part-menu-icon">🔴</span> 配信中バッジ</div>
+        <div class="part-menu-item" data-part="hdr-profile"><span class="part-menu-icon">👤</span> プロフィール欄</div>
+        <div class="part-menu-item" data-part="hdr-message"><span class="part-menu-icon">✉️</span> メッセージ入力欄</div>
+        <div class="part-menu-item" data-part="hdr-clock"><span class="part-menu-icon">🕐</span> 時計（バー埋め込み型）</div>
+        <div class="part-menu-item" data-part="hdr-ticker"><span class="part-menu-icon">📺</span> テロップ（スクロール）</div>
+        <div class="part-menu-section">─ ボックスパーツ</div>
+        <div class="part-menu-item" data-part="clock"><span class="part-menu-icon">🕐</span> 時計（独立）</div>
+        <div class="part-menu-item" data-part="stopwatch"><span class="part-menu-icon">⏱</span> ストップウォッチ</div>
+        <div class="part-menu-item" data-part="counter"><span class="part-menu-icon">🔢</span> カウンター</div>
+        <div class="part-menu-item" data-part="memo"><span class="part-menu-icon">📝</span> 覚書ボックス</div>
+        <div class="part-menu-item" data-part="plain-text"><span class="part-menu-icon">▭</span> テキスト入力</div>
+        <div class="part-menu-item part-menu-has-sub" data-part="shape">
+            <span class="part-menu-icon">◻</span> 図形 ▶
+            <div class="part-menu-sub">
+                <div class="part-menu-item" data-part="shape-rect"><span class="part-menu-icon">▭</span> 四角形</div>
+                <div class="part-menu-item" data-part="shape-circle"><span class="part-menu-icon">○</span> 円</div>
+            </div>
+        </div>
+        <div class="part-menu-item" data-part="title"><span class="part-menu-icon">🏷</span> 演目ボックス</div>
+        <div class="part-menu-item" data-part="image"><span class="part-menu-icon">🖼</span> 画像ボックス</div>
+        <div class="part-menu-section">─ 背景パーツ</div>
+        <div class="part-menu-item" data-part="bg-koshi"><span class="part-menu-icon">▦</span> 格子</div>
+        <div class="part-menu-item" data-part="bg-take"><span class="part-menu-icon">▸</span> 竹林</div>
+        <div class="part-menu-item" data-part="bg-sakura"><span class="part-menu-icon">🌸</span> 桜霞</div>
+        <div class="part-menu-item" data-part="bg-upload"><span class="part-menu-icon">📁</span> 背景画像アップロード</div>
+        <div class="part-menu-item" data-part="bg-color"><span class="part-menu-icon">🎨</span> 背景カラー選択</div>
+        <div class="part-menu-item" data-part="bg-clear"><span class="part-menu-icon">🧼</span> 背景削除</div>
+        <div class="part-menu-section">─ その他</div>
+        <div class="part-menu-item" data-part="save-config"><span class="part-menu-icon">💾</span> 設定を保存</div>
+        <div class="part-menu-item" data-part="load-config"><span class="part-menu-icon">📂</span> 保存を読み込む</div>
+
+        <div class="part-menu-item" data-part="export-config"><span class="part-menu-icon">⬇️</span> 設定をエクスポート</div>
+        <div class="part-menu-item" data-part="import-config"><span class="part-menu-icon">⬆️</span> 設定をインポート</div>
+        <div class="part-menu-item" data-part="reset"><span class="part-menu-icon">🔄</span> 画面リセット</div>
+        <div class="part-menu-item" data-part="help"><span class="part-menu-icon">❓</span> 使い方</div>
+    </div>
+
+    <!-- 使い方モーダル -->
+    <div id="help-modal">
+        <div class="help-popup">
+            <div class="help-title">// 使い方</div>
+            <div class="help-body">
+                <div class="help-section">パーツの追加</div>
+                <div class="help-row"><span class="help-key">ダブルクリック</span><span
+                        class="help-desc">何もない場所でパーツ追加メニューを開く</span></div>
+                <div class="help-section">パーツの操作</div>
+                <div class="help-row"><span class="help-key">ヘッダーをドラッグ</span><span class="help-desc">ボックスを移動</span>
+                </div>
+                <div class="help-row"><span class="help-key">長押し（0.2秒）</span><span class="help-desc">ボックス内のどこでも長押し →
+                        ドラッグで移動</span></div>
+                <div class="help-row"><span class="help-key">角・辺のハンドル</span><span
+                        class="help-desc">ホバーで表示、ドラッグでリサイズ</span></div>
+                <div class="help-row"><span class="help-key">≡ ボタン</span><span class="help-desc">ボックスにホバーで右上に出現 →
+                        複製・文字サイズ・削除</span></div>
+                <div class="help-section">設定の保存・読込</div>
+                <div class="help-row"><span class="help-key">設定を保存</span><span
+                        class="help-desc">現在の配置をブラウザに保存（次回自動読込）</span></div>
+                <div class="help-row"><span class="help-key">エクスポート</span><span
+                        class="help-desc">設定をJSONファイルとしてダウンロード</span></div>
+                <div class="help-row"><span class="help-key">インポート</span><span class="help-desc">保存したJSONを読み込んで復元</span>
+                </div>
+                <div class="help-section">推奨設定</div>
+                <div class="help-row"><span class="help-key">推奨サイズ</span><span class="help-desc">1920 × 1080 px</span>
+                </div>
+                <div class="help-section">制作 / Created by</div>
+                <div class="help-row" style="justify-content:center;padding:6px 0 2px">
+                    <span class="help-desc" style="opacity:1;text-align:center"><strong>donnma(どんま)</strong>
+                        &nbsp;—&nbsp; <a href="https://donnma.com/" target="_blank"
+                            style="color:inherit">donnma.com</a></span>
+                </div>
+            </div>
+            <div class="help-close-row"><button class="help-close-btn" id="help-close">閉じる</button></div>
+        </div>
+    </div>
+
+    <div id="profile-editor">
+        <div class="editor-popup">
+            <div class="editor-title">// プロフィール編集</div>
+            <div id="editor-items"></div>
+            <div class="editor-actions">
+                <button class="btn-add" id="btn-add">＋ 追加</button>
+                <button class="btn-save" id="btn-save">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const captureArea = document.getElementById('capture-area');
+        const partMenu = document.getElementById('part-menu');
+        const saveConfigMenuItem = document.querySelector('[data-part="save-config"]');
+        const isSaveConfigEnabled = () => CONFIG.features?.saveConfigEnabled !== false;
+
+        if (!isSaveConfigEnabled() && saveConfigMenuItem) saveConfigMenuItem.style.display = 'none';
+
+        function removeTopLevel(node) {
+            if (!node) return;
+            if (node.parentElement === captureArea) { try { captureArea.removeChild(node); return; } catch (e) { } }
+            for (const ch of Array.from(captureArea.children)) {
+                try { if (ch.contains(node)) { captureArea.removeChild(ch); return; } } catch (e) { }
+            }
+            try { if (node && typeof node.remove === 'function') node.remove(); } catch (e) { }
+        }
+
+        const root = document.documentElement;
+        root.style.setProperty('--color-accent', CONFIG.color.accent);
+        root.style.setProperty('--color-body-text', CONFIG.color.bodyText);
+        root.style.setProperty('--corner-pulse-duration', CONFIG.animation.cornerPulseDuration);
+        root.style.setProperty('--neon-pulse-duration', CONFIG.animation.neonPulseDuration);
+
+        document.body.style.backgroundColor = CONFIG.color.background;
+        document.body.style.width = CONFIG.layout.width + 'px';
+        document.body.style.height = CONFIG.layout.height + 'px';
+        captureArea.style.width = CONFIG.layout.width + 'px';
+        captureArea.style.height = CONFIG.layout.height + 'px';
+
+        document.querySelector('.live-badge').style.background = CONFIG.color.liveBadge;
+        document.getElementById('live-badge-text').value = CONFIG.text.liveBadge;
+        document.getElementById('message-input').placeholder = CONFIG.text.messagePlaceholder;
+        document.getElementById('title-box-header').value = CONFIG.text.titleBoxHeader;
+        document.getElementById('title-box-content').value = CONFIG.text.titleBoxContent;
+        document.getElementById('comment-box-header').value = CONFIG.text.commentBoxHeader;
+        document.getElementById('memo-box-header').value = CONFIG.text.memoBoxHeader;
+        document.getElementById('memo-box-content').value = CONFIG.text.memoBoxContent;
+        document.getElementById('memo-box-content').placeholder = CONFIG.text.memoPlaceholder;
+
+        const styleEl = document.createElement('style');
+        styleEl.textContent = `
+        @keyframes cornerPulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.3; }
+        }
+        @keyframes neonPulse {
+            0%, 100% { text-shadow: 0 0 6px ${CONFIG.color.accent}, 0 0 12px ${CONFIG.color.accent}; }
+            50%       { text-shadow: 0 0 2px ${CONFIG.color.accent}; }
+        }`;
+        document.head.appendChild(styleEl);
+
+        (function setupInitialHeaderParts() {
+            const livEl = document.getElementById('init-live');
+            livEl.style.background = CONFIG.color.liveBadge;
+            makeHdrPart(livEl, 0, 0);
+
+            const profEl = document.getElementById('profile-container');
+            makeHdrPart(profEl, 0, 0);
+            profEl.addEventListener('dblclick', (e) => { e.stopPropagation(); openEditor(); });
+
+            makeHdrPart(document.getElementById('init-message'), 0, 0);
+            makeHdrPart(document.getElementById('init-clock'), 0, 0);
+        })();
+
+        ['title-box', 'comment-box', 'memo-box'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const delBtn = document.createElement('div');
+            delBtn.className = 'box-del-btn';
+            delBtn.textContent = '×';
+            delBtn.addEventListener('click', (e) => { e.stopPropagation(); el.remove(); });
+            el.appendChild(delBtn);
+            addResizeHandles(el);
+            addHoverMenu(el, el.querySelector('.content'));
+        });
+
+        /* ---- プロフィールサイクル ---- */
+        let profileItems = [...CONFIG.profile];
+        let displayArea = document.getElementById('profile-display-area');
+        const editor = document.getElementById('profile-editor');
+        const editorItemsEl = document.getElementById('editor-items');
+        let profileIndex = 0, profileTimer = null;
+
+        function startProfileCycle() {
+            clearInterval(profileTimer);
+            profileIndex = 0;
+            displayArea.style.transition = 'none';
+            displayArea.style.opacity = '1';
+            displayArea.style.transform = 'translateY(0)';
+            displayArea.textContent = profileItems[0] || '';
+            if (profileItems.length <= 1) return;
+            profileTimer = setInterval(() => {
+                displayArea.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                displayArea.style.opacity = '0';
+                displayArea.style.transform = 'translateY(-8px)';
+                setTimeout(() => {
+                    profileIndex = (profileIndex + 1) % profileItems.length;
+                    displayArea.textContent = profileItems[profileIndex];
+                    displayArea.style.transition = 'none';
+                    displayArea.style.transform = 'translateY(8px)';
+                    setTimeout(() => {
+                        displayArea.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                        displayArea.style.opacity = '1';
+                        displayArea.style.transform = 'translateY(0)';
+                    }, 30);
+                }, 400);
+            }, CONFIG.animation.profileInterval);
+        }
+
+        let _onSaveCallback = null;
+        function openEditor(onSave) {
+            _onSaveCallback = onSave || null;
+            editorItemsEl.innerHTML = '';
+            profileItems.forEach(text => addEditorRow(text));
+            editor.classList.add('open');
+        }
+        function addEditorRow(text = '') {
+            const div = document.createElement('div');
+            div.className = 'editor-item';
+            const input = document.createElement('input');
+            input.type = 'text'; input.value = text; input.placeholder = 'テキストを入力...';
+            const btn = document.createElement('button');
+            btn.className = 'btn-remove'; btn.textContent = '×';
+            btn.onclick = () => div.remove();
+            div.appendChild(input); div.appendChild(btn);
+            editorItemsEl.appendChild(div);
+        }
+        document.getElementById('btn-save').onclick = () => {
+            profileItems = Array.from(editorItemsEl.querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
+            editor.classList.remove('open');
+            startProfileCycle();
+            if (_onSaveCallback) { _onSaveCallback(); _onSaveCallback = null; }
+        };
+        document.getElementById('btn-add').onclick = () => {
+            addEditorRow();
+            editorItemsEl.querySelector('.editor-item:last-child input').focus();
+        };
+        editor.addEventListener('click', (e) => { if (e.target === editor) editor.classList.remove('open'); });
+
+        const helpModal = document.getElementById('help-modal');
+        document.getElementById('help-close').addEventListener('click', () => helpModal.classList.remove('open'));
+        helpModal.addEventListener('click', (e) => { if (e.target === helpModal) helpModal.classList.remove('open'); });
+
+        function normalizeCaptureInputs() {
+            captureArea.querySelectorAll('input').forEach(input => {
+                if (input.type === 'file') return;
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    if (input.checked) input.setAttribute('checked', ''); else input.removeAttribute('checked');
+                } else { input.setAttribute('value', input.value); }
+            });
+            captureArea.querySelectorAll('textarea').forEach(ta => { ta.textContent = ta.value; });
+        }
+
+        function exportConfig() {
+            normalizeCaptureInputs();
+            const state = { profileItems, captureHtml: captureArea.innerHTML, captureBgColor: captureArea.style.backgroundColor || document.body.style.backgroundColor || '' };
+            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const now = new Date();
+            const ts = now.getFullYear() + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2) + '_' + ('0' + now.getHours()).slice(-2) + ('0' + now.getMinutes()).slice(-2);
+            a.href = url; a.download = 'wa-overlay-config_' + ts + '.json'; a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function importConfig() {
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = '.json,application/json';
+            input.onchange = () => {
+                const file = input.files[0]; if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try { applyLoadedConfig(JSON.parse(ev.target.result)); saveCurrentConfig(); }
+                    catch (err) { alert('インポートに失敗しました。'); }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function saveCurrentConfig() {
+            if (!isSaveConfigEnabled()) return;
+            normalizeCaptureInputs();
+            const state = { profileItems, captureHtml: captureArea.innerHTML, captureBgColor: captureArea.style.backgroundColor || document.body.style.backgroundColor || '' };
+            try { localStorage.setItem('waOverlayConfig', JSON.stringify(state)); } catch (err) { }
+        }
+
+        function setupImageDropArea(area) {
+            if (!area || area._imageDropSetup) return;
+            const fileInput = area.querySelector('input[type="file"]');
+            function loadFile(file) {
+                if (!file || !file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => { area.innerHTML = `<img src="${ev.target.result}" alt="">`; };
+                reader.readAsDataURL(file);
+            }
+            if (fileInput) fileInput.addEventListener('change', () => loadFile(fileInput.files[0]));
+            area.addEventListener('dragover', (e) => { e.preventDefault(); area.classList.add('dragover'); });
+            area.addEventListener('dragleave', () => area.classList.remove('dragover'));
+            area.addEventListener('drop', (e) => { e.preventDefault(); area.classList.remove('dragover'); loadFile(e.dataTransfer.files[0]); });
+            area._imageDropSetup = true;
+        }
+
+        function setupProfileContainer(el) {
+            if (el._profileSetup) return;
+            el._profileSetup = true;
+            el.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                openEditor(() => { displayArea = document.getElementById('profile-display-area'); startProfileCycle(); });
+            });
+        }
+
+        function rehydrateCaptureArea() {
+            clockBoxes.length = 0;
+            captureArea.querySelectorAll('.box').forEach(el => {
+                let delBtn = el.querySelector('.box-del-btn');
+                if (!delBtn) { delBtn = document.createElement('div'); delBtn.className = 'box-del-btn'; delBtn.textContent = '×'; el.appendChild(delBtn); }
+                delBtn.addEventListener('click', (e) => { e.stopPropagation(); removeTopLevel(el); });
+                addResizeHandles(el);
+                addHoverMenu(el, el.querySelector('.content'));
+                setupImageDropArea(el.querySelector('.image-drop-area'));
+                if (el.classList.contains('clock-box')) clockBoxes.push(el);
+            });
+            captureArea.querySelectorAll('.live-badge, .profile-container, .info-base').forEach(el => {
+                makeHdrPart(el, 0, 0);
+                if (el.classList.contains('profile-container')) setupProfileContainer(el);
+                if (el.classList.contains('clock-container')) clockBoxes.push(el);
+            });
+            captureArea.querySelectorAll('.bg-part').forEach(el => addHoverMenu(el));
+            document.querySelectorAll('.live-input').forEach(adjustLiveInput);
+        }
+
+        function applyLoadedConfig(state) {
+            if (!state) return;
+            if (Array.isArray(state.profileItems)) profileItems = state.profileItems;
+            if (typeof state.captureHtml === 'string') {
+                captureArea.innerHTML = state.captureHtml;
+                displayArea = document.getElementById('profile-display-area');
+                rehydrateCaptureArea();
+            }
+            if (state.captureBgColor) {
+                document.body.style.backgroundColor = state.captureBgColor;
+                captureArea.style.backgroundColor = state.captureBgColor;
+            }
+            startProfileCycle();
+        }
+
+        function loadSavedConfig() {
+            const raw = localStorage.getItem('waOverlayConfig');
+            if (!raw) return;
+            try { applyLoadedConfig(JSON.parse(raw)); } catch (err) { }
+        }
+
+
+        startProfileCycle();
+
+        /* =====================================================
+         *  ドラッグ移動
+         * ===================================================== */
+        let isDragging = false, targetBox = null, offsetX, offsetY;
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('header') || e.target.classList.contains('header-input')) {
+                isDragging = true;
+                targetBox = e.target.closest('.box');
+                const rect = targetBox.getBoundingClientRect();
+                offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+            }
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging && targetBox) {
+                targetBox.style.left = (e.clientX - offsetX) + 'px';
+                targetBox.style.top = (e.clientY - offsetY) + 'px';
+                targetBox.style.right = 'auto'; targetBox.style.bottom = 'auto';
+            }
+        });
+        document.addEventListener('mouseup', () => { isDragging = false; targetBox = null; });
+
+        document.addEventListener('mousedown', (e) => {
+            if (!e.target.classList.contains('plain-drag-bar')) return;
+            const box = e.target.closest('.box'); if (!box) return;
+            isDragging = true; targetBox = box;
+            const rect = box.getBoundingClientRect();
+            offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.resize-handle') || e.target.closest('.box-menu-toggle') || e.target.closest('.hover-menu') || e.target.closest('.part-menu-toggle')) return;
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+            const box = e.target.closest('.box');
+            if (!box || box.querySelector('.header') || box.querySelector('.plain-drag-bar')) return;
+            isDragging = true; targetBox = box;
+            const rect = box.getBoundingClientRect();
+            offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.resize-handle') || e.target.closest('.box-menu-toggle') || e.target.closest('.part-menu-toggle') || e.target.closest('.hover-menu')) return;
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+            const el = e.target.closest('.live-badge, .profile-container, .info-base, .float-part');
+            if (!el) return;
+            isDragging = true; targetBox = el;
+            const rect = el.getBoundingClientRect();
+            offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+        }, { capture: true });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-delete')) e.target.closest('.box').remove();
+        });
+
+        /* =====================================================
+         *  長押しドラッグ（ボックス内どこでも）
+         * ===================================================== */
+        (function setupLongPressDrag() {
+            const LONG_PRESS_MS = 200, MOVE_CANCEL_PX = 8;
+            let lpTimer = null, lpBox = null;
+            let lpStartX = 0, lpStartY = 0, lpOffsetX = 0, lpOffsetY = 0;
+            let lpActive = false, lpSuppressClick = false;
+
+            function cancelLP() {
+                clearTimeout(lpTimer); lpTimer = null;
+                if (lpBox) lpBox.classList.remove('box-long-pressing', 'box-long-dragging');
+                lpBox = null; lpActive = false;
+            }
+
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('header') || e.target.classList.contains('header-input') || e.target.classList.contains('plain-drag-bar')) return;
+                if (e.target.closest('.resize-handle') || e.target.closest('.box-menu-toggle') || e.target.closest('.hover-menu') || e.target.closest('#part-menu')) return;
+                const box = e.target.closest('.box'); if (!box) return;
+                const rect = box.getBoundingClientRect();
+                lpBox = box; lpStartX = e.clientX; lpStartY = e.clientY;
+                lpOffsetX = e.clientX - rect.left; lpOffsetY = e.clientY - rect.top;
+                lpActive = false; lpSuppressClick = false;
+                box.classList.add('box-long-pressing');
+                lpTimer = setTimeout(() => {
+                    if (!lpBox) return;
+                    lpActive = true; lpSuppressClick = true;
+                    lpBox.classList.remove('box-long-pressing');
+                    lpBox.classList.add('box-long-dragging');
+                    if (document.activeElement && lpBox.contains(document.activeElement)) document.activeElement.blur();
+                }, LONG_PRESS_MS);
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!lpBox) return;
+                const dx = e.clientX - lpStartX, dy = e.clientY - lpStartY;
+                if (!lpActive) { if (Math.sqrt(dx * dx + dy * dy) > MOVE_CANCEL_PX) cancelLP(); return; }
+                lpBox.style.left = (e.clientX - lpOffsetX) + 'px';
+                lpBox.style.top = (e.clientY - lpOffsetY) + 'px';
+                lpBox.style.right = 'auto'; lpBox.style.bottom = 'auto';
+            });
+
+            document.addEventListener('mouseup', () => cancelLP());
+            document.addEventListener('click', (e) => {
+                if (lpSuppressClick) { lpSuppressClick = false; e.stopImmediatePropagation(); e.preventDefault(); }
+            }, { capture: true });
+        })();
+
+        /* =====================================================
+         *  テキストエリアの自動リサイズ
+         * ===================================================== */
+        function adjustSize(el, minH, minW) {
+            el.style.height = 'auto'; el.style.height = Math.max(minH, el.scrollHeight) + 'px';
+            if (minW) { el.style.width = 'auto'; el.style.width = Math.max(minW, el.scrollWidth) + 'px'; }
+        }
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('title-input')) adjustSize(e.target, 50, 150);
+            if (e.target.classList.contains('text-input-box')) adjustSize(e.target, 200, 0);
+            if (e.target.classList.contains('live-input')) adjustLiveInput(e.target);
+        });
+        function adjustLiveInput(input) { input.style.width = Math.max(4, input.value.length + 1) + 'ch'; }
+        document.querySelectorAll('.live-input').forEach(adjustLiveInput);
+
+        /* =====================================================
+         *  パーツ追加メニュー
+         * ===================================================== */
+        let menuSpawnX = 0, menuSpawnY = 0;
+
+        captureArea.addEventListener('dblclick', (e) => {
+            if (e.target.closest('.box') || e.target.closest('.float-part') || e.target.closest('#part-menu') || e.target.closest('#profile-editor')) return;
+            menuSpawnX = e.clientX; menuSpawnY = e.clientY;
+            partMenu.style.visibility = 'hidden';
+            partMenu.classList.add('open');
+            const rect = partMenu.getBoundingClientRect();
+            let left = menuSpawnX, top = menuSpawnY;
+            if (left + rect.width > window.innerWidth - 8) left = Math.max(8, window.innerWidth - rect.width - 8);
+            if (top + rect.height > window.innerHeight - 8) top = Math.max(8, menuSpawnY - rect.height - 8);
+            partMenu.style.left = left + 'px'; partMenu.style.top = top + 'px';
+            partMenu.style.visibility = ''; e.stopPropagation();
+        });
+
+        partMenu.querySelectorAll('.part-menu-has-sub').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                const sub = item.querySelector('.part-menu-sub'); if (!sub) return;
+                sub.style.left = '100%'; sub.style.right = 'auto';
+                if (sub.getBoundingClientRect().right > window.innerWidth - 4) { sub.style.left = 'auto'; sub.style.right = '100%'; }
+            });
+        });
+
+        document.addEventListener('click', (e) => { if (!partMenu.contains(e.target)) partMenu.classList.remove('open'); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') partMenu.classList.remove('open'); });
+
+        function handlePartMenuItem(type, x = menuSpawnX, y = menuSpawnY) {
+            try {
+                switch (type) {
+                    case 'clock': addClockBox(x, y); break;
+                    case 'stopwatch': addStopwatch(x, y); break;
+                    case 'counter': addCounter(x, y); break;
+                    case 'hdr-live': addHdrLive(x, y); break;
+                    case 'hdr-profile': addHdrProfile(x, y); break;
+                    case 'hdr-message': addHdrMessage(x, y); break;
+                    case 'hdr-clock': addHdrClock(x, y); break;
+                    case 'hdr-ticker': addHdrTicker(x, y); break;
+                    case 'memo': addBoxPart(x, y, '覚書', 'memo-box', '<textarea class="text-input-box" placeholder="覚書を入力..."></textarea>'); break;
+                    case 'plain-text': addPlainTextBox(x, y); break;
+                    case 'shape': break;
+                    case 'shape-rect': addShapeBox(x, y, 'shape-rect', 160, 100); break;
+                    case 'shape-circle': addShapeBox(x, y, 'shape-circle', 100, 100); break;
+                    case 'title': addTitleBox(x, y); break;
+                    case 'image': addImageBox(x, y); break;
+                    case 'bg-koshi': addBgKoshi(); break;
+                    case 'bg-take': addBgTake(); break;
+                    case 'bg-sakura': addBgSakura(); break;
+                    case 'bg-upload': promptBgUpload(); break;
+                    case 'bg-color': promptBgColor(); break;
+                    case 'bg-clear':
+                        document.body.style.background = 'transparent';
+                        document.body.style.backgroundColor = 'transparent';
+                        document.body.style.backgroundImage = 'none';
+                        captureArea.style.background = 'transparent';
+                        captureArea.style.backgroundColor = 'transparent';
+                        captureArea.style.backgroundImage = 'none';
+                        document.querySelectorAll('.bg-part').forEach(bg => bg.remove());
+                        break;
+                    case 'save-config': saveCurrentConfig(); break;
+                    case 'load-config': loadSavedConfig(); break;
+
+                    case 'export-config': exportConfig(); break;
+                    case 'import-config': importConfig(); break;
+                    case 'reset': localStorage.setItem('_skip_waOverlayConfig', '1'); location.reload(); break;
+                    case 'help': document.getElementById('help-modal').classList.add('open'); break;
+                    default: console.warn('Unknown part type:', type);
+                }
+            } catch (err) { console.error('Error handling part menu item', type, err); }
+        }
+
+        partMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const item = e.target.closest('.part-menu-item'); if (!item) return;
+            partMenu.classList.remove('open');
+            handlePartMenuItem(item.dataset.part);
+        });
+        document.addEventListener('click', (e) => {
+            const item = e.target.closest('.part-menu-item');
+            if (!item || !item.closest('#part-menu')) return;
+            partMenu.classList.remove('open');
+            handlePartMenuItem(item.dataset.part);
+        });
+
+        function makeBox(x, y, extraClass, headerLabel, innerHTML) {
+            const box = document.createElement('div');
+            box.className = 'box' + (extraClass ? ' ' + extraClass : '');
+            box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" value="${headerLabel}">
+                <div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div>
+            </div>
+            <div class="content">${innerHTML}</div>`;
+            const delBtn = document.createElement('div');
+            delBtn.className = 'box-del-btn'; delBtn.textContent = '×';
+            delBtn.addEventListener('click', (e) => { e.stopPropagation(); removeTopLevel(box); });
+            box.appendChild(delBtn);
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
+            return box;
+        }
+
+        function addBoxPart(x, y, label, cls, inner) { makeBox(x, y, cls, label, inner); }
+
+        function addPlainTextBox(x, y) {
+            const box = document.createElement('div');
+            box.className = 'box plain-box';
+            box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.innerHTML = `<div class="box-menu-toggle" title="メニュー">≡</div><div class="plain-drag-bar" title="ドラッグで移動"></div><div class="content"><textarea class="text-input-box" placeholder="テキストを入力..."></textarea></div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
+            const dragBar = box.querySelector('.plain-drag-bar');
+            dragBar.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                const rect = box.getBoundingClientRect();
+                const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+                const onMove = (me) => { box.style.left = (me.clientX - ox) + 'px'; box.style.top = (me.clientY - oy) + 'px'; box.style.right = 'auto'; box.style.bottom = 'auto'; };
+                const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+        }
+
+        function addShapeBox(x, y, cls, w, h) {
+            const box = document.createElement('div');
+            box.className = 'box shape-box ' + cls;
+            box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.style.width = w + 'px'; box.style.height = h + 'px';
+            box.innerHTML = `<div class="box-menu-toggle" title="メニュー">≡</div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box, { minW: 4, minH: 4 });
+            addHoverMenu(box, null);
+            box.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.resize-handle') || e.target.closest('.box-menu-toggle')) return;
+                e.stopPropagation();
+                const rect = box.getBoundingClientRect();
+                const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+                const onMove = (me) => { box.style.left = (me.clientX - ox) + 'px'; box.style.top = (me.clientY - oy) + 'px'; box.style.right = 'auto'; box.style.bottom = 'auto'; };
+                const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+        }
+
+        function addTitleBox(x, y) { makeBox(x, y, '', '演目', '<textarea class="title-input" rows="1">演目タイトル</textarea>'); }
+
+        /* ---- 背景パーツ ---- */
+        function addBgPart(el) {
+            el.classList.add('bg-part', 'float-part');
+            el.style.position = 'absolute'; el.style.left = '0'; el.style.top = '0';
+            el.style.width = '100%'; el.style.height = '100%';
+            el.style.pointerEvents = 'none'; el.style.zIndex = '0';
+            const toggle = document.createElement('div');
+            toggle.className = 'box-menu-toggle btn'; toggle.title = 'メニュー'; toggle.textContent = '≡';
+            toggle.style.cssText = 'position:absolute;top:10px;right:10px;pointer-events:auto;';
+            el.appendChild(toggle);
+            captureArea.insertBefore(el, captureArea.querySelector('.corner-tl') || captureArea.firstChild);
+            addHoverMenu(el);
+            return el;
+        }
+
+        function addBgKoshi() { const el = document.createElement('div'); el.className = 'bg-koshi'; addBgPart(el); }
+        function addBgTake() { const el = document.createElement('div'); el.className = 'bg-take'; addBgPart(el); }
+        function addBgSakura() { const el = document.createElement('div'); el.className = 'bg-sakura'; addBgPart(el); }
+
+        function promptBgUpload() {
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = 'image/*'; input.style.display = 'none';
+            input.addEventListener('change', () => {
+                const file = input.files && input.files[0]; if (!file) { input.remove(); return; }
+                const reader = new FileReader();
+                reader.onload = (ev) => { setUploadedBackground(ev.target.result); input.remove(); };
+                reader.readAsDataURL(file);
+            });
+            document.body.appendChild(input); input.click();
+        }
+
+        function setUploadedBackground(src) {
+            let bg = document.getElementById('uploaded-bg');
+            if (!bg) {
+                bg = document.createElement('div');
+                bg.id = 'uploaded-bg'; bg.className = 'bg-part';
+                bg.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat;';
+                captureArea.insertBefore(bg, captureArea.querySelector('.corner-tl') || captureArea.firstChild);
+            }
+            bg.style.backgroundImage = `url('${src}')`;
+        }
+
+        function promptBgColor() {
+            const input = document.createElement('input');
+            input.type = 'color'; input.style.display = 'none';
+            function rgbToHex(rgb) {
+                if (!rgb) return '#faf6f0';
+                const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                if (!m) return rgb;
+                return '#' + parseInt(m[1]).toString(16).padStart(2, '0') + parseInt(m[2]).toString(16).padStart(2, '0') + parseInt(m[3]).toString(16).padStart(2, '0');
+            }
+            input.value = rgbToHex(window.getComputedStyle(captureArea).backgroundColor || window.getComputedStyle(document.body).backgroundColor);
+            input.addEventListener('input', (e) => { document.body.style.backgroundColor = e.target.value; captureArea.style.backgroundColor = e.target.value; });
+            input.addEventListener('change', () => { try { input.remove(); } catch (e) { } });
+            document.body.appendChild(input); input.click();
+        }
+
+        /* ---- ヘッダーパーツ ---- */
+        function makeHdrPart(el, x, y) {
+            el.style.position = 'absolute';
+            if (x !== 0 || y !== 0) { el.style.left = x + 'px'; el.style.top = y + 'px'; }
+            addResizeHandles(el);
+            el.addEventListener('mousedown', (e) => {
+                const delBtn = el.querySelector('.box-del-btn');
+                if (e.target === delBtn) return;
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                e.stopPropagation();
+                const rect = el.getBoundingClientRect();
+                const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+                const onMove = (me) => { el.style.left = (me.clientX - ox) + 'px'; el.style.top = (me.clientY - oy) + 'px'; el.style.right = 'auto'; };
+                const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            if (!el.isConnected) captureArea.appendChild(el);
+            addHoverMenu(el);
+            return el;
+        }
+
+        function addHdrLive(x, y) {
+            const el = document.createElement('div');
+            el.className = 'live-badge'; el.style.cursor = 'move';
+            el.style.background = CONFIG.color.liveBadge;
+            el.innerHTML = `<span class="blinking-icon">●</span><input type="text" class="live-input" value="${CONFIG.text.liveBadge}">`;
+            makeHdrPart(el, x, y);
+        }
+
+        function addHdrProfile(x, y) {
+            const el = document.createElement('div');
+            el.className = 'profile-container'; el.style.cursor = 'move';
+            const disp = document.createElement('div');
+            disp.className = 'profile-display-area';
+            disp.style.cssText = 'white-space:nowrap;font-size:17px;font-weight:600;font-family:"Noto Serif JP",serif;color:var(--color-accent);pointer-events:none;animation:neonPulse var(--neon-pulse-duration) infinite ease-in-out;';
+            el.appendChild(disp);
+            makeHdrPart(el, x, y);
+            let idx = 0, timer = null;
+            function cycle() {
+                if (timer) clearInterval(timer);
+                disp.textContent = profileItems[idx % (profileItems.length || 1)] || '';
+                if (profileItems.length <= 1) return;
+                timer = setInterval(() => {
+                    disp.style.transition = 'opacity 0.3s'; disp.style.opacity = '0';
+                    setTimeout(() => { idx = (idx + 1) % profileItems.length; disp.textContent = profileItems[idx]; disp.style.opacity = '1'; }, 300);
+                }, CONFIG.animation.profileInterval);
+            }
+            cycle();
+            el.addEventListener('dblclick', (e) => { e.stopPropagation(); openEditor(() => { idx = 0; cycle(); }); });
+        }
+
+        function addHdrMessage(x, y) {
+            const el = document.createElement('div');
+            el.className = 'info-base'; el.style.cursor = 'move'; el.style.minWidth = '300px'; el.style.height = '54px';
+            el.innerHTML = `<input type="text" class="input-text" placeholder="${CONFIG.text.messagePlaceholder}">`;
+            makeHdrPart(el, x, y);
+        }
+
+        function addHdrClock(x, y) {
+            const el = document.createElement('div');
+            el.className = 'info-base clock-container'; el.style.cursor = 'move'; el.style.height = '54px';
+            el.innerHTML = `<span class="hdr-float-date" style="font-size:14px;opacity:0.75;">0000/00/00</span><span class="hdr-float-time">00:00:00</span>`;
+            makeHdrPart(el, x, y);
+            clockBoxes.push(el);
+        }
+
+        /** テロップ（スクロールテキスト） */
+        function addHdrTicker(x, y) {
+            const el = document.createElement('div');
+            el.className = 'ticker-wrap float-part';
+            el.style.width = '600px';
+            const defText = 'スクロールテキスト　★　';
+            const track = document.createElement('div');
+            track.className = 'ticker-track ticker-ctrl';
+            [0, 1].forEach(() => {
+                const s = document.createElement('span');
+                s.className = 'ticker-txt';
+                s.textContent = defText;
+                track.appendChild(s);
+            });
+            const inner = document.createElement('div');
+            inner.className = 'ticker-inner';
+            inner.appendChild(track);
+            el.appendChild(inner);
+            function triggerEdit() {
+                if (el.querySelector('.ticker-edit-inp')) return;
+                const inp = document.createElement('input');
+                inp.type = 'text';
+                inp.className = 'ticker-edit-inp';
+                inp.value = el.querySelector('.ticker-txt').textContent;
+                el.appendChild(inp);
+                inp.focus();
+                inp.select();
+                const done = () => {
+                    if (!inp.isConnected) return;
+                    const txt = inp.value.trim() || defText;
+                    el.querySelectorAll('.ticker-txt').forEach(s => s.textContent = txt);
+                    inp.remove();
+                };
+                inp.addEventListener('keydown', (ke) => { ke.stopPropagation(); if (ke.key === 'Enter') done(); if (ke.key === 'Escape') inp.remove(); });
+                inp.addEventListener('blur', done);
+                inp.addEventListener('mousedown', e => e.stopPropagation());
+                inp.addEventListener('click', e => e.stopPropagation());
+            }
+            el._tickerEdit = triggerEdit;
+            makeHdrPart(el, x, y);
+            requestAnimationFrame(() => { const gap = inner.offsetWidth || 600; el.querySelectorAll('.ticker-txt').forEach(s => s.style.paddingRight = gap + 'px'); });
+            const grip = document.createElement('div');
+            grip.className = 'ticker-resize-grip';
+            el.appendChild(grip);
+            grip.addEventListener('mousedown', (e) => {
+                e.stopPropagation(); e.preventDefault();
+                const startX = e.clientX, startY = e.clientY, startW = el.offsetWidth, startH = el.offsetHeight;
+                const onMove = (me) => { el.style.width = Math.max(200, startW + me.clientX - startX) + 'px'; el.style.height = Math.max(30, startH + me.clientY - startY) + 'px'; el.querySelectorAll('.ticker-txt').forEach(s => s.style.paddingRight = Math.max(80, inner.offsetWidth) + 'px'); };
+                const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            inner.addEventListener('click', (e) => { e.stopPropagation(); triggerEdit(); });
+        }
+
+        /* ---- ボックスパーツ ---- */
+        function addClockBox(x, y) {
+            const box = document.createElement('div');
+            box.className = 'box clock-box'; box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header"><input type="text" class="header-input" value="時計"><div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div></div>
+            <div class="content"><div class="clock-inner"><div class="clock-time">00:00:00</div><div class="clock-date">0000/00/00</div></div></div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
+            clockBoxes.push(box);
+        }
+
+        function addStopwatch(x, y) {
+            const box = document.createElement('div');
+            box.className = 'box sw-box'; box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header"><input type="text" class="header-input" value="ストップウォッチ"><div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div></div>
+            <div class="content"><div class="sw-inner"><div class="sw-time">00:00.00</div><div class="sw-controls"><button class="sw-btn sw-btn-start">開始</button><button class="sw-btn sw-btn-reset">リセット</button></div></div></div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
+            let elapsed = 0, startTime = null, rafId = null, running = false;
+            const timeEl = box.querySelector('.sw-time');
+            requestAnimationFrame(() => {
+                const _orig = timeEl.textContent;
+                timeEl.textContent = '88:88.88';
+                timeEl.style.minWidth = timeEl.offsetWidth + 'px';
+                timeEl.textContent = _orig;
+            });
+            const startBtn = box.querySelector('.sw-btn-start');
+            const resetBtn = box.querySelector('.sw-btn-reset');
+            box.resetBox = () => { cancelAnimationFrame(rafId); running = false; elapsed = 0; startBtn.textContent = '開始'; startBtn.classList.remove('running'); if (timeEl) timeEl.textContent = '00:00.00'; };
+            function formatTime(ms) { const s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') + '.' + String(Math.floor((ms % 1000) / 10)).padStart(2, '0'); }
+            function tick() { elapsed = Date.now() - startTime; timeEl.textContent = formatTime(elapsed); rafId = requestAnimationFrame(tick); }
+            startBtn.addEventListener('click', () => {
+                if (!running) { startTime = Date.now() - elapsed; rafId = requestAnimationFrame(tick); running = true; startBtn.textContent = '停止'; startBtn.classList.add('running'); }
+                else { cancelAnimationFrame(rafId); running = false; startBtn.textContent = '開始'; startBtn.classList.remove('running'); }
+            });
+            resetBtn.addEventListener('click', () => { cancelAnimationFrame(rafId); running = false; elapsed = 0; startBtn.textContent = '開始'; startBtn.classList.remove('running'); timeEl.textContent = '00:00.00'; });
+        }
+
+        function addCounter(x, y) {
+            const box = document.createElement('div');
+            box.className = 'box counter-box'; box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header"><input type="text" class="header-input" value="カウンター"><div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div></div>
+            <div class="content"><div class="counter-inner">
+                <div class="counter-label">COUNT</div>
+                <div class="counter-value">0</div>
+                <div class="counter-step-row">STEP&nbsp;<input type="number" class="counter-step-input" value="1" min="1"></div>
+                <div class="counter-controls">
+                    <button class="counter-btn counter-btn-minus">－</button>
+                    <button class="counter-btn counter-btn-plus">＋</button>
+                    <button class="counter-btn counter-btn-reset">RST</button>
+                </div>
+            </div></div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
+            let count = 0;
+            const valueEl = box.querySelector('.counter-value');
+            const stepInput = box.querySelector('.counter-step-input');
+            box.resetBox = () => { count = 0; valueEl.textContent = count; };
+            const getStep = () => parseFloat(stepInput.value) || 1;
+            box.querySelector('.counter-btn-plus').addEventListener('click', () => { count += getStep(); valueEl.textContent = count; });
+            box.querySelector('.counter-btn-minus').addEventListener('click', () => { count -= getStep(); valueEl.textContent = count; });
+            box.querySelector('.counter-btn-reset').addEventListener('click', () => { count = 0; valueEl.textContent = count; });
+        }
+
+        function addImageBox(x, y) {
+            const box = makeBox(x, y, 'image-box', '画像',
+                `<div class="image-drop-area" title="クリックまたはドラッグで画像を選択">
+                <input type="file" accept="image/*">
+                <div class="image-drop-hint">🖼</div>
+                <div>クリック or ドラッグで画像を追加</div>
+             </div>`);
+            const dropArea = box.querySelector('.image-drop-area');
+            const fileInput = box.querySelector('input[type="file"]');
+            function loadFile(file) {
+                if (!file || !file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => { dropArea.innerHTML = `<img src="${ev.target.result}" alt="">`; };
+                reader.readAsDataURL(file);
+            }
+            fileInput.addEventListener('change', () => loadFile(fileInput.files[0]));
+            dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('dragover'); });
+            dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+            dropArea.addEventListener('drop', (e) => { e.preventDefault(); dropArea.classList.remove('dragover'); loadFile(e.dataTransfer.files[0]); });
+        }
+
+        const clockBoxes = [];
+
+        /* =====================================================
+         *  リサイズハンドル
+         * ===================================================== */
+        function addResizeHandles(el, opts = {}) {
+            const minW = opts.minW ?? 60, minH = opts.minH ?? 30;
+            if (el._resizeSetup) return; el._resizeSetup = true;
+            el.classList.add('resizable');
+            ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].forEach(dir => {
+                const h = document.createElement('div');
+                h.className = 'resize-handle ' + dir;
+                h.addEventListener('mousedown', (e) => {
+                    e.stopPropagation(); e.preventDefault();
+                    el.classList.add('resizing');
+                    const startX = e.clientX, startY = e.clientY;
+                    const rect = el.getBoundingClientRect();
+                    const startW = rect.width, startH = rect.height, startL = rect.left, startT = rect.top;
+                    const onMove = (me) => {
+                        const dx = me.clientX - startX, dy = me.clientY - startY;
+                        let w = startW, h2 = startH, l = startL, t = startT;
+                        if (dir.includes('e')) w = Math.max(minW, startW + dx);
+                        if (dir.includes('s')) h2 = Math.max(minH, startH + dy);
+                        if (dir.includes('w')) { w = Math.max(minW, startW - dx); l = startL + (startW - w); }
+                        if (dir.includes('n')) { h2 = Math.max(minH, startH - dy); t = startT + (startH - h2); }
+                        el.style.width = w + 'px'; el.style.height = h2 + 'px';
+                        el.style.left = l + 'px'; el.style.top = t + 'px';
+                        el.style.right = 'auto'; el.style.bottom = 'auto';
+                    };
+                    const onUp = () => { el.classList.remove('resizing'); document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                });
+                el.appendChild(h);
+            });
+        }
+
+        /* =====================================================
+         *  ホバーメニュー
+         * ===================================================== */
+        function addHoverMenu(el, contentTarget) {
+            const target = contentTarget || el;
+            let toggle = el.querySelector('.box-menu-toggle');
+            if (!toggle) {
+                toggle = document.createElement('div');
+                toggle.className = 'part-menu-toggle'; toggle.textContent = '≡';
+                el.appendChild(toggle);
+            }
+
+            const menu = document.createElement('div');
+            menu.className = 'hover-menu';
+            menu.innerHTML = `
+            <button class="hover-menu-btn" data-action="clone">📋 複製</button>
+            <div class="hover-menu-sep"></div>
+            <button class="hover-menu-btn danger" data-action="delete">🗑 削除</button>
+            <div class="hover-menu-sep"></div>
+            <button class="hover-menu-btn" data-action="rotate">🔄 回転</button>
+            <div class="hover-menu-rot">
+                <div class="hover-menu-rot-presets">
+                    <button class="hover-menu-preset" data-rot="0">0°</button>
+                    <button class="hover-menu-preset" data-rot="45">45°</button>
+                    <button class="hover-menu-preset" data-rot="90">90°</button>
+                    <button class="hover-menu-preset" data-rot="135">135°</button>
+                    <button class="hover-menu-preset" data-rot="-45">-45°</button>
+                    <button class="hover-menu-preset" data-rot="-90">-90°</button>
+                    <button class="hover-menu-preset" data-rot="180">180°</button>
+                </div>
+                <div style="display:flex;gap:4px;align-items:center;">
+                    <input type="number" class="hover-menu-rot-input hover-menu-fs-input" value="0" min="-360" max="360" style="width:52px;">
+                    <button class="hover-menu-fs-apply hover-menu-rot-apply">OK</button>
+                    <button class="hover-menu-fs-apply hover-menu-rot-reset">↩</button>
+                </div>
+            </div>
+            <button class="hover-menu-btn" data-action="fontsize">🔠 文字サイズ</button>
+            <div class="hover-menu-fs">
+                <div class="hover-menu-presets"></div>
+                <div class="hover-menu-fs-row"></div>
+            </div>
+            <div class="hover-menu-sep"></div>
+            <button class="hover-menu-btn" data-action="textcolor">🎨 文字色</button>
+            <div class="hover-menu-tc">
+                <div class="hover-menu-swatches"></div>
+                <div class="hover-menu-color-row">
+                    <input type="color" class="hover-menu-tc-input" value="#3d2b1f">
+                    <input type="text" class="hover-menu-hex-input" value="#3d2b1f" maxlength="7" placeholder="#rrggbb">
+                    <button class="hover-menu-fs-apply hover-menu-tc-reset">↩</button>
+                </div>
+            </div>
+            <button class="hover-menu-btn" data-action="fillcolor">🪣 塗り色</button>
+            <div class="hover-menu-fc">
+                <div class="hover-menu-swatches"></div>
+                <div class="hover-menu-color-row">
+                    <input type="color" class="hover-menu-fc-input" value="#fdf8f4">
+                    <input type="text" class="hover-menu-hex-input" value="#fdf8f4" maxlength="7" placeholder="#rrggbb">
+                    <button class="hover-menu-fs-apply hover-menu-fc-reset">↩</button>
+                </div>
+            </div>
+            <button class="hover-menu-btn" data-action="bordercolor">🖊 枠色</button>
+            <div class="hover-menu-bc">
+                <div class="hover-menu-swatches"></div>
+                <div class="hover-menu-color-row">
+                    <input type="color" class="hover-menu-bc-input" value="#b5627e">
+                    <input type="text" class="hover-menu-hex-input" value="#b5627e" maxlength="7" placeholder="#rrggbb">
+                    <button class="hover-menu-fs-apply hover-menu-bc-reset">↩</button>
+                </div>
+            </div>
+            <div class="hover-menu-sep"></div>
+            <button class="hover-menu-btn" data-action="close">✕ 閉じる</button>`;
+            const tcSubPanel = menu.querySelector('.hover-menu-tc');
+            const tcInput = menu.querySelector('.hover-menu-tc-input');
+            const fcSubPanel = menu.querySelector('.hover-menu-fc');
+            const fcInput = menu.querySelector('.hover-menu-fc-input');
+            const bcSubPanel = menu.querySelector('.hover-menu-bc');
+            const bcInput = menu.querySelector('.hover-menu-bc-input');
+            const rotSubPanel = menu.querySelector('.hover-menu-rot');
+            const rotInput = menu.querySelector('.hover-menu-rot-input');
+            const fsSubPanel = menu.querySelector('.hover-menu-fs');
+
+            if (el._tickerEdit) {
+                const tickerTrack = el.querySelector('.ticker-track');
+                const speedBtn = document.createElement('button'); speedBtn.className = 'hover-menu-btn'; speedBtn.textContent = '⚡ スクロール速度';
+                const speedPanel = document.createElement('div'); speedPanel.className = 'hover-menu-fs';
+                const speedRow = document.createElement('div'); speedRow.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 8px;';
+                const speedSlider = document.createElement('input'); speedSlider.type = 'range'; speedSlider.min = '3'; speedSlider.max = '60'; speedSlider.style.cssText = 'flex:1;cursor:pointer;';
+                const speedDisp = document.createElement('span'); speedDisp.style.cssText = 'color:#ccc;font-size:11px;min-width:30px;text-align:right;';
+                const syncSpeed = () => { const v = tickerTrack ? parseFloat(tickerTrack.style.animationDuration) || 18 : 18; speedSlider.value = v; speedDisp.textContent = v + 's'; };
+                syncSpeed();
+                speedSlider.addEventListener('mousedown', e => e.stopPropagation());
+                speedSlider.addEventListener('click', e => e.stopPropagation());
+                speedSlider.addEventListener('input', () => { if (tickerTrack) tickerTrack.style.animationDuration = speedSlider.value + 's'; speedDisp.textContent = speedSlider.value + 's'; });
+                speedRow.appendChild(speedSlider); speedRow.appendChild(speedDisp); speedPanel.appendChild(speedRow);
+                speedBtn.addEventListener('click', (e) => { e.stopPropagation(); speedPanel.classList.toggle('open'); if (speedPanel.classList.contains('open')) syncSpeed(); });
+                const afterFs2 = fsSubPanel.nextSibling;
+                menu.insertBefore(speedBtn, afterFs2); menu.insertBefore(speedPanel, afterFs2);
+            }
+
+            // 時計形式パネル（時計要素がある場合のみ）
+            {
+                const clockRoot = el.closest('.box') || el;
+                const hasClockSpan = clockRoot.classList.contains('clock-container') || clockRoot.classList.contains('clock-box') || clockRoot.querySelector('.hdr-float-time, .clock-time');
+                if (hasClockSpan) {
+                    const fmtSep = null;
+                    const fmtBtn = document.createElement('button'); fmtBtn.className = 'hover-menu-btn'; fmtBtn.textContent = '🕐 表示形式';
+                    const fmtPanel = document.createElement('div'); fmtPanel.className = 'hover-menu-fs';
+                    const fmtBtns = [];
+                    fmtPanel.style.cssText = 'padding:4px 6px;gap:2px;';
+                    [
+                        ['date-time', '日付 + 時刻'],
+                        ['time-only', '時刻のみ (H:M:S)'],
+                        ['hm', '時：分のみ (H:M)'],
+                        ['date-only', '日付のみ'],
+                        ['date-hm', '日付 + 時：分'],
+                    ].forEach(([val, lbl]) => {
+                        const fb = document.createElement('button');
+                        fb.className = 'hover-menu-preset';
+                        fb.textContent = lbl;
+                        fb.style.cssText = 'width:100%;text-align:left;padding:3px 6px;font-size:11px;';
+                        const isCur = (clockRoot.dataset.clockFormat || 'date-time') === val;
+                        if (isCur) { fb.style.background = 'var(--color-accent)'; fb.style.color = '#000'; fb.style.opacity = '1'; }
+                        fb.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            clockRoot.dataset.clockFormat = val;
+                            updateClock();
+                            fmtBtns.forEach(b => { b.style.background = ''; b.style.color = ''; b.style.opacity = ''; });
+                            fb.style.background = 'var(--color-accent)'; fb.style.color = '#000'; fb.style.opacity = '1';
+                        });
+                        fmtBtns.push(fb);
+                        fmtPanel.appendChild(fb);
+                    });
+                    fmtBtn.addEventListener('click', (e) => { e.stopPropagation(); fmtPanel.classList.toggle('open'); });
+                    const afterFs = fsSubPanel.nextSibling;
+                    menu.insertBefore(fmtBtn, afterFs); menu.insertBefore(fmtPanel, afterFs);
+                }
+            }
+
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = menu.classList.contains('open');
+                document.querySelectorAll('.hover-menu.open').forEach(m => m.classList.remove('open'));
+                if (!isOpen) {
+                    const rect = toggle.getBoundingClientRect();
+                    menu.style.left = rect.left + 'px'; menu.style.top = (rect.bottom + 4) + 'px';
+                    menu.classList.add('open');
+                    const mr = menu.getBoundingClientRect();
+                    if (mr.right > window.innerWidth) menu.style.left = Math.max(0, window.innerWidth - mr.width - 4) + 'px';
+                    if (mr.bottom > window.innerHeight) menu.style.top = Math.max(0, rect.top - mr.height - 4) + 'px';
+                    [tcSubPanel, fcSubPanel, bcSubPanel, fsSubPanel].forEach(p => p.classList.remove('open'));
+                }
+            });
+            toggle.addEventListener('mousedown', (e) => e.stopPropagation());
+
+            menu.querySelector('[data-action="close"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                [menu, tcSubPanel, fcSubPanel, bcSubPanel, rotSubPanel, fsSubPanel].forEach(p => p.classList.remove('open'));
+            });
+
+            menu.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const root = el.closest('.box') || el.closest('.float-part') || el;
+                try { removeTopLevel(root); } catch (err) { }
+                try { if (menu.parentNode) menu.parentNode.removeChild(menu); } catch (err) { }
+            });
+
+            menu.querySelector('[data-action="clone"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const src = el.closest('.box') || el;
+                const clone = src.cloneNode(true);
+                const rect = src.getBoundingClientRect();
+                clone.style.left = (rect.left + 30) + 'px'; clone.style.top = (rect.top + 30) + 'px';
+                clone.style.right = 'auto'; clone.style.bottom = 'auto';
+                captureArea.appendChild(clone);
+                clone._resizeSetup = false;
+                clone.querySelectorAll('.resize-handle').forEach(h => h.remove());
+                addResizeHandles(clone);
+                const db = clone.querySelector('.box-del-btn');
+                if (db) db.addEventListener('click', (ev) => { ev.stopPropagation(); clone.remove(); });
+                const ct = clone.querySelector('.content');
+                if (ct) addHoverMenu(clone, ct); else addHoverMenu(clone);
+                if (clone.classList.contains('clock-box') || clone.classList.contains('clock-container')) {
+                    if (clone.id) clone.removeAttribute('id');
+                    const _ts = clone.querySelector('#clock, .hdr-float-time'); if (_ts) { _ts.removeAttribute('id'); _ts.classList.add('hdr-float-time'); }
+                    const _ds = clone.querySelector('#date, .hdr-float-date'); if (_ds) { _ds.removeAttribute('id'); _ds.classList.add('hdr-float-date'); }
+                    clockBoxes.push(clone);
+                }
+                if (!clone.classList.contains('box')) {
+                    clone.addEventListener('mousedown', (e) => {
+                        if (e.target.closest('.resize-handle') || e.target.closest('.part-menu-toggle') || e.target.closest('.hover-menu')) return;
+                        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                        e.stopPropagation();
+                        const rect = clone.getBoundingClientRect();
+                        const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+                        const onMove = (me) => { clone.style.left = (me.clientX - ox) + 'px'; clone.style.top = (me.clientY - oy) + 'px'; clone.style.right = 'auto'; };
+                        const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+                        document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+                    });
+                }
+                if (clone.classList.contains('profile-container') || clone.classList.contains('profile-wrapper')) {
+                    clone.removeAttribute('id');
+                    const cloneDisp = clone.querySelector('.profile-display-area') || Array.from(clone.children).find(c => !c.classList.contains('resize-handle') && !c.classList.contains('part-menu-toggle') && !c.classList.contains('box-del-btn') && c.tagName === 'DIV');
+                    if (cloneDisp) {
+                        cloneDisp.removeAttribute('id');
+                        cloneDisp.classList.add('profile-display-area');
+                        cloneDisp.style.transition = 'none'; cloneDisp.style.opacity = '1'; cloneDisp.style.transform = '';
+                        let cidx = 0, ctimer = null;
+                        const ccycle = () => {
+                            if (ctimer) clearInterval(ctimer);
+                            cloneDisp.textContent = profileItems[cidx % (profileItems.length || 1)] || '';
+                            if (profileItems.length <= 1) return;
+                            ctimer = setInterval(() => {
+                                cloneDisp.style.transition = 'opacity 0.3s'; cloneDisp.style.opacity = '0';
+                                setTimeout(() => { cidx = (cidx + 1) % profileItems.length; cloneDisp.textContent = profileItems[cidx]; cloneDisp.style.opacity = '1'; }, 300);
+                            }, CONFIG.animation.profileInterval);
+                        };
+                        ccycle();
+                        clone.addEventListener('dblclick', (e) => { e.stopPropagation(); openEditor(() => { cidx = 0; ccycle(); }); });
+                    }
+                }
+                menu.classList.remove('open');
+            });
+
+            menu.querySelector('[data-action="textcolor"]').addEventListener('click', (e) => { e.stopPropagation(); tcSubPanel.classList.toggle('open'); fsSubPanel.classList.remove('open'); });
+            tcInput.addEventListener('mousedown', e => e.stopPropagation());
+            tcInput.addEventListener('input', (e) => {
+                const root2 = el.closest('.box') || el;
+                const textEls = Array.from(root2.querySelectorAll('.title-input,.text-input-box,.clock-time,.sw-time,.counter-value,.input-text,.live-input,.hdr-float-time,.hdr-float-date,.clock-date,.ticker-ctrl,#clock,#date,.profile-display-area,#profile-display-area'));
+                if (textEls.length === 0) Array.from(target.querySelectorAll('input[type="text"],textarea')).forEach(t => textEls.push(t));
+                textEls.forEach(t => t.style.color = e.target.value);
+            });
+            menu.querySelector('.hover-menu-tc-reset').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const root2 = el.closest('.box') || el;
+                root2.querySelectorAll('.title-input,.text-input-box,.clock-time,.sw-time,.counter-value,.input-text,.live-input,.hdr-float-time,.hdr-float-date,.clock-date,.ticker-ctrl,#clock,#date,.profile-display-area,#profile-display-area').forEach(t => t.style.color = '');
+            });
+
+            menu.querySelector('[data-action="fillcolor"]').addEventListener('click', (e) => { e.stopPropagation(); fcSubPanel.classList.toggle('open');[tcSubPanel, bcSubPanel, fsSubPanel].forEach(p => p.classList.remove('open')); });
+            fcInput.addEventListener('mousedown', e => e.stopPropagation());
+            fcInput.addEventListener('input', (e) => { (el.closest('.box') || el).style.background = e.target.value; });
+            menu.querySelector('.hover-menu-fc-reset').addEventListener('click', (e) => { e.stopPropagation(); (el.closest('.box') || el).style.background = ''; });
+
+            menu.querySelector('[data-action="bordercolor"]').addEventListener('click', (e) => { e.stopPropagation(); bcSubPanel.classList.toggle('open');[tcSubPanel, fcSubPanel, fsSubPanel].forEach(p => p.classList.remove('open')); });
+            bcInput.addEventListener('mousedown', e => e.stopPropagation());
+            bcInput.addEventListener('input', (e) => { (el.closest('.box') || el).style.borderColor = e.target.value; });
+            menu.querySelector('.hover-menu-bc-reset').addEventListener('click', (e) => { e.stopPropagation(); (el.closest('.box') || el).style.borderColor = ''; });
+
+            // カラースウォッチ + HEX入力
+            const _SWATCHES = ['#ffffff', '#000000', '#ff3333', '#ff8800', '#ffee00', '#44cc66', '#00ccff', '#3366ff', '#9933ff', '#ff33cc', '#ff99bb', '#aaaaaa', '#cccccc', '#663300'];
+            [[tcSubPanel, tcInput], [fcSubPanel, fcInput], [bcSubPanel, bcInput]].forEach(([panel, cInput]) => {
+                const hexInp = panel.querySelector('.hover-menu-hex-input');
+                panel.querySelector('.hover-menu-swatches').append(..._SWATCHES.map(c => {
+                    const btn = document.createElement('button');
+                    btn.className = 'hover-menu-swatch';
+                    btn.style.background = c;
+                    btn.title = c;
+                    btn.addEventListener('click', (e) => { e.stopPropagation(); cInput.value = c; hexInp.value = c; cInput.dispatchEvent(new Event('input')); });
+                    return btn;
+                }));
+                hexInp.addEventListener('mousedown', e => e.stopPropagation());
+                hexInp.addEventListener('keydown', e => e.stopPropagation());
+                hexInp.addEventListener('click', e => e.stopPropagation());
+                hexInp.addEventListener('input', (e) => { const v = e.target.value.trim(); if (/^#[0-9a-fA-F]{6}$/.test(v)) { cInput.value = v; cInput.dispatchEvent(new Event('input')); } });
+                cInput.addEventListener('input', () => { hexInp.value = cInput.value; });
+
+                // 不透明度スライダー
+                const alphaRow = document.createElement('div');
+                alphaRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-top:5px;';
+                const alphaLabel = document.createElement('span');
+                alphaLabel.textContent = '不透明度';
+                alphaLabel.style.cssText = 'font-size:10px;opacity:0.65;white-space:nowrap;';
+                const alphaSlider = document.createElement('input');
+                alphaSlider.type = 'range'; alphaSlider.min = '0'; alphaSlider.max = '100'; alphaSlider.value = '100';
+                alphaSlider.style.cssText = 'flex:1;cursor:pointer;';
+                const alphaVal = document.createElement('span');
+                alphaVal.textContent = '100%';
+                alphaVal.style.cssText = 'font-size:10px;opacity:0.65;min-width:32px;text-align:right;';
+                alphaSlider.addEventListener('mousedown', e => e.stopPropagation());
+                alphaSlider.addEventListener('click', e => e.stopPropagation());
+                alphaSlider.addEventListener('input', () => {
+                    alphaVal.textContent = alphaSlider.value + '%';
+                    cInput.dispatchEvent(new Event('input'));
+                });
+                alphaRow.appendChild(alphaLabel); alphaRow.appendChild(alphaSlider); alphaRow.appendChild(alphaVal);
+                panel.appendChild(alphaRow);
+
+                // 透明度を反映した色適用（rgba で上書き）
+                cInput.addEventListener('input', () => {
+                    const a = parseInt(alphaSlider.value) / 100;
+                    let rgba = cInput.value;
+                    if (a < 1) {
+                        const r = parseInt(rgba.slice(1,3), 16), g = parseInt(rgba.slice(3,5), 16), b = parseInt(rgba.slice(5,7), 16);
+                        rgba = `rgba(${r},${g},${b},${a.toFixed(2)})`;
+                    }
+                    if (panel === tcSubPanel) {
+                        const root2 = el.closest('.box') || el;
+                        const textEls = Array.from(root2.querySelectorAll('.title-input,.text-input-box,.clock-time,.sw-time,.counter-value,.input-text,.live-input,.hdr-float-time,.hdr-float-date,.clock-date,.ticker-ctrl,#clock,#date,.profile-display-area,#profile-display-area'));
+                        if (textEls.length === 0) Array.from(target.querySelectorAll('input[type="text"],textarea')).forEach(t => textEls.push(t));
+                        textEls.forEach(t => t.style.color = rgba);
+                    } else if (panel === fcSubPanel) {
+                        (el.closest('.box') || el).style.background = rgba;
+                    } else if (panel === bcSubPanel) {
+                        (el.closest('.box') || el).style.borderColor = rgba;
+                    }
+                });
+            });
+
+            menu.querySelector('[data-action="rotate"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                rotSubPanel.classList.toggle('open');
+                [tcSubPanel, fcSubPanel, bcSubPanel, fsSubPanel].forEach(p => p.classList.remove('open'));
+                if (rotSubPanel.classList.contains('open')) {
+                    const cur = (el.closest('.box') || el).style.transform.match(/rotate\((-?[\d.]+)deg\)/);
+                    rotInput.value = cur ? parseFloat(cur[1]) : 0;
+                }
+            });
+            rotInput.addEventListener('mousedown', e => e.stopPropagation());
+            rotInput.addEventListener('keydown', e => e.stopPropagation());
+            rotSubPanel.querySelectorAll('[data-rot]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const deg = parseInt(btn.dataset.rot);
+                    (el.closest('.box') || el).style.transform = deg === 0 ? '' : `rotate(${deg}deg)`;
+                    rotInput.value = deg;
+                });
+            });
+            menu.querySelector('.hover-menu-rot-apply').addEventListener('click', (e) => { e.stopPropagation(); const deg = parseInt(rotInput.value) || 0; (el.closest('.box') || el).style.transform = deg === 0 ? '' : `rotate(${deg}deg)`; });
+            menu.querySelector('.hover-menu-rot-reset').addEventListener('click', (e) => { e.stopPropagation(); (el.closest('.box') || el).style.transform = ''; rotInput.value = 0; });
+
+            let fsBuilt = false;
+            menu.querySelector('[data-action="fontsize"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = fsSubPanel.classList.contains('open');
+                fsSubPanel.classList.toggle('open');
+                rotSubPanel.classList.remove('open');
+                tcSubPanel.classList.remove('open');
+                fcSubPanel.classList.remove('open');
+                bcSubPanel.classList.remove('open');
+                if (!isOpen && !fsBuilt) { buildFsRows(); fsBuilt = true; }
+            });
+
+            function buildFsRows() {
+                const root = el.closest('.box') || el;
+                const textEls = Array.from(root.querySelectorAll('.title-input,.text-input-box,.clock-time,.clock-date,.sw-time,.counter-value,.hdr-float-time,.hdr-float-date,.ticker-ctrl,#clock,#date,.profile-display-area,#profile-display-area'));
+                if (textEls.length === 0) Array.from(target.querySelectorAll('textarea,input[type="text"]')).forEach(t => textEls.push(t));
+                const presetsEl = fsSubPanel.querySelector('.hover-menu-presets');
+                const fsRowEl = fsSubPanel.querySelector('.hover-menu-fs-row');
+                presetsEl.innerHTML = '';
+                if (fsRowEl) fsRowEl.innerHTML = '';
+                if (textEls.length === 0) { presetsEl.innerHTML = '<span style="color:rgba(180,180,180,0.6);font-size:11px;padding:2px 4px;">対象なし</span>'; return; }
+                textEls.forEach((t, i) => {
+                    const label = (t.placeholder || t.value || ('要素' + (i + 1))).slice(0, 6);
+                    const cur = parseInt(window.getComputedStyle(t).fontSize) || 16;
+                    const wrap = document.createElement('div');
+                    wrap.style.cssText = 'border-top:1px solid rgba(180,180,180,0.12);padding:4px 0;';
+                    const lbl = document.createElement('div');
+                    lbl.textContent = label;
+                    lbl.style.cssText = 'font-size:10px;color:rgba(180,180,180,0.65);margin-bottom:3px;overflow:hidden;white-space:nowrap;';
+                    wrap.appendChild(lbl);
+                    const inp = document.createElement('input');
+                    inp.type = 'number'; inp.value = cur; inp.min = 8; inp.max = 200; inp.className = 'hover-menu-fs-input'; inp.style.width = '48px';
+                    inp.addEventListener('mousedown', ev => ev.stopPropagation());
+                    inp.addEventListener('keydown', ev => ev.stopPropagation());
+                    const preRow = document.createElement('div');
+                    preRow.style.cssText = 'display:flex;gap:2px;flex-wrap:wrap;margin-bottom:3px;';
+                    [12, 16, 20, 24, 32, 48, 64].forEach(sz => {
+                        const pb = document.createElement('button');
+                        pb.className = 'hover-menu-preset'; pb.textContent = sz;
+                        pb.addEventListener('click', (ev) => { ev.stopPropagation(); t.style.fontSize = sz + 'px'; inp.value = sz; });
+                        preRow.appendChild(pb);
+                    });
+                    wrap.appendChild(preRow);
+                    const inputRow = document.createElement('div');
+                    inputRow.style.cssText = 'display:flex;align-items:center;gap:4px;';
+                    const applyBtn = document.createElement('button');
+                    applyBtn.className = 'hover-menu-fs-apply'; applyBtn.textContent = 'OK';
+                    applyBtn.addEventListener('click', (ev) => { ev.stopPropagation(); t.style.fontSize = Math.min(200, Math.max(8, parseInt(inp.value) || cur)) + 'px'; });
+                    inputRow.appendChild(inp); inputRow.appendChild(applyBtn);
+                    wrap.appendChild(inputRow);
+                    presetsEl.appendChild(wrap);
+                });
+
+            }
+
+            document.addEventListener('click', (e) => {
+                if (!menu.contains(e.target) && e.target !== toggle) {
+                    menu.classList.remove('open');
+                    [tcSubPanel, fcSubPanel, bcSubPanel, fsSubPanel].forEach(p => p.classList.remove('open'));
+                }
+            });
+
+            el.style.position = el.style.position || 'absolute';
+            captureArea.appendChild(menu);
+
+            // サブパネル開閉でメニューが広がったとき右端・下端はみ出しを自動修正
+            new ResizeObserver(() => {
+                if (!menu.classList.contains('open')) return;
+                const mr = menu.getBoundingClientRect();
+                if (mr.right > window.innerWidth) menu.style.left = Math.max(0, window.innerWidth - mr.width - 4) + 'px';
+                if (mr.bottom > window.innerHeight) menu.style.top = Math.max(0, window.innerHeight - mr.height - 4) + 'px';
+            }).observe(menu);
+
+            // 要素が外部で削除されたとき、メニューを自動破棄する
+            const mo = new MutationObserver(() => {
+                if (!el.isConnected) { try { if (menu.parentNode) menu.parentNode.removeChild(menu); } catch (e) { } mo.disconnect(); }
+            });
+            mo.observe(document, { childList: true, subtree: true });
+        }
+
+        /* =====================================================
+         *  時計
+         * ===================================================== */
+        function updateClock() {
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}`;
+            const timeStr = now.toLocaleTimeString('ja-JP');
+            const hmStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+            function applyClockFormat(container, timeEl, dateEl) {
+                if (timeEl && !timeEl._wFixed && document.fonts.status === 'loaded') {
+                    timeEl._wFixed = true;
+                    const _ot = timeEl.textContent; timeEl.textContent = '88:88:88';
+                    timeEl.style.minWidth = timeEl.offsetWidth + 'px'; timeEl.textContent = _ot;
+                }
+                if (dateEl && !dateEl._wFixed && document.fonts.status === 'loaded') {
+                    dateEl._wFixed = true;
+                    const _od = dateEl.textContent; dateEl.textContent = '8888/88/88';
+                    dateEl.style.minWidth = dateEl.offsetWidth + 'px'; dateEl.textContent = _od;
+                }
+                const fmt = (container && container.dataset.clockFormat) || 'date-time';
+                if (timeEl) {
+                    timeEl.style.display = fmt === 'date-only' ? 'none' : '';
+                    timeEl.textContent = (fmt === 'hm' || fmt === 'date-hm') ? hmStr : timeStr;
+                }
+                if (dateEl) {
+                    dateEl.style.display = (fmt === 'time-only' || fmt === 'hm') ? 'none' : '';
+                    dateEl.textContent = dateStr;
+                }
+            }
+
+            // 上部バーの時計
+            const dateEl = document.getElementById('date');
+            const clockEl = document.getElementById('clock');
+            const initClock = document.getElementById('init-clock');
+            applyClockFormat(initClock, clockEl, dateEl);
+
+            // 追加した独立時計ボックス・フロート時計
+            clockBoxes.forEach(box => {
+                if (!box.isConnected) return;
+                applyClockFormat(box,
+                    box.querySelector('.clock-time') || box.querySelector('.hdr-float-time') || box.querySelector('#clock'),
+                    box.querySelector('.clock-date') || box.querySelector('.hdr-float-date') || box.querySelector('#date'));
+            });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        const _skipLoad = localStorage.getItem('_skip_waOverlayConfig') === '1';
+        localStorage.removeItem('_skip_waOverlayConfig');
+        if (CONFIG.features.autoLoad && !_skipLoad) loadSavedConfig();
+    </script>
+</body>
+
+</html>

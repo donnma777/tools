@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap"
+        rel="stylesheet">
+    <title>説明書 — GAMING theme</title>
+    <style>
+        :root {
+            --accent: #00fff7;
+            --accent-dim: #00bdb5;
+            --bg: #07070e;
+            --surface: #0d0d1a;
+            --surface2: #111120;
+            --border: rgba(0, 255, 247, 0.25);
+            --border-bright: rgba(0, 255, 247, 0.6);
+            --text: #c0c0cc;
+            --text-sub: #6868a0;
+            --code-bg: #0a0a18;
+            --glow: 0 0 8px rgba(0, 255, 247, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0a0a1a 0%, #0d1a2a 100%);
+            border-bottom: 2px solid var(--accent);
+            padding: 40px 48px 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 247, 0.1) 0%, transparent 70%);
+        }
+
+        header .badge {
+            display: inline-block;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 2px;
+            padding: 2px 10px;
+            font-size: 11px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: var(--glow);
+        }
+
+        header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--accent);
+            text-shadow: var(--glow);
+        }
+
+        header p {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-top: 6px;
+            letter-spacing: 1px;
+        }
+
+        nav {
+            background: #0a0a18;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 48px;
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: var(--glow);
+        }
+
+        nav a:hover {
+            color: white;
+        }
+
+        main {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        section {
+            margin-bottom: 56px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-bright);
+            padding-bottom: 8px;
+            margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            color: var(--accent);
+            text-shadow: var(--glow);
+            letter-spacing: 2px;
+        }
+
+        .section-header .en {
+            font-size: 12px;
+            color: var(--text-sub);
+            letter-spacing: 2px;
+        }
+
+        h3 {
+            font-size: 14px;
+            color: var(--accent);
+            margin: 24px 0 10px;
+            letter-spacing: 1px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        p {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        ol.steps {
+            list-style: none;
+            counter-reset: step;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        ol.steps li {
+            counter-increment: step;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            font-size: 14px;
+        }
+
+        ol.steps li::before {
+            content: counter(step);
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .feature-card .icon {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .feature-card h4 {
+            font-size: 13px;
+            color: var(--accent);
+            margin-bottom: 4px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .feature-card p {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin: 0;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+            padding: 16px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre;
+            overflow-x: auto;
+            margin: 12px 0;
+            line-height: 1.6;
+            color: #a0fffe;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        th {
+            background: rgba(0, 255, 247, 0.12);
+            color: var(--accent);
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 2px solid var(--accent);
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        code {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 1px 6px;
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--accent);
+        }
+
+        .note {
+            background: rgba(0, 255, 247, 0.05);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+            padding: 12px 16px;
+            font-size: 13px;
+            margin: 12px 0;
+            line-height: 1.6;
+        }
+
+        .note strong {
+            color: var(--accent);
+        }
+
+        .en-sub {
+            color: var(--text-sub);
+            font-size: 0.88em;
+            display: block;
+            margin-top: 3px;
+        }
+
+        footer {
+            background: #0a0a18;
+            border-top: 2px solid var(--accent);
+            color: var(--text-sub);
+            text-align: center;
+            padding: 20px;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="badge">STREAMING OVERLAY</div>
+        <h1>GAMING — 説明書 / MANUAL</h1>
+        <p>gaming.html &nbsp;|&nbsp; v1.0</p>
+    </header>
+
+    <nav>
+        <a href="#obs">OBS設定</a>
+        <a href="#basic">基本操作</a>
+        <a href="#menu">メニュー機能</a>
+        <a href="#config">カスタマイズ</a>
+        <a href="#trouble">トラブル対処</a>
+    </nav>
+
+    <main>
+
+        <section id="obs">
+            gaming Streaming Overlay &nbsp;♡&nbsp; Created by <strong>donnma</strong>
+            <p style="margin-top:8px;color:var(--text-sub);font-size:13px;">注意：二次配布および改変しての配布を禁じます。</p>
+            </footer>
+            <span class="en">HOW TO ADD TO OBS</span>
+            </div>
+            <h3>ブラウザソースとして追加 / ADD AS BROWSER SOURCE</h3>
+            <ol class="steps">
+                <li>OBSを起動し、使用したいシーンを選択する。<br><span class="en-sub">Launch OBS Studio and select the target scene.</span>
+                </li>
+                <li>「ソース」パネルの <strong>＋</strong> をクリックし、<strong>「ブラウザ」</strong> を選択する。<br><span class="en-sub">Click
+                        <strong>+</strong> in Sources and choose <strong>Browser</strong>.</span></li>
+                <li><strong>「ローカルファイル」</strong> にチェックを入れ、<code>gaming.html</code> を選択する。<br><span class="en-sub">Check
+                        <strong>"Local File"</strong> and browse to <code>gaming.html</code>.</span></li>
+                <li>幅: <strong>1920</strong>、高さ: <strong>1080</strong> に設定する。<br><span class="en-sub">Set Width:
+                        <strong>1920</strong>, Height: <strong>1080</strong>.</span></li>
+                <li>「カスタムCSS」欄は <strong>空欄</strong> のままにする。<br><span class="en-sub">Leave Custom CSS
+                        <strong>empty</strong>.</span></li>
+                <li>「OK」をクリックして完了。<br><span class="en-sub">Click "OK" to finish.</span></li>
+            </ol>
+            <div class="note">
+                <strong>操作するには「対話」を有効化:</strong> ソースを右クリック → 「対話」を選択。対話ウィンドウ内でクリック・ドラッグ操作ができます。<br>
+                <strong>Enable "Interact":</strong> Right-click the source → "Interact". All clicks and drags work
+                inside the Interact window.
+            </div>
+            <h3>推奨設定 / RECOMMENDED SETTINGS</h3>
+            <table>
+                <tr>
+                    <th>設定項目 / Setting</th>
+                    <th>推奨値 / Value</th>
+                </tr>
+                <tr>
+                    <td>幅 / Width</td>
+                    <td>1920</td>
+                </tr>
+                <tr>
+                    <td>高さ / Height</td>
+                    <td>1080</td>
+                </tr>
+                <tr>
+                    <td>カスタムCSS / Custom CSS</td>
+                    <td>空欄 / Empty</td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="basic">
+            <div class="section-header">
+                <h2>基本操作</h2>
+                <span class="en">BASIC OPERATIONS</span>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon">✏️</div>
+                    <h4>テキスト編集</h4>
+                    <p>テキスト部分をクリックすると直接編集できます。<br>Click any text to edit directly.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📋</div>
+                    <h4>メニューを開く</h4>
+                    <p>空白エリアをダブルクリックするとメニューが表示されます。<br>Double-click any empty area for the context menu.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">✋</div>
+                    <h4>ボックス移動</h4>
+                    <p>ボックスのヘッダーをドラッグして位置を変更できます。<br>Drag the box header to move it.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">☰</div>
+                    <h4>ボックスメニュー</h4>
+                    <p>ボックス右上の <strong>≡</strong> ボタンでオプションを表示します。<br>Click ≡ on a box for its options.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="menu">
+            <div class="section-header">
+                <h2>メニュー機能</h2>
+                <span class="en">MENU FEATURES</span>
+            </div>
+            <h3>ダブルクリックメニュー / DOUBLE-CLICK MENU</h3>
+            <table>
+                <tr>
+                    <th>項目 / Item</th>
+                    <th>説明 / Description</th>
+                </tr>
+                <tr>
+                    <td>ボックス追加<br><code>Add Box</code></td>
+                    <td>テキストボックスを追加します。タイトル・メモ・コメント欄として自由に使えます。<br><span class="en-sub">Adds a movable text box for
+                            titles, memos, comments, etc.</span></td>
+                </tr>
+                <tr>
+                    <td>図形追加<br><code>Add Shape</code></td>
+                    <td>サブメニューから形を選んで図形を追加します。<br><span class="en-sub">Adds a shape — select the type from the
+                            submenu.</span>
+                        <ul style="margin-top:8px;padding-left:18px;font-size:13px;line-height:2">
+                            <li><strong>□ 四角形 / Rectangle</strong></li>
+                            <li><strong>○ 円 / Circle</strong></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>背景色<br><code>Background Color</code></td>
+                    <td>画面全体の背景色を変更します。カラーピッカーが開きます。<br><span class="en-sub">Changes the screen background. Opens a
+                            color picker.</span></td>
+                </tr>
+                <tr>
+                    <td>背景クリア<br><code>Clear Background</code></td>
+                    <td>背景を透明に戻します。<br><span class="en-sub">Resets background to transparent.</span></td>
+                </tr>
+            </table>
+
+            <h3>≡ メニュー (ボックス・図形共通) / BOX & SHAPE OPTIONS</h3>
+            <table>
+                <tr>
+                    <th>操作 / Action</th>
+                    <th>説明 / Description</th>
+                </tr>
+                <tr>
+                    <td>リサイズ / <code>Resize</code></td>
+                    <td>ハンドルをドラッグしてサイズを変更します。<br><span class="en-sub">Drag the edge/corner handles to resize.</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>回転 / <code>Rotate</code></td>
+                    <td>スライダーで -180°〜+180° の範囲で回転します。<br><span class="en-sub">Slider controls rotation from -180° to
+                            +180°.</span></td>
+                </tr>
+                <tr>
+                    <td>塗り色 / <code>Fill Color</code></td>
+                    <td>背景色を変更します。<br><span class="en-sub">Changes the fill/background color.</span></td>
+                </tr>
+                <tr>
+                    <td>枠色 / <code>Border Color</code></td>
+                    <td>枠線の色を変更します。<br><span class="en-sub">Changes the border color.</span></td>
+                </tr>
+                <tr>
+                    <td>削除 / <code>Delete</code></td>
+                    <td>要素を削除します。<br><span class="en-sub">Removes the element.</span></td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="config">
+            <div class="section-header">
+                <h2>カスタマイズ設定 (CONFIG)</h2>
+                <span class="en">CUSTOMIZATION</span>
+            </div>
+            <p>HTMLファイルをテキストエディタで開き、ファイル上部の <code>CONFIG</code> ブロックを編集してください。<br><span class="en-sub">Open the HTML
+                    file in a text editor and edit the <code>CONFIG</code> block near the top.</span></p>
+
+            <div class="code-block">const CONFIG = {
+                color: {
+                accent: '#00fff7', // メインカラー（枠線・発光） / Main color
+                liveBadge: '#ff3c3c', // LIVEバッジ色 / LIVE badge color
+                background: '#0a0a0f', // 背景色 / Background color
+                bodyText: '#c0c0c8', // テキスト色 / Text color
+                },
+                text: {
+                liveBadge: 'LIVE',
+                titleBoxHeader: 'TITLE',
+                titleBoxContent: 'LIVE配信用オーバーレイ画面',
+                commentBoxHeader: 'COMMENT',
+                memoBoxHeader: 'MEMO',
+                memoBoxContent: '空白ダブルクリックでメニュー選択可能',
+                messagePlaceholder: 'メッセージを入力...',
+                memoPlaceholder: 'メモを入力...',
+                },
+                profile: [
+                'あなたの名前 / Your Name',
+                'WEB: yourwebsite.com',
+                'X: @yourhandle',
+                ],
+                animation: {
+                profileInterval: 3000, // プロフィール切替間隔(ms)
+                },
+                };</div>
+
+            <h3>カラー設定 / COLOR SETTINGS</h3>
+            <table>
+                <tr>
+                    <th>キー / Key</th>
+                    <th>説明 / Description</th>
+                    <th>初期値 / Default</th>
+                </tr>
+                <tr>
+                    <td><code>color.accent</code></td>
+                    <td>枠線・発光カラー<br><span class="en-sub">Border & glow color</span></td>
+                    <td><code>'#00fff7'</code></td>
+                </tr>
+                <tr>
+                    <td><code>color.liveBadge</code></td>
+                    <td>LIVEバッジ背景色<br><span class="en-sub">LIVE badge background</span></td>
+                    <td><code>'#ff3c3c'</code></td>
+                </tr>
+                <tr>
+                    <td><code>color.background</code></td>
+                    <td>画面背景色<br><span class="en-sub">Screen background</span></td>
+                    <td><code>'#0a0a0f'</code></td>
+                </tr>
+                <tr>
+                    <td><code>color.bodyText</code></td>
+                    <td>テキスト色<br><span class="en-sub">Text color</span></td>
+                    <td><code>'#c0c0c8'</code></td>
+                </tr>
+            </table>
+
+            <h3>プロフィール / PROFILE</h3>
+            <p>上部バーに順番に表示されるテキストの配列です。<br><span class="en-sub">An array of texts displayed in rotation in the top
+                    bar.</span></p>
+            <div class="code-block">profile: [
+                'ゲーマー名',
+                'GAME: タイトル',
+                'X: @yourhandle',
+                // 行を追加するほど増やせます / Add more lines freely
+                ],</div>
+            <div class="note">
+                <strong>ヒント:</strong> 色はHEX（<code>#00fff7</code>）またはRGBA（<code>rgba(0,255,247,0.5)</code>）形式で指定できます。<br>
+                <strong>Tip:</strong> Colors accept HEX or RGBA format.
+            </div>
+
+            <h3>機能設定 / FEATURES</h3>
+            <table>
+                <tr>
+                    <th>キー / Key</th>
+                    <th>説明 / Description</th>
+                    <th>初期値 / Default</th>
+                </tr>
+                <tr>
+                    <td><code>features.autoLoad</code></td>
+                    <td>ページを開いたとき保存済み設定を自動で読み込む。<br><code>false</code> にすると「保存を読み込む」を手動で押す必要があります。<br><span class="en-sub">Auto-load saved config on page open. Set <code>false</code> for manual load only.</span></td>
+                    <td><code>true</code></td>
+                </tr>
+                <tr>
+                    <td><code>features.saveConfigEnabled</code></td>
+                    <td>設定の保存・読み込み機能を有効にする。<br><code>false</code> にすると「設定を保存」ボタンが非表示になります。<br><span class="en-sub">Enable save/load config. Set <code>false</code> to hide the save button.</span></td>
+                    <td><code>true</code></td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="trouble">
+            <div class="section-header">
+                <h2>トラブル対処</h2>
+                <span class="en">TROUBLESHOOTING</span>
+            </div>
+            <table>
+                <tr>
+                    <th>症状 / Symptom</th>
+                    <th>対処法 / Solution</th>
+                </tr>
+                <tr>
+                    <td>クリックに反応しない<br><span class="en-sub">No response to clicks</span></td>
+                    <td>OBSでソース右クリック → <strong>「対話」</strong> を選択。<br><span class="en-sub">Right-click source in OBS →
+                            <strong>"Interact"</strong>.</span></td>
+                </tr>
+                <tr>
+                    <td>画面が真っ黒<br><span class="en-sub">Black screen</span></td>
+                    <td>「ローカルファイル」にチェックが入っているか確認。<br><span class="en-sub">Verify "Local File" is checked.</span></td>
+                </tr>
+                <tr>
+                    <td>サイズがずれる<br><span class="en-sub">Wrong size</span></td>
+                    <td>幅 <strong>1920</strong>・高さ <strong>1080</strong> を確認。<br><span class="en-sub">Check width=1920,
+                            height=1080.</span></td>
+                </tr>
+                <tr>
+                    <td>配置が保存されない<br><span class="en-sub">Layout lost on reload</span></td>
+                    <td>リロードでリセットされます。<code>CONFIG</code> の直接編集で永続化できます。<br><span class="en-sub">Reloads reset state.
+                            Edit <code>CONFIG</code> for permanent changes.</span></td>
+                </tr>
+            </table>
+        </section>
+
+    </main>
+
+    <footer>
+        GAMING Streaming Overlay &nbsp;|&nbsp; Created by <strong style="color:#00fff7">donnma(どんま)</strong>
+        &nbsp;|&nbsp; <a href="https://donnma.com/" target="_blank"
+            style="color:rgba(0,255,247,0.8);text-decoration:underline">donnma.com</a>
+    </footer>
+
+</body>
+
+</html>

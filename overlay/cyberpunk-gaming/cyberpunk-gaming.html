@@ -1,0 +1,3692 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="OBS Studio用サイバーパンク×ヴェイパーウェイブ配信オーバーレイ。ネオンカラーのダークデザインで1920×1080対応。ドラッグ＆ドロップで自由にカスタマイズ可能。配信者donnma制作。">
+    <meta property="og:title" content="OBS配信オーバーレイ CYBERPUNK VAPORWAVE テーマ | donnma">
+    <meta property="og:description" content="OBS Studio用サイバーパンク×ヴェイパーウェイブ配信オーバーレイ。ネオンカラーのダークデザインで1920×1080対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://donnma.com/overlay/cyberpunk-gaming/">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@donnma777">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;700&family=Permanent+Marker&family=Noto+Sans+JP:wght@700&display=swap"
+        rel="stylesheet">
+    <title>配信画面 - CYBERPUNK VAPORWAVE</title>
+
+    <script>
+        /**
+         * =====================================================
+         *  ★ カスタマイズ設定 ★
+         *  ここを編集するだけでデザインや文字を変更できます。
+         * =====================================================
+         */
+        const CONFIG = {
+
+            // -----------------------------------------------
+            // 【カラー設定】
+            // -----------------------------------------------
+            color: {
+                /** メインカラー（枠線・テキスト・光彩などに使われます） */
+                accent: '#ff007f',
+
+                /** LIVEバッジの背景色 */
+                liveBadge: '#ff007f',
+
+                /** 画面の背景色 */
+                background: '#0b071a',
+
+                /** コメント・メモのテキスト色 */
+                bodyText: '#ffffff',
+            },
+
+            // -----------------------------------------------
+            // 【テキスト設定】
+            // -----------------------------------------------
+            text: {
+                /** LIVEバッジに表示する文字 */
+                liveBadge: 'LIVE',
+
+                /** メッセージ欄のプレースホルダー */
+                messagePlaceholder: 'メッセージを入力...',
+
+                /** TITLEボックスのタイトル */
+                titleBoxHeader: 'TITLE',
+
+                /** TITLEボックスの本文 */
+                titleBoxContent: 'LIVE配信用オーバーレイ',
+
+                /** COMMENTボックスのタイトル */
+                commentBoxHeader: 'COMMENT',
+
+                /** MEMOボックスのタイトル */
+                memoBoxHeader: 'MEMO',
+
+                /** MEMOボックスの初期テキスト */
+                memoBoxContent: '空白ダブルクリックでメニュー選択可能',
+
+                /** MEMOボックスのプレースホルダー */
+                memoPlaceholder: 'メモを入力...',
+            },
+
+            // -----------------------------------------------
+            // 【プロフィール設定】
+            // 上部バーに順番に表示されるテキストのリストです。
+            // 画面上でダブルクリックしても編集できます。
+            // -----------------------------------------------
+            profile: [
+                'donnma(どんま)',
+                'WEB: donnma.com',
+                'X: @donnma777',
+            ],
+
+            // -----------------------------------------------
+            // 【アニメーション設定】
+            // -----------------------------------------------
+            animation: {
+                /** プロフィールの切替間隔（ミリ秒）*/
+                profileInterval: 3000,
+
+                /** コーナー装飾の点滅周期（秒）*/
+                cornerPulseDuration: '2s',
+
+                /** ネオンテキストの点滅周期（秒）*/
+                neonPulseDuration: '3s',
+            },
+
+            // -----------------------------------------------
+            // 【レイアウト設定】
+            // -----------------------------------------------
+            layout: {
+                /** 配信画面の幅（px）*/
+                width: 1920,
+
+                /** 配信画面の高さ（px）*/
+                height: 1080,
+            },
+
+            // -----------------------------------------------
+            // 【機能制御】
+            // -----------------------------------------------
+            features: {
+                /** 設定の保存をコード上で無効化する */
+                /** falseに設定すると保存機能が無効になります */
+                saveConfigEnabled: true,
+                /** ページを開いたとき保存済み設定を自動で読み込む */
+                /** false にすると「保存を読み込む」を手動で押す必要があります */
+                autoLoad: true,
+            },
+        };
+        /**
+         * =====================================================
+         *  ここより下は基本的に編集不要です。
+         * =====================================================
+         */
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            overflow: hidden;
+            font-family: 'Fira Code', 'Noto Sans JP', sans-serif;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.2;
+            }
+        }
+
+        @keyframes neonBlink {
+
+            0%,
+            100% {
+                text-shadow: 0 0 8px var(--color-accent), 0 0 20px var(--color-accent);
+                opacity: 1;
+            }
+
+            50% {
+                text-shadow: 0 0 2px var(--color-accent);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes cornerPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes neonPulse {
+
+            0%,
+            100% {
+                text-shadow: 0 0 5px var(--color-accent);
+                opacity: 1;
+            }
+
+            50% {
+                text-shadow: 0 0 15px var(--color-accent);
+                opacity: 0.8;
+            }
+        }
+
+        .blinking-icon {
+            animation: neonBlink 1.5s infinite alternate;
+            margin-right: 8px;
+            color: #fff;
+        }
+
+        #capture-area {
+            position: relative;
+        }
+
+        /* ---- コーナー装飾 ---- */
+        .corner {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            animation: cornerPulse var(--corner-pulse-duration) infinite ease-in-out;
+        }
+
+        .corner-tl {
+            top: 4px;
+            left: 4px;
+            border-top: 2px solid var(--color-accent);
+            border-left: 2px solid var(--color-accent);
+        }
+
+        .corner-tr {
+            top: 4px;
+            right: 4px;
+            border-top: 2px solid var(--color-accent);
+            border-right: 2px solid var(--color-accent);
+        }
+
+        .corner-bl {
+            bottom: 4px;
+            left: 4px;
+            border-bottom: 2px solid var(--color-accent);
+            border-left: 2px solid var(--color-accent);
+        }
+
+        .corner-br {
+            bottom: 4px;
+            right: 4px;
+            border-bottom: 2px solid var(--color-accent);
+            border-right: 2px solid var(--color-accent);
+        }
+
+        /* ---- 上部バー ---- */
+        .live-badge {
+            height: 50px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            font-family: 'Permanent Marker', cursive;
+            font-size: 22px;
+            font-weight: 900;
+            color: #0b071a;
+            flex-shrink: 0;
+            transform: skewX(-10deg);
+            box-shadow: 4px 4px 0px #00ffcc;
+            clip-path: none;
+        }
+
+        .live-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #0b071a;
+            font-family: 'Permanent Marker', cursive;
+            font-size: 22px;
+            min-width: 40px;
+            width: 4ch;
+            text-align: center;
+        }
+
+        .profile-container {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a103c;
+            border: 2px solid var(--color-accent);
+            transform: skewX(-10deg);
+            clip-path: none;
+            padding: 0 25px;
+            min-width: 320px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .profile-container:hover {
+            background: #261757;
+            box-shadow: 0 0 12px rgba(255, 0, 127, 0.6);
+        }
+
+        #profile-display-area, .profile-display-area {
+            white-space: nowrap;
+            font-size: 16px;
+            font-weight: 700;
+            color: #00ffcc;
+            pointer-events: none;
+            transform: skewX(10deg);
+            text-shadow: 0 0 5px #00ffcc;
+            animation: neonPulse var(--neon-pulse-duration) infinite ease-in-out;
+        }
+
+        /* ---- プロフィール編集ポップアップ ---- */
+        #profile-editor {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 7, 26, 0.9);
+            z-index: 1000;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 100px;
+        }
+
+        #profile-editor.open {
+            display: flex;
+        }
+
+        .editor-popup {
+            background: #0f0a26;
+            border: 2px solid #00ffcc;
+            padding: 24px;
+            width: 460px;
+            box-shadow: 8px 8px 0px var(--color-accent);
+        }
+
+        .editor-title {
+            font-family: 'Fira Code', sans-serif;
+            font-size: 14px;
+            color: var(--color-accent);
+            margin-bottom: 16px;
+        }
+
+        .editor-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .editor-item input {
+            flex: 1;
+            height: 40px;
+            border: 2px solid var(--color-accent);
+            background: #1a103c;
+            padding: 0 12px;
+            color: white;
+            outline: none;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 14px;
+        }
+
+        .editor-item input:focus {
+            background: #261757;
+        }
+
+        .btn-remove {
+            width: 40px;
+            height: 40px;
+            background: var(--color-accent);
+            color: #0b071a;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: flex-end;
+        }
+
+        .btn-add {
+            height: 40px;
+            padding: 0 20px;
+            background: transparent;
+            border: 2px solid #00ffcc;
+            color: #00ffcc;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-add:hover {
+            background: rgba(0, 255, 204, 0.1);
+        }
+
+        .btn-save {
+            height: 40px;
+            padding: 0 24px;
+            background: var(--color-accent);
+            border: none;
+            color: #0b071a;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-save:hover {
+            filter: brightness(0.9);
+        }
+
+        /* ---- 情報バー ---- */
+        .info-base {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            background: rgba(26, 16, 60, 0.7);
+            border: 2px solid #00ffcc;
+            transform: skewX(-10deg);
+            clip-path: none;
+            color: #ffffff;
+            font-size: 15px;
+        }
+
+        .input-text {
+            border: none;
+            background: transparent;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 15px;
+            color: #ffffff;
+            outline: none;
+            width: 100%;
+            text-align: center;
+            transform: skewX(10deg);
+        }
+
+        .clock-container {
+            width: 360px;
+            flex-shrink: 0;
+            gap: 14px;
+            font-family: 'Fira Code', sans-serif;
+            font-weight: 700;
+            color: var(--color-accent);
+            display: flex;
+            justify-content: center;
+            text-shadow: 0 0 8px var(--color-accent);
+        }
+
+        #date {
+            font-size: 13px;
+            color: #00ffcc;
+            text-shadow: 0 0 5px #00ffcc;
+            transform: skewX(10deg);
+        }
+
+        #clock {
+            transform: skewX(10deg);
+        }
+
+        /* ---- ボックスパーツ ---- */
+        .box {
+            position: absolute;
+            background: #0f0a26;
+            border: 2px solid var(--color-accent);
+            min-width: 220px;
+            box-shadow: 6px 6px 0px #00ffcc;
+        }
+
+        .box-del-btn {
+            display: none !important;
+        }
+
+        /* 左辺アクセントライン無効化（テーマ上不要） */
+        .box::before {
+            display: none;
+        }
+
+        .header {
+            background: #1a103c;
+            border-bottom: 2px solid var(--color-accent);
+            padding: 0 14px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            cursor: move;
+            user-select: none;
+        }
+
+        .header-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: #00ffcc;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        .window-btns {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+            align-items: center;
+        }
+
+        .btn {
+            width: 12px;
+            height: 12px;
+            border: 1px solid var(--color-accent);
+            background: transparent;
+            border-radius: 0;
+        }
+
+        .box-menu-toggle {
+            cursor: pointer;
+            background: rgba(255, 0, 127, 0.2);
+            border: 1px solid var(--color-accent);
+            color: var(--color-accent);
+            font-size: 10px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            border-radius: 0;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            z-index: 50;
+        }
+
+        .box:hover .box-menu-toggle,
+        .box-menu-toggle:hover {
+            display: flex;
+        }
+
+        .box-menu-toggle:hover {
+            background: var(--color-accent);
+            color: #0b071a;
+        }
+
+        .content {
+            padding: 14px;
+        }
+
+        textarea {
+            overflow: hidden;
+        }
+
+        .title-input {
+            width: auto;
+            min-width: 200px;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            outline: none;
+            resize: none;
+            display: block;
+            padding: 8px 16px;
+            white-space: nowrap;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .text-input-box {
+            width: 100%;
+            min-height: 200px;
+            border: none;
+            background: transparent;
+            color: var(--color-body-text);
+            font-family: 'Fira Code', sans-serif;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            display: block;
+            line-height: 1.6;
+        }
+
+        .comment-box {
+            width: 360px;
+        }
+
+        .memo-box {
+            width: 360px;
+        }
+
+        .memo-box .text-input-box,
+        .plain-box .text-input-box {
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 700;
+        }
+
+        /* ---- パーツ追加メニュー ---- */
+        #part-menu {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            background: #0f0a26;
+            border: 2px solid var(--color-accent);
+            box-shadow: 6px 6px 0px #00ffcc;
+            min-width: 240px;
+            max-width: min(92vw, 640px);
+            width: auto;
+            padding: 6px 0;
+            box-sizing: border-box;
+            gap: 0;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        #part-menu.open {
+            display: grid;
+        }
+
+        .part-menu-title {
+            grid-column: 1 / -1;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--color-accent);
+            letter-spacing: 2px;
+            padding: 8px 16px 6px;
+            opacity: 0.9;
+            border-bottom: 1px solid rgba(255, 0, 127, 0.3);
+            margin-bottom: 4px;
+        }
+
+        .part-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 14px;
+            color: #e0e0e0;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+            min-width: 0;
+        }
+
+        .part-menu-item:hover {
+            background: rgba(255, 0, 127, 0.15);
+            color: var(--color-accent);
+        }
+
+        .part-menu-section {
+            grid-column: 1 / -1;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: #00ffcc;
+            letter-spacing: 1px;
+            padding: 6px 16px 3px;
+            opacity: 0.8;
+            border-top: 1px solid rgba(255, 0, 127, 0.2);
+            margin-top: 4px;
+        }
+
+        .part-menu-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        /* ---- 画像ボックス用 ---- */
+        .image-box {
+            min-width: 220px;
+            min-height: 180px;
+            width: auto;
+        }
+
+        .image-drop-area {
+            width: 100%;
+            min-height: 160px;
+            height: 100%;
+            border: 2px dashed rgba(255, 0, 127, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 0, 127, 0.6);
+            font-family: 'Fira Code', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .image-drop-area:hover,
+        .image-drop-area.dragover {
+            border-color: var(--color-accent);
+            background: rgba(255, 0, 127, 0.05);
+            color: var(--color-accent);
+        }
+
+        .image-drop-area img {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        .bg-grid {
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 0, 127, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 127, 0.08) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.6;
+            z-index: 0;
+        }
+
+        .bg-bars {
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(90deg, rgba(255, 0, 127, 0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 204, 0.08) 1px, transparent 1px);
+            background-size: 80px 100%;
+            opacity: 0.7;
+            z-index: 0;
+        }
+
+        .bg-neon {
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(255, 0, 127, 0.18), transparent 20%),
+                radial-gradient(circle at 80% 25%, rgba(0, 255, 204, 0.14), transparent 18%),
+                radial-gradient(circle at 50% 80%, rgba(150, 0, 255, 0.12), transparent 22%);
+            z-index: 0;
+            opacity: 0.85;
+        }
+
+        .bg-part {
+            z-index: 0;
+        }
+
+        .float-part {
+            z-index: 100;
+        }
+
+        .bg-part .box-menu-toggle {
+            display: flex !important;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 101;
+        }
+
+        .image-drop-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .image-drop-hint {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        /* ---- テキスト入力ボックス ドラッグバー ---- */
+        .plain-drag-bar {
+            height: 8px;
+            cursor: move;
+            border-radius: 18px 18px 0 0;
+            background: var(--color-accent, currentColor);
+            opacity: 0.2;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .plain-drag-bar:hover {
+            opacity: 0.4;
+        }
+
+        /* ---- 長押しドラッグ ---- */
+        @keyframes longPressGlow {
+            0% {
+                box-shadow: 0 0 0 0 transparent;
+            }
+
+            100% {
+                box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.35);
+            }
+        }
+
+        .box-long-pressing {
+            animation: longPressGlow 0.2s ease forwards;
+        }
+
+        .box-long-dragging {
+            box-shadow: 0 0 0 2px var(--color-accent);
+            opacity: 0.88;
+            cursor: grabbing !important;
+        }
+
+        /* ---- 使い方モーダル ---- */
+        #help-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.72);
+            z-index: 4000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #help-modal.open {
+            display: flex;
+        }
+
+        .help-popup {
+            background: #0b071a;
+            border: 1px solid var(--color-accent);
+            padding: 28px 32px 22px;
+            width: 520px;
+            max-width: 92vw;
+            box-shadow: 0 0 32px rgba(255, 0, 127, 0.25);
+        }
+
+        .help-title {
+            font-family: 'Fira Code', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--color-accent);
+            letter-spacing: 2px;
+            margin-bottom: 18px;
+        }
+
+        .help-body {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .help-section {
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--color-accent);
+            letter-spacing: 2px;
+            opacity: 0.6;
+            margin-top: 14px;
+            margin-bottom: 2px;
+            border-bottom: 1px solid rgba(255, 0, 127, 0.2);
+            padding-bottom: 3px;
+        }
+
+        .help-row {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            padding: 4px 0;
+        }
+
+        .help-key {
+            font-family: 'Fira Code', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--color-accent);
+            background: rgba(255, 0, 127, 0.08);
+            border: 1px solid rgba(255, 0, 127, 0.3);
+            padding: 2px 8px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .help-desc {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.5;
+        }
+
+        .help-close-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .help-close-btn {
+            height: 34px;
+            padding: 0 24px;
+            background: var(--color-accent);
+            border: none;
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        .help-close-btn:hover {
+            filter: brightness(0.85);
+        }
+
+        /* ---- パーツメニュー（ホバー） ---- */
+        .part-menu-toggle {
+            display: none;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 501;
+            width: 18px;
+            height: 18px;
+            background: rgba(255, 0, 127, 0.2);
+            border: 1px solid rgba(255, 0, 127, 0.5);
+            color: var(--color-accent);
+            font-size: 11px;
+            line-height: 18px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .live-badge:hover .part-menu-toggle,
+        .profile-container:hover .part-menu-toggle,
+        .info-base:hover .part-menu-toggle,
+        .float-part:hover .part-menu-toggle {
+            display: block;
+        }
+
+        .part-menu-toggle:hover {
+            background: rgba(255, 0, 127, 0.4);
+        }
+
+        /* ---- ホバーメニュー ---- */
+        .hover-menu {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            background: #0f0a26;
+            border: 2px solid var(--color-accent);
+            box-shadow: 4px 4px 0px #00ffcc;
+            padding: 6px;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 150px;
+        }
+
+        .hover-menu.open {
+            display: flex;
+        }
+
+        .hover-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 8px;
+            background: transparent;
+            border: none;
+            color: #e0e0e0;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: left;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .hover-menu-btn:hover {
+            background: rgba(255, 0, 127, 0.15);
+            color: var(--color-accent);
+        }
+
+        .hover-menu-btn.danger {
+            color: rgba(255, 60, 60, 0.8);
+        }
+
+        .hover-menu-btn.danger:hover {
+            background: rgba(255, 60, 60, 0.1);
+            color: #ff3c3c;
+        }
+
+        .hover-menu-sep {
+            height: 1px;
+            background: rgba(255, 0, 127, 0.2);
+            margin: 2px 0;
+        }
+
+        /* フォントサイズサブパネル */
+        .hover-menu-fs {
+            display: none;
+            padding: 4px 8px;
+            gap: 4px;
+            flex-direction: column;
+        }
+
+        .hover-menu-fs.open {
+            display: flex;
+        }
+
+        .hover-menu-fs-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hover-menu-fs-input {
+            width: 52px;
+            background: #1a103c;
+            border: 1px solid var(--color-accent);
+            color: var(--color-accent);
+            font-family: 'Fira Code', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            padding: 3px;
+        }
+
+        .hover-menu-fs-apply {
+            padding: 3px 8px;
+            background: var(--color-accent);
+            border: none;
+            color: #0b071a;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .hover-menu-tc {
+            display: none;
+            padding: 4px 8px;
+        }
+
+        .hover-menu-tc.open {
+            display: block;
+        }
+
+        .hover-menu-tc-input {
+            width: 36px;
+            height: 24px;
+            border: none;
+            padding: 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            background: transparent;
+        }
+
+        /* 回転サブパネル */
+        .hover-menu-rot {
+            display: none;
+            padding: 4px 8px;
+        }
+
+        .hover-menu-rot.open {
+            display: block;
+        }
+
+        .hover-menu-rot-presets {
+            display: flex;
+            gap: 2px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        /* 塗り色・枠色サブパネル */
+        .hover-menu-fc,
+        .hover-menu-bc {
+            display: none;
+            padding: 4px 8px;
+        }
+
+        .hover-menu-fc.open,
+        .hover-menu-bc.open {
+            display: block;
+        }
+
+        .hover-menu-fc-input,
+        .hover-menu-bc-input {
+            width: 36px;
+            height: 24px;
+            border: none;
+            padding: 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            background: transparent;
+        }
+
+        .hover-menu-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-bottom: 6px;
+        }
+
+        .hover-menu-swatch {
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            padding: 0;
+            flex-shrink: 0;
+            transition: transform 0.12s;
+        }
+
+        .hover-menu-swatch:hover {
+            transform: scale(1.25);
+            border-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .hover-menu-color-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hover-menu-hex-input {
+            width: 68px;
+            font-family: monospace;
+            font-size: 11px;
+            padding: 2px 5px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.85);
+            color: #333;
+        }
+
+        .ticker-wrap {
+            overflow: visible;
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--color-accent, rgba(255, 255, 255, 0.5));
+            border-radius: 4px;
+            height: 40px;
+            min-width: 200px;
+            cursor: move;
+        }
+
+        .ticker-inner {
+            overflow: hidden;
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            border-radius: 4px;
+        }
+
+        .ticker-track {
+            display: flex;
+            animation: tickerScroll 18s linear infinite;
+            will-change: transform;
+            color: var(--color-accent, #fff);
+            font-size: 16px;
+        }
+
+        .ticker-txt {
+            white-space: nowrap;
+            padding-right: 80px;
+            color: inherit;
+            font-size: inherit;
+            letter-spacing: 0.05em;
+        }
+
+        @keyframes tickerScroll {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        .ticker-edit-inp {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            border: 2px solid var(--color-accent, #fff);
+            padding: 0 8px;
+            font-size: 14px;
+        }
+
+        .ticker-resize-grip {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 14px;
+            height: 14px;
+            cursor: se-resize;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        /* 図形パーツ */
+        .shape-box {
+            --color-accent: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.45) !important;
+            border-radius: 4px;
+            min-width: 0 !important;
+            min-height: 0 !important;
+        }
+
+        .shape-circle {
+            border-radius: 50% !important;
+        }
+
+        /* 図形サブメニュー */
+        .part-menu-has-sub {
+            position: relative;
+        }
+
+        .part-menu-sub {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: -4px;
+            background: #0f0a26;
+            border: 1px solid var(--color-accent);
+            border-radius: 6px;
+            box-shadow: 0 4px 20px rgba(0, 255, 247, 0.15);
+            min-width: 150px;
+            padding: 4px 0;
+            z-index: 10001;
+            white-space: nowrap;
+        }
+
+        .part-menu-has-sub:hover .part-menu-sub {
+            display: block;
+        }
+
+        .hover-menu-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-bottom: 4px;
+        }
+
+        .hover-menu-preset {
+            padding: 2px 6px;
+            background: transparent;
+            border: 1px solid rgba(255, 0, 127, 0.3);
+            color: rgba(255, 0, 127, 0.7);
+            font-family: 'Fira Code', sans-serif;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .hover-menu-preset:hover {
+            background: rgba(255, 0, 127, 0.15);
+            color: var(--color-accent);
+        }
+
+        /* ---- リサイズハンドル ---- */
+        .resize-handle {
+            position: absolute;
+            z-index: 20;
+            display: none;
+            background: var(--color-accent);
+            opacity: 0.8;
+            border-radius: 0;
+        }
+
+        .resize-handle.nw {
+            top: -4px;
+            left: -4px;
+            width: 10px;
+            height: 10px;
+            cursor: nw-resize;
+        }
+
+        .resize-handle.ne {
+            top: -4px;
+            right: -4px;
+            width: 10px;
+            height: 10px;
+            cursor: ne-resize;
+        }
+
+        .resize-handle.sw {
+            bottom: -4px;
+            left: -4px;
+            width: 10px;
+            height: 10px;
+            cursor: sw-resize;
+        }
+
+        .resize-handle.se {
+            bottom: -4px;
+            right: -4px;
+            width: 10px;
+            height: 10px;
+            cursor: se-resize;
+        }
+
+        .resize-handle.n {
+            top: -4px;
+            left: 10px;
+            right: 10px;
+            height: 8px;
+            cursor: n-resize;
+        }
+
+        .resize-handle.s {
+            bottom: -4px;
+            left: 10px;
+            right: 10px;
+            height: 8px;
+            cursor: s-resize;
+        }
+
+        .resize-handle.w {
+            left: -4px;
+            top: 10px;
+            bottom: 10px;
+            width: 8px;
+            cursor: w-resize;
+        }
+
+        .resize-handle.e {
+            right: -4px;
+            top: 10px;
+            bottom: 10px;
+            width: 8px;
+            cursor: e-resize;
+        }
+
+        .resizable:hover .resize-handle,
+        .resizable.resizing .resize-handle {
+            display: block;
+        }
+
+        .resize-handle:hover {
+            background: #00ffcc;
+        }
+
+        /* ---- ストップウォッチ ---- */
+        .sw-box {
+            min-width: 0;
+        }
+
+        .sw-box .sw-inner {
+            padding: 10px 20px 14px;
+            font-family: 'Fira Code', sans-serif;
+            font-weight: 700;
+            color: var(--color-accent);
+            text-align: center;
+            text-shadow: 0 0 8px var(--color-accent);
+        }
+
+        .sw-box .sw-time {
+            font-size: 32px;
+            letter-spacing: 2px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hdr-float-time, .hdr-float-date {
+            display: inline-block;
+        }
+        .clock-time, .clock-date, .hdr-float-time, .hdr-float-date {
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum" 1;
+        }
+
+        .sw-box .sw-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .sw-box .sw-btn {
+            font-family: 'Fira Code', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 5px 12px;
+            border: 2px solid var(--color-accent);
+            background: transparent;
+            color: var(--color-accent);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .sw-box .sw-btn:hover {
+            background: rgba(255, 0, 127, 0.15);
+        }
+
+        .sw-box .sw-btn.running {
+            background: rgba(255, 0, 127, 0.12);
+        }
+
+        .sw-box .sw-btn-reset {
+            border-color: rgba(255, 60, 60, 0.6);
+            color: rgba(255, 60, 60, 0.8);
+        }
+
+        .sw-box .sw-btn-reset:hover {
+            background: rgba(255, 60, 60, 0.15);
+        }
+
+        /* ---- カウンター ---- */
+        .counter-box {
+            min-width: 0;
+        }
+
+        .counter-box .counter-inner {
+            padding: 10px 20px 14px;
+            font-family: 'Fira Code', sans-serif;
+            font-weight: 700;
+            color: var(--color-accent);
+            text-align: center;
+            text-shadow: 0 0 8px var(--color-accent);
+        }
+
+        .counter-box .counter-value {
+            font-size: 48px;
+            letter-spacing: 4px;
+            line-height: 1;
+            min-width: 3ch;
+            display: inline-block;
+        }
+
+        .counter-box .counter-label {
+            font-size: 11px;
+            opacity: 0.5;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .counter-box .counter-step-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin: 8px 0 6px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .counter-box .counter-step-input {
+            width: 52px;
+            background: #1a103c;
+            border: 2px solid var(--color-accent);
+            color: var(--color-accent);
+            font-family: 'Fira Code', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            padding: 2px 4px;
+        }
+
+        .counter-box .counter-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 4px;
+        }
+
+        .counter-box .counter-btn {
+            font-family: 'Fira Code', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 6px 16px;
+            border: 2px solid var(--color-accent);
+            background: transparent;
+            color: var(--color-accent);
+            cursor: pointer;
+            transition: background 0.15s;
+            min-width: 48px;
+        }
+
+        .counter-box .counter-btn:hover {
+            background: rgba(255, 0, 127, 0.15);
+        }
+
+        .counter-box .counter-btn-minus {
+            border-color: rgba(255, 60, 60, 0.6);
+            color: rgba(255, 60, 60, 0.8);
+        }
+
+        .counter-box .counter-btn-minus:hover {
+            background: rgba(255, 60, 60, 0.15);
+        }
+
+        .counter-box .counter-btn-reset {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+        }
+
+        .counter-box .counter-btn-reset:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* ---- トースト通知 ---- */
+        #obs-toast {
+            display: none;
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            background: #0f0a26;
+            border: 2px solid var(--color-accent);
+            box-shadow: 4px 4px 0px #00ffcc;
+            padding: 12px 24px;
+            font-family: 'Fira Code', sans-serif;
+            font-size: 14px;
+            color: var(--color-accent);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        #obs-toast.show {
+            display: block;
+            animation: toastFade 3s forwards;
+        }
+
+        @keyframes toastFade {
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            70% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        #obs-toast.error {
+            border-color: #ff3c3c;
+            box-shadow: 4px 4px 0px rgba(255, 60, 60, 0.5);
+            color: #ff3c3c;
+        }
+
+        #obs-toast.success {
+            border-color: #00ffcc;
+            color: #00ffcc;
+        }
+
+        /* ---- 独立時計パーツ ---- */
+        .clock-box {
+            min-width: 0;
+        }
+
+        .clock-box .clock-inner {
+            padding: 10px 20px;
+            font-family: 'Fira Code', sans-serif;
+            font-weight: 700;
+            color: var(--color-accent);
+            text-align: center;
+            text-shadow: 0 0 8px var(--color-accent);
+        }
+
+        .clock-box .clock-time {
+            font-size: 32px;
+            letter-spacing: 2px;
+        }
+
+        .clock-box .clock-date {
+            font-size: 13px;
+            opacity: 0.7;
+            margin-top: 2px;
+            color: #00ffcc;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="capture-area">
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+
+        <!-- 各ヘッダーパーツ（個別に移動・削除可能） -->
+        <div class="live-badge" id="init-live" style="position:absolute; top:20px; left:20px; cursor:move;">
+            <span class="blinking-icon">●</span>
+            <input type="text" class="live-input" id="live-badge-text">
+        </div>
+
+        <div class="profile-container" id="profile-container" title="ダブルクリックで編集"
+            style="position:absolute; top:20px; left:180px; cursor:move;">
+            <div id="profile-display-area" class="profile-display-area"></div>
+        </div>
+
+        <div class="info-base" id="init-message"
+            style="position:absolute; top:20px; left:510px; right:390px; cursor:move;">
+            <input type="text" class="input-text" id="message-input">
+        </div>
+
+        <div class="info-base clock-container" id="init-clock"
+            style="position:absolute; top:20px; right:20px; width:360px; cursor:move;">
+            <span id="date" class="hdr-float-date">0000/00/00</span>
+            <span id="clock" class="hdr-float-time">00:00:00</span>
+        </div>
+
+
+        <div class="box" style="bottom: 20px; left: 500px;" id="title-box">
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" id="title-box-header">
+                <div class="window-btns">
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                </div>
+            </div>
+            <div class="content">
+                <textarea class="title-input" rows="1" id="title-box-content"></textarea>
+            </div>
+        </div>
+
+        <div class="box comment-box" style="top: 100px; right: 20px;" id="comment-box">
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" id="comment-box-header">
+                <div class="window-btns">
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                </div>
+            </div>
+            <div class="content"><textarea class="text-input-box" placeholder=""></textarea></div>
+        </div>
+
+        <div class="box memo-box" style="top: 600px; right: 20px;" id="memo-box">
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" id="memo-box-header">
+                <div class="window-btns">
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                </div>
+            </div>
+            <div class="content"><textarea class="text-input-box" id="memo-box-content"></textarea></div>
+        </div>
+    </div>
+
+    <!-- トースト通知 -->
+    <div id="obs-toast"></div>
+
+    <!-- パーツ追加メニュー -->
+    <div id="part-menu">
+        <div class="part-menu-title">// ADD PART</div>
+        <div class="part-menu-section">─ ヘッダーパーツ</div>
+        <div class="part-menu-item" data-part="hdr-live">
+            <span class="part-menu-icon">🔴</span> LIVEバッジ
+        </div>
+        <div class="part-menu-item" data-part="hdr-profile">
+            <span class="part-menu-icon">👤</span> プロフィール欄
+        </div>
+        <div class="part-menu-item" data-part="hdr-message">
+            <span class="part-menu-icon">✉️</span> メッセージ入力欄
+        </div>
+        <div class="part-menu-item" data-part="hdr-clock">
+            <span class="part-menu-icon">🕐</span> 時計（バー埋め込み型）
+        </div>
+        <div class="part-menu-item" data-part="hdr-ticker">
+            <span class="part-menu-icon">📺</span> テロップ（スクロール）
+        </div>
+        <div class="part-menu-section">─ ボックスパーツ</div>
+        <div class="part-menu-item" data-part="clock">
+            <span class="part-menu-icon">🕐</span> 時計（独立）
+        </div>
+        <div class="part-menu-item" data-part="stopwatch">
+            <span class="part-menu-icon">⏱</span> ストップウォッチ
+        </div>
+        <div class="part-menu-item" data-part="counter">
+            <span class="part-menu-icon">🔢</span> カウンター
+        </div>
+        <div class="part-menu-item" data-part="memo">
+            <span class="part-menu-icon">📝</span> メモボックス
+        </div>
+        <div class="part-menu-item" data-part="plain-text">
+            <span class="part-menu-icon">▭</span> テキスト入力
+        </div>
+        <div class="part-menu-item part-menu-has-sub" data-part="shape">
+            <span class="part-menu-icon">◻</span> 図形 ▶
+            <div class="part-menu-sub">
+                <div class="part-menu-item" data-part="shape-rect"><span class="part-menu-icon">▭</span> 四角形</div>
+                <div class="part-menu-item" data-part="shape-circle"><span class="part-menu-icon">○</span> 円</div>
+            </div>
+        </div>
+        <div class="part-menu-item" data-part="title">
+            <span class="part-menu-icon">🏷</span> TITLEボックス
+        </div>
+        <div class="part-menu-item" data-part="image">
+            <span class="part-menu-icon">🖼</span> 画像ボックス
+        </div>
+        <div class="part-menu-section">─ 背景パーツ</div>
+        <div class="part-menu-item" data-part="bg-grid">
+            <span class="part-menu-icon">▦</span> デジタルグリッド
+        </div>
+        <div class="part-menu-item" data-part="bg-bars">
+            <span class="part-menu-icon">▸</span> サイドライトバー
+        </div>
+        <div class="part-menu-item" data-part="bg-neon">
+            <span class="part-menu-icon">✦</span> ネオンライン
+        </div>
+        <div class="part-menu-item" data-part="bg-upload">
+            <span class="part-menu-icon">📁</span> 背景画像アップロード
+        </div>
+        <div class="part-menu-item" data-part="bg-color">
+            <span class="part-menu-icon">🎨</span> 背景カラー選択
+        </div>
+        <div class="part-menu-item" data-part="bg-clear">
+            <span class="part-menu-icon">🧼</span> 背景削除
+        </div>
+        <div class="part-menu-section">─ その他</div>
+        <div class="part-menu-item" data-part="save-config">
+            <span class="part-menu-icon">💾</span> 設定を保存
+        </div>
+        <div class="part-menu-item" data-part="load-config">
+            <span class="part-menu-icon">📂</span> 保存を読み込む
+        </div>
+
+        <div class="part-menu-item" data-part="export-config">
+            <span class="part-menu-icon">⬇️</span> 設定をエクスポート
+        </div>
+        <div class="part-menu-item" data-part="import-config">
+            <span class="part-menu-icon">⬆️</span> 設定をインポート
+        </div>
+        <div class="part-menu-item" data-part="reset">
+            <span class="part-menu-icon">🔄</span> 画面リセット
+        </div>
+        <div class="part-menu-item" data-part="help">
+            <span class="part-menu-icon">❓</span> 使い方
+        </div>
+    </div>
+
+    <!-- 使い方モーダル -->
+    <div id="help-modal">
+        <div class="help-popup">
+            <div class="help-title">// HOW TO USE</div>
+            <div class="help-body">
+                <div class="help-section">パーツの追加</div>
+                <div class="help-row"><span class="help-key">ダブルクリック</span><span
+                        class="help-desc">何もない場所でパーツ追加メニューを開く</span></div>
+
+                <div class="help-section">パーツの操作</div>
+                <div class="help-row"><span class="help-key">ヘッダーをドラッグ</span><span class="help-desc">ボックスを移動</span>
+                </div>
+                <div class="help-row"><span class="help-key">角・辺のハンドル</span><span
+                        class="help-desc">ホバーで表示、ドラッグでリサイズ</span></div>
+                <div class="help-row"><span class="help-key">≡ ボタン</span><span class="help-desc">ボックスにホバーで右上に出現 →
+                        複製・文字サイズ・削除</span></div>
+                <div class="help-row"><span class="help-key">ヘッダー上部パーツ</span><span class="help-desc">ホバーで右上に≡が出現 →
+                        同様のメニュー</span></div>
+
+                <div class="help-section">プロフィール欄</div>
+                <div class="help-row"><span class="help-key">ダブルクリック</span><span
+                        class="help-desc">プロフィールテキストを編集（複数行を自動で切り替え表示）</span></div>
+
+                <div class="help-section">設定の保存・読込</div>
+                <div class="help-row"><span class="help-key">設定を保存</span><span
+                        class="help-desc">現在の配置をブラウザに保存（次回自動読込）</span></div>
+                <div class="help-row"><span class="help-key">エクスポート</span><span
+                        class="help-desc">設定をJSONファイルとしてダウンロード</span></div>
+                <div class="help-row"><span class="help-key">インポート</span><span class="help-desc">保存したJSONを読み込んで復元</span>
+                </div>
+                <div class="help-section">推奨設定</div>
+                <div class="help-row"><span class="help-key">推奨サイズ</span><span class="help-desc">1920 × 1080 px</span>
+                </div>
+                <div class="help-section">制作 / Created by</div>
+                <div class="help-row" style="justify-content:center;padding:6px 0 2px">
+                    <span class="help-desc" style="opacity:1;text-align:center"><strong>donnma(どんま)</strong>
+                        &nbsp;—&nbsp; <a href="https://donnma.com/" target="_blank"
+                            style="color:inherit">donnma.com</a></span>
+                </div>
+            </div>
+            <div class="help-close-row">
+                <button class="help-close-btn" id="help-close">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile-editor">
+        <div class="editor-popup">
+            <div class="editor-title">// PROFILE EDIT</div>
+            <div id="editor-items"></div>
+            <div class="editor-actions">
+                <button class="btn-add" id="btn-add">＋ 追加</button>
+                <button class="btn-save" id="btn-save">SAVE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =====================================================
+         *  初期化：CONFIG の値を DOM・CSS に反映する
+         * ===================================================== */
+
+        // グローバル参照（関数から参照されるため最初に宣言）
+        const captureArea = document.getElementById('capture-area');
+        const partMenu = document.getElementById('part-menu');
+        const saveConfigMenuItem = document.querySelector('[data-part="save-config"]');
+        const isSaveConfigEnabled = () => CONFIG.features?.saveConfigEnabled !== false;
+
+        if (!isSaveConfigEnabled() && saveConfigMenuItem) {
+            saveConfigMenuItem.style.display = 'none';
+        }
+
+        function removeTopLevel(node) {
+            if (!node) return;
+            // まず直接親が captureArea ならそれを削除
+            if (node.parentElement === captureArea) {
+                try { captureArea.removeChild(node); return; } catch (err) { console.error('direct remove failed', err); }
+            }
+            // そうでない場合、captureArea の直下の子要素の中で node を内包するものを探して削除
+            const children = Array.from(captureArea.children);
+            for (const ch of children) {
+                try {
+                    if (ch.contains(node)) { captureArea.removeChild(ch); return; }
+                } catch (err) { /* ignore */ }
+            }
+            // 最終手段で node 自体を削除
+            try { if (node && typeof node.remove === 'function') node.remove(); } catch (err) { console.error('final remove failed', err); }
+        }
+
+        // CSS カスタムプロパティにカラーを注入
+        const root = document.documentElement;
+        root.style.setProperty('--color-accent', CONFIG.color.accent);
+        root.style.setProperty('--color-body-text', CONFIG.color.bodyText);
+        root.style.setProperty('--corner-pulse-duration', CONFIG.animation.cornerPulseDuration);
+        root.style.setProperty('--neon-pulse-duration', CONFIG.animation.neonPulseDuration);
+
+        // body のサイズをレイアウト設定から適用
+        document.body.style.backgroundColor = 'transparent';
+        document.body.style.width = CONFIG.layout.width + 'px';
+        document.body.style.height = CONFIG.layout.height + 'px';
+        captureArea.style.width = CONFIG.layout.width + 'px';
+        captureArea.style.height = CONFIG.layout.height + 'px';
+        captureArea.style.background = 'linear-gradient(180deg, #0b071a 0%, #150933 100%)';
+
+        // LIVEバッジ（CYBERPUNKテーマ：背景色 + テキストは暗色固定）
+        document.querySelector('.live-badge').style.background = CONFIG.color.liveBadge;
+        document.querySelector('.live-badge').style.color = '#0b071a';
+        document.getElementById('live-badge-text').value = CONFIG.text.liveBadge;
+
+        // メッセージ欄
+        document.getElementById('message-input').placeholder = CONFIG.text.messagePlaceholder;
+
+
+        // TITLEボックス
+        document.getElementById('title-box-header').value = CONFIG.text.titleBoxHeader;
+        document.getElementById('title-box-content').value = CONFIG.text.titleBoxContent;
+
+        // COMMENTボックス
+        document.getElementById('comment-box-header').value = CONFIG.text.commentBoxHeader;
+
+        // MEMOボックス
+        document.getElementById('memo-box-header').value = CONFIG.text.memoBoxHeader;
+        document.getElementById('memo-box-content').value = CONFIG.text.memoBoxContent;
+        document.getElementById('memo-box-content').placeholder = CONFIG.text.memoPlaceholder;
+
+        // アニメーションのキーフレームを動的生成（CSS変数ではアニメーション内の値が効かないため）
+        const styleEl = document.createElement('style');
+        styleEl.textContent = `
+        @keyframes cornerPulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.4; }
+        }
+        @keyframes neonPulse {
+            0%, 100% { text-shadow: 0 0 6px ${CONFIG.color.accent}, 0 0 12px ${CONFIG.color.accent}; }
+            50%       { text-shadow: 0 0 3px ${CONFIG.color.accent}; }
+        }
+    `;
+        document.head.appendChild(styleEl);
+
+        /* =====================================================
+         *  既存ヘッダーバーにドラッグ・削除ボタンを付与
+         * ===================================================== */
+        // 既存ヘッダーパーツを個別にドラッグ・削除可能にする
+        (function setupInitialHeaderParts() {
+            // LIVEバッジ
+            const livEl = document.getElementById('init-live');
+            livEl.style.background = CONFIG.color.liveBadge;
+            livEl.style.color = '#0b071a';
+            makeHdrPart(livEl, 0, 0); // 位置はHTML側のstyleで指定済み
+
+            // プロフィール欄（dblclickは後の startProfileCycle 後に設定）
+            const profEl = document.getElementById('profile-container');
+            makeHdrPart(profEl, 0, 0);
+            profEl.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                openEditor();
+            });
+
+            // メッセージ欄
+            const msgEl = document.getElementById('init-message');
+            makeHdrPart(msgEl, 0, 0);
+
+            // 時計
+            const clkEl = document.getElementById('init-clock');
+            makeHdrPart(clkEl, 0, 0);
+        })();
+
+        // 初期配置のボックスパーツにホバー削除ボタン・フォントサイズ・リサイズを適用
+        ['title-box', 'comment-box', 'memo-box'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const delBtn = document.createElement('div');
+            delBtn.className = 'box-del-btn';
+            delBtn.textContent = '×';
+            delBtn.title = '削除';
+            delBtn.addEventListener('click', (e) => { e.stopPropagation(); el.remove(); });
+            el.appendChild(delBtn);
+
+            addResizeHandles(el);
+            addHoverMenu(el, el.querySelector('.content'));
+        });
+
+        /* =====================================================
+         *  プロフィールサイクル
+         * ===================================================== */
+        let profileItems = [...CONFIG.profile];
+
+        let displayArea = document.getElementById('profile-display-area');
+        const editor = document.getElementById('profile-editor');
+        const editorItemsEl = document.getElementById('editor-items');
+        let profileIndex = 0;
+        let profileTimer = null;
+
+        function startProfileCycle() {
+            clearInterval(profileTimer);
+            profileIndex = 0;
+            displayArea.style.transition = 'none';
+            displayArea.style.opacity = '1';
+            displayArea.style.transform = 'translateY(0)';
+            displayArea.textContent = profileItems[0] || '';
+            if (profileItems.length <= 1) return;
+
+            profileTimer = setInterval(() => {
+                displayArea.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                displayArea.style.opacity = '0';
+                displayArea.style.transform = 'translateY(-8px)';
+                setTimeout(() => {
+                    profileIndex = (profileIndex + 1) % profileItems.length;
+                    displayArea.textContent = profileItems[profileIndex];
+                    displayArea.style.transition = 'none';
+                    displayArea.style.transform = 'translateY(8px)';
+                    setTimeout(() => {
+                        displayArea.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                        displayArea.style.opacity = '1';
+                        displayArea.style.transform = 'translateY(0)';
+                    }, 30);
+                }, 400);
+            }, CONFIG.animation.profileInterval);
+        }
+
+        let _onSaveCallback = null;
+
+        function openEditor(onSave) {
+            _onSaveCallback = onSave || null;
+            editorItemsEl.innerHTML = '';
+            profileItems.forEach(text => addEditorRow(text));
+            editor.classList.add('open');
+        }
+
+        function addEditorRow(text = '') {
+            const div = document.createElement('div');
+            div.className = 'editor-item';
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = text;
+            input.placeholder = 'テキストを入力...';
+            const btn = document.createElement('button');
+            btn.className = 'btn-remove';
+            btn.textContent = '×';
+            btn.onclick = () => div.remove();
+            div.appendChild(input);
+            div.appendChild(btn);
+            editorItemsEl.appendChild(div);
+        }
+
+        document.getElementById('btn-save').onclick = () => {
+            const inputs = editorItemsEl.querySelectorAll('input');
+            profileItems = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
+            editor.classList.remove('open');
+            startProfileCycle();
+            if (_onSaveCallback) { _onSaveCallback(); _onSaveCallback = null; }
+        };
+
+        document.getElementById('btn-add').onclick = () => {
+            addEditorRow();
+            editorItemsEl.querySelector('.editor-item:last-child input').focus();
+        };
+
+        editor.addEventListener('click', (e) => {
+            if (e.target === editor) editor.classList.remove('open');
+        });
+
+        /* ---- 使い方モーダル ---- */
+        const helpModal = document.getElementById('help-modal');
+        document.getElementById('help-close').addEventListener('click', () => helpModal.classList.remove('open'));
+        helpModal.addEventListener('click', (e) => { if (e.target === helpModal) helpModal.classList.remove('open'); });
+
+        function normalizeCaptureInputs() {
+            captureArea.querySelectorAll('input').forEach(input => {
+                if (input.type === 'file') return;
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    if (input.checked) input.setAttribute('checked', ''); else input.removeAttribute('checked');
+                } else {
+                    input.setAttribute('value', input.value);
+                }
+            });
+            captureArea.querySelectorAll('textarea').forEach(textarea => {
+                textarea.textContent = textarea.value;
+            });
+        }
+
+        function showToast(msg, type = 'error') {
+            const toast = document.getElementById('obs-toast');
+            toast.textContent = msg;
+            toast.className = 'show ' + type;
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => { toast.className = ''; }, 3000);
+        }
+
+        function exportConfig() {
+            normalizeCaptureInputs();
+            const state = {
+                profileItems,
+                captureHtml: captureArea.innerHTML,
+                captureBgColor: captureArea.style.backgroundColor || document.body.style.backgroundColor || ''
+            };
+            const json = JSON.stringify(state, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const now = new Date();
+            const ts = now.getFullYear() + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2)
+                + '_' + ('0' + now.getHours()).slice(-2) + ('0' + now.getMinutes()).slice(-2);
+            a.href = url;
+            a.download = 'cyberpunk-vaporwave-config_' + ts + '.json';
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function importConfig() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,application/json';
+            input.onchange = () => {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const state = JSON.parse(ev.target.result);
+                        applyLoadedConfig(state);
+                        saveCurrentConfig();
+                        showToast('✓ インポート完了', 'success');
+                    } catch (err) {
+                        showToast('✕ インポート失敗：正しいJSONファイルか確認してください', 'error');
+                        console.error('import failed', err);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function saveCurrentConfig() {
+            if (!isSaveConfigEnabled()) {
+                return;
+            }
+            normalizeCaptureInputs();
+            const state = {
+                profileItems,
+                captureHtml: captureArea.innerHTML,
+                captureBgColor: captureArea.style.backgroundColor || document.body.style.backgroundColor || ''
+            };
+            try {
+                localStorage.setItem('cyberpunkGamingConfig', JSON.stringify(state));
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function setupImageDropArea(area) {
+            if (!area || area._imageDropSetup) return;
+            const fileInput = area.querySelector('input[type="file"]');
+            const hint = area.querySelector('.image-drop-hint');
+
+            function loadFile(file) {
+                if (!file || !file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    area.innerHTML = `<img src="${ev.target.result}" alt="">`;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            if (fileInput) {
+                fileInput.addEventListener('change', () => loadFile(fileInput.files[0]));
+            }
+            area.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                area.classList.add('dragover');
+            });
+            area.addEventListener('dragleave', () => area.classList.remove('dragover'));
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                area.classList.remove('dragover');
+                loadFile(e.dataTransfer.files[0]);
+            });
+            area._imageDropSetup = true;
+        }
+
+        function setupProfileContainer(el) {
+            if (el._profileSetup) return;
+            el._profileSetup = true;
+            el.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                openEditor(() => {
+                    displayArea = document.getElementById('profile-display-area');
+                    startProfileCycle();
+                });
+            });
+        }
+
+        function rehydrateCaptureArea() {
+            clockBoxes.length = 0;
+            captureArea.querySelectorAll('.box').forEach(el => {
+                let delBtn = el.querySelector('.box-del-btn');
+                if (!delBtn) {
+                    delBtn = document.createElement('div');
+                    delBtn.className = 'box-del-btn';
+                    delBtn.textContent = '×';
+                    delBtn.title = '削除';
+                    el.appendChild(delBtn);
+                }
+                delBtn.addEventListener('click', (e) => { e.stopPropagation(); removeTopLevel(el); });
+                addResizeHandles(el);
+                addHoverMenu(el, el.querySelector('.content'));
+                setupImageDropArea(el.querySelector('.image-drop-area'));
+                if (el.classList.contains('clock-box')) clockBoxes.push(el);
+            });
+            captureArea.querySelectorAll('.live-badge, .profile-container, .info-base').forEach(el => {
+                makeHdrPart(el, 0, 0);
+                if (el.classList.contains('profile-container')) setupProfileContainer(el);
+                if (el.classList.contains('clock-container')) clockBoxes.push(el);
+            });
+            captureArea.querySelectorAll('.bg-part').forEach(el => addHoverMenu(el));
+            document.querySelectorAll('.live-input').forEach(adjustLiveInput);
+        }
+
+        function applyLoadedConfig(state) {
+            if (!state) return;
+            if (Array.isArray(state.profileItems)) profileItems = state.profileItems;
+            if (typeof state.captureHtml === 'string') {
+                captureArea.innerHTML = state.captureHtml;
+                displayArea = document.getElementById('profile-display-area');
+                rehydrateCaptureArea();
+            }
+            if (state.captureBgColor) {
+                try {
+                    document.body.style.backgroundColor = state.captureBgColor;
+                    captureArea.style.backgroundColor = state.captureBgColor;
+                } catch (err) { console.error('apply bg color failed', err); }
+            }
+            startProfileCycle();
+        }
+
+        function loadSavedConfig() {
+            const raw = localStorage.getItem('cyberpunkGamingConfig');
+            if (!raw) {
+                return;
+            }
+            try {
+                const state = JSON.parse(raw);
+                applyLoadedConfig(state);
+            } catch (err) {
+                console.error(err);
+
+            }
+        }
+
+
+        startProfileCycle();
+
+        /* =====================================================
+         *  ボックスのドラッグ移動
+         * ===================================================== */
+        let isDragging = false, targetBox = null, offsetX, offsetY;
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('header') || e.target.classList.contains('header-input')) {
+                isDragging = true;
+                targetBox = e.target.closest('.box');
+                const rect = targetBox.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging && targetBox) {
+                targetBox.style.left = (e.clientX - offsetX) + 'px';
+                targetBox.style.top = (e.clientY - offsetY) + 'px';
+                targetBox.style.right = 'auto';
+                targetBox.style.bottom = 'auto';
+            }
+        });
+
+        document.addEventListener('mouseup', () => { isDragging = false; targetBox = null; });
+
+        // Global: plain-drag-bar（cloneNode後も動作）
+        document.addEventListener('mousedown', (e) => {
+            if (!e.target.classList.contains('plain-drag-bar')) return;
+            const box = e.target.closest('.box');
+            if (!box) return;
+            isDragging = true;
+            targetBox = box;
+            const rect = box.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+        });
+
+        // Global: shape-box（headerもplain-drag-barもない.box要素、cloneNode後も動作）
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.resize-handle') || e.target.closest('.box-menu-toggle') || e.target.closest('.hover-menu') || e.target.closest('.part-menu-toggle')) return;
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+            const box = e.target.closest('.box');
+            if (!box || box.querySelector('.header') || box.querySelector('.plain-drag-bar')) return;
+            isDragging = true;
+            targetBox = box;
+            const rect = box.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+        });
+
+        // Global: ヘッダーパーツ（capture phaseで確実に発火、cloneNode後も動作）
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.resize-handle') || e.target.closest('.box-menu-toggle') || e.target.closest('.part-menu-toggle') || e.target.closest('.hover-menu')) return;
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+            const el = e.target.closest('.live-badge, .profile-container, .info-base, .float-part');
+            if (!el) return;
+            isDragging = true;
+            targetBox = el;
+            const rect = el.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+        }, { capture: true });
+
+        // ボックスの削除（右上の赤いボタン）
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-delete')) e.target.closest('.box').remove();
+        });
+
+        /* =====================================================
+         *  長押しドラッグ（ボックス内どこでも）
+         * ===================================================== */
+        (function setupLongPressDrag() {
+            const LONG_PRESS_MS = 200;
+            const MOVE_CANCEL_PX = 8;
+            let lpTimer = null;
+            let lpBox = null;
+            let lpStartX = 0, lpStartY = 0;
+            let lpOffsetX = 0, lpOffsetY = 0;
+            let lpActive = false;
+            let lpSuppressClick = false;
+
+            function cancelLP() {
+                clearTimeout(lpTimer);
+                lpTimer = null;
+                if (lpBox) lpBox.classList.remove('box-long-pressing', 'box-long-dragging');
+                lpBox = null;
+                lpActive = false;
+            }
+
+            document.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('header') ||
+                    e.target.classList.contains('header-input') ||
+                    e.target.classList.contains('plain-drag-bar')) return;
+                if (e.target.closest('.resize-handle') ||
+                    e.target.closest('.box-menu-toggle') ||
+                    e.target.closest('.hover-menu') ||
+                    e.target.closest('#part-menu')) return;
+                const box = e.target.closest('.box');
+                if (!box) return;
+                const rect = box.getBoundingClientRect();
+                lpBox = box;
+                lpStartX = e.clientX; lpStartY = e.clientY;
+                lpOffsetX = e.clientX - rect.left; lpOffsetY = e.clientY - rect.top;
+                lpActive = false; lpSuppressClick = false;
+                box.classList.add('box-long-pressing');
+                lpTimer = setTimeout(() => {
+                    if (!lpBox) return;
+                    lpActive = true; lpSuppressClick = true;
+                    lpBox.classList.remove('box-long-pressing');
+                    lpBox.classList.add('box-long-dragging');
+                    if (document.activeElement && lpBox.contains(document.activeElement)) document.activeElement.blur();
+                }, LONG_PRESS_MS);
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!lpBox) return;
+                const dx = e.clientX - lpStartX, dy = e.clientY - lpStartY;
+                if (!lpActive) {
+                    if (Math.sqrt(dx * dx + dy * dy) > MOVE_CANCEL_PX) cancelLP();
+                    return;
+                }
+                lpBox.style.left = (e.clientX - lpOffsetX) + 'px';
+                lpBox.style.top = (e.clientY - lpOffsetY) + 'px';
+                lpBox.style.right = 'auto'; lpBox.style.bottom = 'auto';
+            });
+
+            document.addEventListener('mouseup', () => cancelLP());
+
+            document.addEventListener('click', (e) => {
+                if (lpSuppressClick) { lpSuppressClick = false; e.stopImmediatePropagation(); e.preventDefault(); }
+            }, { capture: true });
+        })();
+
+        /* =====================================================
+         *  テキストエリアの自動リサイズ
+         * ===================================================== */
+        function adjustSize(el, minH, minW) {
+            el.style.height = 'auto';
+            el.style.height = Math.max(minH, el.scrollHeight) + 'px';
+            if (minW) {
+                el.style.width = 'auto';
+                el.style.width = Math.max(minW, el.scrollWidth) + 'px';
+            }
+        }
+
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('title-input')) adjustSize(e.target, 50, 150);
+            if (e.target.classList.contains('text-input-box')) adjustSize(e.target, 200, 0);
+            if (e.target.classList.contains('live-input')) adjustLiveInput(e.target);
+        });
+
+        function adjustLiveInput(input) {
+            // 文字数に合わせて幅を動的に変更（最低4文字幅）
+            const len = Math.max(4, input.value.length + 1);
+            input.style.width = len + 'ch';
+        }
+
+        // 初期値に合わせて全 live-input の幅を設定
+        document.querySelectorAll('.live-input').forEach(adjustLiveInput);
+
+        /* =====================================================
+         *  パーツ追加メニュー（何もない場所でダブルクリック）
+         * ===================================================== */
+        let menuSpawnX = 0, menuSpawnY = 0;
+
+        // 何もない場所のダブルクリックを検知
+        captureArea.addEventListener('dblclick', (e) => {
+            // ボックス・上部バー・プロフィール上は除外
+            const isOnBox = !!e.target.closest('.box');
+            const isOnFloat = !!e.target.closest('.float-part');
+            const isOnMenu = !!e.target.closest('#part-menu');
+            const isOnEditor = !!e.target.closest('#profile-editor');
+            if (isOnBox || isOnFloat || isOnMenu || isOnEditor) return;
+
+            menuSpawnX = e.clientX;
+            menuSpawnY = e.clientY;
+
+            // 画面端からはみ出さないように位置調整
+            partMenu.style.visibility = 'hidden';
+            partMenu.classList.add('open');
+            const rect = partMenu.getBoundingClientRect();
+            const menuW = rect.width;
+            const menuH = rect.height;
+            let left = menuSpawnX;
+            let top = menuSpawnY;
+            if (left + menuW > window.innerWidth - 8) {
+                left = Math.max(8, window.innerWidth - menuW - 8);
+            }
+            if (top + menuH > window.innerHeight - 8) {
+                top = Math.max(8, menuSpawnY - menuH - 8);
+            }
+            partMenu.style.left = left + 'px';
+            partMenu.style.top = top + 'px';
+            partMenu.style.visibility = '';
+            e.stopPropagation();
+        });
+
+        // メニュー外クリックで閉じる
+        document.addEventListener('click', (e) => {
+            if (!partMenu.contains(e.target)) partMenu.classList.remove('open');
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') partMenu.classList.remove('open');
+        });
+
+        // 図形サブメニュー: 右端はみ出し時に左向きに開く
+        partMenu.querySelectorAll('.part-menu-has-sub').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                const sub = item.querySelector('.part-menu-sub');
+                if (!sub) return;
+                sub.style.left = '100%'; sub.style.right = 'auto';
+                const r = sub.getBoundingClientRect();
+                if (r.right > window.innerWidth - 4) {
+                    sub.style.left = 'auto'; sub.style.right = '100%';
+                }
+            });
+        });
+
+        // パーツ生成ファクトリー（堅牢化：処理を関数に切り出し例外を捕捉）
+        function handlePartMenuItem(type, x = menuSpawnX, y = menuSpawnY) {
+            try {
+                switch (type) {
+                    case 'clock': addClockBox(x, y); break;
+                    case 'stopwatch': addStopwatch(x, y); break;
+                    case 'counter': addCounter(x, y); break;
+                    case 'header-bar': addHeaderBar(x, y); break;
+                    case 'hdr-live': addHdrLive(x, y); break;
+                    case 'hdr-profile': addHdrProfile(x, y); break;
+                    case 'hdr-message': addHdrMessage(x, y); break;
+                    case 'hdr-clock': addHdrClock(x, y); break;
+                    case 'hdr-ticker': addHdrTicker(x, y); break;
+                    case 'memo': addBoxPart(x, y, 'MEMO', 'memo-box', '<textarea class="text-input-box" placeholder="メモを入力..."></textarea>'); break;
+                    case 'plain-text': addPlainTextBox(x, y); break;
+                    case 'shape': break;
+                    case 'shape-rect': addShapeBox(x, y, 'shape-rect', 160, 100); break;
+                    case 'shape-circle': addShapeBox(x, y, 'shape-circle', 100, 100); break;
+                    case 'title': addTitleBox(x, y); break;
+                    case 'image': addImageBox(x, y); break;
+                    case 'bg-grid': addBgGrid(); break;
+                    case 'bg-bars': addBgBars(); break;
+                    case 'bg-neon': addBgNeon(); break;
+                    case 'bg-upload': promptBgUpload(); break;
+                    case 'bg-color': promptBgColor(); break;
+                    case 'bg-clear':
+                        captureArea.style.background = '';
+                        captureArea.style.backgroundColor = '';
+                        document.querySelectorAll('.bg-part').forEach((bg) => bg.remove());
+                        break;
+                    case 'save-config': saveCurrentConfig(); break;
+                    case 'load-config': loadSavedConfig(); break;
+
+                    case 'export-config': exportConfig(); break;
+                    case 'import-config': importConfig(); break;
+                    case 'reset':
+                        localStorage.setItem('_skip_cyberpunkGamingConfig', '1');
+                        location.reload();
+                        break;
+                    case 'help': document.getElementById('help-modal').classList.add('open'); break;
+                    default:
+                        console.warn('Unknown part type:', type);
+                }
+            } catch (err) {
+                console.error('Error handling part menu item', type, err);
+            }
+        }
+
+        partMenu.addEventListener('click', (e) => {
+            e.stopPropagation(); // ドキュメントのデリゲーションハンドラへ届かないようにする（重複追加防止）
+            const item = e.target.closest('.part-menu-item');
+            if (!item) return;
+            const type = item.dataset.part;
+            partMenu.classList.remove('open');
+            handlePartMenuItem(type);
+        });
+
+        // 予備：#part-menu 内でイベントが拾えない場合のフォールバック（イベントデリゲーション）
+        document.addEventListener('click', (e) => {
+            const item = e.target.closest('.part-menu-item');
+            if (!item) return;
+            if (!item.closest('#part-menu')) return;
+            partMenu.classList.remove('open');
+            handlePartMenuItem(item.dataset.part);
+        });
+
+        /** 汎用ボックス（ヘッダー付き） */
+        function makeBox(x, y, extraClass, headerLabel, innerHTML) {
+            const box = document.createElement('div');
+            box.className = 'box' + (extraClass ? ' ' + extraClass : '');
+            box.style.left = x + 'px';
+            box.style.top = y + 'px';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" value="${headerLabel}">
+                <div class="window-btns">
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                </div>
+            </div>
+            <div class="content">${innerHTML}</div>`;
+
+
+            // ホバー削除ボタン
+            const delBtn = document.createElement('div');
+            delBtn.className = 'box-del-btn';
+            delBtn.textContent = '×';
+            delBtn.title = '削除';
+            delBtn.addEventListener('click', (e) => { e.stopPropagation(); removeTopLevel(box); });
+            box.appendChild(delBtn);
+
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
+            return box;
+        }
+
+        function addBoxPart(x, y, label, cls, inner) {
+            makeBox(x, y, cls, label, inner);
+        }
+
+        function addPlainTextBox(x, y) {
+            const box = document.createElement('div');
+            box.className = 'box plain-box';
+            box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.innerHTML = `<div class="box-menu-toggle" title="メニュー">≡</div><div class="plain-drag-bar" title="ドラッグで移動"></div><div class="content" style="border-radius:inherit;"><textarea class="text-input-box" placeholder="テキストを入力..."></textarea></div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
+            const dragBar = box.querySelector('.plain-drag-bar');
+            dragBar.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                const rect = box.getBoundingClientRect();
+                const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+                const onMove = (me) => { box.style.left = (me.clientX - ox) + 'px'; box.style.top = (me.clientY - oy) + 'px'; box.style.right = 'auto'; box.style.bottom = 'auto'; };
+                const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+        }
+
+        function addShapeBox(x, y, cls, w, h) {
+            const box = document.createElement('div');
+            box.className = 'box shape-box ' + cls;
+            box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.style.width = w + 'px'; box.style.height = h + 'px';
+            box.innerHTML = `<div class="box-menu-toggle" title="メニュー">≡</div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box, { minW: 4, minH: 4 });
+            addHoverMenu(box, null);
+            box.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.resize-handle') || e.target.closest('.box-menu-toggle')) return;
+                e.stopPropagation();
+                const rect = box.getBoundingClientRect();
+                const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+                const onMove = (me) => { box.style.left = (me.clientX - ox) + 'px'; box.style.top = (me.clientY - oy) + 'px'; box.style.right = 'auto'; box.style.bottom = 'auto'; };
+                const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+        }
+        function addTitleBox(x, y) {
+            makeBox(x, y, '', 'TITLE',
+                '<textarea class="title-input" rows="1">タイトル</textarea>');
+        }
+
+
+
+        /* =====================================================
+         *  ヘッダーパーツ共通ドラッグ＆削除ヘルパー
+         * ===================================================== */
+
+        /* =====================================================
+         *  リサイズハンドル共通関数
+         * ===================================================== */
+        function addResizeHandles(el, opts = {}) {
+            const minW = opts.minW ?? 60;
+            const minH = opts.minH ?? 30;
+            const DIRS = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+            el.classList.add('resizable');
+            DIRS.forEach(dir => {
+                const h = document.createElement('div');
+                h.className = 'resize-handle ' + dir;
+                h.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    el.classList.add('resizing');
+
+                    const startX = e.clientX, startY = e.clientY;
+                    const rect = el.getBoundingClientRect();
+                    const startW = rect.width, startH = rect.height;
+                    const startL = rect.left, startT = rect.top;
+
+                    const onMove = (me) => {
+                        const dx = me.clientX - startX;
+                        const dy = me.clientY - startY;
+                        let w = startW, h2 = startH, l = startL, t = startT;
+
+                        if (dir.includes('e')) w = Math.max(minW, startW + dx);
+                        if (dir.includes('s')) h2 = Math.max(minH, startH + dy);
+                        if (dir.includes('w')) { w = Math.max(minW, startW - dx); l = startL + (startW - w); }
+                        if (dir.includes('n')) { h2 = Math.max(minH, startH - dy); t = startT + (startH - h2); }
+
+                        el.style.width = w + 'px';
+                        el.style.height = h2 + 'px';
+                        el.style.left = l + 'px';
+                        el.style.top = t + 'px';
+                        el.style.right = 'auto';
+                        el.style.bottom = 'auto';
+                    };
+                    const onUp = () => {
+                        el.classList.remove('resizing');
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                    };
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                });
+                el.appendChild(h);
+            });
+        }
+
+        /**
+         * el をドラッグ可能にし、ホバーで×ボタンを表示する。
+         * el 自身が見た目のルート要素（ラッパーなし）。
+         */
+        function makeHdrPart(el, x, y) {
+            el.style.position = 'absolute';
+            // x,y が 0 以外の場合のみ位置を上書き（HTML側で指定済みの要素は 0,0 で呼ぶ）
+            if (x !== 0 || y !== 0) {
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+            }
+
+
+
+
+            // リサイズハンドル
+            addResizeHandles(el);
+
+            // ドラッグ
+            el.addEventListener('mousedown', (e) => {
+                const delBtn = el.querySelector('.box-del-btn');
+                if (e.target === delBtn) return;
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                e.stopPropagation();
+                const rect = el.getBoundingClientRect();
+                const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+                const onMove = (me) => {
+                    el.style.left = (me.clientX - ox) + 'px';
+                    el.style.top = (me.clientY - oy) + 'px';
+                    el.style.right = 'auto';
+                };
+                const onUp = () => {
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+
+            // すでにDOMにある要素（初期配置パーツ）は appendChild しない
+            if (!el.isConnected) captureArea.appendChild(el);
+
+            // リサイズハンドル付与
+            addResizeHandles(el);
+            addHoverMenu(el);
+            return el;
+        }
+
+        /** LIVEバッジ */
+        function addHdrLive(x, y) {
+            const el = document.createElement('div');
+            el.className = 'live-badge';
+            el.style.cursor = 'move';
+            el.style.background = CONFIG.color.liveBadge;
+            el.style.color = '#0b071a';
+            el.innerHTML = `<span class="blinking-icon">●</span><input type="text" class="live-input" value="${CONFIG.text.liveBadge}" style="color:#0b071a;">`;
+            makeHdrPart(el, x, y);
+        }
+
+        /** プロフィール欄 */
+        function addHdrProfile(x, y) {
+            const el = document.createElement('div');
+            el.className = 'profile-container';
+            el.title = 'ダブルクリックで編集';
+            el.style.cursor = 'move';
+
+            const disp = document.createElement('div');
+            disp.id = '';  // IDなし（重複回避）
+            disp.className = 'profile-display-area';
+            disp.style.cssText = 'white-space:nowrap;font-size:20px;font-weight:600;color:var(--color-accent);pointer-events:none;animation:neonPulse var(--neon-pulse-duration) infinite ease-in-out;';
+            el.appendChild(disp);
+
+            makeHdrPart(el, x, y);
+
+            // サイクル
+            let idx = 0, timer = null;
+            function cycle() {
+                if (timer) clearInterval(timer);
+                disp.textContent = profileItems[idx % (profileItems.length || 1)] || '';
+                if (profileItems.length <= 1) return;
+                timer = setInterval(() => {
+                    disp.style.transition = 'opacity 0.3s';
+                    disp.style.opacity = '0';
+                    setTimeout(() => {
+                        idx = (idx + 1) % profileItems.length;
+                        disp.textContent = profileItems[idx];
+                        disp.style.opacity = '1';
+                    }, 300);
+                }, CONFIG.animation.profileInterval);
+            }
+            cycle();
+
+            // ダブルクリックで編集（削除ボタン以外）
+            el.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                openEditor(() => { idx = 0; cycle(); });
+            });
+        }
+
+        /** メッセージ入力欄 */
+        function addHdrMessage(x, y) {
+            const el = document.createElement('div');
+            el.className = 'info-base';
+            el.style.cursor = 'move';
+            el.style.minWidth = '300px';
+            el.style.height = '58px';
+            el.innerHTML = `<input type="text" class="input-text" placeholder="${CONFIG.text.messagePlaceholder}">`;
+            makeHdrPart(el, x, y);
+        }
+
+        /** 時計（バー埋め込み型） */
+        function addHdrClock(x, y) {
+            const el = document.createElement('div');
+            el.className = 'info-base clock-container';
+            el.style.cursor = 'move';
+            el.style.height = '58px';
+            el.innerHTML = `<span class="hdr-float-date" style="font-size:15px;opacity:0.7;">0000/00/00</span><span class="hdr-float-time">00:00:00</span>`;
+            makeHdrPart(el, x, y);
+            clockBoxes.push(el);
+        }
+
+        /** テロップ（スクロールテキスト） */
+        function addHdrTicker(x, y) {
+            const el = document.createElement('div');
+            el.className = 'ticker-wrap float-part';
+            el.style.width = '600px';
+            const defText = 'スクロールテキスト　★　';
+            const track = document.createElement('div');
+            track.className = 'ticker-track ticker-ctrl';
+            [0, 1].forEach(() => {
+                const s = document.createElement('span');
+                s.className = 'ticker-txt';
+                s.textContent = defText;
+                track.appendChild(s);
+            });
+            const inner = document.createElement('div');
+            inner.className = 'ticker-inner';
+            inner.appendChild(track);
+            el.appendChild(inner);
+            function triggerEdit() {
+                if (el.querySelector('.ticker-edit-inp')) return;
+                const inp = document.createElement('input');
+                inp.type = 'text';
+                inp.className = 'ticker-edit-inp';
+                inp.value = el.querySelector('.ticker-txt').textContent;
+                el.appendChild(inp);
+                inp.focus();
+                inp.select();
+                const done = () => {
+                    if (!inp.isConnected) return;
+                    const txt = inp.value.trim() || defText;
+                    el.querySelectorAll('.ticker-txt').forEach(s => s.textContent = txt);
+                    inp.remove();
+                };
+                inp.addEventListener('keydown', (ke) => { ke.stopPropagation(); if (ke.key === 'Enter') done(); if (ke.key === 'Escape') inp.remove(); });
+                inp.addEventListener('blur', done);
+                inp.addEventListener('mousedown', e => e.stopPropagation());
+                inp.addEventListener('click', e => e.stopPropagation());
+            }
+            el._tickerEdit = triggerEdit;
+            makeHdrPart(el, x, y);
+            requestAnimationFrame(() => { const gap = inner.offsetWidth || 600; el.querySelectorAll('.ticker-txt').forEach(s => s.style.paddingRight = gap + 'px'); });
+            const grip = document.createElement('div');
+            grip.className = 'ticker-resize-grip';
+            el.appendChild(grip);
+            grip.addEventListener('mousedown', (e) => {
+                e.stopPropagation(); e.preventDefault();
+                const startX = e.clientX, startY = e.clientY, startW = el.offsetWidth, startH = el.offsetHeight;
+                const onMove = (me) => { el.style.width = Math.max(200, startW + me.clientX - startX) + 'px'; el.style.height = Math.max(30, startH + me.clientY - startY) + 'px'; el.querySelectorAll('.ticker-txt').forEach(s => s.style.paddingRight = Math.max(80, inner.offsetWidth) + 'px'); };
+                const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+            inner.addEventListener('click', (e) => { e.stopPropagation(); triggerEdit(); });
+        }
+
+        /** ヘッダーバー全体（各パーツをまとめて追加） */
+        function addHeaderBar(x, y) {
+            addHdrLive(x, y);
+            addHdrProfile(x + 230, y);
+            addHdrMessage(x + 540, y);
+            addHdrClock(x + 900, y);
+        }
+
+        function addBgPart(el) {
+            el.classList.add('bg-part', 'float-part');
+            el.style.position = 'absolute';
+            el.style.left = '0';
+            el.style.top = '0';
+            el.style.width = '100%';
+            el.style.height = '100%';
+            el.style.pointerEvents = 'none';
+            el.style.zIndex = '0';
+
+            const toggle = document.createElement('div');
+            toggle.className = 'box-menu-toggle btn';
+            toggle.title = 'メニュー';
+            toggle.textContent = '≡';
+            toggle.style.position = 'absolute';
+            toggle.style.top = '10px';
+            toggle.style.right = '10px';
+            toggle.style.pointerEvents = 'auto';
+            el.appendChild(toggle);
+
+            captureArea.insertBefore(el, captureArea.querySelector('.corner-tl') || captureArea.firstChild);
+            addHoverMenu(el);
+            return el;
+        }
+
+        function addBgGrid() {
+            const el = document.createElement('div');
+            el.className = 'bg-grid';
+            addBgPart(el);
+        }
+
+        function addBgBars() {
+            const el = document.createElement('div');
+            el.className = 'bg-bars';
+            addBgPart(el);
+        }
+
+        function addBgNeon() {
+            const el = document.createElement('div');
+            el.className = 'bg-neon';
+            addBgPart(el);
+        }
+
+        function promptBgUpload() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+            input.addEventListener('change', () => {
+                const file = input.files && input.files[0];
+                if (!file) {
+                    input.remove();
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    setUploadedBackground(ev.target.result);
+                    input.remove();
+                };
+                reader.readAsDataURL(file);
+            });
+            document.body.appendChild(input);
+            input.click();
+        }
+
+        function setUploadedBackground(src) {
+            let bg = document.getElementById('uploaded-bg');
+            if (!bg) {
+                bg = document.createElement('div');
+                bg.id = 'uploaded-bg';
+                bg.className = 'bg-part';
+                bg.style.position = 'absolute';
+                bg.style.left = '0';
+                bg.style.top = '0';
+                bg.style.width = '100%';
+                bg.style.height = '100%';
+                bg.style.pointerEvents = 'none';
+                bg.style.zIndex = '0';
+                bg.style.backgroundSize = 'cover';
+                bg.style.backgroundPosition = 'center';
+                bg.style.backgroundRepeat = 'no-repeat';
+                captureArea.insertBefore(bg, captureArea.querySelector('.corner-tl') || captureArea.firstChild);
+            }
+            bg.style.backgroundImage = `url('${src}')`;
+        }
+
+        function promptBgColor() {
+            const input = document.createElement('input');
+            input.type = 'color';
+            // get computed color from captureArea or body
+            const comp = window.getComputedStyle(captureArea).backgroundColor || window.getComputedStyle(document.body).backgroundColor || CONFIG.color.background;
+            function rgbToHex(rgb) {
+                if (!rgb) return '#000000';
+                const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                if (!m) return rgb;
+                const r = parseInt(m[1]).toString(16).padStart(2, '0');
+                const g = parseInt(m[2]).toString(16).padStart(2, '0');
+                const b = parseInt(m[3]).toString(16).padStart(2, '0');
+                return '#' + r + g + b;
+            }
+            input.value = rgbToHex(comp);
+            input.style.display = 'none';
+            input.addEventListener('input', (e) => { captureArea.style.backgroundColor = e.target.value; });
+            input.addEventListener('change', () => { try { input.remove(); } catch (err) { } });
+            document.body.appendChild(input);
+            input.click();
+        }
+
+        /** 独立時計ボックス */
+        function addClockBox(x, y) {
+            const box = document.createElement('div');
+            box.className = 'box clock-box';
+            box.style.left = x + 'px';
+            box.style.top = y + 'px';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" value="CLOCK">
+                <div class="window-btns">
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="clock-inner">
+                    <div class="clock-time">00:00:00</div>
+                    <div class="clock-date">0000/00/00</div>
+                </div>
+            </div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
+            clockBoxes.push(box);
+        }
+
+
+
+        /** ストップウォッチ */
+        function addStopwatch(x, y) {
+            const box = document.createElement('div');
+            box.className = 'box sw-box';
+            box.style.left = x + 'px';
+            box.style.top = y + 'px';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" value="STOPWATCH">
+                <div class="window-btns">
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="sw-inner">
+                    <div class="sw-time">00:00.00</div>
+                    <div class="sw-controls">
+                        <button class="sw-btn sw-btn-start">START</button>
+                        <button class="sw-btn sw-btn-reset">RESET</button>
+                    </div>
+                </div>
+            </div>`;
+
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
+
+            // ストップウォッチロジック
+            let elapsed = 0;   // ms
+            let startTime = null;
+            let rafId = null;
+            let running = false;
+            box.resetBox = () => {
+                cancelAnimationFrame(rafId);
+                running = false;
+                elapsed = 0;
+                if (startBtn) {
+                    startBtn.textContent = 'START';
+                    startBtn.classList.remove('running');
+                }
+                if (timeEl) timeEl.textContent = '00:00.00';
+            };
+
+            const timeEl = box.querySelector('.sw-time');
+            requestAnimationFrame(() => {
+                const _orig = timeEl.textContent;
+                timeEl.textContent = '88:88.88';
+                timeEl.style.minWidth = timeEl.offsetWidth + 'px';
+                timeEl.textContent = _orig;
+            });
+            const startBtn = box.querySelector('.sw-btn-start');
+            const resetBtn = box.querySelector('.sw-btn-reset');
+
+            function formatTime(ms) {
+                const totalSec = Math.floor(ms / 1000);
+                const mm = String(Math.floor(totalSec / 60)).padStart(2, '0');
+                const ss = String(totalSec % 60).padStart(2, '0');
+                const xx = String(Math.floor((ms % 1000) / 10)).padStart(2, '0');
+                return mm + ':' + ss + '.' + xx;
+            }
+
+            function tick() {
+                elapsed = Date.now() - startTime;
+                timeEl.textContent = formatTime(elapsed);
+                rafId = requestAnimationFrame(tick);
+            }
+
+            startBtn.addEventListener('click', () => {
+                if (!running) {
+                    startTime = Date.now() - elapsed;
+                    rafId = requestAnimationFrame(tick);
+                    running = true;
+                    startBtn.textContent = 'STOP';
+                    startBtn.classList.add('running');
+                } else {
+                    cancelAnimationFrame(rafId);
+                    running = false;
+                    startBtn.textContent = 'START';
+                    startBtn.classList.remove('running');
+                }
+            });
+
+            resetBtn.addEventListener('click', () => {
+                cancelAnimationFrame(rafId);
+                running = false;
+                elapsed = 0;
+                startBtn.textContent = 'START';
+                startBtn.classList.remove('running');
+                timeEl.textContent = '00:00.00';
+            });
+        }
+
+        /** カウンター */
+        function addCounter(x, y) {
+            const box = document.createElement('div');
+            box.className = 'box counter-box';
+            box.style.left = x + 'px';
+            box.style.top = y + 'px';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" value="COUNTER">
+                <div class="window-btns">
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                    <div class="btn"></div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="counter-inner">
+                    <div class="counter-label">COUNT</div>
+                    <div class="counter-value">0</div>
+                    <div class="counter-step-row">
+                        STEP&nbsp;
+                        <input type="number" class="counter-step-input" value="1" min="1">
+                    </div>
+                    <div class="counter-controls">
+                        <button class="counter-btn counter-btn-minus">－</button>
+                        <button class="counter-btn counter-btn-plus">＋</button>
+                        <button class="counter-btn counter-btn-reset">RST</button>
+                    </div>
+                </div>
+            </div>`;
+
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
+
+            let count = 0;
+            const valueEl = box.querySelector('.counter-value');
+            box.resetBox = () => { count = 0; update(); };
+            const stepInput = box.querySelector('.counter-step-input');
+            const plusBtn = box.querySelector('.counter-btn-plus');
+            const minusBtn = box.querySelector('.counter-btn-minus');
+            const resetBtn = box.querySelector('.counter-btn-reset');
+
+            function getStep() {
+                return parseFloat(stepInput.value) || 1;
+            }
+
+            function update() {
+                valueEl.textContent = count;
+            }
+
+            plusBtn.addEventListener('click', () => { count += getStep(); update(); });
+            minusBtn.addEventListener('click', () => { count -= getStep(); update(); });
+            resetBtn.addEventListener('click', () => { count = 0; update(); });
+        }
+
+        /** 画像ボックス */
+        function addImageBox(x, y) {
+            const box = makeBox(x, y, 'image-box', 'IMAGE',
+                `<div class="image-drop-area" title="クリックまたはドラッグで画像を選択">
+                <input type="file" accept="image/*">
+                <div class="image-drop-hint">🖼</div>
+                <div>クリック or ドラッグで画像を追加</div>
+             </div>`);
+
+            const dropArea = box.querySelector('.image-drop-area');
+            const fileInput = box.querySelector('input[type="file"]');
+
+            function loadFile(file) {
+                if (!file || !file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    dropArea.innerHTML = `<img src="${ev.target.result}" alt="">`;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            fileInput.addEventListener('change', () => loadFile(fileInput.files[0]));
+
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.classList.add('dragover');
+            });
+            dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('dragover');
+                loadFile(e.dataTransfer.files[0]);
+            });
+        }
+
+        // 独立時計ボックスを一括更新するリスト
+        const clockBoxes = [];
+
+        /* =====================================================
+         *  ダブルクリックでフォントサイズ変更
+         * ===================================================== */
+
+        function addHoverMenu(el, contentTarget) {
+            const target = contentTarget || el;
+
+            // ボックス系は header 内の box-menu-toggle、ヘッダーパーツは part-menu-toggle を使う
+            let toggle = el.querySelector('.box-menu-toggle');
+            if (!toggle) {
+                // ヘッダーパーツ用：左上に小さいボタンを生成
+                toggle = document.createElement('div');
+                toggle.className = 'part-menu-toggle';
+                toggle.textContent = '≡';
+                el.appendChild(toggle);
+            }
+
+            // メニュー本体
+            const menu = document.createElement('div');
+            menu.className = 'hover-menu';
+            menu.innerHTML = `
+            <button class="hover-menu-btn" data-action="clone">📋 複製</button>
+            <div class="hover-menu-sep"></div>
+            <button class="hover-menu-btn danger" data-action="delete">🗑 削除</button>
+            <div class="hover-menu-sep"></div>
+            <button class="hover-menu-btn" data-action="rotate">🔄 回転</button>
+            <div class="hover-menu-rot">
+                <div class="hover-menu-rot-presets">
+                    <button class="hover-menu-preset" data-rot="0">0°</button>
+                    <button class="hover-menu-preset" data-rot="45">45°</button>
+                    <button class="hover-menu-preset" data-rot="90">90°</button>
+                    <button class="hover-menu-preset" data-rot="135">135°</button>
+                    <button class="hover-menu-preset" data-rot="-45">-45°</button>
+                    <button class="hover-menu-preset" data-rot="-90">-90°</button>
+                    <button class="hover-menu-preset" data-rot="180">180°</button>
+                </div>
+                <div style="display:flex;gap:4px;align-items:center;">
+                    <input type="number" class="hover-menu-rot-input hover-menu-fs-input" value="0" min="-360" max="360" style="width:52px;">
+                    <button class="hover-menu-fs-apply hover-menu-rot-apply">OK</button>
+                    <button class="hover-menu-fs-apply hover-menu-rot-reset">↩</button>
+                </div>
+            </div>
+            <button class="hover-menu-btn" data-action="fontsize">🔠 文字サイズ</button>
+            <div class="hover-menu-fs">
+                <div class="hover-menu-presets"></div>
+                <div class="hover-menu-fs-row"></div>
+            </div>
+            <div class="hover-menu-sep"></div>
+            <button class="hover-menu-btn" data-action="textcolor">🎨 文字色</button>
+            <div class="hover-menu-tc">
+                <div class="hover-menu-swatches"></div>
+                <div class="hover-menu-color-row">
+                    <input type="color" class="hover-menu-tc-input" value="#ffffff">
+                    <input type="text" class="hover-menu-hex-input" value="#ffffff" maxlength="7" placeholder="#rrggbb">
+                    <button class="hover-menu-fs-apply hover-menu-tc-reset">↩</button>
+                </div>
+            </div>
+            <button class="hover-menu-btn" data-action="fillcolor">🪣 塗り色</button>
+            <div class="hover-menu-fc">
+                <div class="hover-menu-swatches"></div>
+                <div class="hover-menu-color-row">
+                    <input type="color" class="hover-menu-fc-input" value="#ffffff">
+                    <input type="text" class="hover-menu-hex-input" value="#ffffff" maxlength="7" placeholder="#rrggbb">
+                    <button class="hover-menu-fs-apply hover-menu-fc-reset">↩</button>
+                </div>
+            </div>
+            <button class="hover-menu-btn" data-action="bordercolor">🖊 枠色</button>
+            <div class="hover-menu-bc">
+                <div class="hover-menu-swatches"></div>
+                <div class="hover-menu-color-row">
+                    <input type="color" class="hover-menu-bc-input" value="#ffffff">
+                    <input type="text" class="hover-menu-hex-input" value="#ffffff" maxlength="7" placeholder="#rrggbb">
+                    <button class="hover-menu-fs-apply hover-menu-bc-reset">↩</button>
+                </div>
+            </div>
+            <div class="hover-menu-sep"></div>
+            <button class="hover-menu-btn" data-action="close">✕ 閉じる</button>`;
+            const tcSubPanel = menu.querySelector('.hover-menu-tc');
+            const tcInput = menu.querySelector('.hover-menu-tc-input');
+            const fcSubPanel = menu.querySelector('.hover-menu-fc');
+            const fcInput = menu.querySelector('.hover-menu-fc-input');
+            const bcSubPanel = menu.querySelector('.hover-menu-bc');
+            const bcInput = menu.querySelector('.hover-menu-bc-input');
+            const rotSubPanel = menu.querySelector('.hover-menu-rot');
+            const rotInput = menu.querySelector('.hover-menu-rot-input');
+            const fsSubPanel = menu.querySelector('.hover-menu-fs');
+
+            if (el._tickerEdit) {
+                const tickerTrack = el.querySelector('.ticker-track');
+                const speedBtn = document.createElement('button'); speedBtn.className = 'hover-menu-btn'; speedBtn.textContent = '⚡ スクロール速度';
+                const speedPanel = document.createElement('div'); speedPanel.className = 'hover-menu-fs';
+                const speedRow = document.createElement('div'); speedRow.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 8px;';
+                const speedSlider = document.createElement('input'); speedSlider.type = 'range'; speedSlider.min = '3'; speedSlider.max = '60'; speedSlider.style.cssText = 'flex:1;cursor:pointer;';
+                const speedDisp = document.createElement('span'); speedDisp.style.cssText = 'color:#ccc;font-size:11px;min-width:30px;text-align:right;';
+                const syncSpeed = () => { const v = tickerTrack ? parseFloat(tickerTrack.style.animationDuration) || 18 : 18; speedSlider.value = v; speedDisp.textContent = v + 's'; };
+                syncSpeed();
+                speedSlider.addEventListener('mousedown', e => e.stopPropagation());
+                speedSlider.addEventListener('click', e => e.stopPropagation());
+                speedSlider.addEventListener('input', () => { if (tickerTrack) tickerTrack.style.animationDuration = speedSlider.value + 's'; speedDisp.textContent = speedSlider.value + 's'; });
+                speedRow.appendChild(speedSlider); speedRow.appendChild(speedDisp); speedPanel.appendChild(speedRow);
+                speedBtn.addEventListener('click', (e) => { e.stopPropagation(); speedPanel.classList.toggle('open'); if (speedPanel.classList.contains('open')) syncSpeed(); });
+                const afterFs2 = fsSubPanel.nextSibling;
+                menu.insertBefore(speedBtn, afterFs2); menu.insertBefore(speedPanel, afterFs2);
+            }
+
+            // 時計形式パネル（時計要素がある場合のみ）
+            {
+                const clockRoot = el.closest('.box') || el;
+                const hasClockSpan = clockRoot.classList.contains('clock-container') || clockRoot.classList.contains('clock-box') || clockRoot.querySelector('.hdr-float-time, .clock-time');
+                if (hasClockSpan) {
+                    const fmtSep = null;
+                    const fmtBtn = document.createElement('button'); fmtBtn.className = 'hover-menu-btn'; fmtBtn.textContent = '🕐 表示形式';
+                    const fmtPanel = document.createElement('div'); fmtPanel.className = 'hover-menu-fs';
+                    const fmtBtns = [];
+                    fmtPanel.style.cssText = 'padding:4px 6px;gap:2px;';
+                    [
+                        ['date-time', '日付 + 時刻'],
+                        ['time-only', '時刻のみ (H:M:S)'],
+                        ['hm', '時：分のみ (H:M)'],
+                        ['date-only', '日付のみ'],
+                        ['date-hm', '日付 + 時：分'],
+                    ].forEach(([val, lbl]) => {
+                        const fb = document.createElement('button');
+                        fb.className = 'hover-menu-preset';
+                        fb.textContent = lbl;
+                        fb.style.cssText = 'width:100%;text-align:left;padding:3px 6px;font-size:11px;';
+                        const isCur = (clockRoot.dataset.clockFormat || 'date-time') === val;
+                        if (isCur) { fb.style.background = 'var(--color-accent)'; fb.style.color = '#000'; fb.style.opacity = '1'; }
+                        fb.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            clockRoot.dataset.clockFormat = val;
+                            updateClock();
+                            fmtBtns.forEach(b => { b.style.background = ''; b.style.color = ''; b.style.opacity = ''; });
+                            fb.style.background = 'var(--color-accent)'; fb.style.color = '#000'; fb.style.opacity = '1';
+                        });
+                        fmtBtns.push(fb);
+                        fmtPanel.appendChild(fb);
+                    });
+                    fmtBtn.addEventListener('click', (e) => { e.stopPropagation(); fmtPanel.classList.toggle('open'); });
+                    const afterFs = fsSubPanel.nextSibling;
+                    menu.insertBefore(fmtBtn, afterFs); menu.insertBefore(fmtPanel, afterFs);
+                }
+            }
+
+            // 開くボタンでメニュー表示（toggleの画面上の位置にメニューを配置）
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = menu.classList.contains('open');
+                // 一旦全メニューを閉じる
+                document.querySelectorAll('.hover-menu.open').forEach(m => m.classList.remove('open'));
+                if (!isOpen) {
+                    const rect = toggle.getBoundingClientRect();
+                    menu.style.left = rect.left + 'px';
+                    menu.style.top = (rect.bottom + 4) + 'px';
+                    menu.classList.add('open');
+                    const mr = menu.getBoundingClientRect();
+                    if (mr.right > window.innerWidth) menu.style.left = Math.max(0, window.innerWidth - mr.width - 4) + 'px';
+                    if (mr.bottom > window.innerHeight) menu.style.top = Math.max(0, rect.top - mr.height - 4) + 'px';
+                    tcSubPanel.classList.remove('open');
+                    fcSubPanel.classList.remove('open');
+                    bcSubPanel.classList.remove('open');
+                    fsSubPanel.classList.remove('open');
+                }
+            });
+            toggle.addEventListener('mousedown', (e) => e.stopPropagation());
+
+            // 閉じる
+            menu.querySelector('[data-action="close"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.remove('open');
+                tcSubPanel.classList.remove('open');
+                fcSubPanel.classList.remove('open');
+                bcSubPanel.classList.remove('open');
+                rotSubPanel.classList.remove('open');
+                fsSubPanel.classList.remove('open');
+            });
+
+            // 削除（確実にルート要素を削除し、メニュー自身も破棄する）
+            menu.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const root = el.closest('.box') || el.closest('.float-part') || el;
+                try { removeTopLevel(root); } catch (err) { console.error('remove root failed', err); }
+                try { if (menu && menu.parentNode) menu.parentNode.removeChild(menu); } catch (err) { }
+            });
+
+            // 複製
+            menu.querySelector('[data-action="clone"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const src = el.closest('.box') || el;
+                const clone = src.cloneNode(true);
+                const rect = src.getBoundingClientRect();
+                clone.style.left = (rect.left + 30) + 'px';
+                clone.style.top = (rect.top + 30) + 'px';
+                clone.style.right = 'auto';
+                clone.style.bottom = 'auto';
+                captureArea.appendChild(clone);
+                clone.querySelectorAll('.resize-handle').forEach(h => h.remove());
+                addResizeHandles(clone);
+                const db = clone.querySelector('.box-del-btn');
+                if (db) db.addEventListener('click', (ev) => { ev.stopPropagation(); clone.remove(); });
+                const ct = clone.querySelector('.content');
+                if (ct) addHoverMenu(clone, ct); else addHoverMenu(clone);
+                if (clone.classList.contains('clock-box') || clone.classList.contains('clock-container')) {
+                    if (clone.id) clone.removeAttribute('id');
+                    const _ts = clone.querySelector('#clock, .hdr-float-time'); if (_ts) { _ts.removeAttribute('id'); _ts.classList.add('hdr-float-time'); }
+                    const _ds = clone.querySelector('#date, .hdr-float-date'); if (_ds) { _ds.removeAttribute('id'); _ds.classList.add('hdr-float-date'); }
+                    clockBoxes.push(clone);
+                }
+                // 非.box（ヘッダーパーツ等）は直接リスナーも追加（makeHdrPartと同じ実装）
+                if (!clone.classList.contains('box')) {
+                    clone.addEventListener('mousedown', (e) => {
+                        if (e.target.closest('.resize-handle') || e.target.closest('.part-menu-toggle') || e.target.closest('.hover-menu')) return;
+                        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                        e.stopPropagation();
+                        const rect = clone.getBoundingClientRect();
+                        const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+                        const onMove = (me) => { clone.style.left = (me.clientX - ox) + 'px'; clone.style.top = (me.clientY - oy) + 'px'; clone.style.right = 'auto'; };
+                        const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+                        document.addEventListener('mousemove', onMove);
+                        document.addEventListener('mouseup', onUp);
+                    });
+                }
+                // profile-container: IDを除去しサイクルアニメとdblclick編集を再設定
+                if (clone.classList.contains('profile-container') || clone.classList.contains('profile-wrapper')) {
+                    clone.removeAttribute('id');
+                    const cloneDisp = clone.querySelector('.profile-display-area') || Array.from(clone.children).find(c =>
+                        !c.classList.contains('resize-handle') && !c.classList.contains('part-menu-toggle') && !c.classList.contains('box-del-btn') && c.tagName === 'DIV'
+                    );
+                    if (cloneDisp) {
+                        cloneDisp.removeAttribute('id');
+                        cloneDisp.classList.add('profile-display-area');
+                        cloneDisp.style.transition = 'none'; cloneDisp.style.opacity = '1'; cloneDisp.style.transform = '';
+                        let cidx = 0, ctimer = null;
+                        const ccycle = () => {
+                            if (ctimer) clearInterval(ctimer);
+                            cloneDisp.textContent = profileItems[cidx % (profileItems.length || 1)] || '';
+                            if (profileItems.length <= 1) return;
+                            ctimer = setInterval(() => {
+                                cloneDisp.style.transition = 'opacity 0.3s';
+                                cloneDisp.style.opacity = '0';
+                                setTimeout(() => { cidx = (cidx + 1) % profileItems.length; cloneDisp.textContent = profileItems[cidx]; cloneDisp.style.opacity = '1'; }, 300);
+                            }, CONFIG.animation.profileInterval);
+                        };
+                        ccycle();
+                        clone.addEventListener('dblclick', (e) => { e.stopPropagation(); openEditor(() => { cidx = 0; ccycle(); }); });
+                    }
+                }
+                menu.classList.remove('open');
+            });
+
+            menu.querySelector('[data-action="textcolor"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                tcSubPanel.classList.toggle('open');
+                fsSubPanel.classList.remove('open');
+            });
+            tcInput.addEventListener('mousedown', e => e.stopPropagation());
+            tcInput.addEventListener('input', (e) => {
+                const root2 = el.closest('.box') || el;
+                const textEls = Array.from(root2.querySelectorAll('.title-input,.text-input-box,.clock-time,.sw-time,.counter-value,.input-text,.live-input,.hdr-float-time,.hdr-float-date,.clock-date,.ticker-ctrl,#clock,#date,.profile-display-area,#profile-display-area'));
+                if (textEls.length === 0) Array.from(target.querySelectorAll('input[type="text"],textarea')).forEach(t => textEls.push(t));
+                textEls.forEach(t => t.style.color = e.target.value);
+            });
+            menu.querySelector('.hover-menu-tc-reset').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const root2 = el.closest('.box') || el;
+                const textEls = Array.from(root2.querySelectorAll('.title-input,.text-input-box,.clock-time,.sw-time,.counter-value,.input-text,.live-input,.hdr-float-time,.hdr-float-date,.clock-date,.ticker-ctrl,#clock,#date,.profile-display-area,#profile-display-area'));
+                textEls.forEach(t => t.style.color = '');
+            });
+
+            menu.querySelector('[data-action="fillcolor"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                fcSubPanel.classList.toggle('open');
+                tcSubPanel.classList.remove('open');
+                bcSubPanel.classList.remove('open');
+                fsSubPanel.classList.remove('open');
+            });
+            fcInput.addEventListener('mousedown', e => e.stopPropagation());
+            fcInput.addEventListener('input', (e) => {
+                const root2 = el.closest('.box') || el;
+                root2.style.background = e.target.value;
+            });
+            menu.querySelector('.hover-menu-fc-reset').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const root2 = el.closest('.box') || el;
+                root2.style.background = '';
+            });
+
+            menu.querySelector('[data-action="bordercolor"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                bcSubPanel.classList.toggle('open');
+                tcSubPanel.classList.remove('open');
+                fcSubPanel.classList.remove('open');
+                fsSubPanel.classList.remove('open');
+            });
+            bcInput.addEventListener('mousedown', e => e.stopPropagation());
+            bcInput.addEventListener('input', (e) => {
+                const root2 = el.closest('.box') || el;
+                root2.style.borderColor = e.target.value;
+            });
+            menu.querySelector('.hover-menu-bc-reset').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const root2 = el.closest('.box') || el;
+                root2.style.borderColor = '';
+            });
+
+            // カラースウォッチ + HEX入力
+            const _SWATCHES = ['#ffffff', '#000000', '#ff3333', '#ff8800', '#ffee00', '#44cc66', '#00ccff', '#3366ff', '#9933ff', '#ff33cc', '#ff99bb', '#aaaaaa', '#cccccc', '#663300'];
+            [[tcSubPanel, tcInput], [fcSubPanel, fcInput], [bcSubPanel, bcInput]].forEach(([panel, cInput]) => {
+                const hexInp = panel.querySelector('.hover-menu-hex-input');
+                panel.querySelector('.hover-menu-swatches').append(..._SWATCHES.map(c => {
+                    const btn = document.createElement('button');
+                    btn.className = 'hover-menu-swatch';
+                    btn.style.background = c;
+                    btn.title = c;
+                    btn.addEventListener('click', (e) => { e.stopPropagation(); cInput.value = c; hexInp.value = c; cInput.dispatchEvent(new Event('input')); });
+                    return btn;
+                }));
+                hexInp.addEventListener('mousedown', e => e.stopPropagation());
+                hexInp.addEventListener('keydown', e => e.stopPropagation());
+                hexInp.addEventListener('click', e => e.stopPropagation());
+                hexInp.addEventListener('input', (e) => { const v = e.target.value.trim(); if (/^#[0-9a-fA-F]{6}$/.test(v)) { cInput.value = v; cInput.dispatchEvent(new Event('input')); } });
+                cInput.addEventListener('input', () => { hexInp.value = cInput.value; });
+
+                // 不透明度スライダー
+                const alphaRow = document.createElement('div');
+                alphaRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-top:5px;';
+                const alphaLabel = document.createElement('span');
+                alphaLabel.textContent = '不透明度';
+                alphaLabel.style.cssText = 'font-size:10px;opacity:0.65;white-space:nowrap;';
+                const alphaSlider = document.createElement('input');
+                alphaSlider.type = 'range'; alphaSlider.min = '0'; alphaSlider.max = '100'; alphaSlider.value = '100';
+                alphaSlider.style.cssText = 'flex:1;cursor:pointer;';
+                const alphaVal = document.createElement('span');
+                alphaVal.textContent = '100%';
+                alphaVal.style.cssText = 'font-size:10px;opacity:0.65;min-width:32px;text-align:right;';
+                alphaSlider.addEventListener('mousedown', e => e.stopPropagation());
+                alphaSlider.addEventListener('click', e => e.stopPropagation());
+                alphaSlider.addEventListener('input', () => {
+                    alphaVal.textContent = alphaSlider.value + '%';
+                    cInput.dispatchEvent(new Event('input'));
+                });
+                alphaRow.appendChild(alphaLabel); alphaRow.appendChild(alphaSlider); alphaRow.appendChild(alphaVal);
+                panel.appendChild(alphaRow);
+
+                // 透明度を反映した色適用（rgba で上書き）
+                cInput.addEventListener('input', () => {
+                    const a = parseInt(alphaSlider.value) / 100;
+                    let rgba = cInput.value;
+                    if (a < 1) {
+                        const r = parseInt(rgba.slice(1,3), 16), g = parseInt(rgba.slice(3,5), 16), b = parseInt(rgba.slice(5,7), 16);
+                        rgba = `rgba(${r},${g},${b},${a.toFixed(2)})`;
+                    }
+                    if (panel === tcSubPanel) {
+                        const root2 = el.closest('.box') || el;
+                        const textEls = Array.from(root2.querySelectorAll('.title-input,.text-input-box,.clock-time,.sw-time,.counter-value,.input-text,.live-input,.hdr-float-time,.hdr-float-date,.clock-date,.ticker-ctrl,#clock,#date,.profile-display-area,#profile-display-area'));
+                        if (textEls.length === 0) Array.from(target.querySelectorAll('input[type="text"],textarea')).forEach(t => textEls.push(t));
+                        textEls.forEach(t => t.style.color = rgba);
+                    } else if (panel === fcSubPanel) {
+                        (el.closest('.box') || el).style.background = rgba;
+                    } else if (panel === bcSubPanel) {
+                        (el.closest('.box') || el).style.borderColor = rgba;
+                    }
+                });
+            });
+
+            menu.querySelector('[data-action="rotate"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                rotSubPanel.classList.toggle('open');
+                tcSubPanel.classList.remove('open');
+                fcSubPanel.classList.remove('open');
+                bcSubPanel.classList.remove('open');
+                fsSubPanel.classList.remove('open');
+                if (rotSubPanel.classList.contains('open')) {
+                    const root2 = el.closest('.box') || el;
+                    const cur = root2.style.transform.match(/rotate\((-?[\d.]+)deg\)/);
+                    rotInput.value = cur ? parseFloat(cur[1]) : 0;
+                }
+            });
+            rotInput.addEventListener('mousedown', e => e.stopPropagation());
+            rotInput.addEventListener('keydown', e => e.stopPropagation());
+            rotSubPanel.querySelectorAll('[data-rot]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const deg = parseInt(btn.dataset.rot);
+                    (el.closest('.box') || el).style.transform = deg === 0 ? '' : `rotate(${deg}deg)`;
+                    rotInput.value = deg;
+                });
+            });
+            menu.querySelector('.hover-menu-rot-apply').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const deg = parseInt(rotInput.value) || 0;
+                (el.closest('.box') || el).style.transform = deg === 0 ? '' : `rotate(${deg}deg)`;
+            });
+            menu.querySelector('.hover-menu-rot-reset').addEventListener('click', (e) => {
+                e.stopPropagation();
+                (el.closest('.box') || el).style.transform = '';
+                rotInput.value = 0;
+            });
+
+            let fsBuilt = false;
+            menu.querySelector('[data-action="fontsize"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = fsSubPanel.classList.contains('open');
+                fsSubPanel.classList.toggle('open');
+                rotSubPanel.classList.remove('open');
+                tcSubPanel.classList.remove('open');
+                fcSubPanel.classList.remove('open');
+                bcSubPanel.classList.remove('open');
+                if (!isOpen && !fsBuilt) { buildFsRows(); fsBuilt = true; }
+            });
+
+            function buildFsRows() {
+                const root = el.closest('.box') || el;
+                const textEls = Array.from(root.querySelectorAll('.title-input,.text-input-box,.clock-time,.clock-date,.sw-time,.counter-value,.hdr-float-time,.hdr-float-date,.ticker-ctrl,#clock,#date,.profile-display-area,#profile-display-area'));
+                if (textEls.length === 0) Array.from(target.querySelectorAll('textarea,input[type="text"]')).forEach(t => textEls.push(t));
+                const presetsEl = fsSubPanel.querySelector('.hover-menu-presets');
+                const fsRowEl = fsSubPanel.querySelector('.hover-menu-fs-row');
+                presetsEl.innerHTML = '';
+                if (fsRowEl) fsRowEl.innerHTML = '';
+                if (textEls.length === 0) { presetsEl.innerHTML = '<span style="color:rgba(180,180,180,0.6);font-size:11px;padding:2px 4px;">対象なし</span>'; return; }
+                textEls.forEach((t, i) => {
+                    const label = (t.placeholder || t.value || ('要素' + (i + 1))).slice(0, 6);
+                    const cur = parseInt(window.getComputedStyle(t).fontSize) || 16;
+                    const wrap = document.createElement('div');
+                    wrap.style.cssText = 'border-top:1px solid rgba(180,180,180,0.12);padding:4px 0;';
+                    const lbl = document.createElement('div');
+                    lbl.textContent = label;
+                    lbl.style.cssText = 'font-size:10px;color:rgba(180,180,180,0.65);margin-bottom:3px;overflow:hidden;white-space:nowrap;';
+                    wrap.appendChild(lbl);
+                    const inp = document.createElement('input');
+                    inp.type = 'number'; inp.value = cur; inp.min = 8; inp.max = 200; inp.className = 'hover-menu-fs-input'; inp.style.width = '48px';
+                    inp.addEventListener('mousedown', ev => ev.stopPropagation());
+                    inp.addEventListener('keydown', ev => ev.stopPropagation());
+                    const preRow = document.createElement('div');
+                    preRow.style.cssText = 'display:flex;gap:2px;flex-wrap:wrap;margin-bottom:3px;';
+                    [12, 16, 20, 24, 32, 48, 64].forEach(sz => {
+                        const pb = document.createElement('button');
+                        pb.className = 'hover-menu-preset'; pb.textContent = sz;
+                        pb.addEventListener('click', (ev) => { ev.stopPropagation(); t.style.fontSize = sz + 'px'; inp.value = sz; });
+                        preRow.appendChild(pb);
+                    });
+                    wrap.appendChild(preRow);
+                    const inputRow = document.createElement('div');
+                    inputRow.style.cssText = 'display:flex;align-items:center;gap:4px;';
+                    const applyBtn = document.createElement('button');
+                    applyBtn.className = 'hover-menu-fs-apply'; applyBtn.textContent = 'OK';
+                    applyBtn.addEventListener('click', (ev) => { ev.stopPropagation(); t.style.fontSize = Math.min(200, Math.max(8, parseInt(inp.value) || cur)) + 'px'; });
+                    inputRow.appendChild(inp); inputRow.appendChild(applyBtn);
+                    wrap.appendChild(inputRow);
+                    presetsEl.appendChild(wrap);
+                });
+
+            }
+
+            // メニュー外クリックで閉じる
+            document.addEventListener('click', (e) => {
+                if (!menu.contains(e.target) && e.target !== toggle) {
+                    menu.classList.remove('open');
+                    tcSubPanel.classList.remove('open');
+                    fcSubPanel.classList.remove('open');
+                    bcSubPanel.classList.remove('open');
+                    fsSubPanel.classList.remove('open');
+                }
+            });
+
+            // メニューは captureArea 直下に置くことで
+            // clip-path / overflow の影響を受けずに全体表示できる
+            el.style.position = el.style.position || 'absolute';
+            captureArea.appendChild(menu);
+
+            // サブパネル開閉でメニューが広がったとき右端・下端はみ出しを自動修正
+            new ResizeObserver(() => {
+                if (!menu.classList.contains('open')) return;
+                const mr = menu.getBoundingClientRect();
+                if (mr.right > window.innerWidth) menu.style.left = Math.max(0, window.innerWidth - mr.width - 4) + 'px';
+                if (mr.bottom > window.innerHeight) menu.style.top = Math.max(0, window.innerHeight - mr.height - 4) + 'px';
+            }).observe(menu);
+
+            // 要素が外部で削除されたとき、メニューを自動破棄する
+            const mo = new MutationObserver(() => {
+                if (!el.isConnected) {
+                    try { if (menu && menu.parentNode) menu.parentNode.removeChild(menu); } catch (err) { }
+                    mo.disconnect();
+                }
+            });
+            mo.observe(document, { childList: true, subtree: true });
+        }
+
+        /* =====================================================
+         *  時計
+         * ===================================================== */
+        function updateClock() {
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}`;
+            const timeStr = now.toLocaleTimeString('ja-JP');
+            const hmStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+            function applyClockFormat(container, timeEl, dateEl) {
+                if (timeEl && !timeEl._wFixed && document.fonts.status === 'loaded') {
+                    timeEl._wFixed = true;
+                    const _ot = timeEl.textContent; timeEl.textContent = '88:88:88';
+                    timeEl.style.minWidth = timeEl.offsetWidth + 'px'; timeEl.textContent = _ot;
+                }
+                if (dateEl && !dateEl._wFixed && document.fonts.status === 'loaded') {
+                    dateEl._wFixed = true;
+                    const _od = dateEl.textContent; dateEl.textContent = '8888/88/88';
+                    dateEl.style.minWidth = dateEl.offsetWidth + 'px'; dateEl.textContent = _od;
+                }
+                const fmt = (container && container.dataset.clockFormat) || 'date-time';
+                if (timeEl) {
+                    timeEl.style.display = fmt === 'date-only' ? 'none' : '';
+                    timeEl.textContent = (fmt === 'hm' || fmt === 'date-hm') ? hmStr : timeStr;
+                }
+                if (dateEl) {
+                    dateEl.style.display = (fmt === 'time-only' || fmt === 'hm') ? 'none' : '';
+                    dateEl.textContent = dateStr;
+                }
+            }
+
+            // 上部バーの時計
+            const dateEl = document.getElementById('date');
+            const clockEl = document.getElementById('clock');
+            const initClock = document.getElementById('init-clock');
+            applyClockFormat(initClock, clockEl, dateEl);
+
+            // 追加した独立時計ボックス・フロート時計
+            clockBoxes.forEach(box => {
+                if (!box.isConnected) return; // 削除済みはスキップ
+                applyClockFormat(box,
+                    box.querySelector('.clock-time') || box.querySelector('.hdr-float-time') || box.querySelector('#clock'),
+                    box.querySelector('.clock-date') || box.querySelector('.hdr-float-date') || box.querySelector('#date'));
+            });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+        const _skipLoad = localStorage.getItem('_skip_cyberpunkGamingConfig') === '1';
+        localStorage.removeItem('_skip_cyberpunkGamingConfig');
+        if (CONFIG.features.autoLoad && !_skipLoad) loadSavedConfig();
+    </script>
+</body>
+
+</html>
