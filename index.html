@@ -381,11 +381,70 @@
       gap: 12px;
     }
 
+    /* ── Tool cards (non-overlay) ── */
+    .tool-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--tool-accent, rgba(255,255,255,0.15));
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+
+    .tool-icon {
+      flex-shrink: 0;
+      width: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      background: var(--tool-accent-bg, rgba(255,255,255,0.04));
+      border-right: 1px solid var(--border);
+    }
+
+    .tool-body {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .tool-tag {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--tool-accent, var(--muted));
+      text-transform: uppercase;
+    }
+
+    .tool-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .tool-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+      flex: 1;
+      margin-bottom: 10px;
+    }
+
     @media (max-width: 600px) {
       .hero { padding: 60px 20px 52px; }
       .card-actions { flex-direction: column; }
       .btn { justify-content: center; }
       .footer-inner { flex-direction: column; text-align: center; }
+      .tool-card { flex-direction: column; }
+      .tool-icon { width: 100%; height: 64px; border-right: none; border-bottom: 1px solid var(--border); }
     }
   </style>
 </head>
@@ -602,6 +661,40 @@
           <div class="step-text">「説明書」で各テーマの詳細な使い方を確認する</div>
         </div>
       </div>
+    </div>
+
+    <!-- Plugin & Extension section -->
+    <p class="section-title" style="margin-top: 64px;">Plugin & Extension — プラグイン・拡張機能</p>
+
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+
+      <!-- smart-access-control -->
+      <div class="tool-card" style="--tool-accent:#5b8dee; --tool-accent-bg:rgba(91,141,238,0.08);">
+        <div class="tool-icon">🛡️</div>
+        <div class="tool-body">
+          <div class="tool-tag">WordPress Plugin</div>
+          <div class="tool-name">Smart Access Control</div>
+          <div class="tool-desc">クローラー・User-Agent・IPアドレスを組み合わせてアクセスを精密に制御するWPプラグイン。AIクローラーやスクレイピングツールの許可/拒否、AIへの画像非表示やテキスト最適化表示に対応。</div>
+          <div class="card-actions">
+            <a class="btn btn-primary" style="background:#5b8dee; color:#fff;" href="https://donnma.com/public-app-smart-access-control-v4-0-0/" target="_blank" rel="noopener">解説ブログ</a>
+            <a class="btn btn-secondary" href="https://github.com/donnma777/smart-access-control/releases/tag/v4.0.1" target="_blank" rel="noopener">GitHub (v4.0.1)</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- feature-browser-benri-tools -->
+      <div class="tool-card" style="--tool-accent:#4eca8b; --tool-accent-bg:rgba(78,202,139,0.08);">
+        <div class="tool-icon">🧩</div>
+        <div class="tool-body">
+          <div class="tool-tag">Chrome Extension</div>
+          <div class="tool-name">便利ツール拡張機能まとめ</div>
+          <div class="tool-desc">広告ブロック・強制ダークモード・スクリーンショットなどを単体または統合版でまとめたChrome拡張機能リポジトリ。</div>
+          <div class="card-actions">
+            <a class="btn btn-primary" style="background:#4eca8b; color:#0c1a12;" href="https://github.com/donnma777/feature-browser-benri-tools" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </main>
