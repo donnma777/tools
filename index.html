@@ -440,6 +440,69 @@
       gap: 12px;
     }
 
+    /* ── Official site banner ── */
+    .official-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px;
+      background: linear-gradient(135deg, rgba(0,255,247,0.06) 0%, rgba(255,0,127,0.06) 100%);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      text-decoration: none;
+      margin-bottom: 0;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+
+    .official-banner:hover {
+      border-color: rgba(0,255,247,0.35);
+      background: linear-gradient(135deg, rgba(0,255,247,0.10) 0%, rgba(255,0,127,0.08) 100%);
+      transform: translateY(-2px);
+    }
+
+    .official-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .official-badge {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: #00fff7;
+      border: 1px solid rgba(0,255,247,0.4);
+      border-radius: 4px;
+      padding: 3px 10px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .official-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.05em;
+    }
+
+    .official-url {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .official-arrow {
+      font-size: 1.2rem;
+      color: var(--muted);
+      transition: transform 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .official-banner:hover .official-arrow {
+      transform: translateX(4px);
+      color: #00fff7;
+    }
+
     /* ── Tool cards (non-overlay) ── */
     .tool-card {
       background: var(--surface);
@@ -534,7 +597,18 @@
 
   <!-- Theme cards -->
   <main class="section">
-    <p class="section-title">Overlay — オーバーレイテーマ</p>
+
+    <!-- Official site banner -->
+    <a class="official-banner" href="https://donnma.com/" target="_blank" rel="noopener">
+      <div class="official-banner-left">
+        <span class="official-badge">Official Site</span>
+        <span class="official-name">どんまうんど</span>
+        <span class="official-url">donnma.com</span>
+      </div>
+      <span class="official-arrow">→</span>
+    </a>
+
+    <p class="section-title" style="margin-top: 48px;">Overlay — オーバーレイテーマ</p>
 
     <div class="grid">
 
