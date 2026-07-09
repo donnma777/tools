@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>どんまうんど-Tools-Overlay</title>
+  <meta name="description" content="OBS Studio用配信オーバーレイのテーマ集。サイバーパンク、ゲーミング、ガーリーネオン、スウィートロリータ、和風、ナチュラルボタニカルなど8つのテーマを無料公開中。">
+  <meta property="og:title" content="どんまうんど-Tools-Overlay">
+  <meta property="og:description" content="OBS Studio用配信オーバーレイのテーマ集。8種類のデザインを無料公開中。">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@donnma777">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+       crossorigin="anonymous"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0c14;
+      --surface: #13131f;
+      --border: rgba(255,255,255,0.07);
+      --text: #e8e8f0;
+      --muted: #7a7a9a;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans JP', sans-serif;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Topnav ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: rgba(12,12,20,0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topnav-brand {
+      font-family: 'Orbitron', monospace;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .topnav-brand:hover { opacity: 0.7; }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover { color: var(--text); }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00fff7;
+      flex-shrink: 0;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      padding: 64px 24px 56px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 25% 40%, rgba(0,200,255,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 75% 60%, rgba(255,0,127,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: #00fff7;
+      border: 1px solid rgba(0,255,247,0.3);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.6rem, 5vw, 3rem);
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #ffffff 0%, #a0a0c8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 32px;
+    }
+
+    .hero-badges {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 14px;
+      color: var(--muted);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* ── Section ── */
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-family: 'Orbitron', monospace;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Banner row ── */
+    .banner-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .official-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px;
+      background: linear-gradient(135deg, rgba(0,255,247,0.06) 0%, rgba(255,0,127,0.06) 100%);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+
+    .official-banner:hover {
+      border-color: rgba(0,255,247,0.35);
+      background: linear-gradient(135deg, rgba(0,255,247,0.10) 0%, rgba(255,0,127,0.08) 100%);
+      transform: translateY(-2px);
+    }
+
+    .official-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .official-badge {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: #00fff7;
+      border: 1px solid rgba(0,255,247,0.4);
+      border-radius: 4px;
+      padding: 3px 10px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .official-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .official-url {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .official-arrow {
+      font-size: 1.2rem;
+      color: var(--muted);
+      transition: transform 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .official-banner:hover .official-arrow {
+      transform: translateX(4px);
+      color: #00fff7;
+    }
+
+    .booth-banner:hover {
+      border-color: rgba(252,77,80,0.35);
+      background: linear-gradient(135deg, rgba(252,77,80,0.08) 0%, rgba(255,140,0,0.06) 100%);
+    }
+
+    .booth-banner:hover .official-arrow { color: #fc4d50; }
+
+    /* ── Grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--card-accent, rgba(255,255,255,0.15));
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--card-accent, transparent);
+    }
+
+    .preview {
+      position: relative;
+      height: 160px;
+      overflow: hidden;
+    }
+
+    .preview-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 14px;
+      gap: 8px;
+    }
+
+    .preview-topbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preview-live {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      background: var(--card-livebadge, #ff3333);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    .preview-title-text {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--card-accent, #fff);
+      letter-spacing: 0.05em;
+      opacity: 0.9;
+    }
+
+    .preview-boxes {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .preview-box {
+      flex: 1;
+      border: 1px solid var(--card-accent, rgba(255,255,255,0.3));
+      border-radius: 6px;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      opacity: 0.7;
+    }
+
+    .preview-box-label {
+      font-family: 'Orbitron', monospace;
+      font-size: 7px;
+      letter-spacing: 0.15em;
+      color: var(--card-accent, #fff);
+    }
+
+    .preview-box-bar {
+      height: 3px;
+      border-radius: 99px;
+      background: var(--card-accent, rgba(255,255,255,0.4));
+      opacity: 0.5;
+    }
+
+    .preview-box-bar:last-child { width: 65%; }
+
+    .preview-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 100%, var(--card-accent, transparent) 0%, transparent 70%);
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    .card--light .preview-box { background: rgba(0,0,0,0.06); }
+    .card--light .preview-glow { opacity: 0.04; }
+
+    .card-body { padding: 20px; }
+
+    .card-tag {
+      font-family: 'Orbitron', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--card-accent, var(--muted));
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .card-name {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .card-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .card-actions { display: flex; gap: 8px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    .btn-primary {
+      background: var(--card-accent, #444);
+      color: var(--card-bg, #000);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    /* ── Usage ── */
+    .usage {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-top: 48px;
+    }
+
+    .usage h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .step { display: flex; gap: 14px; align-items: flex-start; }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(0,255,247,0.12);
+      border: 1px solid rgba(0,255,247,0.25);
+      color: #00fff7;
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-text {
+      font-size: 0.82rem;
+      color: var(--muted);
+      padding-top: 4px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1px;
+      transition: color 0.15s;
+    }
+
+    footer a:hover { color: var(--text); }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .banner-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .hero { padding: 48px 20px 40px; }
+      .card-actions { flex-direction: column; }
+      .btn { justify-content: center; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .topnav-back span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topnav -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../">どんまうんど-Tools</a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">← トップに戻る</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-label">OBS Studio Overlay</div>
+    <h1>どんまうんど-Tools-Overlay</h1>
+    <p>配信をもっとかっこよく、かわいく。<br>OBS Studio 向け配信オーバーレイのテーマ集です。</p>
+    <div class="hero-badges">
+      <span class="badge"><span class="badge-dot" style="color:#00fff7"></span>全8テーマ</span>
+      <span class="badge"><span class="badge-dot" style="color:#a0e090"></span>1920×1080 対応</span>
+      <span class="badge"><span class="badge-dot" style="color:#ff6ec7"></span>ドラッグ&amp;ドロップ対応</span>
+    </div>
+  </header>
+
+  <main class="section">
+
+    <!-- Banners -->
+    <div class="banner-row">
+      <a class="official-banner" href="https://donnma.com/" target="_blank" rel="noopener">
+        <div class="official-banner-left">
+          <span class="official-badge">Official Site</span>
+          <span class="official-name">どんまうんど</span>
+          <span class="official-url">donnma.com</span>
+        </div>
+        <span class="official-arrow">→</span>
+      </a>
+      <a class="official-banner booth-banner" href="https://donnma.booth.pm/item_lists/nevT9GeV" target="_blank" rel="noopener">
+        <div class="official-banner-left">
+          <span class="official-badge" style="color:#fc4d50; border-color:rgba(252,77,80,0.4);">BOOTH</span>
+          <span class="official-name">配信素材ショップ</span>
+          <span class="official-url">donnma.booth.pm</span>
+        </div>
+        <span class="official-arrow">→</span>
+      </a>
+    </div>
+
+    <p class="section-title">テーマを選ぶ</p>
+
+    <div class="grid">
+
+      <!-- GAMING -->
+      <div class="card" style="--card-accent:#00fff7; --card-bg:#0a0a0f; --card-livebadge:#ff3c3c;">
+        <div class="preview" style="background:#0a0a0f;">
+          <div class="preview-inner">
+            <div class="preview-topbar">
+              <span class="preview-live">LIVE</span>
+              <span class="preview-title-text" style="font-family:'Orbitron',monospace;">GAMING OVERLAY</span>
+            </div>
+            <div class="preview-boxes">
+              <div class="preview-box">
+                <div class="preview-box-label">TITLE</div>
+                <div class="preview-box-bar"></div>
+                <div class="preview-box-bar"></div>
+              </div>
+              <div class="preview-box">
+                <div class="preview-box-label">COMMENT</div>
+                <div class="preview-box-bar"></div>
+                <div class="preview-box-bar"></div>
+              </div>
+            </div>
+          </div>
+          <div class="preview-glow"></div>
+        </div>
+        <div class="card-body">
+          <div class="card-tag">Gaming</div>
+          <div class="card-name">GAMING</div>
+          <div class="card-desc">シャープなサイバー系ダークデザイン。シアン×ブラックのゲーミングスタイル。</div>
+          <div class="card-actions">
+            <a class="btn btn-primary" href="gaming/gaming.html">オーバーレイを見る</a>
+            <a class="btn btn-secondary" href="gaming/index.html">説明書</a>
+            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/gaming" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CYBERPUNK VAPORWAVE -->
+      <div class="card" style="--card-accent:#ff007f; --card-bg:#0b071a; --card-livebadge:#ff007f;">
+        <div class="preview" style="background:#0b071a;">
+          <div class="preview-inner">
+            <div class="preview-topbar">
+              <span class="preview-live" style="background:#ff007f;">LIVE</span>
+              <span class="preview-title-text" style="font-family:'Orbitron',monospace;color:#ff007f;">CYBERPUNK</span>
+            </div>
+            <div class="preview-boxes">
+              <div class="preview-box">
+                <div class="preview-box-label">TITLE</div>
+                <div class="preview-box-bar"></div>
+                <div class="preview-box-bar"></div>
+              </div>
+              <div class="preview-box">
+                <div class="preview-box-label">COMMENT</div>
+                <div class="preview-box-bar"></div>
+                <div class="preview-box-bar"></div>
+              </div>
+            </div>
+          </div>
+          <div class="preview-glow"></div>
+        </div>
+        <div class="card-body">
+          <div class="card-tag">Cyberpunk</div>
+          <div class="card-name">CYBERPUNK VAPORWAVE</div>
+          <div class="card-desc">ネオンピンク×ダークパープルの退廃的なサイバーパンク×ヴェイパーウェイブデザイン。</div>
+          <div class="card-actions">
+            <a class="btn btn-primary" style="color:#fff;" href="cyberpunk-gaming/cyberpunk-gaming.html">オーバーレイを見る</a>
+            <a class="btn btn-secondary" href="cyberpunk-gaming/index.html">説明書</a>
+            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/cyberpunk-gaming" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAMING GIRLY NEON -->
+      <div class="card" style="--card-accent:#ff6ec7; --card-bg:#0d0010; --card-livebadge:#c92b8a;">
+        <div class="preview" style="background:#0d0010;">
+          <div class="preview-inner">
+            <div class="preview-topbar">
+              <span class="preview-live" style="background:#c92b8a;">LIVE</span>
+              <span class="preview-title-text" style="color:#ff6ec7;">GIRLY NEON</span>
+            </div>
+            <div class="preview-boxes">
+              <div class="preview-box">
+                <div class="preview-box-label" style="color:#ff6ec7;">TITLE</div>
+                <div class="preview-box-bar"></div>
+                <div class="preview-box-bar"></div>
+              </div>
+              <div class="preview-box">
+                <div class="preview-box-label" style="color:#ff6ec7;">COMMENT</div>
+                <div class="preview-box-bar"></div>
+                <div class="preview-box-bar"></div>
+              </div>
+            </div>
+          </div>
+          <div class="preview-glow"></div>
+        </div>
+        <div class="card-body">
+          <div class="card-tag">Girly Neon</div>
+          <div class="card-name">GAMING GIRLY NEON</div>
+          <div class="card-desc">ダーク背景にポップなネオンカラーが映えるガーリーゲーミングデザイン。</div>
+          <div class="card-actions">
+            <a class="btn btn-primary" style="color:#fff;" href="gaming_girly_neon/gaming_girly_neon.html">オーバーレイを見る</a>
+            <a class="btn btn-secondary" href="gaming_girly_neon/index.html">説明書</a>
+            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/gaming_girly_neon" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SWEET LOLITA ROSE -->
+      <div class="card card--light" style="--card-accent:#df6ba6; --card-bg:#fff0f7; --card-livebadge:#df6ba6;">
+        <div class="preview" style="background:#fff0f7;">
+          <div class="preview-inner">
+            <div class="preview-topbar">
+              <span class="preview-live" style="background:#df6ba6; color:#fff;">LIVE</span>
+              <span class="preview-title-text" style="color:#df6ba6;">SWEET LOLITA</span>
+            </div>
+            <div class="preview-boxes">
+              <div class="preview-box" style="border-color:rgba(223,107,166,0.4); background:rgba(223,107,166,0.06);">
+                <div class="preview-box-label" style="color:#df6ba6;">TITLE</div>
+                <div class="preview-box-bar" style="background:#df6ba6;"></div>
+                <div class="preview-box-bar" style="background:#df6ba6;"></div>
+              </div>
+              <div class="preview-box" style="border-color:rgba(223,107,166,0.4); background:rgba(223,107,166,0.06);">
+                <div class="preview-box-label" style="color:#df6ba6;">COMMENT</div>
+                <div class="preview-box-bar" style="background:#df6ba6;"></div>
+                <div class="preview-box-bar" style="background:#df6ba6;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="preview-glow"></div>
+        </div>
+        <div class="card-body">
+          <div class="card-tag">Sweet Lolita</div>
+          <div class="card-name">SWEET LOLITA ROSE</div>
+          <div class="card-desc">ピンク×白のふんわりロリータデザイン。かわいらしい配信画面を演出。</div>
+          <div class="card-actions">
+            <a class="btn btn-primary" style="color:#fff;" href="sweet_lolita_rose/sweet_lolita_rose.html">オーバーレイを見る</a>
+            <a class="btn btn-secondary" href="sweet_lolita_rose/index.html">説明書</a>
+            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/sweet_lolita_rose" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- WA -->
+      <div class="card card--light" style="--card-accent:#b5627e; --card-bg:#faf6f0; --card-livebadge:#8b3a56;">
+        <div class="preview" style="background:#faf6f0;">
+          <div class="preview-inner">
+            <div class="preview-topbar">
+              <span class="preview-live" style="background:#8b3a56; color:#fff; font-family:'Noto Sans JP',sans-serif; font-size:9px; letter-spacing:0;">配信中</span>
+              <span class="preview-title-text" style="color:#b5627e; font-family:'Noto Sans JP',sans-serif; letter-spacing:0.1em;">和　WA</span>
+            </div>
+            <div class="preview-boxes">
+              <div class="preview-box" style="border-color:rgba(181,98,126,0.4); background:rgba(181,98,126,0.06);">
+                <div class="preview-box-label" style="color:#b5627e; font-family:'Noto Sans JP',sans-serif; letter-spacing:0;">タイトル</div>
+                <div class="preview-box-bar" style="background:#b5627e;"></div>
+                <div class="preview-box-bar" style="background:#b5627e;"></div>
+              </div>
+              <div class="preview-box" style="border-color:rgba(181,98,126,0.4); background:rgba(181,98,126,0.06);">
+                <div class="preview-box-label" style="color:#b5627e; font-family:'Noto Sans JP',sans-serif; letter-spacing:0;">コメント</div>
+                <div class="preview-box-bar" style="background:#b5627e;"></div>
+                <div class="preview-box-bar" style="background:#b5627e;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="preview-glow"></div>
+        </div>
+        <div class="card-body">
+          <div class="card-tag">Japanese Style</div>
+          <div class="card-name">和 WA</div>
+          <div class="card-desc">くすみローズ×ベージュの落ち着いた和風デザイン。上品な配信画面を演出。</div>
+          <div class="card-actions">
+            <a class="btn btn-primary" style="color:#fff;" href="wa/wa.html">オーバーレイを見る</a>
+            <a class="btn btn-secondary" href="wa/index.html">説明書</a>
+            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/wa" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- POP -->
+      <div class="card card--light" style="--card-accent:#7ec8e3; --card-bg:#f0faff; --card-livebadge:#5bb3d8;">
+        <div class="preview" style="background:#f0faff;">
+          <div class="preview-inner">
+            <div class="preview-topbar">
+              <span class="preview-live" style="background:#5bb3d8; color:#fff;">LIVE</span>
+              <span class="preview-title-text" style="color:#3a8bb5;">POP ★</span>
+            </div>
+            <div class="preview-boxes">
+              <div class="preview-box" style="border-color:rgba(126,200,227,0.5); background:rgba(126,200,227,0.08);">
+                <div class="preview-box-label" style="color:#3a8bb5;">TITLE</div>
+                <div class="preview-box-bar" style="background:#7ec8e3;"></div>
+                <div class="preview-box-bar" style="background:#7ec8e3;"></div>
+              </div>
+              <div class="preview-box" style="border-color:rgba(126,200,227,0.5); background:rgba(126,200,227,0.08);">
+                <div class="preview-box-label" style="color:#3a8bb5;">COMMENT</div>
+                <div class="preview-box-bar" style="background:#7ec8e3;"></div>
+                <div class="preview-box-bar" style="background:#7ec8e3;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="preview-glow"></div>
+        </div>
+        <div class="card-body">
+          <div class="card-tag">Pop</div>
+          <div class="card-name">POP</div>
+          <div class="card-desc">水色×白の明るいポップデザイン。元気で親しみやすい配信画面を演出。</div>
+          <div class="card-actions">
+            <a class="btn btn-primary" style="color:#fff;" href="pop/pop.html">オーバーレイを見る</a>
+            <a class="btn btn-secondary" href="pop/index.html">説明書</a>
+            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/pop" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- NATURAL BOTANICA -->
+      <div class="card card--light" style="--card-accent:#5f8d55; --card-bg:#f5f7ee; --card-livebadge:#3f6b3a;">
+        <div class="preview" style="background:#f5f7ee;">
+          <div class="preview-inner">
+            <div class="preview-topbar">
+              <span class="preview-live" style="background:#3f6b3a; color:#fff; font-family:'Noto Sans JP',sans-serif; font-size:9px; letter-spacing:0;">配信中</span>
+              <span class="preview-title-text" style="color:#5f8d55; font-family:'Noto Sans JP',sans-serif; letter-spacing:0.05em;">BOTANICA</span>
+            </div>
+            <div class="preview-boxes">
+              <div class="preview-box" style="border-color:rgba(95,141,85,0.4); background:rgba(95,141,85,0.06);">
+                <div class="preview-box-label" style="color:#5f8d55; font-family:'Noto Sans JP',sans-serif; letter-spacing:0;">記録</div>
+                <div class="preview-box-bar" style="background:#5f8d55;"></div>
+                <div class="preview-box-bar" style="background:#5f8d55;"></div>
+              </div>
+              <div class="preview-box" style="border-color:rgba(95,141,85,0.4); background:rgba(95,141,85,0.06);">
+                <div class="preview-box-label" style="color:#5f8d55; font-family:'Noto Sans JP',sans-serif; letter-spacing:0;">コメント</div>
+                <div class="preview-box-bar" style="background:#5f8d55;"></div>
+                <div class="preview-box-bar" style="background:#5f8d55;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="preview-glow"></div>
+        </div>
+        <div class="card-body">
+          <div class="card-tag">Natural Botanica</div>
+          <div class="card-name">NATURAL BOTANICA</div>
+          <div class="card-desc">グリーン×生成りのナチュラル植物系デザイン。落ち着いた癒し系の配信画面を演出。</div>
+          <div class="card-actions">
+            <a class="btn btn-primary" style="color:#fff;" href="natural_botanica/natural_botanica.html">オーバーレイを見る</a>
+            <a class="btn btn-secondary" href="natural_botanica/index.html">説明書</a>
+            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/natural_botanica" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CITY POP -->
+      <div class="card" style="--card-accent:#f59e0b; --card-bg:#1c0a00; --card-livebadge:#c2410c;">
+        <div class="preview" style="background:#1c0a00;">
+          <div class="preview-inner">
+            <div class="preview-topbar">
+              <span class="preview-live" style="background:#c2410c;">ON AIR</span>
+              <span class="preview-title-text" style="color:#f59e0b;">CITY POP</span>
+            </div>
+            <div class="preview-boxes">
+              <div class="preview-box" style="border-color:rgba(245,158,11,0.4); background:rgba(245,158,11,0.06);">
+                <div class="preview-box-label" style="color:#f59e0b;">TITLE</div>
+                <div class="preview-box-bar" style="background:#f59e0b;"></div>
+                <div class="preview-box-bar" style="background:#f59e0b;"></div>
+              </div>
+              <div class="preview-box" style="border-color:rgba(245,158,11,0.4); background:rgba(245,158,11,0.06);">
+                <div class="preview-box-label" style="color:#f59e0b;">COMMENT</div>
+                <div class="preview-box-bar" style="background:#f59e0b;"></div>
+                <div class="preview-box-bar" style="background:#f59e0b;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="preview-glow"></div>
+        </div>
+        <div class="card-body">
+          <div class="card-tag">City Pop</div>
+          <div class="card-name">CITY POP</div>
+          <div class="card-desc">レトロな80年代シティポップデザイン。オレンジ×深いブラウンで大人っぽい配信画面を演出。</div>
+          <div class="card-actions">
+            <a class="btn btn-primary" style="color:#fff;" href="citypop/citypop.html">オーバーレイを見る</a>
+            <a class="btn btn-secondary" href="citypop/index.html">説明書</a>
+            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/citypop" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Usage -->
+    <div class="usage">
+      <h2>使い方</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">好きなテーマを選び「オーバーレイを見る」でHTMLを開く</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">OBS Studio の「ブラウザソース」でそのファイルを読み込む</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">HTMLファイル冒頭の CONFIG を編集してテキスト・カラーをカスタマイズ</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text">「説明書」で各テーマの詳細な使い方を確認する</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- AdSense -->
+  <div style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-4863572964771965"
+         data-ad-slot="7669813635"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+      <span>
+        <a href="https://github.com/donnma777/tools" target="_blank" rel="noopener">GitHub</a>
+        &nbsp;·&nbsp;
+        解像度 1920×1080 推奨
+      </span>
+    </div>
+  </footer>
+
+</body>
+</html>
