@@ -623,14 +623,14 @@
             z-index: 2000;
             background: rgba(255, 245, 252, 0.98);
             border: 1px solid rgba(234, 146, 193, 0.30);
-            border-radius: 24px;
-            box-shadow: 0 32px 70px rgba(234, 146, 193, 0.16);
+            border-radius: 10px;
+            box-shadow: 0 20px 44px rgba(234, 146, 193, 0.16);
             min-width: 240px;
             max-width: min(92vw, 640px);
             width: auto;
-            padding: 12px;
+            padding: 6px 0;
             box-sizing: border-box;
-            gap: 10px;
+            gap: 0;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             backdrop-filter: blur(12px);
             animation: popMenu 0.18s ease-out;
@@ -647,15 +647,13 @@
         .part-menu-title {
             grid-column: 1 / -1;
             font-family: 'Outfit', sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
             color: #8b5878;
             letter-spacing: 1.5px;
-            padding: 12px 16px;
-            border-radius: 18px;
-            background: rgba(255, 230, 245, 0.85);
-            box-shadow: inset 0 0 0 1px rgba(234, 146, 193, 0.12);
-            text-align: center;
+            padding: 8px 16px 6px;
+            opacity: 0.75;
+            border-bottom: 1px solid rgba(234, 146, 193, 0.2);
             margin-bottom: 4px;
         }
 
@@ -663,27 +661,20 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 12px 14px;
+            padding: 9px 12px;
             font-family: 'Quicksand', sans-serif;
             font-size: 15px;
             font-weight: 700;
             color: #7a4d6a;
             cursor: pointer;
             user-select: none;
-            transition: background 0.18s ease, transform 0.18s ease, color 0.18s ease;
+            transition: background 0.15s ease, color 0.15s ease;
             min-width: 0;
-            border-radius: 18px;
-            background: rgba(255, 230, 245, 0.80);
-            border: 1px solid transparent;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
         }
 
         .part-menu-item:hover {
-            background: rgba(234, 146, 193, 0.22);
+            background: rgba(234, 146, 193, 0.15);
             color: var(--color-accent);
-            transform: translateY(-1px);
-            border-color: rgba(234, 146, 193, 0.35);
-            box-shadow: 0 10px 20px rgba(234, 146, 193, 0.08);
         }
 
         .part-menu-section {
@@ -693,23 +684,17 @@
             font-weight: 800;
             color: #a65b8e;
             letter-spacing: 1px;
-            padding: 8px 16px 4px;
-            opacity: 0.75;
+            padding: 6px 16px 3px;
+            opacity: 0.7;
             border-top: 1px dashed rgba(234, 146, 193, 0.18);
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
         .part-menu-icon {
-            font-size: 18px;
-            width: 26px;
-            height: 26px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: rgba(255, 214, 235, 0.7);
-            color: #9a5b90;
-            opacity: 1;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            opacity: 0.85;
         }
 
         @keyframes popMenu {
