@@ -2,7 +2,7 @@
 
 配信者向けのツールやアセットを無料公開しているリポジトリです。
 
-- サイト: https://tools.donnma.com/
+- サイト: https://donnma.com/live-tool/
 - 公式サイト: https://donnma.com/
 - BOOTH: https://donnma.booth.pm/item_lists/nevT9GeV
 
@@ -20,15 +20,19 @@ OBS Studio のブラウザソースで使える配信オーバーレイのテー
 | GAMING GIRLY NEON | `overlay/gaming_girly_neon/` |
 | SWEET LOLITA ROSE | `overlay/sweet_lolita_rose/` |
 | 和 WA | `overlay/wa/` |
+| POP | `overlay/pop/` |
+| CITY POP | `overlay/citypop/` |
 
-各フォルダにオーバーレイ本体と `説明書.html` が入っています。
+各フォルダにオーバーレイ本体（`.html`）と説明書（`index.html` または `説明書.html`）、ローカルプレビュー用の `サーバー起動.bat` が入っています。
 
 ### 使い方
 
 1. お好みのテーマフォルダを選ぶ
 2. OBS Studio の「ブラウザソース」でHTMLファイルを読み込む
 3. HTMLファイル冒頭の `CONFIG` を編集してテキスト・カラーをカスタマイズ
-4. `説明書.html` で詳細な使い方を確認する
+4. 説明書で詳細な使い方を確認する
+
+パーツメニューの「表示更新」を使うと、同じURLを別タブで開いている画面へ編集内容をリアルタイムに反映できます（`file://` 直接ではなく `http://` 経由で開く必要があります。`サーバー起動.bat` で手元確認用のローカルサーバーを立ち上げられます）。
 
 ---
 
