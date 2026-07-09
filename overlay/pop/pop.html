@@ -3,17 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="OBS Studio用シティポップ配信オーバーレイ。レトロな80年代シティポップデザインで1920×1080対応。ドラッグ＆ドロップで自由にカスタマイズ可能。配信者donnma制作。">
-    <meta property="og:title" content="OBS配信オーバーレイ CITY POP テーマ | donnma">
-    <meta property="og:description" content="OBS Studio用シティポップ配信オーバーレイ。レトロな80年代シティポップデザインで1920×1080対応。">
+    <meta name="description" content="OBS Studio用ポップ配信オーバーレイ。明るい水色ポップデザインで1920×1080対応。ドラッグ＆ドロップで自由にカスタマイズ可能。配信者donnma制作。">
+    <meta property="og:title" content="OBS配信オーバーレイ POP テーマ | donnma">
+    <meta property="og:description" content="OBS Studio用ポップ配信オーバーレイ。明るい水色ポップデザインで1920×1080対応。">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://donnma.com/overlay/citypop/">
+    <meta property="og:url" content="https://donnma.com/overlay/pop/">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@donnma777">
     <link
-        href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap"
         rel="stylesheet">
-    <title>配信画面 - CITY POP</title>
+    <title>配信画面 - POP ★</title>
 
     <script>
         /**
@@ -28,20 +28,20 @@
             // 【カラー設定】
             // -----------------------------------------------
             color: {
-                /** メインカラー（枠線・ハイライトなどに使われます） */
-                accent: '#f59e0b',
+                /** メインカラー（枠線・テキスト・光彩などに使われます） */
+                accent: '#7ec8e3',
 
-                /** サブカラー（ネオン・グロー） */
-                sub: '#ec4899',
+                /** サブカラー（ボタン・ハート装飾など） */
+                sub: '#ff9ecb',
 
-                /** LIVEバッジの背景（グラデーション開始色） */
-                liveBadge: '#c2410c',
+                /** LIVEバッジの背景色 */
+                liveBadge: '#5bb3d8',
 
                 /** 画面の背景色 */
-                background: '#1c0a00',
+                background: '#f0faff',
 
                 /** コメント・メモのテキスト色 */
-                bodyText: '#fef9e7',
+                bodyText: '#3a8bb5',
             },
 
             // -----------------------------------------------
@@ -49,28 +49,28 @@
             // -----------------------------------------------
             text: {
                 /** LIVEバッジに表示する文字 */
-                liveBadge: 'ON AIR',
+                liveBadge: 'LIVE',
 
                 /** メッセージ欄のプレースホルダー */
-                messagePlaceholder: 'MESSAGE...',
+                messagePlaceholder: 'メッセージを入力...',
 
                 /** TITLEボックスのタイトル */
-                titleBoxHeader: 'NOW PLAYING',
+                titleBoxHeader: 'タイトル ★',
 
                 /** TITLEボックスの本文 */
-                titleBoxContent: 'ようこそ',
+                titleBoxContent: 'ポップな配信オーバーレイへようこそ！',
 
                 /** COMMENTボックスのタイトル */
-                commentBoxHeader: 'COMMENT',
+                commentBoxHeader: 'コメント ✨',
 
                 /** MEMOボックスのタイトル */
-                memoBoxHeader: 'MEMO',
+                memoBoxHeader: 'メモ 📝',
 
                 /** MEMOボックスの初期テキスト */
                 memoBoxContent: '空白ダブルクリックでメニュー選択可能',
 
                 /** MEMOボックスのプレースホルダー */
-                memoPlaceholder: 'MEMO...',
+                memoPlaceholder: 'メモを入力...',
             },
 
             // -----------------------------------------------
@@ -89,18 +89,21 @@
                 /** プロフィールの切替間隔（ミリ秒）*/
                 profileInterval: 3000,
 
-                /** ネオングロー点滅周期（秒）*/
-                neonPulseDuration: '3s',
+                /** 星アニメーションの速度（秒）*/
+                starSpeed: '8s',
 
-                /** シルエット星の点滅周期（秒）*/
-                starBlinkDuration: '4s',
+                /** ポップアニメーションの周期（秒）*/
+                popPulseDuration: '2s',
             },
 
             // -----------------------------------------------
             // 【レイアウト設定】
             // -----------------------------------------------
             layout: {
+                /** 配信画面の幅（px）*/
                 width: 1920,
+
+                /** 配信画面の高さ（px）*/
                 height: 1080,
             },
 
@@ -133,30 +136,35 @@
 
         body {
             overflow: hidden;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Nunito', sans-serif;
         }
 
-        @keyframes neonPulse {
+        @keyframes popFloat {
 
             0%,
             100% {
-                text-shadow: 0 0 6px var(--color-accent), 0 0 16px var(--color-accent), 0 0 32px var(--color-sub);
+                transform: translateY(0);
             }
 
             50% {
-                text-shadow: 0 0 2px var(--color-accent);
+                transform: translateY(-4px);
             }
         }
 
-        @keyframes borderNeon {
-
-            0%,
-            100% {
-                box-shadow: 0 0 4px var(--color-accent), 0 0 12px rgba(245, 158, 11, 0.3);
+        @keyframes starSpin {
+            0% {
+                transform: rotate(0deg) scale(1);
+                opacity: 0.9;
             }
 
             50% {
-                box-shadow: 0 0 2px var(--color-accent);
+                transform: rotate(180deg) scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: rotate(360deg) scale(1);
+                opacity: 0.9;
             }
         }
 
@@ -168,146 +176,73 @@
             }
 
             50% {
-                opacity: 0.2;
+                opacity: 0.3;
             }
         }
 
-        @keyframes scanline {
+        @keyframes rainbowShift {
             0% {
-                transform: translateY(-100%);
+                color: #ff9ecb;
             }
 
-            100% {
-                transform: translateY(100vh);
-            }
-        }
-
-        @keyframes starTwinkle {
-
-            0%,
-            100% {
-                opacity: 0.9;
+            25% {
+                color: #7ec8e3;
             }
 
             50% {
-                opacity: 0.2;
+                color: #b5a8f9;
+            }
+
+            75% {
+                color: #7ec8e3;
+            }
+
+            100% {
+                color: #ff9ecb;
             }
         }
 
         .blinking-icon {
-            animation: blink 2s infinite ease-in-out;
-            margin-right: 8px;
-            color: var(--color-sub);
+            animation: blink 1.8s infinite ease-in-out;
+            margin-right: 6px;
         }
 
         #capture-area {
             position: relative;
         }
 
-        /* ---- スキャンラインオーバーレイ ---- */
-        .scanline-overlay {
+        /* ---- コーナー装飾（星） ---- */
+        .corner-star {
             position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 900;
-            background: repeating-linear-gradient(0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(0, 0, 0, 0.04) 2px,
-                    rgba(0, 0, 0, 0.04) 4px);
-        }
-
-        /* ---- コーナー装飾 ---- */
-        .corner {
-            position: absolute;
+            font-size: 20px;
+            animation: starSpin var(--star-speed) linear infinite;
+            color: var(--color-sub);
             z-index: 500;
             pointer-events: none;
-            width: 24px;
-            height: 24px;
         }
 
-        .corner::before,
-        .corner::after {
-            content: '';
-            position: absolute;
-            background: var(--color-accent);
-            animation: borderNeon var(--neon-pulse-duration) infinite ease-in-out;
+        .corner-star.tl {
+            top: 12px;
+            left: 12px;
         }
 
-        .corner-tl {
-            top: 14px;
-            left: 14px;
+        .corner-star.tr {
+            top: 12px;
+            right: 12px;
+            animation-direction: reverse;
         }
 
-        .corner-tl::before {
-            top: 0;
-            left: 0;
-            width: 2px;
-            height: 24px;
+        .corner-star.bl {
+            bottom: 12px;
+            left: 12px;
+            animation-delay: -2s;
         }
 
-        .corner-tl::after {
-            top: 0;
-            left: 0;
-            width: 24px;
-            height: 2px;
-        }
-
-        .corner-tr {
-            top: 14px;
-            right: 14px;
-        }
-
-        .corner-tr::before {
-            top: 0;
-            right: 0;
-            width: 2px;
-            height: 24px;
-        }
-
-        .corner-tr::after {
-            top: 0;
-            right: 0;
-            width: 24px;
-            height: 2px;
-        }
-
-        .corner-bl {
-            bottom: 14px;
-            left: 14px;
-        }
-
-        .corner-bl::before {
-            bottom: 0;
-            left: 0;
-            width: 2px;
-            height: 24px;
-        }
-
-        .corner-bl::after {
-            bottom: 0;
-            left: 0;
-            width: 24px;
-            height: 2px;
-        }
-
-        .corner-br {
-            bottom: 14px;
-            right: 14px;
-        }
-
-        .corner-br::before {
-            bottom: 0;
-            right: 0;
-            width: 2px;
-            height: 24px;
-        }
-
-        .corner-br::after {
-            bottom: 0;
-            right: 0;
-            width: 24px;
-            height: 2px;
+        .corner-star.br {
+            bottom: 12px;
+            right: 12px;
+            animation-delay: -4s;
+            animation-direction: reverse;
         }
 
         /* ---- 上部バー ---- */
@@ -316,15 +251,13 @@
             padding: 0 20px;
             display: flex;
             align-items: center;
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 15px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 17px;
             font-weight: 700;
-            letter-spacing: 3px;
             color: #fff;
             flex-shrink: 0;
-            background: linear-gradient(90deg, #c2410c, #9a1e6e);
-            border: 1px solid var(--color-accent);
-            box-shadow: 0 0 12px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border-radius: 26px;
+            box-shadow: 0 3px 12px rgba(91, 179, 216, 0.35);
         }
 
         .live-input {
@@ -332,12 +265,11 @@
             border: none;
             outline: none;
             color: white;
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: 'Quicksand', sans-serif;
             font-weight: 700;
-            font-size: 15px;
-            letter-spacing: 3px;
+            font-size: 17px;
             min-width: 40px;
-            width: 8ch;
+            width: 5ch;
             text-align: center;
         }
 
@@ -346,28 +278,27 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(28, 10, 0, 0.82);
-            border: 1px solid var(--color-accent);
+            background: rgba(255, 255, 255, 0.88);
+            border: 2px solid var(--color-accent);
             padding: 0 24px;
-            min-width: 280px;
+            min-width: 260px;
             overflow: hidden;
             cursor: pointer;
-            box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+            border-radius: 26px;
+            box-shadow: 0 3px 10px rgba(126, 200, 227, 0.2);
         }
 
         .profile-container:hover {
-            background: rgba(40, 18, 0, 0.9);
+            background: #fff;
         }
 
         #profile-display-area, .profile-display-area {
             white-space: nowrap;
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            font-family: 'Josefin Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Quicksand', sans-serif;
             color: var(--color-accent);
             pointer-events: none;
-            animation: neonPulse var(--neon-pulse-duration) infinite ease-in-out;
         }
 
         /* ---- プロフィール編集ポップアップ ---- */
@@ -378,7 +309,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(10, 4, 0, 0.7);
+            background: rgba(60, 130, 180, 0.25);
             z-index: 1000;
             align-items: flex-start;
             justify-content: center;
@@ -390,18 +321,18 @@
         }
 
         .editor-popup {
-            background: #1c0a00;
-            border: 1px solid var(--color-accent);
+            background: #fff;
+            border: 2px solid var(--color-accent);
+            border-radius: 20px;
             padding: 24px 28px;
             width: 480px;
-            box-shadow: 0 0 24px rgba(245, 158, 11, 0.25);
+            box-shadow: 0 8px 32px rgba(126, 200, 227, 0.25);
         }
 
         .editor-title {
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 13px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
             font-weight: 700;
-            letter-spacing: 3px;
             color: var(--color-accent);
             margin-bottom: 16px;
         }
@@ -415,28 +346,30 @@
 
         .editor-item input {
             flex: 1;
-            height: 36px;
-            border: 1px solid rgba(245, 158, 11, 0.35);
-            padding: 0 12px;
-            font-family: 'DM Sans', sans-serif;
+            height: 38px;
+            border: 2px solid rgba(126, 200, 227, 0.4);
+            border-radius: 12px;
+            padding: 0 14px;
+            font-family: 'Nunito', sans-serif;
             font-size: 14px;
-            color: var(--color-body-text);
+            color: #2a6080;
             outline: none;
-            background: rgba(255, 255, 255, 0.06);
+            background: #f4fcff;
         }
 
         .editor-item input:focus {
             border-color: var(--color-accent);
-            background: rgba(255, 255, 255, 0.1);
+            background: #fff;
         }
 
         .btn-remove {
-            width: 28px;
-            height: 28px;
-            background: rgba(236, 72, 153, 0.2);
-            color: var(--color-sub);
-            border: 1px solid rgba(236, 72, 153, 0.4);
-            font-size: 14px;
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            background: #ff8cb5;
+            color: white;
+            border: none;
+            font-size: 16px;
             cursor: pointer;
             flex-shrink: 0;
             display: flex;
@@ -452,37 +385,38 @@
         }
 
         .btn-add {
-            height: 34px;
-            padding: 0 16px;
+            height: 36px;
+            padding: 0 18px;
             background: transparent;
-            border: 1px solid var(--color-accent);
+            border: 2px solid var(--color-accent);
             color: var(--color-accent);
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
             font-weight: 700;
-            letter-spacing: 2px;
             cursor: pointer;
+            border-radius: 12px;
         }
 
         .btn-add:hover {
-            background: rgba(245, 158, 11, 0.1);
+            background: rgba(126, 200, 227, 0.1);
         }
 
         .btn-save {
-            height: 34px;
-            padding: 0 20px;
+            height: 36px;
+            padding: 0 22px;
             background: var(--color-accent);
             border: none;
-            color: #1c0a00;
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 12px;
+            color: #fff;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 13px;
             font-weight: 700;
-            letter-spacing: 2px;
             cursor: pointer;
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(126, 200, 227, 0.3);
         }
 
         .btn-save:hover {
-            filter: brightness(1.1);
+            filter: brightness(0.92);
         }
 
         /* ---- 情報バー ---- */
@@ -491,91 +425,79 @@
             display: flex;
             align-items: center;
             padding: 0 18px;
-            font-weight: 600;
-            font-size: 14px;
-            background: rgba(28, 10, 0, 0.82);
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            color: var(--color-body-text);
-            letter-spacing: 1px;
-            box-shadow: 0 0 8px rgba(245, 158, 11, 0.12);
+            font-weight: 700;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.88);
+            border: 2px solid rgba(126, 200, 227, 0.5);
+            color: #2a6080;
+            border-radius: 26px;
+            box-shadow: 0 3px 10px rgba(126, 200, 227, 0.15);
         }
 
         .input-text {
             border: none;
             background: transparent;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: var(--color-body-text);
+            font-family: 'Nunito', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #2a6080;
             outline: none;
             width: 100%;
             text-align: center;
         }
 
         .clock-container {
-            width: 340px;
+            width: 320px;
             flex-shrink: 0;
             gap: 14px;
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 16px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 17px;
             font-weight: 700;
-            letter-spacing: 3px;
             color: var(--color-accent);
             display: flex;
             justify-content: center;
-            animation: neonPulse var(--neon-pulse-duration) infinite ease-in-out;
         }
 
         #date {
-            font-size: 12px;
-            opacity: 0.7;
-            letter-spacing: 2px;
+            font-size: 13px;
+            opacity: 0.75;
         }
 
         /* ---- ボックスパーツ ---- */
         .box {
             position: absolute;
-            background: rgba(28, 10, 0, 0.88);
-            border: 1px solid rgba(245, 158, 11, 0.45);
+            background: rgba(255, 255, 255, 0.93);
+            border: 2px solid rgba(126, 200, 227, 0.5);
             min-width: 200px;
-            box-shadow: 0 0 12px rgba(245, 158, 11, 0.12);
+            border-radius: 18px;
+            box-shadow: 0 4px 16px rgba(126, 200, 227, 0.15);
         }
 
         .box-del-btn {
             display: none !important;
         }
 
-        .box::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(180deg, var(--color-accent), var(--color-sub));
-        }
-
         .header {
-            background: rgba(245, 158, 11, 0.06);
-            border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+            background: rgba(126, 200, 227, 0.1);
+            border-bottom: 2px solid rgba(126, 200, 227, 0.25);
             padding: 0 14px;
-            height: 32px;
+            height: 36px;
             display: flex;
             align-items: center;
             cursor: move;
             user-select: none;
+            border-radius: 16px 16px 0 0;
         }
 
         .header-input {
             background: transparent;
             border: none;
             outline: none;
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 11px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 13px;
             font-weight: 700;
             color: var(--color-accent);
-            letter-spacing: 3px;
+            letter-spacing: 0.5px;
             width: 100%;
         }
 
@@ -587,17 +509,17 @@
         }
 
         .btn {
-            width: 7px;
-            height: 7px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: rgba(245, 158, 11, 0.2);
-            border: 1px solid rgba(245, 158, 11, 0.5);
+            background: rgba(126, 200, 227, 0.35);
+            border: 1px solid rgba(126, 200, 227, 0.6);
         }
 
         .box-menu-toggle {
             cursor: pointer;
-            background: rgba(245, 158, 11, 0.08);
-            border: 1px solid rgba(245, 158, 11, 0.4);
+            background: rgba(126, 200, 227, 0.15);
+            border: 2px solid rgba(126, 200, 227, 0.45);
             color: var(--color-accent);
             font-size: 10px;
             display: none;
@@ -607,9 +529,10 @@
             position: absolute;
             top: 6px;
             right: 6px;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             z-index: 50;
+            border-radius: 8px;
         }
 
         .box:hover .box-menu-toggle,
@@ -618,7 +541,7 @@
         }
 
         .box-menu-toggle:hover {
-            background: rgba(245, 158, 11, 0.2);
+            background: rgba(126, 200, 227, 0.3);
         }
 
         .content {
@@ -635,17 +558,15 @@
             border: none;
             background: transparent;
             text-align: center;
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: 'Quicksand', sans-serif;
             font-size: 24px;
             font-weight: 700;
-            letter-spacing: 2px;
-            color: var(--color-accent);
+            color: #2a6080;
             outline: none;
             resize: none;
             display: block;
             padding: 8px 16px;
             white-space: nowrap;
-            animation: neonPulse var(--neon-pulse-duration) infinite ease-in-out;
         }
 
         .text-input-box {
@@ -654,8 +575,8 @@
             border: none;
             background: transparent;
             color: var(--color-body-text);
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 400;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
             font-size: 15px;
             outline: none;
             resize: none;
@@ -673,8 +594,9 @@
 
         .memo-box .text-input-box,
         .plain-box .text-input-box {
-            color: var(--color-body-text);
-            font-weight: 500;
+            color: #2a6080;
+            font-weight: 700;
+            font-size: 15px;
         }
 
         /* ---- パーツ追加メニュー ---- */
@@ -682,16 +604,18 @@
             display: none;
             position: fixed;
             z-index: 2000;
-            background: #1c0a00;
-            border: 1px solid rgba(245, 158, 11, 0.5);
-            box-shadow: 0 0 24px rgba(245, 158, 11, 0.18);
+            background: #fff;
+            border: 2px solid rgba(126, 200, 227, 0.5);
+            box-shadow: 0 8px 28px rgba(126, 200, 227, 0.25);
+            border-radius: 18px;
             min-width: 240px;
             max-width: min(92vw, 640px);
             width: auto;
-            padding: 6px 0;
+            padding: 8px 0;
             box-sizing: border-box;
             gap: 0;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            overflow: hidden;
         }
 
         #part-menu.open {
@@ -700,14 +624,14 @@
 
         .part-menu-title {
             grid-column: 1 / -1;
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 10px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 12px;
             font-weight: 700;
-            letter-spacing: 3px;
             color: var(--color-accent);
+            letter-spacing: 1px;
             padding: 8px 16px 6px;
-            opacity: 0.9;
-            border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+            opacity: 0.85;
+            border-bottom: 2px solid rgba(126, 200, 227, 0.2);
             margin-bottom: 4px;
         }
 
@@ -716,11 +640,10 @@
             align-items: center;
             gap: 10px;
             padding: 9px 14px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            color: var(--color-body-text);
+            font-family: 'Nunito', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #2a6080;
             cursor: pointer;
             user-select: none;
             transition: background 0.15s;
@@ -728,28 +651,28 @@
         }
 
         .part-menu-item:hover {
-            background: rgba(245, 158, 11, 0.1);
+            background: rgba(126, 200, 227, 0.1);
             color: var(--color-accent);
         }
 
         .part-menu-section {
             grid-column: 1 / -1;
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 9px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: 3px;
             color: var(--color-accent);
+            letter-spacing: 1px;
             padding: 6px 16px 3px;
-            opacity: 0.55;
-            border-top: 1px solid rgba(245, 158, 11, 0.12);
+            opacity: 0.7;
+            border-top: 1px solid rgba(126, 200, 227, 0.2);
             margin-top: 4px;
         }
 
         .part-menu-icon {
-            font-size: 14px;
+            font-size: 15px;
             width: 20px;
             text-align: center;
-            opacity: 0.75;
+            opacity: 0.85;
         }
 
         /* ---- 画像ボックス ---- */
@@ -763,24 +686,25 @@
             width: 100%;
             min-height: 160px;
             height: 100%;
-            border: 1px dashed rgba(245, 158, 11, 0.3);
+            border: 2px dashed rgba(126, 200, 227, 0.4);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: rgba(245, 158, 11, 0.45);
-            font-family: 'DM Sans', sans-serif;
+            color: rgba(126, 200, 227, 0.7);
+            font-family: 'Nunito', sans-serif;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 700;
             cursor: pointer;
             position: relative;
             transition: border-color 0.2s, background 0.2s;
+            border-radius: 0 0 14px 14px;
         }
 
         .image-drop-area:hover,
         .image-drop-area.dragover {
             border-color: var(--color-accent);
-            background: rgba(245, 158, 11, 0.05);
+            background: rgba(126, 200, 227, 0.05);
             color: var(--color-accent);
         }
 
@@ -791,6 +715,7 @@
             max-height: 100%;
             display: block;
             object-fit: contain;
+            border-radius: 0 0 14px 14px;
         }
 
         .image-drop-area input[type="file"] {
@@ -801,12 +726,24 @@
         }
 
         .image-drop-hint {
-            font-size: 24px;
+            font-size: 26px;
             margin-bottom: 6px;
         }
 
         /* ---- 背景パーツ ---- */
-        .bg-city {
+        .bg-stripe {
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(-45deg,
+                    transparent,
+                    transparent 28px,
+                    rgba(126, 200, 227, 0.08) 28px,
+                    rgba(126, 200, 227, 0.08) 30px);
+            z-index: 0;
+        }
+
+        .bg-stars-layer {
             pointer-events: none;
             position: absolute;
             inset: 0;
@@ -814,78 +751,32 @@
             overflow: hidden;
         }
 
-        .bg-city-sky {
+        .bg-star {
             position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg,
-                    #0a0020 0%,
-                    #1c0a00 35%,
-                    #3d1500 55%,
-                    #7c2d00 72%,
-                    #b45309 84%,
-                    #d97706 92%,
-                    #fbbf24 100%);
+            color: var(--color-sub);
+            font-size: 14px;
+            animation: starSpin var(--star-speed) linear infinite;
+            opacity: 0.55;
         }
 
-        .bg-city-stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 55%;
-        }
-
-        .bg-city-star {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-        }
-
-        .bg-city-buildings {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 45%;
-            display: flex;
-            align-items: flex-end;
-        }
-
-        .bg-city-silhouette {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            fill: #0d0508;
-        }
-
-        .bg-city-window {
-            position: absolute;
-            background: rgba(251, 191, 36, 0.6);
-            animation: starTwinkle var(--star-blink-duration) infinite ease-in-out;
-        }
-
-        .bg-grid {
+        .bg-dots {
             pointer-events: none;
             position: absolute;
             inset: 0;
+            background-image: radial-gradient(circle, rgba(126, 200, 227, 0.22) 2px, transparent 2px);
+            background-size: 36px 36px;
             z-index: 0;
-            background-image:
-                linear-gradient(rgba(245, 158, 11, 0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(245, 158, 11, 0.07) 1px, transparent 1px);
-            background-size: 60px 60px;
         }
 
-        .bg-scanline {
+        .bg-gradient {
             pointer-events: none;
             position: absolute;
             inset: 0;
-            z-index: 1;
-            background: repeating-linear-gradient(0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(0, 0, 0, 0.06) 2px,
-                    rgba(0, 0, 0, 0.06) 4px);
+            background:
+                radial-gradient(ellipse at 20% 15%, rgba(255, 158, 203, 0.2) 0%, transparent 40%),
+                radial-gradient(ellipse at 80% 75%, rgba(126, 200, 227, 0.25) 0%, transparent 40%),
+                radial-gradient(ellipse at 55% 50%, rgba(181, 168, 249, 0.12) 0%, transparent 50%);
+            z-index: 0;
         }
 
         .bg-part {
@@ -906,26 +797,27 @@
 
         /* ---- テキスト入力ボックス ドラッグバー ---- */
         .plain-drag-bar {
-            height: 6px;
+            height: 8px;
             cursor: move;
-            background: linear-gradient(90deg, var(--color-accent), var(--color-sub));
-            opacity: 0.35;
+            border-radius: 18px 18px 0 0;
+            background: var(--color-accent);
+            opacity: 0.25;
             user-select: none;
             flex-shrink: 0;
         }
 
         .plain-drag-bar:hover {
-            opacity: 0.65;
+            opacity: 0.5;
         }
 
         /* ---- 長押しドラッグ ---- */
         @keyframes longPressGlow {
             0% {
-                box-shadow: 0 0 12px rgba(245, 158, 11, 0.12);
+                box-shadow: 0 4px 16px rgba(126, 200, 227, 0.15);
             }
 
             100% {
-                box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.5), 0 0 20px rgba(245, 158, 11, 0.25);
+                box-shadow: 0 0 0 6px rgba(126, 200, 227, 0.35), 0 4px 20px rgba(126, 200, 227, 0.25);
             }
         }
 
@@ -934,8 +826,8 @@
         }
 
         .box-long-dragging {
-            box-shadow: 0 0 0 2px var(--color-accent), 0 0 20px rgba(245, 158, 11, 0.3) !important;
-            opacity: 0.92;
+            box-shadow: 0 0 0 3px var(--color-accent), 0 8px 24px rgba(126, 200, 227, 0.3) !important;
+            opacity: 0.9;
             cursor: grabbing !important;
         }
 
@@ -944,7 +836,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(10, 4, 0, 0.75);
+            background: rgba(60, 140, 190, 0.3);
             z-index: 4000;
             align-items: center;
             justify-content: center;
@@ -955,19 +847,19 @@
         }
 
         .help-popup {
-            background: #1c0a00;
-            border: 1px solid var(--color-accent);
+            background: #fff;
+            border: 2px solid var(--color-accent);
             padding: 28px 32px 22px;
             width: 520px;
             max-width: 92vw;
-            box-shadow: 0 0 32px rgba(245, 158, 11, 0.2);
+            box-shadow: 0 8px 32px rgba(126, 200, 227, 0.25);
+            border-radius: 20px;
         }
 
         .help-title {
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 13px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
             font-weight: 700;
-            letter-spacing: 4px;
             color: var(--color-accent);
             margin-bottom: 18px;
         }
@@ -979,15 +871,15 @@
         }
 
         .help-section {
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 9px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: 3px;
             color: var(--color-accent);
-            opacity: 0.6;
+            letter-spacing: 1px;
+            opacity: 0.7;
             margin-top: 14px;
             margin-bottom: 2px;
-            border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+            border-bottom: 1px solid rgba(126, 200, 227, 0.25);
             padding-bottom: 3px;
         }
 
@@ -999,24 +891,25 @@
         }
 
         .help-key {
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 10px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 11px;
             font-weight: 700;
-            letter-spacing: 1px;
             color: var(--color-accent);
-            background: rgba(245, 158, 11, 0.08);
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            background: rgba(126, 200, 227, 0.1);
+            border: 2px solid rgba(126, 200, 227, 0.3);
             padding: 2px 10px;
             white-space: nowrap;
             flex-shrink: 0;
             min-width: 140px;
             text-align: center;
+            border-radius: 10px;
         }
 
         .help-desc {
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Nunito', sans-serif;
             font-size: 13px;
-            color: rgba(254, 249, 231, 0.7);
+            font-weight: 600;
+            color: #3a8bb5;
             line-height: 1.6;
         }
 
@@ -1027,20 +920,21 @@
         }
 
         .help-close-btn {
-            height: 34px;
+            height: 36px;
             padding: 0 24px;
             background: var(--color-accent);
             border: none;
-            color: #1c0a00;
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 11px;
+            color: #fff;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 13px;
             font-weight: 700;
-            letter-spacing: 2px;
             cursor: pointer;
+            border-radius: 14px;
+            box-shadow: 0 3px 8px rgba(126, 200, 227, 0.35);
         }
 
         .help-close-btn:hover {
-            filter: brightness(1.1);
+            filter: brightness(0.92);
         }
 
         /* ---- パーツメニュートグル ---- */
@@ -1052,14 +946,15 @@
             z-index: 501;
             width: 18px;
             height: 18px;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.4);
+            background: rgba(126, 200, 227, 0.15);
+            border: 2px solid rgba(126, 200, 227, 0.4);
             color: var(--color-accent);
             font-size: 11px;
             line-height: 18px;
             text-align: center;
             cursor: pointer;
             user-select: none;
+            border-radius: 8px;
         }
 
         .live-badge:hover .part-menu-toggle,
@@ -1070,7 +965,7 @@
         }
 
         .part-menu-toggle:hover {
-            background: rgba(245, 158, 11, 0.25);
+            background: rgba(126, 200, 227, 0.3);
         }
 
         /* ---- ホバーメニュー ---- */
@@ -1078,13 +973,14 @@
             display: none;
             position: fixed;
             z-index: 3000;
-            background: #1c0a00;
-            border: 1px solid rgba(245, 158, 11, 0.5);
-            box-shadow: 0 0 16px rgba(245, 158, 11, 0.18);
+            background: #fff;
+            border: 2px solid rgba(126, 200, 227, 0.5);
+            box-shadow: 0 4px 20px rgba(126, 200, 227, 0.2);
             padding: 6px;
             flex-direction: column;
             gap: 4px;
             min-width: 150px;
+            border-radius: 16px;
         }
 
         .hover-menu.open {
@@ -1098,33 +994,34 @@
             padding: 5px 10px;
             background: transparent;
             border: none;
-            color: var(--color-body-text);
-            font-family: 'DM Sans', sans-serif;
+            color: #2a6080;
+            font-family: 'Nunito', sans-serif;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 700;
             cursor: pointer;
             text-align: left;
             white-space: nowrap;
             width: 100%;
+            border-radius: 10px;
         }
 
         .hover-menu-btn:hover {
-            background: rgba(245, 158, 11, 0.1);
+            background: rgba(126, 200, 227, 0.1);
             color: var(--color-accent);
         }
 
         .hover-menu-btn.danger {
-            color: rgba(236, 72, 153, 0.8);
+            color: rgba(255, 100, 120, 0.85);
         }
 
         .hover-menu-btn.danger:hover {
-            background: rgba(236, 72, 153, 0.1);
-            color: var(--color-sub);
+            background: rgba(255, 100, 120, 0.1);
+            color: #ff5470;
         }
 
         .hover-menu-sep {
             height: 1px;
-            background: rgba(245, 158, 11, 0.15);
+            background: rgba(126, 200, 227, 0.2);
             margin: 2px 0;
         }
 
@@ -1147,27 +1044,28 @@
 
         .hover-menu-fs-input {
             width: 52px;
-            background: rgba(245, 158, 11, 0.08);
-            border: 1px solid rgba(245, 158, 11, 0.4);
+            background: rgba(126, 200, 227, 0.08);
+            border: 2px solid rgba(126, 200, 227, 0.4);
             color: var(--color-accent);
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: 'Quicksand', sans-serif;
             font-size: 13px;
             font-weight: 700;
             text-align: center;
             outline: none;
             padding: 3px;
+            border-radius: 8px;
         }
 
         .hover-menu-fs-apply {
-            padding: 3px 8px;
+            padding: 3px 10px;
             background: var(--color-accent);
             border: none;
-            color: #1c0a00;
-            font-family: 'Josefin Sans', sans-serif;
+            color: #fff;
+            font-family: 'Quicksand', sans-serif;
             font-size: 10px;
             font-weight: 700;
-            letter-spacing: 1px;
             cursor: pointer;
+            border-radius: 8px;
         }
 
         .hover-menu-tc {
@@ -1185,6 +1083,7 @@
             border: none;
             padding: 1px;
             cursor: pointer;
+            border-radius: 8px;
             background: transparent;
         }
 
@@ -1260,9 +1159,9 @@
             position: relative;
             display: flex;
             align-items: center;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid var(--color-accent, rgba(255, 255, 255, 0.5));
-            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 2px solid var(--color-accent, #7ec8e3);
+            border-radius: 999px;
             height: 40px;
             min-width: 200px;
             cursor: move;
@@ -1275,14 +1174,14 @@
             display: flex;
             align-items: center;
             min-width: 0;
-            border-radius: 4px;
+            border-radius: 999px;
         }
 
         .ticker-track {
             display: flex;
             animation: tickerScroll 18s linear infinite;
             will-change: transform;
-            color: var(--color-accent, #fff);
+            color: var(--color-accent, #7ec8e3);
             font-size: 16px;
         }
 
@@ -1312,11 +1211,12 @@
             height: 100%;
             box-sizing: border-box;
             z-index: 100;
-            background: rgba(0, 0, 0, 0.85);
-            color: #fff;
-            border: 2px solid var(--color-accent, #fff);
-            padding: 0 8px;
+            background: rgba(255, 255, 255, 0.97);
+            color: var(--color-accent, #7ec8e3);
+            border: 2px solid var(--color-accent, #7ec8e3);
+            padding: 0 14px;
             font-size: 14px;
+            border-radius: 999px;
         }
 
         .ticker-resize-grip {
@@ -1337,6 +1237,7 @@
             border: none;
             padding: 1px;
             cursor: pointer;
+            border-radius: 8px;
             background: transparent;
         }
 
@@ -1348,32 +1249,30 @@
         }
 
         .hover-menu-preset {
-            padding: 2px 6px;
+            padding: 2px 8px;
             background: transparent;
-            border: 1px solid rgba(245, 158, 11, 0.25);
-            color: rgba(245, 158, 11, 0.6);
-            font-family: 'Josefin Sans', sans-serif;
+            border: 1px solid rgba(126, 200, 227, 0.3);
+            color: rgba(126, 200, 227, 0.8);
+            font-family: 'Quicksand', sans-serif;
             font-size: 10px;
             cursor: pointer;
+            border-radius: 8px;
         }
 
         .hover-menu-preset:hover {
-            background: rgba(245, 158, 11, 0.1);
+            background: rgba(126, 200, 227, 0.1);
             color: var(--color-accent);
         }
 
         /* ---- 図形パーツ ---- */
         .shape-box {
-            background: rgba(28, 10, 0, 0.6);
-            border: 1px solid rgba(245, 158, 11, 0.4) !important;
+            background: rgba(240, 250, 255, 0.7);
+            border: 2px solid rgba(126, 200, 227, 0.45) !important;
+            border-radius: 12px;
             min-width: 0 !important;
             min-height: 0 !important;
             overflow: visible;
-            box-shadow: 0 0 8px rgba(245, 158, 11, 0.1);
-        }
-
-        .shape-box::before {
-            display: none !important;
+            box-shadow: 0 3px 10px rgba(126, 200, 227, 0.12);
         }
 
         .shape-circle {
@@ -1390,13 +1289,15 @@
             position: absolute;
             left: 100%;
             top: -4px;
-            background: #1c0a00;
-            border: 1px solid rgba(245, 158, 11, 0.45);
-            box-shadow: 0 0 16px rgba(245, 158, 11, 0.15);
+            background: #fff;
+            border: 2px solid rgba(126, 200, 227, 0.45);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(126, 200, 227, 0.18);
             min-width: 150px;
             padding: 4px 0;
             z-index: 10001;
             white-space: nowrap;
+            overflow: hidden;
         }
 
         .part-menu-has-sub:hover .part-menu-sub {
@@ -1410,74 +1311,75 @@
             display: none;
             background: var(--color-accent);
             opacity: 0.7;
+            border-radius: 4px;
         }
 
         .resize-handle.nw {
-            top: -4px;
-            left: -4px;
-            width: 10px;
-            height: 10px;
+            top: -5px;
+            left: -5px;
+            width: 11px;
+            height: 11px;
             cursor: nw-resize;
         }
 
         .resize-handle.n {
-            top: -4px;
-            left: 10px;
-            right: 10px;
-            height: 7px;
+            top: -5px;
+            left: 12px;
+            right: 12px;
+            height: 8px;
             cursor: n-resize;
         }
 
         .resize-handle.ne {
-            top: -4px;
-            right: -4px;
-            width: 10px;
-            height: 10px;
+            top: -5px;
+            right: -5px;
+            width: 11px;
+            height: 11px;
             cursor: ne-resize;
         }
 
         .resize-handle.e {
-            right: -4px;
-            top: 10px;
-            bottom: 10px;
-            width: 7px;
+            right: -5px;
+            top: 12px;
+            bottom: 12px;
+            width: 8px;
             cursor: e-resize;
         }
 
         .resize-handle.se {
-            bottom: -4px;
-            right: -4px;
-            width: 10px;
-            height: 10px;
+            bottom: -5px;
+            right: -5px;
+            width: 11px;
+            height: 11px;
             cursor: se-resize;
         }
 
         .resize-handle.s {
-            bottom: -4px;
-            left: 10px;
-            right: 10px;
-            height: 7px;
+            bottom: -5px;
+            left: 12px;
+            right: 12px;
+            height: 8px;
             cursor: s-resize;
         }
 
         .resize-handle.sw {
-            bottom: -4px;
-            left: -4px;
-            width: 10px;
-            height: 10px;
+            bottom: -5px;
+            left: -5px;
+            width: 11px;
+            height: 11px;
             cursor: sw-resize;
         }
 
         .resize-handle.w {
-            left: -4px;
-            top: 10px;
-            bottom: 10px;
-            width: 7px;
+            left: -5px;
+            top: 12px;
+            bottom: 12px;
+            width: 8px;
             cursor: w-resize;
         }
 
         .resize-handle:hover {
-            background: rgba(245, 158, 11, 0.5);
+            background: rgba(126, 200, 227, 0.4);
         }
 
         .resizable:hover .resize-handle,
@@ -1492,7 +1394,7 @@
 
         .sw-box .sw-inner {
             padding: 10px 20px 14px;
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: 'Quicksand', sans-serif;
             font-weight: 700;
             color: var(--color-accent);
             text-align: center;
@@ -1500,9 +1402,8 @@
 
         .sw-box .sw-time {
             font-size: 30px;
-            letter-spacing: 4px;
+            letter-spacing: 2px;
             font-variant-numeric: tabular-nums;
-            animation: neonPulse var(--neon-pulse-duration) infinite ease-in-out;
         }
 
         .hdr-float-time, .hdr-float-date {
@@ -1521,33 +1422,34 @@
         }
 
         .sw-box .sw-btn {
-            font-family: 'Josefin Sans', sans-serif;
-            font-size: 10px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 11px;
             font-weight: 700;
-            letter-spacing: 2px;
             padding: 5px 14px;
-            border: 1px solid var(--color-accent);
+            border: 2px solid var(--color-accent);
             background: transparent;
             color: var(--color-accent);
             cursor: pointer;
             transition: background 0.15s;
+            min-width: 44px;
+            border-radius: 12px;
         }
 
         .sw-box .sw-btn:hover {
-            background: rgba(245, 158, 11, 0.1);
+            background: rgba(126, 200, 227, 0.12);
         }
 
         .sw-box .sw-btn.running {
-            background: rgba(245, 158, 11, 0.1);
+            background: rgba(126, 200, 227, 0.12);
         }
 
         .sw-box .sw-btn-reset {
-            border-color: var(--color-sub);
-            color: var(--color-sub);
+            border-color: rgba(255, 100, 120, 0.5);
+            color: rgba(255, 100, 120, 0.8);
         }
 
         .sw-box .sw-btn-reset:hover {
-            background: rgba(236, 72, 153, 0.1);
+            background: rgba(255, 100, 120, 0.1);
         }
 
         /* ---- カウンター ---- */
@@ -1557,25 +1459,24 @@
 
         .counter-box .counter-inner {
             padding: 10px 20px 14px;
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: 'Quicksand', sans-serif;
             font-weight: 700;
             color: var(--color-accent);
             text-align: center;
         }
 
         .counter-box .counter-value {
-            font-size: 48px;
-            letter-spacing: 6px;
+            font-size: 46px;
+            letter-spacing: 4px;
             line-height: 1;
             min-width: 3ch;
             display: inline-block;
-            animation: neonPulse var(--neon-pulse-duration) infinite ease-in-out;
         }
 
         .counter-box .counter-label {
-            font-size: 9px;
-            opacity: 0.5;
-            letter-spacing: 4px;
+            font-size: 10px;
+            opacity: 0.55;
+            letter-spacing: 2px;
             margin-bottom: 6px;
         }
 
@@ -1585,21 +1486,22 @@
             justify-content: center;
             gap: 6px;
             margin: 8px 0 6px;
-            font-size: 10px;
-            opacity: 0.6;
+            font-size: 11px;
+            opacity: 0.7;
         }
 
         .counter-box .counter-step-input {
-            width: 48px;
+            width: 50px;
             background: transparent;
-            border: 1px solid rgba(245, 158, 11, 0.35);
+            border: 2px solid rgba(126, 200, 227, 0.4);
             color: var(--color-accent);
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: 'Quicksand', sans-serif;
             font-size: 13px;
             font-weight: 700;
             text-align: center;
             outline: none;
             padding: 2px 4px;
+            border-radius: 8px;
         }
 
         .counter-box .counter-controls {
@@ -1610,41 +1512,41 @@
         }
 
         .counter-box .counter-btn {
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: 'Quicksand', sans-serif;
             font-size: 13px;
             font-weight: 700;
-            letter-spacing: 2px;
             padding: 6px 14px;
-            border: 1px solid var(--color-accent);
+            border: 2px solid var(--color-accent);
             background: transparent;
             color: var(--color-accent);
             cursor: pointer;
             transition: background 0.15s;
             min-width: 44px;
+            border-radius: 12px;
         }
 
         .counter-box .counter-btn:hover {
-            background: rgba(245, 158, 11, 0.1);
+            background: rgba(126, 200, 227, 0.12);
         }
 
         .counter-box .counter-btn-minus {
-            border-color: var(--color-sub);
-            color: var(--color-sub);
+            border-color: rgba(255, 100, 120, 0.5);
+            color: rgba(255, 100, 120, 0.8);
         }
 
         .counter-box .counter-btn-minus:hover {
-            background: rgba(236, 72, 153, 0.1);
+            background: rgba(255, 100, 120, 0.1);
         }
 
         .counter-box .counter-btn-reset {
-            border-color: rgba(245, 158, 11, 0.2);
-            color: rgba(245, 158, 11, 0.4);
-            font-size: 10px;
+            border-color: rgba(126, 200, 227, 0.25);
+            color: rgba(126, 200, 227, 0.55);
+            font-size: 11px;
         }
 
         .counter-box .counter-btn-reset:hover {
-            background: rgba(245, 158, 11, 0.08);
-            color: rgba(245, 158, 11, 0.8);
+            background: rgba(126, 200, 227, 0.08);
+            color: rgba(126, 200, 227, 0.9);
         }
 
         /* ---- 独立時計 ---- */
@@ -1654,7 +1556,7 @@
 
         .clock-box .clock-inner {
             padding: 10px 20px;
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: 'Quicksand', sans-serif;
             font-weight: 700;
             color: var(--color-accent);
             text-align: center;
@@ -1662,43 +1564,40 @@
 
         .clock-box .clock-time {
             font-size: 30px;
-            letter-spacing: 4px;
-            animation: neonPulse var(--neon-pulse-duration) infinite ease-in-out;
+            letter-spacing: 2px;
         }
 
         .clock-box .clock-date {
-            font-size: 11px;
-            opacity: 0.6;
-            margin-top: 4px;
-            letter-spacing: 3px;
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 2px;
         }
     </style>
 </head>
 
 <body>
     <div id="capture-area">
-        <div class="corner corner-tl"></div>
-        <div class="corner corner-tr"></div>
-        <div class="corner corner-bl"></div>
-        <div class="corner corner-br"></div>
-        <div class="scanline-overlay"></div>
+        <div class="corner-star tl">★</div>
+        <div class="corner-star tr">★</div>
+        <div class="corner-star bl">✦</div>
+        <div class="corner-star br">✦</div>
 
         <div class="live-badge" id="init-live" style="position:absolute;top:20px;left:20px;cursor:move;">
-            <span class="blinking-icon">◉</span>
+            <span class="blinking-icon">●</span>
             <input type="text" class="live-input" id="live-badge-text">
         </div>
 
         <div class="profile-container" id="profile-container" title="ダブルクリックで編集"
-            style="position:absolute;top:20px;left:210px;cursor:move;">
+            style="position:absolute;top:20px;left:190px;cursor:move;">
             <div id="profile-display-area" class="profile-display-area"></div>
         </div>
 
-        <div class="info-base" id="init-message" style="position:absolute;top:20px;left:505px;right:375px;cursor:move;">
+        <div class="info-base" id="init-message" style="position:absolute;top:20px;left:465px;right:355px;cursor:move;">
             <input type="text" class="input-text" id="message-input">
         </div>
 
         <div class="info-base clock-container" id="init-clock"
-            style="position:absolute;top:20px;right:20px;width:340px;cursor:move;">
+            style="position:absolute;top:20px;right:20px;width:320px;cursor:move;">
             <span id="date" class="hdr-float-date">0000/00/00</span>
             <span id="clock" class="hdr-float-time">00:00:00</span>
         </div>
@@ -1745,14 +1644,14 @@
 
     <!-- パーツ追加メニュー -->
     <div id="part-menu">
-        <div class="part-menu-title">// PARTS</div>
-        <div class="part-menu-section">── HEADER</div>
+        <div class="part-menu-title">★ パーツを追加</div>
+        <div class="part-menu-section">─ ヘッダーパーツ</div>
         <div class="part-menu-item" data-part="hdr-live"><span class="part-menu-icon">🔴</span> 配信中バッジ</div>
         <div class="part-menu-item" data-part="hdr-profile"><span class="part-menu-icon">👤</span> プロフィール欄</div>
         <div class="part-menu-item" data-part="hdr-message"><span class="part-menu-icon">✉️</span> メッセージ入力欄</div>
         <div class="part-menu-item" data-part="hdr-clock"><span class="part-menu-icon">🕐</span> 時計（バー埋め込み型）</div>
         <div class="part-menu-item" data-part="hdr-ticker"><span class="part-menu-icon">📺</span> テロップ（スクロール）</div>
-        <div class="part-menu-section">── BOX</div>
+        <div class="part-menu-section">─ ボックスパーツ</div>
         <div class="part-menu-item" data-part="clock"><span class="part-menu-icon">🕐</span> 時計（独立）</div>
         <div class="part-menu-item" data-part="stopwatch"><span class="part-menu-icon">⏱</span> ストップウォッチ</div>
         <div class="part-menu-item" data-part="counter"><span class="part-menu-icon">🔢</span> カウンター</div>
@@ -1767,14 +1666,15 @@
         </div>
         <div class="part-menu-item" data-part="title"><span class="part-menu-icon">🏷</span> タイトルボックス</div>
         <div class="part-menu-item" data-part="image"><span class="part-menu-icon">🖼</span> 画像ボックス</div>
-        <div class="part-menu-section">── BACKGROUND</div>
-        <div class="part-menu-item" data-part="bg-city"><span class="part-menu-icon">🌆</span> シティシルエット</div>
-        <div class="part-menu-item" data-part="bg-grid"><span class="part-menu-icon">▦</span> グリッド</div>
-        <div class="part-menu-item" data-part="bg-scanline"><span class="part-menu-icon">≡</span> スキャンライン</div>
+        <div class="part-menu-section">─ 背景パーツ</div>
+        <div class="part-menu-item" data-part="bg-stripe"><span class="part-menu-icon">╱</span> ストライプ</div>
+        <div class="part-menu-item" data-part="bg-stars"><span class="part-menu-icon">★</span> 星</div>
+        <div class="part-menu-item" data-part="bg-dots"><span class="part-menu-icon">·</span> 水玉ドット</div>
+        <div class="part-menu-item" data-part="bg-gradient"><span class="part-menu-icon">🌈</span> グラデーション</div>
         <div class="part-menu-item" data-part="bg-upload"><span class="part-menu-icon">📁</span> 背景画像アップロード</div>
         <div class="part-menu-item" data-part="bg-color"><span class="part-menu-icon">🎨</span> 背景カラー選択</div>
         <div class="part-menu-item" data-part="bg-clear"><span class="part-menu-icon">🧼</span> 背景削除</div>
-        <div class="part-menu-section">── SYSTEM</div>
+        <div class="part-menu-section">─ その他</div>
         <div class="part-menu-item" data-part="save-config"><span class="part-menu-icon">💾</span> 設定を保存</div>
         <div class="part-menu-item" data-part="load-config"><span class="part-menu-icon">📂</span> 保存を読み込む</div>
         <div class="part-menu-item" data-part="push-live"><span class="part-menu-icon">📡</span> 表示更新（別タブに反映）</div>
@@ -1788,50 +1688,50 @@
     <!-- 使い方モーダル -->
     <div id="help-modal">
         <div class="help-popup">
-            <div class="help-title">// HOW TO USE</div>
+            <div class="help-title">★ 使い方</div>
             <div class="help-body">
-                <div class="help-section">PARTS</div>
-                <div class="help-row"><span class="help-key">DOUBLE CLICK</span><span
+                <div class="help-section">パーツの追加</div>
+                <div class="help-row"><span class="help-key">ダブルクリック</span><span
                         class="help-desc">何もない場所でパーツ追加メニューを開く</span></div>
-                <div class="help-section">MOVE &amp; RESIZE</div>
-                <div class="help-row"><span class="help-key">HEADER DRAG</span><span class="help-desc">ボックスを移動</span>
+                <div class="help-section">パーツの操作</div>
+                <div class="help-row"><span class="help-key">ヘッダーをドラッグ</span><span class="help-desc">ボックスを移動</span>
                 </div>
-                <div class="help-row"><span class="help-key">LONG PRESS 0.2s</span><span class="help-desc">ボックス内のどこでも長押し
-                        → ドラッグで移動</span></div>
-                <div class="help-row"><span class="help-key">HANDLE DRAG</span><span
+                <div class="help-row"><span class="help-key">長押し（0.2秒）</span><span class="help-desc">ボックス内のどこでも長押し →
+                        ドラッグで移動</span></div>
+                <div class="help-row"><span class="help-key">角・辺のハンドル</span><span
                         class="help-desc">ホバーで表示、ドラッグでリサイズ</span></div>
-                <div class="help-row"><span class="help-key">≡ MENU</span><span class="help-desc">右上に出現 →
-                        複製・文字サイズ・色変更・削除</span></div>
-                <div class="help-section">SAVE / LOAD</div>
-                <div class="help-row"><span class="help-key">SAVE CONFIG</span><span
+                <div class="help-row"><span class="help-key">≡ ボタン</span><span class="help-desc">ボックスにホバーで右上に出現 →
+                        複製・文字サイズ・削除</span></div>
+                <div class="help-section">設定の保存・読込</div>
+                <div class="help-row"><span class="help-key">設定を保存</span><span
                         class="help-desc">現在の配置をブラウザに保存（次回自動読込）</span></div>
-                <div class="help-row"><span class="help-key">EXPORT</span><span
+                <div class="help-row"><span class="help-key">エクスポート</span><span
                         class="help-desc">設定をJSONファイルとしてダウンロード</span></div>
-                <div class="help-row"><span class="help-key">IMPORT</span><span
-                        class="help-desc">保存したJSONを読み込んで復元</span></div>
-                <div class="help-row"><span class="help-key">DISPLAY UPDATE</span><span
-                        class="help-desc">同じURLを別タブで開いている場合、その画面へ即座に反映（同一オリジンで開く必要あり）</span></div>
-                <div class="help-section">SPEC</div>
-                <div class="help-row"><span class="help-key">CANVAS</span><span class="help-desc">1920 × 1080 px
-                        推奨</span></div>
-                <div class="help-section">CREATED BY</div>
+                <div class="help-row"><span class="help-key">インポート</span><span class="help-desc">保存したJSONを読み込んで復元</span>
+                </div>
+                <div class="help-row"><span class="help-key">表示更新</span><span class="help-desc">同じURLを別タブで開いている場合、その画面へ即座に反映(同一オリジンで開く必要あり)</span>
+                </div>
+                <div class="help-section">推奨設定</div>
+                <div class="help-row"><span class="help-key">推奨サイズ</span><span class="help-desc">1920 × 1080 px</span>
+                </div>
+                <div class="help-section">制作 / Created by</div>
                 <div class="help-row" style="justify-content:center;padding:6px 0 2px">
-                    <span class="help-desc" style="color:var(--color-accent);"><strong>donnma（どんま）</strong> — <a
-                            href="https://donnma.com/" target="_blank"
-                            style="color:var(--color-sub)">donnma.com</a></span>
+                    <span class="help-desc" style="opacity:1;text-align:center"><strong>donnma（どんま）</strong>
+                        &nbsp;—&nbsp; <a href="https://donnma.com/" target="_blank"
+                            style="color:inherit">donnma.com</a></span>
                 </div>
             </div>
-            <div class="help-close-row"><button class="help-close-btn" id="help-close">CLOSE</button></div>
+            <div class="help-close-row"><button class="help-close-btn" id="help-close">閉じる ✓</button></div>
         </div>
     </div>
 
     <div id="profile-editor">
         <div class="editor-popup">
-            <div class="editor-title">// PROFILE EDIT</div>
+            <div class="editor-title">★ プロフィール編集</div>
             <div id="editor-items"></div>
             <div class="editor-actions">
-                <button class="btn-add" id="btn-add">+ ADD</button>
-                <button class="btn-save" id="btn-save">SAVE</button>
+                <button class="btn-add" id="btn-add">＋ 追加</button>
+                <button class="btn-save" id="btn-save">保存 ✓</button>
             </div>
         </div>
     </div>
@@ -1839,7 +1739,10 @@
     <script>
         const captureArea = document.getElementById('capture-area');
         const partMenu = document.getElementById('part-menu');
+        const saveConfigMenuItem = document.querySelector('[data-part="save-config"]');
         const isSaveConfigEnabled = () => CONFIG.features?.saveConfigEnabled !== false;
+
+        if (!isSaveConfigEnabled() && saveConfigMenuItem) saveConfigMenuItem.style.display = 'none';
 
         function removeTopLevel(node) {
             if (!node) return;
@@ -1854,8 +1757,7 @@
         root.style.setProperty('--color-accent', CONFIG.color.accent);
         root.style.setProperty('--color-sub', CONFIG.color.sub);
         root.style.setProperty('--color-body-text', CONFIG.color.bodyText);
-        root.style.setProperty('--neon-pulse-duration', CONFIG.animation.neonPulseDuration);
-        root.style.setProperty('--star-blink-duration', CONFIG.animation.starBlinkDuration);
+        root.style.setProperty('--star-speed', CONFIG.animation.starSpeed);
 
         document.body.style.backgroundColor = CONFIG.color.background;
         document.body.style.width = CONFIG.layout.width + 'px';
@@ -1863,8 +1765,7 @@
         captureArea.style.width = CONFIG.layout.width + 'px';
         captureArea.style.height = CONFIG.layout.height + 'px';
 
-        const liveBadge = document.querySelector('.live-badge');
-        liveBadge.style.background = `linear-gradient(90deg, ${CONFIG.color.liveBadge}, #9a1e6e)`;
+        document.querySelector('.live-badge').style.background = CONFIG.color.liveBadge;
         document.getElementById('live-badge-text').value = CONFIG.text.liveBadge;
         document.getElementById('message-input').placeholder = CONFIG.text.messagePlaceholder;
         document.getElementById('title-box-header').value = CONFIG.text.titleBoxHeader;
@@ -1902,8 +1803,11 @@
         let profileIndex = 0, profileTimer = null;
 
         function startProfileCycle() {
-            clearInterval(profileTimer); profileIndex = 0;
-            displayArea.style.transition = 'none'; displayArea.style.opacity = '1'; displayArea.style.transform = 'translateY(0)';
+            clearInterval(profileTimer);
+            profileIndex = 0;
+            displayArea.style.transition = 'none';
+            displayArea.style.opacity = '1';
+            displayArea.style.transform = 'translateY(0)';
             displayArea.textContent = profileItems[0] || '';
             if (profileItems.length <= 1) return;
             profileTimer = setInterval(() => {
@@ -1913,28 +1817,39 @@
                     profileIndex = (profileIndex + 1) % profileItems.length;
                     displayArea.textContent = profileItems[profileIndex];
                     displayArea.style.transition = 'none'; displayArea.style.transform = 'translateY(8px)';
-                    setTimeout(() => { displayArea.style.transition = 'opacity 0.4s ease, transform 0.4s ease'; displayArea.style.opacity = '1'; displayArea.style.transform = 'translateY(0)'; }, 30);
+                    setTimeout(() => {
+                        displayArea.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                        displayArea.style.opacity = '1'; displayArea.style.transform = 'translateY(0)';
+                    }, 30);
                 }, 400);
             }, CONFIG.animation.profileInterval);
         }
 
         let _onSaveCallback = null;
         function openEditor(onSave) {
-            _onSaveCallback = onSave || null; editorItemsEl.innerHTML = '';
-            profileItems.forEach(text => addEditorRow(text)); editor.classList.add('open');
+            _onSaveCallback = onSave || null;
+            editorItemsEl.innerHTML = '';
+            profileItems.forEach(text => addEditorRow(text));
+            editor.classList.add('open');
         }
         function addEditorRow(text = '') {
             const div = document.createElement('div'); div.className = 'editor-item';
-            const input = document.createElement('input'); input.type = 'text'; input.value = text; input.placeholder = 'TEXT...';
-            const btn = document.createElement('button'); btn.className = 'btn-remove'; btn.textContent = '×'; btn.onclick = () => div.remove();
-            div.appendChild(input); div.appendChild(btn); editorItemsEl.appendChild(div);
+            const input = document.createElement('input');
+            input.type = 'text'; input.value = text; input.placeholder = 'テキストを入力...';
+            const btn = document.createElement('button');
+            btn.className = 'btn-remove'; btn.textContent = '×';
+            btn.onclick = () => div.remove();
+            div.appendChild(input); div.appendChild(btn);
+            editorItemsEl.appendChild(div);
         }
         document.getElementById('btn-save').onclick = () => {
             profileItems = Array.from(editorItemsEl.querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
             editor.classList.remove('open'); startProfileCycle();
             if (_onSaveCallback) { _onSaveCallback(); _onSaveCallback = null; }
         };
-        document.getElementById('btn-add').onclick = () => { addEditorRow(); editorItemsEl.querySelector('.editor-item:last-child input').focus(); };
+        document.getElementById('btn-add').onclick = () => {
+            addEditorRow(); editorItemsEl.querySelector('.editor-item:last-child input').focus();
+        };
         editor.addEventListener('click', (e) => { if (e.target === editor) editor.classList.remove('open'); });
 
         const helpModal = document.getElementById('help-modal');
@@ -1951,9 +1866,9 @@
                 captureBgColor: captureArea.style.backgroundColor || document.body.style.backgroundColor || ''
             };
             try {
-                localStorage.setItem('citypopOverlayConfig', JSON.stringify(state));
+                localStorage.setItem('popOverlayConfig', JSON.stringify(state));
                 // 内容が同一でも必ず storage イベントを発火させるためのタイムスタンプ
-                localStorage.setItem('citypopOverlayLivePing', String(Date.now()));
+                localStorage.setItem('popOverlayLivePing', String(Date.now()));
             } catch (err) {
                 console.error(err);
             }
@@ -1961,7 +1876,7 @@
 
         // 別タブで「表示更新」が押されたら自動的に反映する
         window.addEventListener('storage', (e) => {
-            if (e.key === 'citypopOverlayLivePing' && e.newValue) {
+            if (e.key === 'popOverlayLivePing' && e.newValue) {
                 loadSavedConfig();
             }
         });
@@ -1969,8 +1884,9 @@
         function normalizeCaptureInputs() {
             captureArea.querySelectorAll('input').forEach(input => {
                 if (input.type === 'file') return;
-                if (input.type === 'checkbox' || input.type === 'radio') { if (input.checked) input.setAttribute('checked', ''); else input.removeAttribute('checked'); }
-                else { input.setAttribute('value', input.value); }
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    if (input.checked) input.setAttribute('checked', ''); else input.removeAttribute('checked');
+                } else { input.setAttribute('value', input.value); }
             });
             captureArea.querySelectorAll('textarea').forEach(ta => { ta.textContent = ta.value; });
         }
@@ -1979,19 +1895,24 @@
             normalizeCaptureInputs();
             const state = { profileItems, captureHtml: captureArea.innerHTML, captureBgColor: captureArea.style.backgroundColor || document.body.style.backgroundColor || '' };
             const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob); const a = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
             const now = new Date();
             const ts = now.getFullYear() + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2) + '_' + ('0' + now.getHours()).slice(-2) + ('0' + now.getMinutes()).slice(-2);
-            a.href = url; a.download = 'citypop-overlay-config_' + ts + '.json'; a.click();
+            a.href = url; a.download = 'pop-overlay-config_' + ts + '.json'; a.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
         function importConfig() {
-            const input = document.createElement('input'); input.type = 'file'; input.accept = '.json,application/json';
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = '.json,application/json';
             input.onchange = () => {
                 const file = input.files[0]; if (!file) return;
                 const reader = new FileReader();
-                reader.onload = (ev) => { try { applyLoadedConfig(JSON.parse(ev.target.result)); saveCurrentConfig(); } catch (err) { alert('インポートに失敗しました。'); } };
+                reader.onload = (ev) => {
+                    try { applyLoadedConfig(JSON.parse(ev.target.result)); saveCurrentConfig(); }
+                    catch (err) { alert('インポートに失敗しました。'); }
+                };
                 reader.readAsText(file);
             };
             input.click();
@@ -2001,7 +1922,7 @@
             if (!isSaveConfigEnabled()) return;
             normalizeCaptureInputs();
             const state = { profileItems, captureHtml: captureArea.innerHTML, captureBgColor: captureArea.style.backgroundColor || document.body.style.backgroundColor || '' };
-            try { localStorage.setItem('citypopOverlayConfig', JSON.stringify(state)); } catch (err) { }
+            try { localStorage.setItem('popOverlayConfig', JSON.stringify(state)); } catch (err) { }
         }
 
         function setupImageDropArea(area) {
@@ -2022,7 +1943,10 @@
 
         function setupProfileContainer(el) {
             if (el._profileSetup) return; el._profileSetup = true;
-            el.addEventListener('dblclick', (e) => { e.stopPropagation(); openEditor(() => { displayArea = document.getElementById('profile-display-area'); startProfileCycle(); }); });
+            el.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                openEditor(() => { displayArea = document.getElementById('profile-display-area'); startProfileCycle(); });
+            });
         }
 
         function rehydrateCaptureArea() {
@@ -2031,7 +1955,8 @@
                 let delBtn = el.querySelector('.box-del-btn');
                 if (!delBtn) { delBtn = document.createElement('div'); delBtn.className = 'box-del-btn'; delBtn.textContent = '×'; el.appendChild(delBtn); }
                 delBtn.addEventListener('click', (e) => { e.stopPropagation(); removeTopLevel(el); });
-                addResizeHandles(el); addHoverMenu(el, el.querySelector('.content'));
+                addResizeHandles(el);
+                addHoverMenu(el, el.querySelector('.content'));
                 setupImageDropArea(el.querySelector('.image-drop-area'));
                 if (el.classList.contains('clock-box')) clockBoxes.push(el);
             });
@@ -2042,7 +1967,9 @@
             });
             captureArea.querySelectorAll('.bg-part').forEach(el => addHoverMenu(el));
             document.querySelectorAll('.live-input').forEach(adjustLiveInput);
-            captureArea.querySelectorAll('.bg-city').forEach(el => { if (!el._citySetup) buildCityScenery(el); });
+            captureArea.querySelectorAll('.bg-stars-layer').forEach(el => {
+                if (!el._starsSetup) buildStars(el);
+            });
         }
 
         function applyLoadedConfig(state) {
@@ -2053,12 +1980,16 @@
                 displayArea = document.getElementById('profile-display-area');
                 rehydrateCaptureArea();
             }
-            if (state.captureBgColor) { document.body.style.backgroundColor = state.captureBgColor; captureArea.style.backgroundColor = state.captureBgColor; }
+            if (state.captureBgColor) {
+                document.body.style.backgroundColor = state.captureBgColor;
+                captureArea.style.backgroundColor = state.captureBgColor;
+            }
             startProfileCycle();
         }
 
         function loadSavedConfig() {
-            const raw = localStorage.getItem('citypopOverlayConfig'); if (!raw) return;
+            const raw = localStorage.getItem('popOverlayConfig');
+            if (!raw) return;
             try { applyLoadedConfig(JSON.parse(raw)); } catch (err) { }
         }
 
@@ -2072,12 +2003,18 @@
 
         document.addEventListener('mousedown', (e) => {
             if (e.target.classList.contains('header') || e.target.classList.contains('header-input')) {
-                isDragging = true; targetBox = e.target.closest('.box');
-                const rect = targetBox.getBoundingClientRect(); offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+                isDragging = true;
+                targetBox = e.target.closest('.box');
+                const rect = targetBox.getBoundingClientRect();
+                offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
             }
         });
         document.addEventListener('mousemove', (e) => {
-            if (isDragging && targetBox) { targetBox.style.left = (e.clientX - offsetX) + 'px'; targetBox.style.top = (e.clientY - offsetY) + 'px'; targetBox.style.right = 'auto'; targetBox.style.bottom = 'auto'; }
+            if (isDragging && targetBox) {
+                targetBox.style.left = (e.clientX - offsetX) + 'px';
+                targetBox.style.top = (e.clientY - offsetY) + 'px';
+                targetBox.style.right = 'auto'; targetBox.style.bottom = 'auto';
+            }
         });
         document.addEventListener('mouseup', () => { isDragging = false; targetBox = null; });
 
@@ -2085,7 +2022,8 @@
             if (!e.target.classList.contains('plain-drag-bar')) return;
             const box = e.target.closest('.box'); if (!box) return;
             isDragging = true; targetBox = box;
-            const rect = box.getBoundingClientRect(); offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+            const rect = box.getBoundingClientRect();
+            offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
         });
 
         document.addEventListener('mousedown', (e) => {
@@ -2094,7 +2032,8 @@
             const box = e.target.closest('.box');
             if (!box || box.querySelector('.header') || box.querySelector('.plain-drag-bar')) return;
             isDragging = true; targetBox = box;
-            const rect = box.getBoundingClientRect(); offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+            const rect = box.getBoundingClientRect();
+            offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
         });
 
         document.addEventListener('mousedown', (e) => {
@@ -2103,16 +2042,29 @@
             const el = e.target.closest('.live-badge, .profile-container, .info-base, .float-part');
             if (!el) return;
             isDragging = true; targetBox = el;
-            const rect = el.getBoundingClientRect(); offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+            const rect = el.getBoundingClientRect();
+            offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
         }, { capture: true });
 
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-delete')) e.target.closest('.box').remove();
+        });
+
         /* =====================================================
-         *  長押しドラッグ
+         *  長押しドラッグ（ボックス内どこでも）
          * ===================================================== */
         (function setupLongPressDrag() {
             const LONG_PRESS_MS = 200, MOVE_CANCEL_PX = 8;
-            let lpTimer = null, lpBox = null, lpStartX = 0, lpStartY = 0, lpOffsetX = 0, lpOffsetY = 0, lpActive = false, lpSuppressClick = false;
-            function cancelLP() { clearTimeout(lpTimer); lpTimer = null; if (lpBox) lpBox.classList.remove('box-long-pressing', 'box-long-dragging'); lpBox = null; lpActive = false; }
+            let lpTimer = null, lpBox = null;
+            let lpStartX = 0, lpStartY = 0, lpOffsetX = 0, lpOffsetY = 0;
+            let lpActive = false, lpSuppressClick = false;
+
+            function cancelLP() {
+                clearTimeout(lpTimer); lpTimer = null;
+                if (lpBox) lpBox.classList.remove('box-long-pressing', 'box-long-dragging');
+                lpBox = null; lpActive = false;
+            }
+
             document.addEventListener('mousedown', (e) => {
                 if (e.target.classList.contains('header') || e.target.classList.contains('header-input') || e.target.classList.contains('plain-drag-bar')) return;
                 if (e.target.closest('.resize-handle') || e.target.closest('.box-menu-toggle') || e.target.closest('.hover-menu') || e.target.closest('#part-menu')) return;
@@ -2123,19 +2075,27 @@
                 lpActive = false; lpSuppressClick = false;
                 box.classList.add('box-long-pressing');
                 lpTimer = setTimeout(() => {
-                    if (!lpBox) return; lpActive = true; lpSuppressClick = true;
-                    lpBox.classList.remove('box-long-pressing'); lpBox.classList.add('box-long-dragging');
+                    if (!lpBox) return;
+                    lpActive = true; lpSuppressClick = true;
+                    lpBox.classList.remove('box-long-pressing');
+                    lpBox.classList.add('box-long-dragging');
                     if (document.activeElement && lpBox.contains(document.activeElement)) document.activeElement.blur();
                 }, LONG_PRESS_MS);
             });
+
             document.addEventListener('mousemove', (e) => {
                 if (!lpBox) return;
                 const dx = e.clientX - lpStartX, dy = e.clientY - lpStartY;
                 if (!lpActive) { if (Math.sqrt(dx * dx + dy * dy) > MOVE_CANCEL_PX) cancelLP(); return; }
-                lpBox.style.left = (e.clientX - lpOffsetX) + 'px'; lpBox.style.top = (e.clientY - lpOffsetY) + 'px'; lpBox.style.right = 'auto'; lpBox.style.bottom = 'auto';
+                lpBox.style.left = (e.clientX - lpOffsetX) + 'px';
+                lpBox.style.top = (e.clientY - lpOffsetY) + 'px';
+                lpBox.style.right = 'auto'; lpBox.style.bottom = 'auto';
             });
+
             document.addEventListener('mouseup', () => cancelLP());
-            document.addEventListener('click', (e) => { if (lpSuppressClick) { lpSuppressClick = false; e.stopImmediatePropagation(); e.preventDefault(); } }, { capture: true });
+            document.addEventListener('click', (e) => {
+                if (lpSuppressClick) { lpSuppressClick = false; e.stopImmediatePropagation(); e.preventDefault(); }
+            }, { capture: true });
         })();
 
         /* =====================================================
@@ -2150,7 +2110,7 @@
             if (e.target.classList.contains('text-input-box')) adjustSize(e.target, 200, 0);
             if (e.target.classList.contains('live-input')) adjustLiveInput(e.target);
         });
-        function adjustLiveInput(input) { input.style.width = Math.max(5, input.value.length + 1) + 'ch'; }
+        function adjustLiveInput(input) { input.style.width = Math.max(4, input.value.length + 1) + 'ch'; }
         document.querySelectorAll('.live-input').forEach(adjustLiveInput);
 
         /* =====================================================
@@ -2161,7 +2121,8 @@
         captureArea.addEventListener('dblclick', (e) => {
             if (e.target.closest('.box') || e.target.closest('.float-part') || e.target.closest('#part-menu') || e.target.closest('#profile-editor')) return;
             menuSpawnX = e.clientX; menuSpawnY = e.clientY;
-            partMenu.style.visibility = 'hidden'; partMenu.classList.add('open');
+            partMenu.style.visibility = 'hidden';
+            partMenu.classList.add('open');
             const rect = partMenu.getBoundingClientRect();
             let left = menuSpawnX, top = menuSpawnY;
             if (left + rect.width > window.innerWidth - 8) left = Math.max(8, window.innerWidth - rect.width - 8);
@@ -2183,69 +2144,93 @@
 
         function handlePartMenuItem(type) {
             const x = menuSpawnX, y = menuSpawnY;
-            switch (type) {
-                case 'clock': addClockBox(x, y); break;
-                case 'stopwatch': addStopwatch(x, y); break;
-                case 'counter': addCounter(x, y); break;
-                case 'hdr-live': addHdrLive(x, y); break;
-                case 'hdr-profile': addHdrProfile(x, y); break;
-                case 'hdr-message': addHdrMessage(x, y); break;
-                case 'hdr-clock': addHdrClock(x, y); break;
-                case 'hdr-ticker': addHdrTicker(x, y); break;
-                case 'memo': makeBox(x, y, 'memo-box', 'MEMO', '<textarea class="text-input-box" placeholder="MEMO..."></textarea>'); break;
-                case 'plain-text': addPlainTextBox(x, y); break;
-                case 'shape': break;
-                case 'shape-rect': addShapeBox(x, y, 'shape-rect', 160, 100); break;
-                case 'shape-circle': addShapeBox(x, y, 'shape-circle', 100, 100); break;
-                case 'title': makeBox(x, y, '', 'NOW PLAYING', '<textarea class="title-input" rows="1">タイトル</textarea>'); break;
-                case 'image': addImageBox(x, y); break;
-                case 'bg-city': addBgCity(); break;
-                case 'bg-grid': addBgEl('bg-grid'); break;
-                case 'bg-scanline': addBgEl('bg-scanline'); break;
-                case 'bg-upload': promptBgUpload(); break;
-                case 'bg-color': promptBgColor(); break;
-                case 'bg-clear':
-                    document.body.style.background = 'transparent'; document.body.style.backgroundColor = 'transparent';
-                    captureArea.style.background = 'transparent'; captureArea.style.backgroundColor = 'transparent';
-                    document.querySelectorAll('.bg-part').forEach(bg => bg.remove()); break;
-                case 'save-config': saveCurrentConfig(); break;
-                case 'load-config': loadSavedConfig(); break;
-                case 'push-live': pushLiveUpdate(); break;
+            try {
+                switch (type) {
+                    case 'clock': addClockBox(x, y); break;
+                    case 'stopwatch': addStopwatch(x, y); break;
+                    case 'counter': addCounter(x, y); break;
+                    case 'hdr-live': addHdrLive(x, y); break;
+                    case 'hdr-profile': addHdrProfile(x, y); break;
+                    case 'hdr-message': addHdrMessage(x, y); break;
+                    case 'hdr-clock': addHdrClock(x, y); break;
+                    case 'hdr-ticker': addHdrTicker(x, y); break;
+                    case 'memo': addBoxPart(x, y, 'メモ 📝', 'memo-box', '<textarea class="text-input-box" placeholder="メモを入力..."></textarea>'); break;
+                    case 'plain-text': addPlainTextBox(x, y); break;
+                    case 'shape': break;
+                    case 'shape-rect': addShapeBox(x, y, 'shape-rect', 160, 100); break;
+                    case 'shape-circle': addShapeBox(x, y, 'shape-circle', 100, 100); break;
+                    case 'title': addTitleBox(x, y); break;
+                    case 'image': addImageBox(x, y); break;
+                    case 'bg-stripe': addBgStripe(); break;
+                    case 'bg-stars': addBgStars(); break;
+                    case 'bg-dots': addBgDots(); break;
+                    case 'bg-gradient': addBgGradient(); break;
+                    case 'bg-upload': promptBgUpload(); break;
+                    case 'bg-color': promptBgColor(); break;
+                    case 'bg-clear':
+                        document.body.style.background = 'transparent';
+                        document.body.style.backgroundColor = 'transparent';
+                        document.body.style.backgroundImage = 'none';
+                        captureArea.style.background = 'transparent';
+                        captureArea.style.backgroundColor = 'transparent';
+                        captureArea.style.backgroundImage = 'none';
+                        document.querySelectorAll('.bg-part').forEach(bg => bg.remove());
+                        break;
+                    case 'save-config': saveCurrentConfig(); break;
+                    case 'load-config': loadSavedConfig(); break;
+                    case 'push-live': pushLiveUpdate(); break;
 
-                case 'export-config': exportConfig(); break;
-                case 'import-config': importConfig(); break;
-                case 'reset': localStorage.setItem('_skip_citypopOverlayConfig', '1'); location.reload(); break;
-                case 'help': document.getElementById('help-modal').classList.add('open'); break;
-            }
+                    case 'export-config': exportConfig(); break;
+                    case 'import-config': importConfig(); break;
+                    case 'reset': localStorage.setItem('_skip_popOverlayConfig', '1'); location.reload(); break;
+                    case 'help': document.getElementById('help-modal').classList.add('open'); break;
+                }
+            } catch (err) { console.error('Error:', type, err); }
         }
 
         partMenu.addEventListener('click', (e) => {
             e.stopPropagation();
             const item = e.target.closest('.part-menu-item'); if (!item) return;
-            partMenu.classList.remove('open'); handlePartMenuItem(item.dataset.part);
+            partMenu.classList.remove('open');
+            handlePartMenuItem(item.dataset.part);
         });
 
         function makeBox(x, y, extraClass, headerLabel, innerHTML) {
             const box = document.createElement('div');
             box.className = 'box' + (extraClass ? ' ' + extraClass : '');
             box.style.left = x + 'px'; box.style.top = y + 'px';
-            box.innerHTML = `<div class="box-menu-toggle" title="menu">≡</div><div class="header"><input type="text" class="header-input" value="${headerLabel}"><div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div></div><div class="content">${innerHTML}</div>`;
-            const delBtn = document.createElement('div'); delBtn.className = 'box-del-btn'; delBtn.textContent = '×';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header">
+                <input type="text" class="header-input" value="${headerLabel}">
+                <div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div>
+            </div>
+            <div class="content">${innerHTML}</div>`;
+            const delBtn = document.createElement('div');
+            delBtn.className = 'box-del-btn'; delBtn.textContent = '×';
             delBtn.addEventListener('click', (e) => { e.stopPropagation(); removeTopLevel(box); });
-            box.appendChild(delBtn); captureArea.appendChild(box);
-            addResizeHandles(box); addHoverMenu(box, box.querySelector('.content'));
+            box.appendChild(delBtn);
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
             return box;
         }
 
+        function addBoxPart(x, y, label, cls, inner) { makeBox(x, y, cls, label, inner); }
+
         function addPlainTextBox(x, y) {
-            const box = document.createElement('div'); box.className = 'box plain-box';
+            const box = document.createElement('div');
+            box.className = 'box plain-box';
             box.style.left = x + 'px'; box.style.top = y + 'px';
-            box.innerHTML = `<div class="box-menu-toggle" title="menu">≡</div><div class="plain-drag-bar"></div><div class="content"><textarea class="text-input-box" placeholder="TEXT..."></textarea></div>`;
-            captureArea.appendChild(box); addResizeHandles(box); addHoverMenu(box, box.querySelector('.content'));
+            box.innerHTML = `<div class="box-menu-toggle" title="メニュー">≡</div><div class="plain-drag-bar" title="ドラッグで移動"></div><div class="content"><textarea class="text-input-box" placeholder="テキストを入力..."></textarea></div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
             const dragBar = box.querySelector('.plain-drag-bar');
             dragBar.addEventListener('mousedown', (e) => {
                 e.stopPropagation();
-                const rect = box.getBoundingClientRect(); const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+                const rect = box.getBoundingClientRect();
+                const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
                 const onMove = (me) => { box.style.left = (me.clientX - ox) + 'px'; box.style.top = (me.clientY - oy) + 'px'; box.style.right = 'auto'; box.style.bottom = 'auto'; };
                 const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
                 document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
@@ -2253,122 +2238,106 @@
         }
 
         function addShapeBox(x, y, cls, w, h) {
-            const box = document.createElement('div'); box.className = 'box shape-box ' + cls;
-            box.style.left = x + 'px'; box.style.top = y + 'px'; box.style.width = w + 'px'; box.style.height = h + 'px';
-            box.innerHTML = `<div class="box-menu-toggle" title="menu">≡</div>`;
-            captureArea.appendChild(box); addResizeHandles(box, { minW: 4, minH: 4 }); addHoverMenu(box, null);
+            const box = document.createElement('div');
+            box.className = 'box shape-box ' + cls;
+            box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.style.width = w + 'px'; box.style.height = h + 'px';
+            box.innerHTML = `<div class="box-menu-toggle" title="メニュー">≡</div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box, { minW: 4, minH: 4 });
+            addHoverMenu(box, null);
             box.addEventListener('mousedown', (e) => {
                 if (e.target.closest('.resize-handle') || e.target.closest('.box-menu-toggle')) return;
                 e.stopPropagation();
-                const rect = box.getBoundingClientRect(); const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+                const rect = box.getBoundingClientRect();
+                const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
                 const onMove = (me) => { box.style.left = (me.clientX - ox) + 'px'; box.style.top = (me.clientY - oy) + 'px'; box.style.right = 'auto'; box.style.bottom = 'auto'; };
                 const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
                 document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
             });
         }
 
+        function addTitleBox(x, y) { makeBox(x, y, '', 'タイトル ★', '<textarea class="title-input" rows="1">タイトルを入力</textarea>'); }
+
         /* ---- 背景パーツ ---- */
         function addBgPart(el) {
             el.classList.add('bg-part', 'float-part');
-            el.style.cssText = (el.style.cssText || '') + ';position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;';
+            el.style.position = 'absolute'; el.style.left = '0'; el.style.top = '0';
+            el.style.width = '100%'; el.style.height = '100%';
+            el.style.pointerEvents = 'none'; el.style.zIndex = '0';
             const toggle = document.createElement('div');
-            toggle.className = 'box-menu-toggle'; toggle.title = 'menu'; toggle.textContent = '≡';
+            toggle.className = 'box-menu-toggle btn'; toggle.title = 'メニュー'; toggle.textContent = '≡';
             toggle.style.cssText = 'position:absolute;top:10px;right:10px;pointer-events:auto;';
             el.appendChild(toggle);
-            captureArea.insertBefore(el, captureArea.querySelector('.corner-tl') || captureArea.firstChild);
-            addHoverMenu(el); return el;
+            captureArea.insertBefore(el, captureArea.querySelector('.corner-star') || captureArea.firstChild);
+            addHoverMenu(el);
+            return el;
         }
 
-        function addBgEl(cls) { const el = document.createElement('div'); el.className = cls; addBgPart(el); }
-
-        function buildCityScenery(container) {
-            container._citySetup = true;
-            const sky = document.createElement('div'); sky.className = 'bg-city-sky'; container.appendChild(sky);
-
-            const starsEl = document.createElement('div'); starsEl.className = 'bg-city-stars';
-            for (let i = 0; i < 80; i++) {
-                const s = document.createElement('div'); s.className = 'bg-city-star';
-                const size = 1 + Math.random() * 2.5;
-                s.style.cssText = `left:${Math.random() * 100}%;top:${Math.random() * 100}%;width:${size}px;height:${size}px;opacity:${0.4 + Math.random() * 0.6};animation:starTwinkle ${2 + Math.random() * 4}s ${-Math.random() * 4}s infinite ease-in-out;`;
-                starsEl.appendChild(s);
+        function buildStars(container) {
+            container._starsSetup = true;
+            const symbols = ['★', '✦', '✧', '✩', '✪', '✫', '✬'];
+            const count = 28;
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'bg-star';
+                star.textContent = symbols[i % symbols.length];
+                star.style.left = (Math.random() * 96) + '%';
+                star.style.top = (Math.random() * 96) + '%';
+                const size = 10 + Math.random() * 16;
+                star.style.fontSize = size + 'px';
+                const delay = -(Math.random() * 8);
+                const dur = 5 + Math.random() * 8;
+                star.style.animationDelay = delay + 's';
+                star.style.animationDuration = dur + 's';
+                star.style.opacity = (0.3 + Math.random() * 0.5).toString();
+                star.style.color = Math.random() > 0.5 ? CONFIG.color.sub : CONFIG.color.accent;
+                container.appendChild(star);
             }
-            container.appendChild(starsEl);
-
-            const svgNS = 'http://www.w3.org/2000/svg';
-            const svg = document.createElementNS(svgNS, 'svg');
-            svg.setAttribute('viewBox', '0 0 1920 486');
-            svg.setAttribute('preserveAspectRatio', 'none');
-            svg.className = 'bg-city-silhouette';
-            svg.style.cssText = 'position:absolute;bottom:0;left:0;right:0;width:100%;height:45%;';
-
-            const buildings = [
-                // [x, y, width, height]
-                [0, 286, 60, 200], [55, 186, 80, 300], [130, 240, 50, 246], [175, 140, 90, 346],
-                [260, 210, 40, 276], [295, 80, 70, 406], [360, 180, 55, 306], [410, 260, 45, 226],
-                [450, 120, 100, 366], [545, 200, 60, 286], [600, 150, 80, 336], [675, 240, 45, 246],
-                [715, 60, 90, 426], [800, 180, 70, 306], [865, 220, 55, 266], [915, 100, 110, 386],
-                [1020, 230, 50, 256], [1065, 150, 85, 336], [1145, 200, 60, 286], [1200, 280, 40, 206],
-                [1235, 100, 95, 386], [1325, 240, 55, 246], [1375, 170, 75, 316], [1445, 220, 50, 266],
-                [1490, 80, 100, 406], [1585, 200, 65, 286], [1645, 260, 50, 226], [1690, 140, 85, 346],
-                [1770, 200, 55, 286], [1820, 260, 50, 226], [1865, 180, 55, 306],
-            ];
-
-            const path = document.createElementNS(svgNS, 'path');
-            let d = 'M0,486 ';
-            buildings.forEach(([bx, by, bw, bh]) => {
-                d += `L${bx},486 L${bx},${by} L${bx + bw},${by} L${bx + bw},486 `;
-            });
-            d += 'L1920,486 Z';
-            path.setAttribute('d', d);
-            path.setAttribute('fill', '#0d0508');
-            svg.appendChild(path);
-
-            const windowsGroup = document.createElementNS(svgNS, 'g');
-            buildings.forEach(([bx, by, bw, bh]) => {
-                const cols = Math.floor(bw / 12); const rows = Math.floor(bh / 16);
-                for (let row = 0; row < rows; row++) {
-                    for (let col = 0; col < cols; col++) {
-                        if (Math.random() < 0.35) {
-                            const wx = bx + col * 12 + 3;
-                            const wy = by + row * 16 + 4;
-                            const rect = document.createElementNS(svgNS, 'rect');
-                            rect.setAttribute('x', wx); rect.setAttribute('y', wy);
-                            rect.setAttribute('width', 6); rect.setAttribute('height', 8);
-                            rect.setAttribute('fill', 'rgba(251,191,36,0.55)');
-                            rect.style.cssText = `animation:starTwinkle ${3 + Math.random() * 5}s ${-Math.random() * 5}s infinite ease-in-out;`;
-                            windowsGroup.appendChild(rect);
-                        }
-                    }
-                }
-            });
-            svg.appendChild(windowsGroup);
-            container.appendChild(svg);
         }
 
-        function addBgCity() {
-            const el = document.createElement('div'); el.className = 'bg-city';
-            buildCityScenery(el); addBgPart(el);
+        function addBgStripe() { const el = document.createElement('div'); el.className = 'bg-stripe'; addBgPart(el); }
+        function addBgDots() { const el = document.createElement('div'); el.className = 'bg-dots'; addBgPart(el); }
+        function addBgGradient() { const el = document.createElement('div'); el.className = 'bg-gradient'; addBgPart(el); }
+        function addBgStars() {
+            const el = document.createElement('div'); el.className = 'bg-stars-layer';
+            buildStars(el);
+            addBgPart(el);
         }
 
         function promptBgUpload() {
-            const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.style.display = 'none';
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = 'image/*'; input.style.display = 'none';
             input.addEventListener('change', () => {
                 const file = input.files && input.files[0]; if (!file) { input.remove(); return; }
                 const reader = new FileReader();
-                reader.onload = (ev) => {
-                    let bg = document.getElementById('uploaded-bg');
-                    if (!bg) { bg = document.createElement('div'); bg.id = 'uploaded-bg'; bg.className = 'bg-part'; bg.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;background-size:cover;background-position:center;'; captureArea.insertBefore(bg, captureArea.firstChild); }
-                    bg.style.backgroundImage = `url('${ev.target.result}')`; input.remove();
-                };
+                reader.onload = (ev) => { setUploadedBackground(ev.target.result); input.remove(); };
                 reader.readAsDataURL(file);
             });
             document.body.appendChild(input); input.click();
         }
 
+        function setUploadedBackground(src) {
+            let bg = document.getElementById('uploaded-bg');
+            if (!bg) {
+                bg = document.createElement('div');
+                bg.id = 'uploaded-bg'; bg.className = 'bg-part';
+                bg.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;background-size:cover;background-position:center;background-repeat:no-repeat;';
+                captureArea.insertBefore(bg, captureArea.querySelector('.corner-star') || captureArea.firstChild);
+            }
+            bg.style.backgroundImage = `url('${src}')`;
+        }
+
         function promptBgColor() {
-            const input = document.createElement('input'); input.type = 'color'; input.style.display = 'none';
-            function rgbToHex(rgb) { if (!rgb) return '#1c0a00'; const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/); if (!m) return rgb; return '#' + parseInt(m[1]).toString(16).padStart(2, '0') + parseInt(m[2]).toString(16).padStart(2, '0') + parseInt(m[3]).toString(16).padStart(2, '0'); }
-            input.value = rgbToHex(window.getComputedStyle(document.body).backgroundColor);
+            const input = document.createElement('input');
+            input.type = 'color'; input.style.display = 'none';
+            function rgbToHex(rgb) {
+                if (!rgb) return '#f0faff';
+                const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                if (!m) return rgb;
+                return '#' + parseInt(m[1]).toString(16).padStart(2, '0') + parseInt(m[2]).toString(16).padStart(2, '0') + parseInt(m[3]).toString(16).padStart(2, '0');
+            }
+            input.value = rgbToHex(window.getComputedStyle(captureArea).backgroundColor || window.getComputedStyle(document.body).backgroundColor);
             input.addEventListener('input', (e) => { document.body.style.backgroundColor = e.target.value; captureArea.style.backgroundColor = e.target.value; });
             input.addEventListener('change', () => { try { input.remove(); } catch (e) { } });
             document.body.appendChild(input); input.click();
@@ -2384,44 +2353,60 @@
                 if (e.target === delBtn) return;
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
                 e.stopPropagation();
-                const rect = el.getBoundingClientRect(); const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
+                const rect = el.getBoundingClientRect();
+                const ox = e.clientX - rect.left, oy = e.clientY - rect.top;
                 const onMove = (me) => { el.style.left = (me.clientX - ox) + 'px'; el.style.top = (me.clientY - oy) + 'px'; el.style.right = 'auto'; };
                 const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
                 document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
             });
             if (!el.isConnected) captureArea.appendChild(el);
-            addHoverMenu(el); return el;
+            addHoverMenu(el);
+            return el;
         }
 
         function addHdrLive(x, y) {
-            const el = document.createElement('div'); el.className = 'live-badge'; el.style.cursor = 'move';
-            el.style.background = `linear-gradient(90deg, ${CONFIG.color.liveBadge}, #9a1e6e)`;
-            el.innerHTML = `<span class="blinking-icon">◉</span><input type="text" class="live-input" value="${CONFIG.text.liveBadge}">`;
+            const el = document.createElement('div');
+            el.className = 'live-badge'; el.style.cursor = 'move';
+            el.style.background = CONFIG.color.liveBadge;
+            el.innerHTML = `<span class="blinking-icon">●</span><input type="text" class="live-input" value="${CONFIG.text.liveBadge}">`;
             makeHdrPart(el, x, y);
         }
 
         function addHdrProfile(x, y) {
-            const el = document.createElement('div'); el.className = 'profile-container'; el.style.cursor = 'move';
+            const el = document.createElement('div');
+            el.className = 'profile-container'; el.style.cursor = 'move';
             const disp = document.createElement('div');
             disp.className = 'profile-display-area';
-            disp.style.cssText = 'white-space:nowrap;font-size:15px;font-weight:600;letter-spacing:2px;font-family:"Josefin Sans",sans-serif;color:var(--color-accent);pointer-events:none;animation:neonPulse var(--neon-pulse-duration) infinite ease-in-out;';
-            el.appendChild(disp); makeHdrPart(el, x, y);
+            disp.style.cssText = 'white-space:nowrap;font-size:16px;font-weight:700;font-family:"Quicksand",sans-serif;color:var(--color-accent);pointer-events:none;';
+            el.appendChild(disp);
+            makeHdrPart(el, x, y);
             let idx = 0, timer = null;
-            function cycle() { clearInterval(timer); disp.textContent = profileItems[idx % (profileItems.length || 1)] || ''; if (profileItems.length <= 1) return; timer = setInterval(() => { disp.style.transition = 'opacity 0.3s'; disp.style.opacity = '0'; setTimeout(() => { idx = (idx + 1) % profileItems.length; disp.textContent = profileItems[idx]; disp.style.opacity = '1'; }, 300); }, CONFIG.animation.profileInterval); }
+            function cycle() {
+                if (timer) clearInterval(timer);
+                disp.textContent = profileItems[idx % (profileItems.length || 1)] || '';
+                if (profileItems.length <= 1) return;
+                timer = setInterval(() => {
+                    disp.style.transition = 'opacity 0.3s'; disp.style.opacity = '0';
+                    setTimeout(() => { idx = (idx + 1) % profileItems.length; disp.textContent = profileItems[idx]; disp.style.opacity = '1'; }, 300);
+                }, CONFIG.animation.profileInterval);
+            }
             cycle();
             el.addEventListener('dblclick', (e) => { e.stopPropagation(); openEditor(() => { idx = 0; cycle(); }); });
         }
 
         function addHdrMessage(x, y) {
-            const el = document.createElement('div'); el.className = 'info-base'; el.style.cursor = 'move'; el.style.minWidth = '300px'; el.style.height = '52px';
+            const el = document.createElement('div');
+            el.className = 'info-base'; el.style.cursor = 'move'; el.style.minWidth = '300px'; el.style.height = '52px';
             el.innerHTML = `<input type="text" class="input-text" placeholder="${CONFIG.text.messagePlaceholder}">`;
             makeHdrPart(el, x, y);
         }
 
         function addHdrClock(x, y) {
-            const el = document.createElement('div'); el.className = 'info-base clock-container'; el.style.cursor = 'move'; el.style.height = '52px';
-            el.innerHTML = `<span class="hdr-float-date" style="font-size:12px;opacity:0.7;letter-spacing:2px;">0000/00/00</span><span class="hdr-float-time">00:00:00</span>`;
-            makeHdrPart(el, x, y); clockBoxes.push(el);
+            const el = document.createElement('div');
+            el.className = 'info-base clock-container'; el.style.cursor = 'move'; el.style.height = '52px';
+            el.innerHTML = `<span class="hdr-float-date" style="font-size:13px;opacity:0.75;">0000/00/00</span><span class="hdr-float-time">00:00:00</span>`;
+            makeHdrPart(el, x, y);
+            clockBoxes.push(el);
         }
 
         /** テロップ（スクロールテキスト） */
@@ -2479,17 +2464,30 @@
             inner.addEventListener('click', (e) => { e.stopPropagation(); triggerEdit(); });
         }
 
+        /* ---- ボックスパーツ ---- */
         function addClockBox(x, y) {
-            const box = document.createElement('div'); box.className = 'box clock-box'; box.style.left = x + 'px'; box.style.top = y + 'px';
-            box.innerHTML = `<div class="box-menu-toggle" title="menu">≡</div><div class="header"><input type="text" class="header-input" value="TIME"><div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div></div><div class="content"><div class="clock-inner"><div class="clock-time">00:00:00</div><div class="clock-date">0000/00/00</div></div></div>`;
-            captureArea.appendChild(box); addResizeHandles(box); addHoverMenu(box, box.querySelector('.content'));
+            const box = document.createElement('div');
+            box.className = 'box clock-box'; box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header"><input type="text" class="header-input" value="🕐 時計"><div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div></div>
+            <div class="content"><div class="clock-inner"><div class="clock-time">00:00:00</div><div class="clock-date">0000/00/00</div></div></div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
             clockBoxes.push(box);
         }
 
         function addStopwatch(x, y) {
-            const box = document.createElement('div'); box.className = 'box sw-box'; box.style.left = x + 'px'; box.style.top = y + 'px';
-            box.innerHTML = `<div class="box-menu-toggle" title="menu">≡</div><div class="header"><input type="text" class="header-input" value="STOPWATCH"><div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div></div><div class="content"><div class="sw-inner"><div class="sw-time">00:00.00</div><div class="sw-controls"><button class="sw-btn sw-btn-start">START</button><button class="sw-btn sw-btn-reset">RESET</button></div></div></div>`;
-            captureArea.appendChild(box); addResizeHandles(box); addHoverMenu(box, box.querySelector('.content'));
+            const box = document.createElement('div');
+            box.className = 'box sw-box'; box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header"><input type="text" class="header-input" value="⏱ ストップウォッチ"><div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div></div>
+            <div class="content"><div class="sw-inner"><div class="sw-time">00:00.00</div><div class="sw-controls"><button class="sw-btn sw-btn-start">▶ 開始</button><button class="sw-btn sw-btn-reset">↺ リセット</button></div></div></div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
             let elapsed = 0, startTime = null, rafId = null, running = false;
             const timeEl = box.querySelector('.sw-time');
             requestAnimationFrame(() => {
@@ -2498,21 +2496,39 @@
                 timeEl.style.minWidth = timeEl.offsetWidth + 'px';
                 timeEl.textContent = _orig;
             });
-            const startBtn = box.querySelector('.sw-btn-start'); const resetBtn = box.querySelector('.sw-btn-reset');
-            function fmt(ms) { const s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') + '.' + String(Math.floor((ms % 1000) / 10)).padStart(2, '0'); }
-            function tick() { elapsed = Date.now() - startTime; timeEl.textContent = fmt(elapsed); rafId = requestAnimationFrame(tick); }
+            const startBtn = box.querySelector('.sw-btn-start');
+            const resetBtn = box.querySelector('.sw-btn-reset');
+            function formatTime(ms) { const s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') + '.' + String(Math.floor((ms % 1000) / 10)).padStart(2, '0'); }
+            function tick() { elapsed = Date.now() - startTime; timeEl.textContent = formatTime(elapsed); rafId = requestAnimationFrame(tick); }
             startBtn.addEventListener('click', () => {
-                if (!running) { startTime = Date.now() - elapsed; rafId = requestAnimationFrame(tick); running = true; startBtn.textContent = 'STOP'; startBtn.classList.add('running'); }
-                else { cancelAnimationFrame(rafId); running = false; startBtn.textContent = 'START'; startBtn.classList.remove('running'); }
+                if (!running) { startTime = Date.now() - elapsed; rafId = requestAnimationFrame(tick); running = true; startBtn.textContent = '⏸ 停止'; startBtn.classList.add('running'); }
+                else { cancelAnimationFrame(rafId); running = false; startBtn.textContent = '▶ 開始'; startBtn.classList.remove('running'); }
             });
-            resetBtn.addEventListener('click', () => { cancelAnimationFrame(rafId); running = false; elapsed = 0; startBtn.textContent = 'START'; startBtn.classList.remove('running'); timeEl.textContent = '00:00.00'; });
+            resetBtn.addEventListener('click', () => { cancelAnimationFrame(rafId); running = false; elapsed = 0; startBtn.textContent = '▶ 開始'; startBtn.classList.remove('running'); timeEl.textContent = '00:00.00'; });
         }
 
         function addCounter(x, y) {
-            const box = document.createElement('div'); box.className = 'box counter-box'; box.style.left = x + 'px'; box.style.top = y + 'px';
-            box.innerHTML = `<div class="box-menu-toggle" title="menu">≡</div><div class="header"><input type="text" class="header-input" value="COUNTER"><div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div></div><div class="content"><div class="counter-inner"><div class="counter-label">COUNT</div><div class="counter-value">0</div><div class="counter-step-row">STEP&nbsp;<input type="number" class="counter-step-input" value="1" min="1"></div><div class="counter-controls"><button class="counter-btn counter-btn-minus">－</button><button class="counter-btn counter-btn-plus">＋</button><button class="counter-btn counter-btn-reset">RST</button></div></div></div>`;
-            captureArea.appendChild(box); addResizeHandles(box); addHoverMenu(box, box.querySelector('.content'));
-            let count = 0; const valueEl = box.querySelector('.counter-value'); const stepInput = box.querySelector('.counter-step-input');
+            const box = document.createElement('div');
+            box.className = 'box counter-box'; box.style.left = x + 'px'; box.style.top = y + 'px';
+            box.innerHTML = `
+            <div class="box-menu-toggle" title="メニュー">≡</div>
+            <div class="header"><input type="text" class="header-input" value="🔢 カウンター"><div class="window-btns"><div class="btn"></div><div class="btn"></div><div class="btn"></div></div></div>
+            <div class="content"><div class="counter-inner">
+                <div class="counter-label">COUNT</div>
+                <div class="counter-value">0</div>
+                <div class="counter-step-row">STEP&nbsp;<input type="number" class="counter-step-input" value="1" min="1"></div>
+                <div class="counter-controls">
+                    <button class="counter-btn counter-btn-minus">－</button>
+                    <button class="counter-btn counter-btn-plus">＋</button>
+                    <button class="counter-btn counter-btn-reset">RST</button>
+                </div>
+            </div></div>`;
+            captureArea.appendChild(box);
+            addResizeHandles(box);
+            addHoverMenu(box, box.querySelector('.content'));
+            let count = 0;
+            const valueEl = box.querySelector('.counter-value');
+            const stepInput = box.querySelector('.counter-step-input');
             const getStep = () => parseFloat(stepInput.value) || 1;
             box.querySelector('.counter-btn-plus').addEventListener('click', () => { count += getStep(); valueEl.textContent = count; });
             box.querySelector('.counter-btn-minus').addEventListener('click', () => { count -= getStep(); valueEl.textContent = count; });
@@ -2520,9 +2536,20 @@
         }
 
         function addImageBox(x, y) {
-            const box = makeBox(x, y, 'image-box', 'IMAGE', `<div class="image-drop-area"><input type="file" accept="image/*"><div class="image-drop-hint">🖼</div><div>CLICK OR DRAG</div></div>`);
-            const dropArea = box.querySelector('.image-drop-area'); const fileInput = box.querySelector('input[type="file"]');
-            function loadFile(file) { if (!file || !file.type.startsWith('image/')) return; const reader = new FileReader(); reader.onload = (ev) => { dropArea.innerHTML = `<img src="${ev.target.result}" alt="">`; }; reader.readAsDataURL(file); }
+            const box = makeBox(x, y, 'image-box', '🖼 画像',
+                `<div class="image-drop-area" title="クリックまたはドラッグで画像を選択">
+                <input type="file" accept="image/*">
+                <div class="image-drop-hint">🖼</div>
+                <div>クリック or ドラッグで追加</div>
+             </div>`);
+            const dropArea = box.querySelector('.image-drop-area');
+            const fileInput = box.querySelector('input[type="file"]');
+            function loadFile(file) {
+                if (!file || !file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => { dropArea.innerHTML = `<img src="${ev.target.result}" alt="">`; };
+                reader.readAsDataURL(file);
+            }
             fileInput.addEventListener('change', () => loadFile(fileInput.files[0]));
             dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.classList.add('dragover'); });
             dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
@@ -2536,12 +2563,16 @@
          * ===================================================== */
         function addResizeHandles(el, opts = {}) {
             const minW = opts.minW ?? 60, minH = opts.minH ?? 30;
-            if (el._resizeSetup) return; el._resizeSetup = true; el.classList.add('resizable');
+            if (el._resizeSetup) return; el._resizeSetup = true;
+            el.classList.add('resizable');
             ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].forEach(dir => {
-                const h = document.createElement('div'); h.className = 'resize-handle ' + dir;
+                const h = document.createElement('div');
+                h.className = 'resize-handle ' + dir;
                 h.addEventListener('mousedown', (e) => {
-                    e.stopPropagation(); e.preventDefault(); el.classList.add('resizing');
-                    const startX = e.clientX, startY = e.clientY; const rect = el.getBoundingClientRect();
+                    e.stopPropagation(); e.preventDefault();
+                    el.classList.add('resizing');
+                    const startX = e.clientX, startY = e.clientY;
+                    const rect = el.getBoundingClientRect();
                     const startW = rect.width, startH = rect.height, startL = rect.left, startT = rect.top;
                     const onMove = (me) => {
                         const dx = me.clientX - startX, dy = me.clientY - startY;
@@ -2550,7 +2581,9 @@
                         if (dir.includes('s')) h2 = Math.max(minH, startH + dy);
                         if (dir.includes('w')) { w = Math.max(minW, startW - dx); l = startL + (startW - w); }
                         if (dir.includes('n')) { h2 = Math.max(minH, startH - dy); t = startT + (startH - h2); }
-                        el.style.width = w + 'px'; el.style.height = h2 + 'px'; el.style.left = l + 'px'; el.style.top = t + 'px'; el.style.right = 'auto'; el.style.bottom = 'auto';
+                        el.style.width = w + 'px'; el.style.height = h2 + 'px';
+                        el.style.left = l + 'px'; el.style.top = t + 'px';
+                        el.style.right = 'auto'; el.style.bottom = 'auto';
                     };
                     const onUp = () => { el.classList.remove('resizing'); document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
                     document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
@@ -2565,7 +2598,11 @@
         function addHoverMenu(el, contentTarget) {
             const target = contentTarget || el;
             let toggle = el.querySelector('.box-menu-toggle');
-            if (!toggle) { toggle = document.createElement('div'); toggle.className = 'part-menu-toggle'; toggle.textContent = '≡'; el.appendChild(toggle); }
+            if (!toggle) {
+                toggle = document.createElement('div');
+                toggle.className = 'part-menu-toggle'; toggle.textContent = '≡';
+                el.appendChild(toggle);
+            }
 
             const menu = document.createElement('div');
             menu.className = 'hover-menu';
@@ -2576,8 +2613,20 @@
             <div class="hover-menu-sep"></div>
             <button class="hover-menu-btn" data-action="rotate">🔄 回転</button>
             <div class="hover-menu-rot">
-                <div class="hover-menu-rot-presets"><button class="hover-menu-preset" data-rot="0">0°</button><button class="hover-menu-preset" data-rot="45">45°</button><button class="hover-menu-preset" data-rot="90">90°</button><button class="hover-menu-preset" data-rot="-45">-45°</button><button class="hover-menu-preset" data-rot="-90">-90°</button><button class="hover-menu-preset" data-rot="180">180°</button></div>
-                <div style="display:flex;gap:4px;align-items:center;"><input type="number" class="hover-menu-rot-input hover-menu-fs-input" value="0" min="-360" max="360" style="width:52px;"><button class="hover-menu-fs-apply hover-menu-rot-apply">OK</button><button class="hover-menu-fs-apply hover-menu-rot-reset">↩</button></div>
+                <div class="hover-menu-rot-presets">
+                    <button class="hover-menu-preset" data-rot="0">0°</button>
+                    <button class="hover-menu-preset" data-rot="45">45°</button>
+                    <button class="hover-menu-preset" data-rot="90">90°</button>
+                    <button class="hover-menu-preset" data-rot="135">135°</button>
+                    <button class="hover-menu-preset" data-rot="-45">-45°</button>
+                    <button class="hover-menu-preset" data-rot="-90">-90°</button>
+                    <button class="hover-menu-preset" data-rot="180">180°</button>
+                </div>
+                <div style="display:flex;gap:4px;align-items:center;">
+                    <input type="number" class="hover-menu-rot-input hover-menu-fs-input" value="0" min="-360" max="360" style="width:52px;">
+                    <button class="hover-menu-fs-apply hover-menu-rot-apply">OK</button>
+                    <button class="hover-menu-fs-apply hover-menu-rot-reset">↩</button>
+                </div>
             </div>
             <button class="hover-menu-btn" data-action="fontsize">🔠 文字サイズ</button>
             <div class="hover-menu-fs">
@@ -2586,17 +2635,42 @@
             </div>
             <div class="hover-menu-sep"></div>
             <button class="hover-menu-btn" data-action="textcolor">🎨 文字色</button>
-            <div class="hover-menu-tc"><div class="hover-menu-swatches"></div><div class="hover-menu-color-row"><input type="color" class="hover-menu-tc-input" value="#fef9e7"><input type="text" class="hover-menu-hex-input" value="#fef9e7" maxlength="7" placeholder="#rrggbb"><button class="hover-menu-fs-apply hover-menu-tc-reset">↩</button></div></div>
+            <div class="hover-menu-tc">
+                <div class="hover-menu-swatches"></div>
+                <div class="hover-menu-color-row">
+                    <input type="color" class="hover-menu-tc-input" value="#2a6080">
+                    <input type="text" class="hover-menu-hex-input" value="#2a6080" maxlength="7" placeholder="#rrggbb">
+                    <button class="hover-menu-fs-apply hover-menu-tc-reset">↩</button>
+                </div>
+            </div>
             <button class="hover-menu-btn" data-action="fillcolor">🪣 塗り色</button>
-            <div class="hover-menu-fc"><div class="hover-menu-swatches"></div><div class="hover-menu-color-row"><input type="color" class="hover-menu-fc-input" value="#1c0a00"><input type="text" class="hover-menu-hex-input" value="#1c0a00" maxlength="7" placeholder="#rrggbb"><button class="hover-menu-fs-apply hover-menu-fc-reset">↩</button></div></div>
+            <div class="hover-menu-fc">
+                <div class="hover-menu-swatches"></div>
+                <div class="hover-menu-color-row">
+                    <input type="color" class="hover-menu-fc-input" value="#f0faff">
+                    <input type="text" class="hover-menu-hex-input" value="#f0faff" maxlength="7" placeholder="#rrggbb">
+                    <button class="hover-menu-fs-apply hover-menu-fc-reset">↩</button>
+                </div>
+            </div>
             <button class="hover-menu-btn" data-action="bordercolor">🖊 枠色</button>
-            <div class="hover-menu-bc"><div class="hover-menu-swatches"></div><div class="hover-menu-color-row"><input type="color" class="hover-menu-bc-input" value="#f59e0b"><input type="text" class="hover-menu-hex-input" value="#f59e0b" maxlength="7" placeholder="#rrggbb"><button class="hover-menu-fs-apply hover-menu-bc-reset">↩</button></div></div>
+            <div class="hover-menu-bc">
+                <div class="hover-menu-swatches"></div>
+                <div class="hover-menu-color-row">
+                    <input type="color" class="hover-menu-bc-input" value="#7ec8e3">
+                    <input type="text" class="hover-menu-hex-input" value="#7ec8e3" maxlength="7" placeholder="#rrggbb">
+                    <button class="hover-menu-fs-apply hover-menu-bc-reset">↩</button>
+                </div>
+            </div>
             <div class="hover-menu-sep"></div>
-            <button class="hover-menu-btn" data-action="close">✕ CLOSE</button>`;
-            const tcSubPanel = menu.querySelector('.hover-menu-tc'); const tcInput = menu.querySelector('.hover-menu-tc-input');
-            const fcSubPanel = menu.querySelector('.hover-menu-fc'); const fcInput = menu.querySelector('.hover-menu-fc-input');
-            const bcSubPanel = menu.querySelector('.hover-menu-bc'); const bcInput = menu.querySelector('.hover-menu-bc-input');
-            const rotSubPanel = menu.querySelector('.hover-menu-rot'); const rotInput = menu.querySelector('.hover-menu-rot-input');
+            <button class="hover-menu-btn" data-action="close">✕ 閉じる</button>`;
+            const tcSubPanel = menu.querySelector('.hover-menu-tc');
+            const tcInput = menu.querySelector('.hover-menu-tc-input');
+            const fcSubPanel = menu.querySelector('.hover-menu-fc');
+            const fcInput = menu.querySelector('.hover-menu-fc-input');
+            const bcSubPanel = menu.querySelector('.hover-menu-bc');
+            const bcInput = menu.querySelector('.hover-menu-bc-input');
+            const rotSubPanel = menu.querySelector('.hover-menu-rot');
+            const rotInput = menu.querySelector('.hover-menu-rot-input');
             const fsSubPanel = menu.querySelector('.hover-menu-fs');
 
             if (el._tickerEdit) {
@@ -2661,28 +2735,44 @@
                 const isOpen = menu.classList.contains('open');
                 document.querySelectorAll('.hover-menu.open').forEach(m => m.classList.remove('open'));
                 if (!isOpen) {
-                    const rect = toggle.getBoundingClientRect(); menu.style.left = rect.left + 'px'; menu.style.top = (rect.bottom + 4) + 'px'; menu.classList.add('open');
+                    const rect = toggle.getBoundingClientRect();
+                    menu.style.left = rect.left + 'px'; menu.style.top = (rect.bottom + 4) + 'px';
+                    menu.classList.add('open');
                     const mr = menu.getBoundingClientRect();
                     if (mr.right > window.innerWidth) menu.style.left = Math.max(0, window.innerWidth - mr.width - 4) + 'px';
                     if (mr.bottom > window.innerHeight) menu.style.top = Math.max(0, rect.top - mr.height - 4) + 'px';
                     [tcSubPanel, fcSubPanel, bcSubPanel, fsSubPanel].forEach(p => p.classList.remove('open'));
                 }
             });
-            toggle.addEventListener('mousedown', e => e.stopPropagation());
+            toggle.addEventListener('mousedown', (e) => e.stopPropagation());
 
-            menu.querySelector('[data-action="close"]').addEventListener('click', (e) => { e.stopPropagation();[menu, tcSubPanel, fcSubPanel, bcSubPanel, rotSubPanel, fsSubPanel].forEach(p => p.classList.remove('open')); });
+            menu.querySelector('[data-action="close"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                [menu, tcSubPanel, fcSubPanel, bcSubPanel, rotSubPanel, fsSubPanel].forEach(p => p.classList.remove('open'));
+            });
+
             menu.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
-                e.stopPropagation(); const root = el.closest('.box') || el.closest('.float-part') || el;
+                e.stopPropagation();
+                const root = el.closest('.box') || el.closest('.float-part') || el;
                 try { removeTopLevel(root); } catch (err) { }
                 try { if (menu.parentNode) menu.parentNode.removeChild(menu); } catch (err) { }
             });
+
             menu.querySelector('[data-action="clone"]').addEventListener('click', (e) => {
-                e.stopPropagation(); const src = el.closest('.box') || el;
-                const clone = src.cloneNode(true); const rect = src.getBoundingClientRect();
-                clone.style.left = (rect.left + 30) + 'px'; clone.style.top = (rect.top + 30) + 'px'; clone.style.right = 'auto'; clone.style.bottom = 'auto';
-                captureArea.appendChild(clone); clone._resizeSetup = false; clone.querySelectorAll('.resize-handle').forEach(h => h.remove());
-                addResizeHandles(clone); const db = clone.querySelector('.box-del-btn'); if (db) db.addEventListener('click', (ev) => { ev.stopPropagation(); clone.remove(); });
-                const ct = clone.querySelector('.content'); if (ct) addHoverMenu(clone, ct); else addHoverMenu(clone);
+                e.stopPropagation();
+                const src = el.closest('.box') || el;
+                const clone = src.cloneNode(true);
+                const rect = src.getBoundingClientRect();
+                clone.style.left = (rect.left + 30) + 'px'; clone.style.top = (rect.top + 30) + 'px';
+                clone.style.right = 'auto'; clone.style.bottom = 'auto';
+                captureArea.appendChild(clone);
+                clone._resizeSetup = false;
+                clone.querySelectorAll('.resize-handle').forEach(h => h.remove());
+                addResizeHandles(clone);
+                const db = clone.querySelector('.box-del-btn');
+                if (db) db.addEventListener('click', (ev) => { ev.stopPropagation(); clone.remove(); });
+                const ct = clone.querySelector('.content');
+                if (ct) addHoverMenu(clone, ct); else addHoverMenu(clone);
                 if (clone.classList.contains('clock-box') || clone.classList.contains('clock-container')) {
                     if (clone.id) clone.removeAttribute('id');
                     const _ts = clone.querySelector('#clock, .hdr-float-time'); if (_ts) { _ts.removeAttribute('id'); _ts.classList.add('hdr-float-time'); }
@@ -2721,7 +2811,10 @@
                 if (textEls.length === 0) Array.from(target.querySelectorAll('input[type="text"],textarea')).forEach(t => textEls.push(t));
                 textEls.forEach(t => t.style.color = e.target.value);
             });
-            menu.querySelector('.hover-menu-tc-reset').addEventListener('click', (e) => { e.stopPropagation(); (el.closest('.box') || el).querySelectorAll('.title-input,.text-input-box,.clock-time,.sw-time,.counter-value,.input-text,.live-input').forEach(t => t.style.color = ''); });
+            menu.querySelector('.hover-menu-tc-reset').addEventListener('click', (e) => {
+                e.stopPropagation();
+                (el.closest('.box') || el).querySelectorAll('.title-input,.text-input-box,.clock-time,.sw-time,.counter-value,.input-text,.live-input').forEach(t => t.style.color = '');
+            });
 
             menu.querySelector('[data-action="fillcolor"]').addEventListener('click', (e) => { e.stopPropagation(); fcSubPanel.classList.toggle('open');[tcSubPanel, bcSubPanel, fsSubPanel].forEach(p => p.classList.remove('open')); });
             fcInput.addEventListener('mousedown', e => e.stopPropagation());
@@ -2794,11 +2887,24 @@
             });
 
             menu.querySelector('[data-action="rotate"]').addEventListener('click', (e) => {
-                e.stopPropagation(); rotSubPanel.classList.toggle('open');[tcSubPanel, fcSubPanel, bcSubPanel, fsSubPanel].forEach(p => p.classList.remove('open'));
-                if (rotSubPanel.classList.contains('open')) { const cur = (el.closest('.box') || el).style.transform.match(/rotate\((-?[\d.]+)deg\)/); rotInput.value = cur ? parseFloat(cur[1]) : 0; }
+                e.stopPropagation();
+                rotSubPanel.classList.toggle('open');
+                [tcSubPanel, fcSubPanel, bcSubPanel, fsSubPanel].forEach(p => p.classList.remove('open'));
+                if (rotSubPanel.classList.contains('open')) {
+                    const cur = (el.closest('.box') || el).style.transform.match(/rotate\((-?[\d.]+)deg\)/);
+                    rotInput.value = cur ? parseFloat(cur[1]) : 0;
+                }
             });
-            rotInput.addEventListener('mousedown', e => e.stopPropagation()); rotInput.addEventListener('keydown', e => e.stopPropagation());
-            rotSubPanel.querySelectorAll('[data-rot]').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const deg = parseInt(btn.dataset.rot); (el.closest('.box') || el).style.transform = deg === 0 ? '' : `rotate(${deg}deg)`; rotInput.value = deg; }); });
+            rotInput.addEventListener('mousedown', e => e.stopPropagation());
+            rotInput.addEventListener('keydown', e => e.stopPropagation());
+            rotSubPanel.querySelectorAll('[data-rot]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const deg = parseInt(btn.dataset.rot);
+                    (el.closest('.box') || el).style.transform = deg === 0 ? '' : `rotate(${deg}deg)`;
+                    rotInput.value = deg;
+                });
+            });
             menu.querySelector('.hover-menu-rot-apply').addEventListener('click', (e) => { e.stopPropagation(); const deg = parseInt(rotInput.value) || 0; (el.closest('.box') || el).style.transform = deg === 0 ? '' : `rotate(${deg}deg)`; });
             menu.querySelector('.hover-menu-rot-reset').addEventListener('click', (e) => { e.stopPropagation(); (el.closest('.box') || el).style.transform = ''; rotInput.value = 0; });
 
@@ -2857,7 +2963,13 @@
 
             }
 
-            document.addEventListener('click', (e) => { if (!menu.contains(e.target) && e.target !== toggle) { menu.classList.remove('open');[tcSubPanel, fcSubPanel, bcSubPanel, fsSubPanel].forEach(p => p.classList.remove('open')); } });
+            document.addEventListener('click', (e) => {
+                if (!menu.contains(e.target) && e.target !== toggle) {
+                    menu.classList.remove('open');
+                    [tcSubPanel, fcSubPanel, bcSubPanel, fsSubPanel].forEach(p => p.classList.remove('open'));
+                }
+            });
+
             el.style.position = el.style.position || 'absolute';
             captureArea.appendChild(menu);
 
@@ -2870,7 +2982,9 @@
             }).observe(menu);
 
             // 要素が外部で削除されたとき、メニューを自動破棄する
-            const mo = new MutationObserver(() => { if (!el.isConnected) { try { if (menu.parentNode) menu.parentNode.removeChild(menu); } catch (e) { } mo.disconnect(); } });
+            const mo = new MutationObserver(() => {
+                if (!el.isConnected) { try { if (menu.parentNode) menu.parentNode.removeChild(menu); } catch (e) { } mo.disconnect(); }
+            });
             mo.observe(document, { childList: true, subtree: true });
         }
 
@@ -2919,10 +3033,11 @@
                     box.querySelector('.clock-date') || box.querySelector('.hdr-float-date') || box.querySelector('#date'));
             });
         }
-        setInterval(updateClock, 1000); updateClock();
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        const _skipLoad = localStorage.getItem('_skip_citypopOverlayConfig') === '1';
-        localStorage.removeItem('_skip_citypopOverlayConfig');
+        const _skipLoad = localStorage.getItem('_skip_popOverlayConfig') === '1';
+        localStorage.removeItem('_skip_popOverlayConfig');
         if (CONFIG.features.autoLoad && !_skipLoad) loadSavedConfig();
     </script>
 </body>
