@@ -1747,6 +1747,9 @@
         <div class="part-menu-item" data-part="load-config">
             <span class="part-menu-icon">📂</span> 保存を読み込む
         </div>
+        <div class="part-menu-item" data-part="push-live">
+            <span class="part-menu-icon">📡</span> 表示更新（別タブに反映）
+        </div>
 
         <div class="part-menu-item" data-part="export-config">
             <span class="part-menu-icon">⬇️</span> 設定をエクスポート
@@ -1791,6 +1794,8 @@
                 <div class="help-row"><span class="help-key">エクスポート</span><span
                         class="help-desc">設定をJSONファイルとしてダウンロード</span></div>
                 <div class="help-row"><span class="help-key">インポート</span><span class="help-desc">保存したJSONを読み込んで復元</span>
+                </div>
+                <div class="help-row"><span class="help-key">表示更新</span><span class="help-desc">同じURLを別タブで開いている場合、その画面へ即座に反映（同一オリジンで開く必要あり）</span>
                 </div>
                 <div class="help-section">推奨設定</div>
                 <div class="help-row"><span class="help-key">推奨サイズ</span><span class="help-desc">1920 × 1080 px</span>
@@ -2111,6 +2116,31 @@
                 console.error(err);
             }
         }
+
+        // 表示更新：現在の編集内容を保存し、同一オリジンで開いている別タブへ即時反映させる
+        // （別タブ側は下の 'storage' イベントリスナーで検知して再描画する）
+        function pushLiveUpdate() {
+            normalizeCaptureInputs();
+            const state = {
+                profileItems,
+                captureHtml: captureArea.innerHTML,
+                captureBgColor: captureArea.style.backgroundColor || document.body.style.backgroundColor || ''
+            };
+            try {
+                localStorage.setItem('cyberpunkGamingConfig', JSON.stringify(state));
+                // 内容が同一でも必ず storage イベントを発火させるためのタイムスタンプ
+                localStorage.setItem('cyberpunkGamingLivePing', String(Date.now()));
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // 別タブで「表示更新」が押されたら自動的に反映する
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'cyberpunkGamingLivePing' && e.newValue) {
+                loadSavedConfig();
+            }
+        });
 
         function setupImageDropArea(area) {
             if (!area || area._imageDropSetup) return;
@@ -2465,6 +2495,7 @@
                         break;
                     case 'save-config': saveCurrentConfig(); break;
                     case 'load-config': loadSavedConfig(); break;
+                    case 'push-live': pushLiveUpdate(); break;
 
                     case 'export-config': exportConfig(); break;
                     case 'import-config': importConfig(); break;

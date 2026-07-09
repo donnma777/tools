@@ -3,25 +3,24 @@
 
 <head>
     <meta charset="UTF-8">
-  <meta name="robots" content="noindex">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;900&family=Quicksand:wght@600;700&display=swap"
         rel="stylesheet">
-    <title>説明書 — GAMING theme</title>
+    <title>説明書 — SWEET LOLITA theme</title>
     <style>
         :root {
-            --accent: #00fff7;
-            --accent-dim: #00bdb5;
-            --bg: #07070e;
-            --surface: #0d0d1a;
-            --surface2: #111120;
-            --border: rgba(0, 255, 247, 0.25);
-            --border-bright: rgba(0, 255, 247, 0.6);
-            --text: #c0c0cc;
-            --text-sub: #6868a0;
-            --code-bg: #0a0a18;
-            --glow: 0 0 8px rgba(0, 255, 247, 0.5);
+            --accent: #ea92c1;
+            --accent-dim: #c96fa0;
+            --bg: #fff0f7;
+            --surface: #fff5fa;
+            --surface2: #ffe8f3;
+            --border: rgba(234, 146, 193, 0.3);
+            --border-bright: rgba(234, 146, 193, 0.7);
+            --text: #6b3a58;
+            --text-sub: #b07898;
+            --code-bg: #fde8f3;
+            --glow: 0 0 8px rgba(234, 146, 193, 0.5);
         }
 
         * {
@@ -31,14 +30,14 @@
         }
 
         body {
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Quicksand', sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.75;
         }
 
         header {
-            background: linear-gradient(135deg, #0a0a1a 0%, #0d1a2a 100%);
+            background: linear-gradient(135deg, #ffe0ef 0%, #ffd6ea 100%);
             border-bottom: 2px solid var(--accent);
             padding: 40px 48px 32px;
             position: relative;
@@ -53,28 +52,26 @@
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 255, 247, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(234, 146, 193, 0.18) 0%, transparent 70%);
         }
 
         header .badge {
             display: inline-block;
             border: 1px solid var(--accent);
-            color: var(--accent);
-            border-radius: 2px;
-            padding: 2px 10px;
+            color: var(--accent-dim);
+            border-radius: 20px;
+            padding: 2px 14px;
             font-size: 11px;
             letter-spacing: 3px;
             margin-bottom: 12px;
-            font-family: 'Orbitron', sans-serif;
-            text-shadow: var(--glow);
+            font-family: 'Outfit', sans-serif;
         }
 
         header h1 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Outfit', sans-serif;
             font-size: 28px;
             font-weight: 900;
-            color: var(--accent);
-            text-shadow: var(--glow);
+            color: var(--accent-dim);
         }
 
         header p {
@@ -85,7 +82,7 @@
         }
 
         nav {
-            background: #0a0a18;
+            background: #fde8f3;
             border-bottom: 1px solid var(--border);
             padding: 10px 48px;
             display: flex;
@@ -94,16 +91,15 @@
         }
 
         nav a {
-            color: var(--accent);
+            color: var(--accent-dim);
             text-decoration: none;
             font-size: 13px;
             font-weight: 700;
             letter-spacing: 1px;
-            text-shadow: var(--glow);
         }
 
         nav a:hover {
-            color: white;
+            color: #a0426e;
         }
 
         main {
@@ -126,10 +122,9 @@
         }
 
         .section-header h2 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Outfit', sans-serif;
             font-size: 18px;
-            color: var(--accent);
-            text-shadow: var(--glow);
+            color: var(--accent-dim);
             letter-spacing: 2px;
         }
 
@@ -141,10 +136,10 @@
 
         h3 {
             font-size: 14px;
-            color: var(--accent);
+            color: var(--accent-dim);
             margin: 24px 0 10px;
             letter-spacing: 1px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         p {
@@ -172,7 +167,7 @@
             content: counter(step);
             background: transparent;
             border: 2px solid var(--accent);
-            color: var(--accent);
+            color: var(--accent-dim);
             border-radius: 50%;
             width: 26px;
             height: 26px;
@@ -183,7 +178,7 @@
             font-weight: 700;
             flex-shrink: 0;
             margin-top: 2px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         .feature-grid {
@@ -195,7 +190,7 @@
         .feature-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 16px;
             padding: 16px;
         }
 
@@ -206,9 +201,9 @@
 
         .feature-card h4 {
             font-size: 13px;
-            color: var(--accent);
+            color: var(--accent-dim);
             margin-bottom: 4px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Outfit', sans-serif;
             letter-spacing: 1px;
         }
 
@@ -222,7 +217,7 @@
             background: var(--code-bg);
             border: 1px solid var(--border);
             border-left: 3px solid var(--accent);
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 16px 20px;
             font-family: 'Courier New', monospace;
             font-size: 13px;
@@ -230,7 +225,7 @@
             overflow-x: auto;
             margin: 12px 0;
             line-height: 1.6;
-            color: #a0fffe;
+            color: #a0426e;
         }
 
         table {
@@ -241,8 +236,8 @@
         }
 
         th {
-            background: rgba(0, 255, 247, 0.12);
-            color: var(--accent);
+            background: rgba(234, 146, 193, 0.15);
+            color: var(--accent-dim);
             padding: 8px 12px;
             text-align: left;
             border-bottom: 2px solid var(--accent);
@@ -262,18 +257,18 @@
         code {
             background: var(--code-bg);
             border: 1px solid var(--border);
-            border-radius: 2px;
+            border-radius: 6px;
             padding: 1px 6px;
             font-family: monospace;
             font-size: 12px;
-            color: var(--accent);
+            color: var(--accent-dim);
         }
 
         .note {
-            background: rgba(0, 255, 247, 0.05);
+            background: rgba(234, 146, 193, 0.08);
             border: 1px solid var(--border);
             border-left: 3px solid var(--accent);
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 12px 16px;
             font-size: 13px;
             margin: 12px 0;
@@ -281,7 +276,7 @@
         }
 
         .note strong {
-            color: var(--accent);
+            color: var(--accent-dim);
         }
 
         .en-sub {
@@ -292,7 +287,7 @@
         }
 
         footer {
-            background: #0a0a18;
+            background: #fde8f3;
             border-top: 2px solid var(--accent);
             color: var(--text-sub);
             text-align: center;
@@ -307,15 +302,14 @@
 
     <header>
         <div class="badge">STREAMING OVERLAY</div>
-        <h1>GAMING — 説明書 / MANUAL</h1>
-        <p>gaming.html &nbsp;|&nbsp; v1.0</p>
+        <h1>SWEET LOLITA — 説明書 / MANUAL ♡</h1>
+        <p>sweet_lolita_rose.html &nbsp;|&nbsp; v1.0</p>
     </header>
 
     <nav>
         <a href="#obs">OBS設定</a>
         <a href="#basic">基本操作</a>
         <a href="#menu">メニュー機能</a>
-        <a href="#live">リアルタイムプレビュー</a>
         <a href="#config">カスタマイズ</a>
         <a href="#trouble">トラブル対処</a>
     </nav>
@@ -323,10 +317,9 @@
     <main>
 
         <section id="obs">
-            gaming Streaming Overlay &nbsp;♡&nbsp; Created by <strong>donnma</strong>
-            <p style="margin-top:8px;color:var(--text-sub);font-size:13px;">注意：二次配布および改変しての配布を禁じます。</p>
-            </footer>
-            <span class="en">HOW TO ADD TO OBS</span>
+            <div class="section-header">
+                <h2>OBS設定</h2>
+                <span class="en">HOW TO ADD TO OBS</span>
             </div>
             <h3>ブラウザソースとして追加 / ADD AS BROWSER SOURCE</h3>
             <ol class="steps">
@@ -334,8 +327,8 @@
                 </li>
                 <li>「ソース」パネルの <strong>＋</strong> をクリックし、<strong>「ブラウザ」</strong> を選択する。<br><span class="en-sub">Click
                         <strong>+</strong> in Sources and choose <strong>Browser</strong>.</span></li>
-                <li><strong>「ローカルファイル」</strong> にチェックを入れ、<code>gaming.html</code> を選択する。<br><span class="en-sub">Check
-                        <strong>"Local File"</strong> and browse to <code>gaming.html</code>.</span></li>
+                <li><strong>「ローカルファイル」</strong> にチェックを入れ、<code>sweet_lolita_rose.html</code> を選択する。<br><span class="en-sub">Check
+                        <strong>"Local File"</strong> and browse to <code>sweet_lolita_rose.html</code>.</span></li>
                 <li>幅: <strong>1920</strong>、高さ: <strong>1080</strong> に設定する。<br><span class="en-sub">Set Width:
                         <strong>1920</strong>, Height: <strong>1080</strong>.</span></li>
                 <li>「カスタムCSS」欄は <strong>空欄</strong> のままにする。<br><span class="en-sub">Leave Custom CSS
@@ -387,7 +380,7 @@
                 <div class="feature-card">
                     <div class="icon">✋</div>
                     <h4>ボックス移動</h4>
-                    <p>ボックスのヘッダーをドラッグして位置を変更できます。<br>Drag the box header to move it.</p>
+                    <p>ヘッダーをドラッグ、またはボックス内を長押し（約0.2秒）してからドラッグで移動できます。<br>Drag the header, or long-press inside the box to move it.</p>
                 </div>
                 <div class="feature-card">
                     <div class="icon">☰</div>
@@ -420,6 +413,16 @@
                         <ul style="margin-top:8px;padding-left:18px;font-size:13px;line-height:2">
                             <li><strong>□ 四角形 / Rectangle</strong></li>
                             <li><strong>○ 円 / Circle</strong></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>背景パーツ<br><code>Background Parts</code></td>
+                    <td>テーマ専用の背景装飾を追加します。<br><span class="en-sub">Adds decorative background effects unique to this theme.</span>
+                        <ul style="margin-top:8px;padding-left:18px;font-size:13px;line-height:2">
+                            <li><strong>✦ 流れ星・キラキラ / Stars</strong></li>
+                            <li><strong>🌈 オーロラ / Aurora</strong></li>
+                            <li><strong>○ バブル / Bubbles</strong></li>
                         </ul>
                     </td>
                 </tr>
@@ -465,46 +468,6 @@
             </table>
         </section>
 
-        <section id="live">
-            <div class="section-header">
-                <h2>リアルタイムプレビュー</h2>
-                <span class="en">REAL-TIME PREVIEW</span>
-            </div>
-            <p>パーツメニューの <strong>📡 表示更新（別タブに反映）</strong> を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。<br>
-                <span class="en-sub">Click <strong>"📡 Update Display"</strong> in the parts menu to instantly push
-                    your current edits to another tab open on the same URL — handy for keeping an editing tab and a
-                    preview tab side by side.</span></p>
-
-            <div class="note">
-                <strong>条件：2つのタブが同じオリジン（同じURL）で開かれている必要があります。</strong><br>
-                ファイルをダブルクリックして <code>file://</code> で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code> または
-                <code>https://</code> 経由で開いてください。<br>
-                <strong>Requirement: both tabs must share the same origin (same URL).</strong><br>
-                Opening the file directly via <code>file://</code> (double-click) often won't share data between
-                tabs in some browsers. Use <code>http://</code> or <code>https://</code> instead.
-            </div>
-
-            <h3>手元での確認方法（ローカルサーバー） / LOCAL PREVIEW</h3>
-            <ol class="steps">
-                <li>同梱の <code>サーバー起動.bat</code> をダブルクリックする（要 Python）。<br><span class="en-sub">Double-click the
-                        included <code>サーバー起動.bat</code> (requires Python).</span></li>
-                <li>自動でブラウザタブが2つ開く（編集用・確認用、どちらも同じURL）。<br><span class="en-sub">Two browser tabs open
-                        automatically — both point to the same local URL.</span></li>
-                <li>片方のタブで編集し、メニューから <strong>📡 表示更新</strong> を押す。<br><span class="en-sub">Edit in one tab, then click
-                        <strong>📡 Update Display</strong> in the menu.</span></li>
-                <li>もう一方のタブに変更が即座に反映される。<br><span class="en-sub">The other tab updates instantly.</span></li>
-                <li>終わったら、開いたウィンドウで何かキーを押すとローカルサーバーが停止する。<br><span class="en-sub">Press any key in the
-                        console window to stop the local server when done.</span></li>
-            </ol>
-
-            <div class="note">
-                <strong>配信本番では：</strong> OBSの「Custom Browser Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>（例:
-                <code>https://donnma.com/overlay/gaming/gaming.html</code>）を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。<br>
-                <strong>On stream:</strong> If both the OBS "Custom Browser Dock" and the Browser Source point to the
-                <strong>same hosted URL</strong>, this feature works without any local server.
-            </div>
-        </section>
-
         <section id="config">
             <div class="section-header">
                 <h2>カスタマイズ設定 (CONFIG)</h2>
@@ -514,31 +477,32 @@
                     file in a text editor and edit the <code>CONFIG</code> block near the top.</span></p>
 
             <div class="code-block">const CONFIG = {
-                color: {
-                accent: '#00fff7', // メインカラー（枠線・発光） / Main color
-                liveBadge: '#ff3c3c', // LIVEバッジ色 / LIVE badge color
-                background: '#0a0a0f', // 背景色 / Background color
-                bodyText: '#c0c0c8', // テキスト色 / Text color
-                },
-                text: {
-                liveBadge: 'LIVE',
-                titleBoxHeader: 'TITLE',
-                titleBoxContent: 'LIVE配信用オーバーレイ画面',
-                commentBoxHeader: 'COMMENT',
-                memoBoxHeader: 'MEMO',
-                memoBoxContent: '空白ダブルクリックでメニュー選択可能',
-                messagePlaceholder: 'メッセージを入力...',
-                memoPlaceholder: 'メモを入力...',
-                },
-                profile: [
-                'あなたの名前 / Your Name',
-                'WEB: yourwebsite.com',
-                'X: @yourhandle',
-                ],
-                animation: {
-                profileInterval: 3000, // プロフィール切替間隔(ms)
-                },
-                };</div>
+  color: {
+    accent: '#ea92c1',    // メインカラー（枠線・発光） / Main color
+    liveBadge: '#df6ba6', // LIVEバッジ色 / LIVE badge color
+    background: '#fff0f7',// 背景色 / Background color
+    bodyText: '#7a4d6a',  // テキスト色 / Text color
+  },
+  text: {
+    liveBadge: 'LIVE',
+    titleBoxHeader: 'SWEET LOLITA',
+    titleBoxContent: 'ふんわり甘ロリ配信へようこそ♡',
+    commentBoxHeader: 'MESSAGE',
+    memoBoxHeader: 'MEMO',
+    memoBoxContent: 'ダブルクリックでメニューを開けるよ',
+    messagePlaceholder: 'メルヘンなコメントを入れてね',
+    memoPlaceholder: 'メモを書く...',
+  },
+  profile: [
+    'あなたの名前 / Your Name',
+    'WEB: yourwebsite.com',
+    'X: @yourhandle',
+    // 行を追加するほど増やせます / Add more lines freely
+  ],
+  animation: {
+    profileInterval: 3000, // プロフィール切替間隔(ms)
+  },
+};</div>
 
             <h3>カラー設定 / COLOR SETTINGS</h3>
             <table>
@@ -550,22 +514,22 @@
                 <tr>
                     <td><code>color.accent</code></td>
                     <td>枠線・発光カラー<br><span class="en-sub">Border & glow color</span></td>
-                    <td><code>'#00fff7'</code></td>
+                    <td><code>'#ea92c1'</code></td>
                 </tr>
                 <tr>
                     <td><code>color.liveBadge</code></td>
                     <td>LIVEバッジ背景色<br><span class="en-sub">LIVE badge background</span></td>
-                    <td><code>'#ff3c3c'</code></td>
+                    <td><code>'#df6ba6'</code></td>
                 </tr>
                 <tr>
                     <td><code>color.background</code></td>
                     <td>画面背景色<br><span class="en-sub">Screen background</span></td>
-                    <td><code>'#0a0a0f'</code></td>
+                    <td><code>'#fff0f7'</code></td>
                 </tr>
                 <tr>
                     <td><code>color.bodyText</code></td>
                     <td>テキスト色<br><span class="en-sub">Text color</span></td>
-                    <td><code>'#c0c0c8'</code></td>
+                    <td><code>'#7a4d6a'</code></td>
                 </tr>
             </table>
 
@@ -573,13 +537,13 @@
             <p>上部バーに順番に表示されるテキストの配列です。<br><span class="en-sub">An array of texts displayed in rotation in the top
                     bar.</span></p>
             <div class="code-block">profile: [
-                'ゲーマー名',
-                'GAME: タイトル',
-                'X: @yourhandle',
-                // 行を追加するほど増やせます / Add more lines freely
-                ],</div>
+  '配信者名',
+  'GAME: タイトル',
+  'X: @yourhandle',
+  // 行を追加するほど増やせます / Add more lines freely
+],</div>
             <div class="note">
-                <strong>ヒント:</strong> 色はHEX（<code>#00fff7</code>）またはRGBA（<code>rgba(0,255,247,0.5)</code>）形式で指定できます。<br>
+                <strong>ヒント:</strong> 色はHEX（<code>#ea92c1</code>）またはRGBA（<code>rgba(234,146,193,0.5)</code>）形式で指定できます。<br>
                 <strong>Tip:</strong> Colors accept HEX or RGBA format.
             </div>
 
@@ -619,7 +583,7 @@
                             <strong>"Interact"</strong>.</span></td>
                 </tr>
                 <tr>
-                    <td>画面が真っ黒<br><span class="en-sub">Black screen</span></td>
+                    <td>画面が真っ白<br><span class="en-sub">White screen</span></td>
                     <td>「ローカルファイル」にチェックが入っているか確認。<br><span class="en-sub">Verify "Local File" is checked.</span></td>
                 </tr>
                 <tr>
@@ -638,9 +602,10 @@
     </main>
 
     <footer>
-        GAMING Streaming Overlay &nbsp;|&nbsp; Created by <strong style="color:#00fff7">donnma(どんま)</strong>
+        SWEET LOLITA Streaming Overlay &nbsp;|&nbsp; Created by <strong style="color:#ea92c1">donnma(どんま)</strong>
         &nbsp;|&nbsp; <a href="https://donnma.com/" target="_blank"
-            style="color:rgba(0,255,247,0.8);text-decoration:underline">donnma.com</a>
+            style="color:rgba(234,146,193,0.9);text-decoration:underline">donnma.com</a>
+        <p style="margin-top:8px;color:rgba(234,146,193,0.7);font-size:13px;">注意：二次配布および改変しての配布を禁じます。</p>
     </footer>
 
 </body>

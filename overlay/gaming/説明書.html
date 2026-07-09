@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-  <meta name="robots" content="noindex">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap"
@@ -315,7 +314,6 @@
         <a href="#obs">OBS設定</a>
         <a href="#basic">基本操作</a>
         <a href="#menu">メニュー機能</a>
-        <a href="#live">リアルタイムプレビュー</a>
         <a href="#config">カスタマイズ</a>
         <a href="#trouble">トラブル対処</a>
     </nav>
@@ -463,46 +461,6 @@
                     <td>要素を削除します。<br><span class="en-sub">Removes the element.</span></td>
                 </tr>
             </table>
-        </section>
-
-        <section id="live">
-            <div class="section-header">
-                <h2>リアルタイムプレビュー</h2>
-                <span class="en">REAL-TIME PREVIEW</span>
-            </div>
-            <p>パーツメニューの <strong>📡 表示更新（別タブに反映）</strong> を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。<br>
-                <span class="en-sub">Click <strong>"📡 Update Display"</strong> in the parts menu to instantly push
-                    your current edits to another tab open on the same URL — handy for keeping an editing tab and a
-                    preview tab side by side.</span></p>
-
-            <div class="note">
-                <strong>条件：2つのタブが同じオリジン（同じURL）で開かれている必要があります。</strong><br>
-                ファイルをダブルクリックして <code>file://</code> で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code> または
-                <code>https://</code> 経由で開いてください。<br>
-                <strong>Requirement: both tabs must share the same origin (same URL).</strong><br>
-                Opening the file directly via <code>file://</code> (double-click) often won't share data between
-                tabs in some browsers. Use <code>http://</code> or <code>https://</code> instead.
-            </div>
-
-            <h3>手元での確認方法（ローカルサーバー） / LOCAL PREVIEW</h3>
-            <ol class="steps">
-                <li>同梱の <code>サーバー起動.bat</code> をダブルクリックする（要 Python）。<br><span class="en-sub">Double-click the
-                        included <code>サーバー起動.bat</code> (requires Python).</span></li>
-                <li>自動でブラウザタブが2つ開く（編集用・確認用、どちらも同じURL）。<br><span class="en-sub">Two browser tabs open
-                        automatically — both point to the same local URL.</span></li>
-                <li>片方のタブで編集し、メニューから <strong>📡 表示更新</strong> を押す。<br><span class="en-sub">Edit in one tab, then click
-                        <strong>📡 Update Display</strong> in the menu.</span></li>
-                <li>もう一方のタブに変更が即座に反映される。<br><span class="en-sub">The other tab updates instantly.</span></li>
-                <li>終わったら、開いたウィンドウで何かキーを押すとローカルサーバーが停止する。<br><span class="en-sub">Press any key in the
-                        console window to stop the local server when done.</span></li>
-            </ol>
-
-            <div class="note">
-                <strong>配信本番では：</strong> OBSの「Custom Browser Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>（例:
-                <code>https://donnma.com/overlay/gaming/gaming.html</code>）を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。<br>
-                <strong>On stream:</strong> If both the OBS "Custom Browser Dock" and the Browser Source point to the
-                <strong>same hosted URL</strong>, this feature works without any local server.
-            </div>
         </section>
 
         <section id="config">

@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-  <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>和 WA オーバーレイ — 説明書</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;500;600&display=swap" rel="stylesheet">
@@ -364,45 +363,6 @@
                 <div class="step-body"><strong>画面リセット</strong> — ページをリロードして初期状態に戻します。保存データは消えません。</div>
             </li>
         </ul>
-    </div>
-
-    <!-- リアルタイムプレビュー -->
-    <div class="section">
-        <div class="section-title">リアルタイムプレビュー / Real-time Preview</div>
-        <div class="card">
-            <div class="card-title">📡 表示更新（別タブに反映）</div>
-            <p>パーツメニューの「表示更新」を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。</p>
-        </div>
-        <div class="card">
-            <div class="card-title">条件：同一オリジン</div>
-            <p>2つのタブが同じオリジン（同じURL）で開かれている必要があります。ファイルをダブルクリックして <code>file://</code> で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code> または <code>https://</code> 経由で開いてください。</p>
-        </div>
-        <ul class="steps">
-            <li>
-                <div class="step-num">1</div>
-                <div class="step-body">同梱の <code>サーバー起動.bat</code> をダブルクリックする（要 Python）。</div>
-            </li>
-            <li>
-                <div class="step-num">2</div>
-                <div class="step-body">自動でブラウザタブが2つ開く（編集用・確認用、どちらも同じURL）。</div>
-            </li>
-            <li>
-                <div class="step-num">3</div>
-                <div class="step-body">片方のタブで編集し、メニューから「表示更新」を押す。</div>
-            </li>
-            <li>
-                <div class="step-num">4</div>
-                <div class="step-body">もう一方のタブに変更が即座に反映される。</div>
-            </li>
-            <li>
-                <div class="step-num">5</div>
-                <div class="step-body">終わったら、開いたウィンドウで何かキーを押すとローカルサーバーが停止する。</div>
-            </li>
-        </ul>
-        <div class="card">
-            <div class="card-title">配信本番では</div>
-            <p>OBSの「Custom Browser Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。</p>
-        </div>
     </div>
 
     <!-- カスタマイズ -->

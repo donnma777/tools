@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CITY POP オーバーレイ — 説明書</title>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --accent: #f59e0b;
+        --sub: #ec4899;
+        --bg: #1c0a00;
+        --card-bg: #261000;
+        --border: rgba(245, 158, 11, 0.25);
+        --text: #fef9e7;
+        --muted: rgba(254, 249, 231, 0.6);
+        --code-bg: rgba(245, 158, 11, 0.08);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 15px;
+        line-height: 1.85;
+        padding: 48px 24px 80px;
+    }
+    .wrap { max-width: 820px; margin: 0 auto; }
+
+    /* ヘッダー */
+    .doc-header {
+        text-align: center;
+        padding: 40px 0 36px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 48px;
+        position: relative;
+    }
+    .doc-header::before, .doc-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        width: 60px; height: 1px;
+        background: var(--accent);
+        box-shadow: 0 0 8px var(--accent);
+    }
+    .doc-header::before { left: 0; }
+    .doc-header::after { right: 0; }
+
+    .doc-eyebrow {
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 11px; font-weight: 700; letter-spacing: 6px;
+        color: var(--sub); margin-bottom: 10px; opacity: 0.9;
+    }
+    .doc-title {
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 34px; font-weight: 700;
+        letter-spacing: 6px;
+        color: var(--accent);
+        margin-bottom: 6px;
+        text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+    }
+    .doc-sub {
+        font-size: 12px; color: var(--muted);
+        letter-spacing: 3px; font-family: 'Josefin Sans', sans-serif;
+    }
+
+    /* セクション */
+    .section { margin-bottom: 44px; }
+    .section-title {
+        font-family: 'Josefin Sans', sans-serif;
+        font-size: 10px; font-weight: 700;
+        color: var(--accent); letter-spacing: 4px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 8px; margin-bottom: 18px;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::before {
+        content: '//';
+        color: var(--sub); font-size: 12px; opacity: 0.7;
+    }
+
+    /* カード */
+    .card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-left: 2px solid var(--accent);
+        padding: 18px 22px; margin-bottom: 14px;
+        box-shadow: 0 0 16px rgba(245, 158, 11, 0.05);
+    }
+    .card-title {
+        font-family: 'Josefin Sans', sans-serif;
+        font-weight: 700; font-size: 12px; letter-spacing: 3px;
+        color: var(--accent); margin-bottom: 8px;
+    }
+    .card p { color: var(--muted); font-size: 14px; }
+
+    /* テーブル */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+    th, td { padding: 10px 14px; text-align: left; font-size: 14px; border-bottom: 1px solid rgba(245,158,11,0.12); }
+    th {
+        font-family: 'Josefin Sans', sans-serif; font-weight: 700;
+        font-size: 10px; letter-spacing: 3px;
+        color: var(--accent); background: rgba(245, 158, 11, 0.04);
+    }
+    td { color: var(--muted); }
+    td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+
+    /* コード */
+    code {
+        font-family: 'Consolas', 'Courier New', monospace;
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        padding: 2px 8px; font-size: 12px;
+        color: var(--accent);
+    }
+
+    /* ステップ */
+    .steps { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .steps li {
+        display: flex; align-items: flex-start; gap: 14px;
+        background: var(--card-bg); border: 1px solid var(--border);
+        padding: 14px 18px;
+    }
+    .step-num {
+        font-family: 'Josefin Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+        color: #1c0a00; background: var(--accent);
+        width: 24px; height: 24px;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; margin-top: 1px;
+        box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+    }
+    .step-body { flex: 1; font-size: 14px; color: var(--muted); }
+    .step-body strong { color: var(--text); }
+
+    /* キーバッジ */
+    .key {
+        display: inline-block;
+        font-family: 'Josefin Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1px;
+        color: var(--accent); background: rgba(245, 158, 11, 0.08);
+        border: 1px solid rgba(245, 158, 11, 0.3); padding: 3px 12px;
+        white-space: nowrap; flex-shrink: 0; min-width: 140px; text-align: center;
+    }
+
+    /* 背景プレビュー */
+    .bg-swatches { display: flex; flex-wrap: wrap; gap: 12px; }
+    .bg-swatch {
+        flex: 1; min-width: 200px;
+        background: var(--card-bg); border: 1px solid var(--border);
+        overflow: hidden;
+    }
+    .bg-swatch-preview { height: 64px; width: 100%; position: relative; overflow: hidden; }
+
+    .bg-city-preview {
+        background: linear-gradient(180deg, #0a0020 0%, #1c0a00 40%, #7c2d00 70%, #d97706 90%, #fbbf24 100%);
+    }
+    .bg-city-preview::after {
+        content: '';
+        position: absolute; bottom: 0; left: 0; right: 0; height: 36px;
+        background: #0d0508;
+        clip-path: polygon(0% 100%, 0% 60%, 4% 60%, 4% 30%, 8% 30%, 8% 50%, 12% 50%, 12% 10%, 18% 10%, 18% 40%, 22% 40%, 22% 20%, 30% 20%, 30% 45%, 34% 45%, 34% 5%, 42% 5%, 42% 35%, 46% 35%, 46% 55%, 52% 55%, 52% 15%, 60% 15%, 60% 42%, 64% 42%, 64% 25%, 72% 25%, 72% 50%, 76% 50%, 76% 8%, 84% 8%, 84% 38%, 90% 38%, 90% 55%, 96% 55%, 96% 28%, 100% 28%, 100% 100%);
+    }
+    .bg-grid-preview {
+        background-image:
+            linear-gradient(rgba(245,158,11,0.15) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(245,158,11,0.15) 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-color: #1c0a00;
+    }
+    .bg-scan-preview {
+        background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(245,158,11,0.08) 2px, rgba(245,158,11,0.08) 4px);
+        background-color: #1c0a00;
+    }
+
+    .bg-swatch-body { padding: 10px 14px 14px; }
+    .bg-swatch-name {
+        font-family: 'Josefin Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px;
+        color: var(--accent); margin-bottom: 3px;
+    }
+    .bg-swatch-desc { font-size: 12px; color: var(--muted); }
+
+    /* カラーパレット */
+    .color-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid rgba(245,158,11,0.1); }
+    .color-row:last-child { border-bottom: none; }
+    .color-chip { width: 36px; height: 36px; flex-shrink: 0; border: 1px solid rgba(245,158,11,0.2); }
+    .color-meta { flex: 1; }
+    .color-name { font-weight: 600; font-size: 14px; color: var(--text); letter-spacing: 1px; }
+    .color-code { font-family: 'Consolas', monospace; font-size: 12px; color: var(--muted); }
+    .color-glow { box-shadow: 0 0 12px rgba(245, 158, 11, 0.35); }
+
+    /* フッター */
+    .doc-footer {
+        text-align: center; margin-top: 60px; padding-top: 28px;
+        border-top: 1px solid var(--border);
+        font-size: 13px; color: var(--muted);
+    }
+    .doc-footer a { color: var(--accent); text-decoration: none; }
+    .doc-footer a:hover { text-shadow: 0 0 8px var(--accent); }
+    .doc-footer .credit {
+        font-family: 'Josefin Sans', sans-serif; font-size: 16px; font-weight: 700;
+        letter-spacing: 4px; color: var(--accent); margin-bottom: 8px;
+        text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+    }
+
+    /* ヒント */
+    .hint {
+        background: rgba(245, 158, 11, 0.05);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        border-left: 2px solid var(--accent);
+        padding: 12px 16px; margin-top: 10px;
+        font-size: 13px; color: var(--muted);
+    }
+    .hint strong { color: var(--text); }
+
+    /* 2カラム */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ネオンライン */
+    .neon-line {
+        height: 1px; background: var(--accent);
+        box-shadow: 0 0 6px var(--accent), 0 0 12px rgba(245,158,11,0.3);
+        margin: 0 0 32px; opacity: 0.6;
+    }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="doc-header">
+        <div class="doc-eyebrow">RETRO CITY POP OVERLAY</div>
+        <div class="doc-title">CITY POP</div>
+        <div class="doc-sub">USER GUIDE — 説明書</div>
+    </div>
+
+    <!-- 概要 -->
+    <div class="section">
+        <div class="section-title">OVERVIEW — 概要</div>
+        <div class="card">
+            <div class="card-title">CITY POP について</div>
+            <p>80年代シティポップにインスパイアされた、レトロネオン配信オーバーレイです。夕暮れの都市シルエット・ゴールドとピンクのネオングロー・CRTスキャンラインが特徴。OBS の「ブラウザソース」に読み込んで使用します。</p>
+        </div>
+        <div class="hint">
+            <strong>推奨設定：</strong> キャンバスサイズ 1920 × 1080 px、OBS ブラウザソース幅 1920・高さ 1080、「OBSと同じ解像度を使用する」を有効に。
+        </div>
+    </div>
+
+    <!-- 基本操作 -->
+    <div class="section">
+        <div class="section-title">CONTROLS — 基本操作</div>
+        <table>
+            <tr><th>操作</th><th>内容</th></tr>
+            <tr><td><span class="key">DOUBLE CLICK</span></td><td>何もない場所でパーツ追加メニューを開く</td></tr>
+            <tr><td><span class="key">HEADER DRAG</span></td><td>ボックスを移動する</td></tr>
+            <tr><td><span class="key">LONG PRESS 0.2s</span></td><td>ボックス内のどこでも長押し → そのままドラッグで移動</td></tr>
+            <tr><td><span class="key">HANDLE DRAG</span></td><td>ホバーで表示されるハンドルをドラッグでリサイズ</td></tr>
+            <tr><td><span class="key">≡ MENU</span></td><td>ボックス右上に出現 → 複製・文字サイズ・色変更・削除</td></tr>
+            <tr><td><span class="key">HEADER TEXT</span></td><td>ヘッダーのテキストはクリックで直接編集できます</td></tr>
+        </table>
+    </div>
+
+    <!-- パーツ一覧 -->
+    <div class="section">
+        <div class="section-title">PARTS — パーツ一覧</div>
+
+        <div class="card">
+            <div class="card-title">HEADER PARTS</div>
+            <table>
+                <tr><th>パーツ名</th><th>説明</th></tr>
+                <tr><td>🔴 配信中バッジ</td><td>点滅する ON AIR バッジ。グラデーション背景で存在感を演出</td></tr>
+                <tr><td>👤 プロフィール欄</td><td>複数行を自動スクロール表示。ダブルクリックで編集</td></tr>
+                <tr><td>✉️ メッセージ入力欄</td><td>自由にテキストを入力できる横長バー</td></tr>
+                <tr><td>🕐 時計（バー埋め込み型）</td><td>ネオングロー付きの日付＋時刻バー</td></tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="card-title">BOX PARTS</div>
+            <table>
+                <tr><th>パーツ名</th><th>説明</th></tr>
+                <tr><td>🕐 時計（独立）</td><td>ネオングロー付きの独立した時計ボックス</td></tr>
+                <tr><td>⏱ ストップウォッチ</td><td>START / STOP / RESET 付きのタイマー</td></tr>
+                <tr><td>🔢 カウンター</td><td>＋／－／RST 付き。ステップ値を変更可能</td></tr>
+                <tr><td>📝 メモボックス</td><td>メモ用テキスト入力ボックス</td></tr>
+                <tr><td>▭ テキスト入力</td><td>ヘッダーなしのシンプルなテキスト欄</td></tr>
+                <tr><td>◻ 図形（四角形）</td><td>リサイズ・色変更できる四角形</td></tr>
+                <tr><td>○ 図形（円）</td><td>リサイズ・色変更できる円形</td></tr>
+                <tr><td>🏷 タイトルボックス</td><td>NOW PLAYING 表示用の大きな文字ボックス（ネオングロー付き）</td></tr>
+                <tr><td>🖼 画像ボックス</td><td>クリックまたはドラッグ＆ドロップで画像を表示</td></tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="card-title">BACKGROUND PARTS</div>
+            <div class="bg-swatches" style="margin-top:8px;">
+                <div class="bg-swatch">
+                    <div class="bg-swatch-preview bg-city-preview"></div>
+                    <div class="bg-swatch-body">
+                        <div class="bg-swatch-name">🌆 CITY SILHOUETTE</div>
+                        <div class="bg-swatch-desc">SVG描画のビル群＋夕焼けグラデーション＋点滅する窓の明かり＋星空</div>
+                    </div>
+                </div>
+                <div class="bg-swatch">
+                    <div class="bg-swatch-preview bg-grid-preview"></div>
+                    <div class="bg-swatch-body">
+                        <div class="bg-swatch-name">▦ GRID</div>
+                        <div class="bg-swatch-desc">アンバーグローの格子模様。レトロな透視図感</div>
+                    </div>
+                </div>
+                <div class="bg-swatch">
+                    <div class="bg-swatch-preview bg-scan-preview"></div>
+                    <div class="bg-swatch-body">
+                        <div class="bg-swatch-name">≡ SCANLINE</div>
+                        <div class="bg-swatch-desc">CRTモニター風のスキャンライン効果</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hint" style="margin-top:14px;">
+                <strong>おすすめ組み合わせ：</strong> シティシルエット ＋ スキャンライン を重ねると本格的なレトロ感が出ます。<br>
+                <strong>≡ メニュー → 削除</strong> で個別に取り除けます。<br>
+                <strong>背景削除</strong> を選ぶとすべての背景パーツが消えます。
+            </div>
+        </div>
+    </div>
+
+    <!-- 保存・読み込み -->
+    <div class="section">
+        <div class="section-title">SAVE / LOAD — 設定の保存と読み込み</div>
+        <ul class="steps">
+            <li>
+                <div class="step-num">1</div>
+                <div class="step-body"><strong>SAVE CONFIG（設定を保存）</strong> — パーツの配置・内容をブラウザのローカルストレージに保存します。次回読み込み時に自動的に復元されます。</div>
+            </li>
+            <li>
+                <div class="step-num">2</div>
+                <div class="step-body"><strong>EXPORT（設定をエクスポート）</strong> — <code>citypop-overlay-config_日時.json</code> としてダウンロードします。バックアップや PC 間の移行に使用できます。</div>
+            </li>
+            <li>
+                <div class="step-num">3</div>
+                <div class="step-body"><strong>IMPORT（設定をインポート）</strong> — エクスポートした JSON ファイルを選択して復元します。</div>
+            </li>
+            <li>
+                <div class="step-num">4</div>
+                <div class="step-body"><strong>RESET（画面リセット）</strong> — ページをリロードして初期状態に戻します。保存データは消えません。</div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- カスタマイズ -->
+    <div class="section">
+        <div class="section-title">CUSTOMIZE — カスタマイズ</div>
+        <div class="card">
+            <div class="card-title">CONFIG ブロック（HTML 内）</div>
+            <p>ファイル上部の <code>const CONFIG = { ... }</code> ブロックを編集することで、色・テキスト・アニメーション速度などを変更できます。</p>
+        </div>
+        <table style="margin-top:0;">
+            <tr><th>設定項目</th><th>初期値</th><th>説明</th></tr>
+            <tr><td><code>color.accent</code></td><td><code>#f59e0b</code></td><td>枠線・時計・ネオングローのメインカラー（ローズゴールド）</td></tr>
+            <tr><td><code>color.sub</code></td><td><code>#ec4899</code></td><td>点滅アイコン・サブネオンカラー（ホットピンク）</td></tr>
+            <tr><td><code>color.liveBadge</code></td><td><code>#c2410c</code></td><td>バッジグラデーションの開始色</td></tr>
+            <tr><td><code>color.background</code></td><td><code>#1c0a00</code></td><td>画面の背景色（深夜ブラウン）</td></tr>
+            <tr><td><code>color.bodyText</code></td><td><code>#fef9e7</code></td><td>コメント・メモの文字色（クリーム）</td></tr>
+            <tr><td><code>text.liveBadge</code></td><td><code>ON AIR</code></td><td>バッジに表示する文字</td></tr>
+            <tr><td><code>text.titleBoxHeader</code></td><td><code>NOW PLAYING</code></td><td>タイトルボックスのヘッダー</td></tr>
+            <tr><td><code>text.commentBoxHeader</code></td><td><code>COMMENT</code></td><td>コメントボックスのヘッダー</td></tr>
+            <tr><td><code>profile</code></td><td>3行の配列</td><td>プロフィール欄に表示する文字列リスト</td></tr>
+            <tr><td><code>animation.neonPulseDuration</code></td><td><code>3s</code></td><td>ネオングローの点滅周期</td></tr>
+            <tr><td><code>animation.starBlinkDuration</code></td><td><code>4s</code></td><td>ビルの窓・星の点滅周期</td></tr>
+            <tr><td><code>features.autoLoad</code></td><td><code>true</code></td><td>ページを開いたとき保存済み設定を自動で読み込む（<code>false</code> にすると手動のみ）</td></tr>
+            <tr><td><code>features.saveConfigEnabled</code></td><td><code>true</code></td><td>設定の保存・読み込み機能を有効にする（<code>false</code> で「設定を保存」ボタン非表示）</td></tr>
+        </table>
+    </div>
+
+    <!-- カラーパレット -->
+    <div class="section">
+        <div class="section-title">PALETTE — カラーパレット</div>
+        <div class="card">
+            <div class="color-row">
+                <div class="color-chip color-glow" style="background:#f59e0b;"></div>
+                <div class="color-meta">
+                    <div class="color-name">ROSE GOLD（メインアクセント）</div>
+                    <div class="color-code">#f59e0b</div>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-chip" style="background:#ec4899;box-shadow:0 0 12px rgba(236,72,153,0.4);"></div>
+                <div class="color-meta">
+                    <div class="color-name">NEON PINK（サブ・点滅アイコン）</div>
+                    <div class="color-code">#ec4899</div>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-chip" style="background:#c2410c;"></div>
+                <div class="color-meta">
+                    <div class="color-name">SUNSET（バッジグラデーション）</div>
+                    <div class="color-code">#c2410c</div>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-chip" style="background:#1c0a00;border:1px solid rgba(245,158,11,0.3);"></div>
+                <div class="color-meta">
+                    <div class="color-name">MIDNIGHT BROWN（背景）</div>
+                    <div class="color-code">#1c0a00</div>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-chip" style="background:#fef9e7;"></div>
+                <div class="color-meta">
+                    <div class="color-name">CREAM（本文テキスト）</div>
+                    <div class="color-code">#fef9e7</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OBS設定 -->
+    <div class="section">
+        <div class="section-title">OBS SETUP — OBS 設定</div>
+        <ul class="steps">
+            <li>
+                <div class="step-num">1</div>
+                <div class="step-body">OBS の <strong>ソース追加 → ブラウザ</strong> を選択し、<strong>「ローカルファイル」</strong> にチェックを入れる</div>
+            </li>
+            <li>
+                <div class="step-num">2</div>
+                <div class="step-body"><code>citypop.html</code> を選択する（このフォルダ内のファイル）</div>
+            </li>
+            <li>
+                <div class="step-num">3</div>
+                <div class="step-body">幅 <strong>1920</strong>、高さ <strong>1080</strong> に設定する</div>
+            </li>
+            <li>
+                <div class="step-num">4</div>
+                <div class="step-body"><strong>「OBSと同じ解像度を使用する」</strong> を有効にする（推奨）</div>
+            </li>
+            <li>
+                <div class="step-num">5</div>
+                <div class="step-body">ソースを右クリック → <strong>「インタラクト」</strong> でブラウザ内を操作できます</div>
+            </li>
+        </ul>
+        <div class="hint">
+            <strong>背景を透明にする場合：</strong>「カスタム CSS」欄に <code>body { background-color: transparent !important; }</code> を追加し、「ページが表示されていない場合にソースをシャットダウン」のチェックを外してください。
+        </div>
+    </div>
+
+    <!-- フォント -->
+    <div class="section">
+        <div class="section-title">FONTS — 使用フォント</div>
+        <div class="two-col">
+            <div class="card">
+                <div class="card-title">JOSEFIN SANS</div>
+                <p>ヘッダー・バッジ・ラベルに使用。幾何学的でレトロ感のある大文字書体。80年代の雰囲気を演出。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">DM SANS</div>
+                <p>本文・入力テキストに使用。クリーンで可読性の高いモダンサンセリフ。</p>
+            </div>
+        </div>
+        <div class="hint">フォントはGoogle Fontsから読み込みます。オフライン環境ではシステムのデフォルトフォントが使用されます。</div>
+    </div>
+
+    <!-- フッター -->
+    <div class="doc-footer">
+        <div class="neon-line"></div>
+        <div class="credit">DONNMA</div>
+        <p>WEB: <a href="https://donnma.com/" target="_blank">donnma.com</a> &nbsp;/&nbsp; X: <a href="https://twitter.com/donnma777" target="_blank">@donnma777</a></p>
+        <p style="margin-top:8px;font-size:11px;letter-spacing:2px;opacity:0.45;font-family:'Josefin Sans',sans-serif;">CITY POP STREAM OVERLAY — RETRO CITY NIGHT</p>
+        <p style="margin-top:6px;font-size:12px;opacity:0.45;">注意：二次配布および改変しての配布を禁じます。</p>
+    </div>
+
+</div>
+</body>
+</html>
