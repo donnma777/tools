@@ -160,6 +160,7 @@
 
         #capture-area {
             position: relative;
+            transform-origin: top left;
         }
 
         /* ---- コーナー装飾 ---- */
@@ -1755,6 +1756,19 @@
         document.body.style.height = CONFIG.layout.height + 'px';
         captureArea.style.width = CONFIG.layout.width + 'px';
         captureArea.style.height = CONFIG.layout.height + 'px';
+
+        // プレビュー用：ウィンドウがCONFIG.layoutより小さい場合、見た目だけ縮小して収める
+        // （中身のpx座標系には触れないため、縮小表示中のドラッグ編集は非推奨）
+        function fitPreviewToWindow() {
+            const w = CONFIG.layout.width;
+            const h = CONFIG.layout.height;
+            const scale = Math.min(window.innerWidth / w, window.innerHeight / h, 1);
+            captureArea.style.transform = scale < 1 ? `scale(${scale})` : '';
+            document.body.style.width = (w * scale) + 'px';
+            document.body.style.height = (h * scale) + 'px';
+        }
+        window.addEventListener('resize', fitPreviewToWindow);
+        fitPreviewToWindow();
 
         document.querySelector('.live-badge').style.background = CONFIG.color.liveBadge;
         document.getElementById('live-badge-text').value = CONFIG.text.liveBadge;
