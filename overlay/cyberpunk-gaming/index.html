@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-  <meta name="robots" content="noindex">
+    <meta name="robots">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link
         href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;700&family=Noto+Sans+JP:wght@700&display=swap"
@@ -470,14 +470,17 @@
                 <h2>リアルタイムプレビュー</h2>
                 <span class="en">REAL-TIME PREVIEW</span>
             </div>
-            <p>パーツメニューの <strong>📡 表示更新（別タブに反映）</strong> を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。<br>
+            <p>パーツメニューの <strong>📡 表示更新（別タブに反映）</strong>
+                を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。<br>
                 <span class="en-sub">Click <strong>"📡 Update Display"</strong> in the parts menu to instantly push
                     your current edits to another tab open on the same URL — handy for keeping an editing tab and a
-                    preview tab side by side.</span></p>
+                    preview tab side by side.</span>
+            </p>
 
             <div class="note">
                 <strong>条件：2つのタブが同じオリジン（同じURL）で開かれている必要があります。</strong><br>
-                ファイルをダブルクリックして <code>file://</code> で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code> または
+                ファイルをダブルクリックして <code>file://</code> で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code>
+                または
                 <code>https://</code> 経由で開いてください。<br>
                 <strong>Requirement: both tabs must share the same origin (same URL).</strong><br>
                 Opening the file directly via <code>file://</code> (double-click) often won't share data between
@@ -498,7 +501,20 @@
             </ol>
 
             <div class="note">
-                <strong>配信本番では：</strong> OBSの「Custom Browser Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。<br>
+                <strong>Pythonが必要です：</strong> このPCにPythonが入っていない場合、<code>サーバー起動.bat</code>
+                を実行してもエラーになります。<a href="https://www.python.org/downloads/" target="_blank"
+                    rel="noopener">python.org</a>
+                からダウンロード・インストールしてください（インストール時に「Add python.exe to PATH」に必ずチェック）。インストール後、
+                <code>サーバー起動.bat</code> を再度実行すれば起動します。<br>
+                <strong>Python required:</strong> If Python isn't installed on this PC, <code>サーバー起動.bat</code>
+                will fail. Install it from <a href="https://www.python.org/downloads/" target="_blank"
+                    rel="noopener">python.org</a> (check "Add python.exe to PATH" during setup), then run the file
+                again.
+            </div>
+
+            <div class="note">
+                <strong>配信本番では：</strong> OBSの「Custom Browser
+                Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。<br>
                 <strong>On stream:</strong> If both the OBS "Custom Browser Dock" and the Browser Source point to the
                 <strong>same hosted URL</strong>, this feature works without any local server.
             </div>
@@ -582,12 +598,16 @@
                 </tr>
                 <tr>
                     <td><code>features.autoLoad</code></td>
-                    <td>ページを開いたとき保存済み設定を自動で読み込む。<br><code>false</code> にすると「保存を読み込む」を手動で押す必要があります。<br><span class="en-sub">Auto-load saved config on page open. Set <code>false</code> for manual load only.</span></td>
+                    <td>ページを開いたとき保存済み設定を自動で読み込む。<br><code>false</code> にすると「保存を読み込む」を手動で押す必要があります。<br><span
+                            class="en-sub">Auto-load saved config on page open. Set <code>false</code> for manual load
+                            only.</span></td>
                     <td><code>true</code></td>
                 </tr>
                 <tr>
                     <td><code>features.saveConfigEnabled</code></td>
-                    <td>設定の保存・読み込み機能を有効にする。<br><code>false</code> にすると「設定を保存」ボタンが非表示になります。<br><span class="en-sub">Enable save/load config. Set <code>false</code> to hide the save button.</span></td>
+                    <td>設定の保存・読み込み機能を有効にする。<br><code>false</code> にすると「設定を保存」ボタンが非表示になります。<br><span
+                            class="en-sub">Enable save/load config. Set <code>false</code> to hide the save
+                            button.</span></td>
                     <td><code>true</code></td>
                 </tr>
             </table>

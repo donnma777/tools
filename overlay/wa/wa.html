@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-  <meta name="robots" content="noindex">
-    <meta name="description" content="OBS Studio用和風ローズ配信オーバーレイ。落ち着いた和の雰囲気あるデザインで1920×1080対応。ドラッグ＆ドロップで自由にカスタマイズ可能。配信者donnma制作。">
+    <meta name="robots">
+    <meta name="description"
+        content="OBS Studio用和風ローズ配信オーバーレイ。落ち着いた和の雰囲気あるデザインで1920×1080対応。ドラッグ＆ドロップで自由にカスタマイズ可能。配信者donnma制作。">
     <meta property="og:title" content="OBS配信オーバーレイ 和風 WA テーマ | donnma">
     <meta property="og:description" content="OBS Studio用和風ローズ配信オーバーレイ。落ち着いた和の雰囲気あるデザインで1920×1080対応。">
     <meta property="og:type" content="website">
@@ -271,7 +272,8 @@
             background: rgba(255, 250, 245, 0.96);
         }
 
-        #profile-display-area, .profile-display-area {
+        #profile-display-area,
+        .profile-display-area {
             white-space: nowrap;
             font-size: 17px;
             font-weight: 600;
@@ -1389,10 +1391,15 @@
             font-variant-numeric: tabular-nums;
         }
 
-        .hdr-float-time, .hdr-float-date {
+        .hdr-float-time,
+        .hdr-float-date {
             display: inline-block;
         }
-        .clock-time, .clock-date, .hdr-float-time, .hdr-float-date {
+
+        .clock-time,
+        .clock-date,
+        .hdr-float-time,
+        .hdr-float-date {
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
         }
@@ -1692,7 +1699,8 @@
                         class="help-desc">設定をJSONファイルとしてダウンロード</span></div>
                 <div class="help-row"><span class="help-key">インポート</span><span class="help-desc">保存したJSONを読み込んで復元</span>
                 </div>
-                <div class="help-row"><span class="help-key">表示更新</span><span class="help-desc">同じURLを別タブで開いている場合、その画面へ即座に反映（同一オリジンで開く必要あり）</span>
+                <div class="help-row"><span class="help-key">表示更新</span><span
+                        class="help-desc">同じURLを別タブで開いている場合、その画面へ即座に反映（同一オリジンで開く必要あり）</span>
                 </div>
                 <div class="help-section">推奨設定</div>
                 <div class="help-row"><span class="help-key">推奨サイズ</span><span class="help-desc">1920 × 1080 px</span>
@@ -2871,7 +2879,7 @@
                     const a = parseInt(alphaSlider.value) / 100;
                     let rgba = cInput.value;
                     if (a < 1) {
-                        const r = parseInt(rgba.slice(1,3), 16), g = parseInt(rgba.slice(3,5), 16), b = parseInt(rgba.slice(5,7), 16);
+                        const r = parseInt(rgba.slice(1, 3), 16), g = parseInt(rgba.slice(3, 5), 16), b = parseInt(rgba.slice(5, 7), 16);
                         rgba = `rgba(${r},${g},${b},${a.toFixed(2)})`;
                     }
                     if (panel === tcSubPanel) {

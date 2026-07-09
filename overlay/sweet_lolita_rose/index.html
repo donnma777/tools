@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-  <meta name="robots" content="noindex">
+    <meta name="robots">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;900&family=Quicksand:wght@600;700&display=swap"
@@ -329,7 +329,8 @@
                 </li>
                 <li>「ソース」パネルの <strong>＋</strong> をクリックし、<strong>「ブラウザ」</strong> を選択する。<br><span class="en-sub">Click
                         <strong>+</strong> in Sources and choose <strong>Browser</strong>.</span></li>
-                <li><strong>「ローカルファイル」</strong> にチェックを入れ、<code>sweet_lolita_rose.html</code> を選択する。<br><span class="en-sub">Check
+                <li><strong>「ローカルファイル」</strong> にチェックを入れ、<code>sweet_lolita_rose.html</code> を選択する。<br><span
+                        class="en-sub">Check
                         <strong>"Local File"</strong> and browse to <code>sweet_lolita_rose.html</code>.</span></li>
                 <li>幅: <strong>1920</strong>、高さ: <strong>1080</strong> に設定する。<br><span class="en-sub">Set Width:
                         <strong>1920</strong>, Height: <strong>1080</strong>.</span></li>
@@ -382,7 +383,8 @@
                 <div class="feature-card">
                     <div class="icon">✋</div>
                     <h4>ボックス移動</h4>
-                    <p>ヘッダーをドラッグ、またはボックス内を長押し（約0.2秒）してからドラッグで移動できます。<br>Drag the header, or long-press inside the box to move it.</p>
+                    <p>ヘッダーをドラッグ、またはボックス内を長押し（約0.2秒）してからドラッグで移動できます。<br>Drag the header, or long-press inside the box to
+                        move it.</p>
                 </div>
                 <div class="feature-card">
                     <div class="icon">☰</div>
@@ -420,7 +422,8 @@
                 </tr>
                 <tr>
                     <td>背景パーツ<br><code>Background Parts</code></td>
-                    <td>テーマ専用の背景装飾を追加します。<br><span class="en-sub">Adds decorative background effects unique to this theme.</span>
+                    <td>テーマ専用の背景装飾を追加します。<br><span class="en-sub">Adds decorative background effects unique to this
+                            theme.</span>
                         <ul style="margin-top:8px;padding-left:18px;font-size:13px;line-height:2">
                             <li><strong>✦ 流れ星・キラキラ / Stars</strong></li>
                             <li><strong>🌈 オーロラ / Aurora</strong></li>
@@ -475,14 +478,17 @@
                 <h2>リアルタイムプレビュー</h2>
                 <span class="en">REAL-TIME PREVIEW</span>
             </div>
-            <p>パーツメニューの <strong>📡 表示更新（別タブに反映）</strong> を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。<br>
+            <p>パーツメニューの <strong>📡 表示更新（別タブに反映）</strong>
+                を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。<br>
                 <span class="en-sub">Click <strong>"📡 Update Display"</strong> in the parts menu to instantly push
                     your current edits to another tab open on the same URL — handy for keeping an editing tab and a
-                    preview tab side by side.</span></p>
+                    preview tab side by side.</span>
+            </p>
 
             <div class="note">
                 <strong>条件：2つのタブが同じオリジン（同じURL）で開かれている必要があります。</strong><br>
-                ファイルをダブルクリックして <code>file://</code> で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code> または
+                ファイルをダブルクリックして <code>file://</code> で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code>
+                または
                 <code>https://</code> 経由で開いてください。<br>
                 <strong>Requirement: both tabs must share the same origin (same URL).</strong><br>
                 Opening the file directly via <code>file://</code> (double-click) often won't share data between
@@ -503,7 +509,20 @@
             </ol>
 
             <div class="note">
-                <strong>配信本番では：</strong> OBSの「Custom Browser Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。<br>
+                <strong>Pythonが必要です：</strong> このPCにPythonが入っていない場合、<code>サーバー起動.bat</code>
+                を実行してもエラーになります。<a href="https://www.python.org/downloads/" target="_blank"
+                    rel="noopener">python.org</a>
+                からダウンロード・インストールしてください（インストール時に「Add python.exe to PATH」に必ずチェック）。インストール後、
+                <code>サーバー起動.bat</code> を再度実行すれば起動します。<br>
+                <strong>Python required:</strong> If Python isn't installed on this PC, <code>サーバー起動.bat</code>
+                will fail. Install it from <a href="https://www.python.org/downloads/" target="_blank"
+                    rel="noopener">python.org</a> (check "Add python.exe to PATH" during setup), then run the file
+                again.
+            </div>
+
+            <div class="note">
+                <strong>配信本番では：</strong> OBSの「Custom Browser
+                Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。<br>
                 <strong>On stream:</strong> If both the OBS "Custom Browser Dock" and the Browser Source point to the
                 <strong>same hosted URL</strong>, this feature works without any local server.
             </div>
@@ -518,32 +537,32 @@
                     file in a text editor and edit the <code>CONFIG</code> block near the top.</span></p>
 
             <div class="code-block">const CONFIG = {
-  color: {
-    accent: '#ea92c1',    // メインカラー（枠線・発光） / Main color
-    liveBadge: '#df6ba6', // LIVEバッジ色 / LIVE badge color
-    background: '#fff0f7',// 背景色 / Background color
-    bodyText: '#7a4d6a',  // テキスト色 / Text color
-  },
-  text: {
-    liveBadge: 'LIVE',
-    titleBoxHeader: 'SWEET LOLITA',
-    titleBoxContent: 'ふんわり甘ロリ配信へようこそ♡',
-    commentBoxHeader: 'MESSAGE',
-    memoBoxHeader: 'MEMO',
-    memoBoxContent: 'ダブルクリックでメニューを開けるよ',
-    messagePlaceholder: 'メルヘンなコメントを入れてね',
-    memoPlaceholder: 'メモを書く...',
-  },
-  profile: [
-    'あなたの名前 / Your Name',
-    'WEB: yourwebsite.com',
-    'X: @yourhandle',
-    // 行を追加するほど増やせます / Add more lines freely
-  ],
-  animation: {
-    profileInterval: 3000, // プロフィール切替間隔(ms)
-  },
-};</div>
+                color: {
+                accent: '#ea92c1', // メインカラー（枠線・発光） / Main color
+                liveBadge: '#df6ba6', // LIVEバッジ色 / LIVE badge color
+                background: '#fff0f7',// 背景色 / Background color
+                bodyText: '#7a4d6a', // テキスト色 / Text color
+                },
+                text: {
+                liveBadge: 'LIVE',
+                titleBoxHeader: 'SWEET LOLITA',
+                titleBoxContent: 'ふんわり甘ロリ配信へようこそ♡',
+                commentBoxHeader: 'MESSAGE',
+                memoBoxHeader: 'MEMO',
+                memoBoxContent: 'ダブルクリックでメニューを開けるよ',
+                messagePlaceholder: 'メルヘンなコメントを入れてね',
+                memoPlaceholder: 'メモを書く...',
+                },
+                profile: [
+                'あなたの名前 / Your Name',
+                'WEB: yourwebsite.com',
+                'X: @yourhandle',
+                // 行を追加するほど増やせます / Add more lines freely
+                ],
+                animation: {
+                profileInterval: 3000, // プロフィール切替間隔(ms)
+                },
+                };</div>
 
             <h3>カラー設定 / COLOR SETTINGS</h3>
             <table>
@@ -578,13 +597,14 @@
             <p>上部バーに順番に表示されるテキストの配列です。<br><span class="en-sub">An array of texts displayed in rotation in the top
                     bar.</span></p>
             <div class="code-block">profile: [
-  '配信者名',
-  'GAME: タイトル',
-  'X: @yourhandle',
-  // 行を追加するほど増やせます / Add more lines freely
-],</div>
+                '配信者名',
+                'GAME: タイトル',
+                'X: @yourhandle',
+                // 行を追加するほど増やせます / Add more lines freely
+                ],</div>
             <div class="note">
-                <strong>ヒント:</strong> 色はHEX（<code>#ea92c1</code>）またはRGBA（<code>rgba(234,146,193,0.5)</code>）形式で指定できます。<br>
+                <strong>ヒント:</strong>
+                色はHEX（<code>#ea92c1</code>）またはRGBA（<code>rgba(234,146,193,0.5)</code>）形式で指定できます。<br>
                 <strong>Tip:</strong> Colors accept HEX or RGBA format.
             </div>
 
@@ -597,12 +617,16 @@
                 </tr>
                 <tr>
                     <td><code>features.autoLoad</code></td>
-                    <td>ページを開いたとき保存済み設定を自動で読み込む。<br><code>false</code> にすると「保存を読み込む」を手動で押す必要があります。<br><span class="en-sub">Auto-load saved config on page open. Set <code>false</code> for manual load only.</span></td>
+                    <td>ページを開いたとき保存済み設定を自動で読み込む。<br><code>false</code> にすると「保存を読み込む」を手動で押す必要があります。<br><span
+                            class="en-sub">Auto-load saved config on page open. Set <code>false</code> for manual load
+                            only.</span></td>
                     <td><code>true</code></td>
                 </tr>
                 <tr>
                     <td><code>features.saveConfigEnabled</code></td>
-                    <td>設定の保存・読み込み機能を有効にする。<br><code>false</code> にすると「設定を保存」ボタンが非表示になります。<br><span class="en-sub">Enable save/load config. Set <code>false</code> to hide the save button.</span></td>
+                    <td>設定の保存・読み込み機能を有効にする。<br><code>false</code> にすると「設定を保存」ボタンが非表示になります。<br><span
+                            class="en-sub">Enable save/load config. Set <code>false</code> to hide the save
+                            button.</span></td>
                     <td><code>true</code></td>
                 </tr>
             </table>

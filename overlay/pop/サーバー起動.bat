@@ -2,6 +2,18 @@
 cd /d "%~dp0"
 title Overlay Local Server
 
+where python >nul 2>nul
+if errorlevel 1 (
+    echo Python was not found on this PC.
+    echo This tool needs Python to run a local preview server.
+    echo Download and install it from: https://www.python.org/downloads/
+    echo ^(Be sure to check "Add python.exe to PATH" during setup^)
+    echo.
+    echo After installing Python, run this file again.
+    pause
+    exit /b 1
+)
+
 echo Starting local server...
 start "overlay-local-server" /min python -m http.server 8080
 

@@ -1,538 +1,852 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-<meta charset="UTF-8">
-  <meta name="robots" content="noindex">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>POP ★ オーバーレイ — 説明書</title>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-    :root {
-        --accent: #7ec8e3;
-        --accent-dark: #3a8bb5;
-        --sub: #ff9ecb;
-        --bg: #f0faff;
-        --card-bg: #ffffff;
-        --border: rgba(126, 200, 227, 0.3);
-        --text: #2a6080;
-        --muted: #5a9ab5;
-        --code-bg: rgba(126, 200, 227, 0.08);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-        background: var(--bg);
-        color: var(--text);
-        font-family: 'Nunito', sans-serif;
-        font-size: 15px;
-        line-height: 1.85;
-        padding: 48px 24px 80px;
-    }
-    .wrap { max-width: 820px; margin: 0 auto; }
+    <meta charset="UTF-8">
+    <meta name="robots">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POP ★ オーバーレイ — 説明書</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --accent: #7ec8e3;
+            --accent-dark: #3a8bb5;
+            --sub: #ff9ecb;
+            --bg: #f0faff;
+            --card-bg: #ffffff;
+            --border: rgba(126, 200, 227, 0.3);
+            --text: #2a6080;
+            --muted: #5a9ab5;
+            --code-bg: rgba(126, 200, 227, 0.08);
+        }
 
-    /* ヘッダー */
-    .doc-header {
-        text-align: center;
-        padding: 40px 0 36px;
-        border-bottom: 2px solid var(--border);
-        margin-bottom: 48px;
-    }
-    .doc-deco {
-        font-size: 32px;
-        margin-bottom: 10px;
-        letter-spacing: 6px;
-    }
-    .doc-title {
-        font-family: 'Quicksand', sans-serif;
-        font-size: 30px;
-        font-weight: 700;
-        color: var(--accent-dark);
-        margin-bottom: 6px;
-        letter-spacing: 2px;
-    }
-    .doc-title span { color: var(--sub); }
-    .doc-sub {
-        font-size: 13px;
-        color: var(--muted);
-        font-weight: 600;
-        letter-spacing: 1px;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* セクション */
-    .section { margin-bottom: 44px; }
-    .section-title {
-        font-family: 'Quicksand', sans-serif;
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--accent-dark);
-        letter-spacing: 2px;
-        border-bottom: 2px solid var(--border);
-        padding-bottom: 8px;
-        margin-bottom: 18px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .section-title .icon { font-size: 16px; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Nunito', sans-serif;
+            font-size: 15px;
+            line-height: 1.85;
+            padding: 48px 24px 80px;
+        }
 
-    /* カード */
-    .card {
-        background: var(--card-bg);
-        border: 2px solid var(--border);
-        border-radius: 16px;
-        padding: 20px 24px;
-        margin-bottom: 14px;
-        box-shadow: 0 3px 12px rgba(126, 200, 227, 0.1);
-    }
-    .card-title {
-        font-family: 'Quicksand', sans-serif;
-        font-weight: 700;
-        font-size: 15px;
-        color: var(--accent-dark);
-        margin-bottom: 8px;
-    }
-    .card p { color: var(--muted); font-size: 14px; }
+        .wrap {
+            max-width: 820px;
+            margin: 0 auto;
+        }
 
-    /* テーブル */
-    table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
-    th, td { padding: 10px 14px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--border); }
-    th {
-        font-family: 'Quicksand', sans-serif;
-        font-weight: 700; font-size: 12px;
-        color: var(--accent-dark); letter-spacing: 1px;
-        background: rgba(126, 200, 227, 0.06);
-    }
-    td { color: var(--muted); }
-    td:first-child { color: var(--text); font-weight: 700; white-space: nowrap; }
-    tr:last-child td { border-bottom: none; }
+        /* ヘッダー */
+        .doc-header {
+            text-align: center;
+            padding: 40px 0 36px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 48px;
+        }
 
-    /* コード */
-    code {
-        font-family: 'Consolas', 'Courier New', monospace;
-        background: var(--code-bg);
-        border: 1px solid var(--border);
-        padding: 2px 8px;
-        font-size: 12px;
-        color: var(--accent-dark);
-        border-radius: 8px;
-    }
+        .doc-deco {
+            font-size: 32px;
+            margin-bottom: 10px;
+            letter-spacing: 6px;
+        }
 
-    /* ステップ */
-    .steps { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .steps li {
-        display: flex; align-items: flex-start; gap: 14px;
-        background: var(--card-bg); border: 2px solid var(--border);
-        border-radius: 14px; padding: 14px 18px;
-        box-shadow: 0 2px 8px rgba(126, 200, 227, 0.08);
-    }
-    .step-num {
-        font-family: 'Quicksand', sans-serif;
-        font-size: 12px; font-weight: 700;
-        color: #fff;
-        background: var(--accent);
-        width: 24px; height: 24px;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 10px; flex-shrink: 0; margin-top: 1px;
-        box-shadow: 0 2px 6px rgba(126, 200, 227, 0.35);
-    }
-    .step-body { flex: 1; font-size: 14px; color: var(--muted); }
-    .step-body strong { color: var(--text); }
+        .doc-title {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            margin-bottom: 6px;
+            letter-spacing: 2px;
+        }
 
-    /* キーバッジ */
-    .key {
-        display: inline-block;
-        font-family: 'Quicksand', sans-serif;
-        font-size: 11px; font-weight: 700;
-        color: var(--accent-dark);
-        background: rgba(126, 200, 227, 0.1);
-        border: 2px solid rgba(126, 200, 227, 0.35);
-        padding: 3px 12px; border-radius: 12px;
-        white-space: nowrap; flex-shrink: 0; min-width: 140px; text-align: center;
-    }
+        .doc-title span {
+            color: var(--sub);
+        }
 
-    /* 背景プレビュー */
-    .bg-swatches { display: flex; flex-wrap: wrap; gap: 12px; }
-    .bg-swatch {
-        flex: 1; min-width: 180px;
-        background: var(--card-bg);
-        border: 2px solid var(--border);
-        border-radius: 14px; overflow: hidden;
-        box-shadow: 0 3px 10px rgba(126, 200, 227, 0.1);
-    }
-    .bg-swatch-preview { height: 56px; width: 100%; }
-    .bg-swatch-stripe {
-        background: repeating-linear-gradient(
-            -45deg,
-            #f0faff,
-            #f0faff 14px,
-            rgba(126, 200, 227, 0.12) 14px,
-            rgba(126, 200, 227, 0.12) 15px
-        );
-    }
-    .bg-swatch-stars {
-        background: #f0faff;
-        display: flex; align-items: center; justify-content: space-around;
-        font-size: 18px; padding: 0 8px;
-    }
-    .bg-swatch-dots {
-        background-image: radial-gradient(circle, rgba(126,200,227,0.3) 2px, transparent 2px);
-        background-size: 18px 18px;
-        background-color: #f0faff;
-    }
-    .bg-swatch-gradient {
-        background:
-            radial-gradient(ellipse at 20% 30%, rgba(255,158,203,0.3) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 70%, rgba(126,200,227,0.3) 0%, transparent 50%),
-            #f0faff;
-    }
-    .bg-swatch-body { padding: 10px 14px 14px; }
-    .bg-swatch-name {
-        font-family: 'Quicksand', sans-serif;
-        font-size: 13px; font-weight: 700;
-        color: var(--accent-dark); margin-bottom: 2px;
-    }
-    .bg-swatch-desc { font-size: 12px; color: var(--muted); }
+        .doc-sub {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
 
-    /* カラーパレット */
-    .color-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .color-row:last-child { border-bottom: none; }
-    .color-chip { width: 36px; height: 36px; border-radius: 12px; flex-shrink: 0; border: 2px solid rgba(0,0,0,0.06); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-    .color-meta { flex: 1; }
-    .color-name { font-weight: 700; font-size: 14px; color: var(--text); }
-    .color-code { font-family: 'Consolas', monospace; font-size: 12px; color: var(--muted); }
+        /* セクション */
+        .section {
+            margin-bottom: 44px;
+        }
 
-    /* フッター */
-    .doc-footer {
-        text-align: center;
-        margin-top: 60px; padding-top: 28px;
-        border-top: 2px solid var(--border);
-        font-size: 13px; color: var(--muted);
-    }
-    .doc-footer a { color: var(--accent-dark); text-decoration: none; }
-    .doc-footer a:hover { text-decoration: underline; }
-    .doc-footer .credit {
-        font-family: 'Quicksand', sans-serif;
-        font-size: 16px; font-weight: 700;
-        color: var(--accent-dark); margin-bottom: 6px;
-    }
+        .section-title {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            letter-spacing: 2px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    /* ヒント */
-    .hint {
-        background: rgba(126, 200, 227, 0.07);
-        border: 2px solid rgba(126, 200, 227, 0.25);
-        border-left: 4px solid var(--accent);
-        padding: 12px 16px; margin-top: 10px;
-        font-size: 13px; color: var(--muted); border-radius: 0 12px 12px 0;
-    }
-    .hint strong { color: var(--text); }
+        .section-title .icon {
+            font-size: 16px;
+        }
 
-    /* 2カラム */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+        /* カード */
+        .card {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 14px;
+            box-shadow: 0 3px 12px rgba(126, 200, 227, 0.1);
+        }
 
-    /* タグ */
-    .tag {
-        display: inline-block;
-        background: rgba(255, 158, 203, 0.15);
-        border: 1px solid rgba(255, 158, 203, 0.4);
-        color: #d06090;
-        font-family: 'Quicksand', sans-serif;
-        font-size: 10px; font-weight: 700;
-        padding: 1px 8px; border-radius: 8px;
-        margin-left: 6px; vertical-align: middle;
-    }
-</style>
+        .card-title {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--accent-dark);
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* テーブル */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--accent-dark);
+            letter-spacing: 1px;
+            background: rgba(126, 200, 227, 0.06);
+        }
+
+        td {
+            color: var(--muted);
+        }
+
+        td:first-child {
+            color: var(--text);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* コード */
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            padding: 2px 8px;
+            font-size: 12px;
+            color: var(--accent-dark);
+            border-radius: 8px;
+        }
+
+        /* ステップ */
+        .steps {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .steps li {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 18px;
+            box-shadow: 0 2px 8px rgba(126, 200, 227, 0.08);
+        }
+
+        .step-num {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--accent);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            flex-shrink: 0;
+            margin-top: 1px;
+            box-shadow: 0 2px 6px rgba(126, 200, 227, 0.35);
+        }
+
+        .step-body {
+            flex: 1;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .step-body strong {
+            color: var(--text);
+        }
+
+        /* キーバッジ */
+        .key {
+            display: inline-block;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            background: rgba(126, 200, 227, 0.1);
+            border: 2px solid rgba(126, 200, 227, 0.35);
+            padding: 3px 12px;
+            border-radius: 12px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        /* 背景プレビュー */
+        .bg-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .bg-swatch {
+            flex: 1;
+            min-width: 180px;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(126, 200, 227, 0.1);
+        }
+
+        .bg-swatch-preview {
+            height: 56px;
+            width: 100%;
+        }
+
+        .bg-swatch-stripe {
+            background: repeating-linear-gradient(-45deg,
+                    #f0faff,
+                    #f0faff 14px,
+                    rgba(126, 200, 227, 0.12) 14px,
+                    rgba(126, 200, 227, 0.12) 15px);
+        }
+
+        .bg-swatch-stars {
+            background: #f0faff;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            font-size: 18px;
+            padding: 0 8px;
+        }
+
+        .bg-swatch-dots {
+            background-image: radial-gradient(circle, rgba(126, 200, 227, 0.3) 2px, transparent 2px);
+            background-size: 18px 18px;
+            background-color: #f0faff;
+        }
+
+        .bg-swatch-gradient {
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(255, 158, 203, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(126, 200, 227, 0.3) 0%, transparent 50%),
+                #f0faff;
+        }
+
+        .bg-swatch-body {
+            padding: 10px 14px 14px;
+        }
+
+        .bg-swatch-name {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            margin-bottom: 2px;
+        }
+
+        .bg-swatch-desc {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* カラーパレット */
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .color-row:last-child {
+            border-bottom: none;
+        }
+
+        .color-chip {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            border: 2px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .color-meta {
+            flex: 1;
+        }
+
+        .color-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .color-code {
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* フッター */
+        .doc-footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 28px;
+            border-top: 2px solid var(--border);
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .doc-footer a {
+            color: var(--accent-dark);
+            text-decoration: none;
+        }
+
+        .doc-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .doc-footer .credit {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            margin-bottom: 6px;
+        }
+
+        /* ヒント */
+        .hint {
+            background: rgba(126, 200, 227, 0.07);
+            border: 2px solid rgba(126, 200, 227, 0.25);
+            border-left: 4px solid var(--accent);
+            padding: 12px 16px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--muted);
+            border-radius: 0 12px 12px 0;
+        }
+
+        .hint strong {
+            color: var(--text);
+        }
+
+        /* 2カラム */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* タグ */
+        .tag {
+            display: inline-block;
+            background: rgba(255, 158, 203, 0.15);
+            border: 1px solid rgba(255, 158, 203, 0.4);
+            color: #d06090;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 8px;
+            border-radius: 8px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+    </style>
 </head>
+
 <body>
-<div class="wrap">
+    <div class="wrap">
 
-    <div class="doc-header">
-        <div class="doc-deco">★ ✦ ★ ✦ ★</div>
-        <div class="doc-title">POP <span>★</span> 説明書</div>
-        <div class="doc-sub">Pop Kawaii Stream Overlay — User Guide</div>
-    </div>
-
-    <!-- 概要 -->
-    <div class="section">
-        <div class="section-title"><span class="icon">✨</span> 概要 / Overview</div>
-        <div class="card">
-            <div class="card-title">POP ★ について</div>
-            <p>スカイブルー × ピンクのポップでかわいい配信オーバーレイです。丸みのあるデザインと星の装飾が特徴。OBS の「ブラウザソース」に読み込んで使用します。すべての設定はブラウザ内に保存されるため、外部ファイルは不要です。</p>
+        <div class="doc-header">
+            <div class="doc-deco">★ ✦ ★ ✦ ★</div>
+            <div class="doc-title">POP <span>★</span> 説明書</div>
+            <div class="doc-sub">Pop Kawaii Stream Overlay — User Guide</div>
         </div>
-        <div class="hint">
-            <strong>推奨設定：</strong> キャンバスサイズ 1920 × 1080 px、OBS ブラウザソース幅 1920・高さ 1080、「OBSと同じ解像度を使用する」を有効に。
+
+        <!-- 概要 -->
+        <div class="section">
+            <div class="section-title"><span class="icon">✨</span> 概要 / Overview</div>
+            <div class="card">
+                <div class="card-title">POP ★ について</div>
+                <p>スカイブルー × ピンクのポップでかわいい配信オーバーレイです。丸みのあるデザインと星の装飾が特徴。OBS
+                    の「ブラウザソース」に読み込んで使用します。すべての設定はブラウザ内に保存されるため、外部ファイルは不要です。</p>
+            </div>
+            <div class="hint">
+                <strong>推奨設定：</strong> キャンバスサイズ 1920 × 1080 px、OBS ブラウザソース幅 1920・高さ 1080、「OBSと同じ解像度を使用する」を有効に。
+            </div>
         </div>
-    </div>
 
-    <!-- 基本操作 -->
-    <div class="section">
-        <div class="section-title"><span class="icon">🎮</span> 基本操作 / Basic Operations</div>
-        <table>
-            <tr><th>操作</th><th>内容</th></tr>
-            <tr><td><span class="key">ダブルクリック</span></td><td>何もない場所でパーツ追加メニューを開く</td></tr>
-            <tr><td><span class="key">ヘッダーをドラッグ</span></td><td>ボックスを移動する</td></tr>
-            <tr><td><span class="key">長押し（0.2秒）</span></td><td>ボックス内のどこでも長押し → そのままドラッグで移動</td></tr>
-            <tr><td><span class="key">角・辺のハンドル</span></td><td>ホバーで表示、ドラッグでリサイズ</td></tr>
-            <tr><td><span class="key">≡ ボタン</span></td><td>ボックス右上に出現 → 複製・文字サイズ・色変更・削除</td></tr>
-            <tr><td><span class="key">ヘッダー文字</span></td><td>クリックで直接編集できます</td></tr>
-        </table>
-    </div>
-
-    <!-- パーツ一覧 -->
-    <div class="section">
-        <div class="section-title"><span class="icon">🧩</span> パーツ一覧 / Parts</div>
-
-        <div class="card">
-            <div class="card-title">ヘッダーパーツ</div>
+        <!-- 基本操作 -->
+        <div class="section">
+            <div class="section-title"><span class="icon">🎮</span> 基本操作 / Basic Operations</div>
             <table>
-                <tr><th>パーツ名</th><th>説明</th></tr>
-                <tr><td>🔴 配信中バッジ</td><td>点滅する LIVE ラベル。文字は直接編集可能。丸みのあるピル形状</td></tr>
-                <tr><td>👤 プロフィール欄</td><td>複数行を自動スクロール表示。ダブルクリックで編集</td></tr>
-                <tr><td>✉️ メッセージ入力欄</td><td>自由にテキストを入力できる横長バー</td></tr>
-                <tr><td>🕐 時計（バー埋め込み型）</td><td>日付＋時刻を常時表示する時計バー</td></tr>
+                <tr>
+                    <th>操作</th>
+                    <th>内容</th>
+                </tr>
+                <tr>
+                    <td><span class="key">ダブルクリック</span></td>
+                    <td>何もない場所でパーツ追加メニューを開く</td>
+                </tr>
+                <tr>
+                    <td><span class="key">ヘッダーをドラッグ</span></td>
+                    <td>ボックスを移動する</td>
+                </tr>
+                <tr>
+                    <td><span class="key">長押し（0.2秒）</span></td>
+                    <td>ボックス内のどこでも長押し → そのままドラッグで移動</td>
+                </tr>
+                <tr>
+                    <td><span class="key">角・辺のハンドル</span></td>
+                    <td>ホバーで表示、ドラッグでリサイズ</td>
+                </tr>
+                <tr>
+                    <td><span class="key">≡ ボタン</span></td>
+                    <td>ボックス右上に出現 → 複製・文字サイズ・色変更・削除</td>
+                </tr>
+                <tr>
+                    <td><span class="key">ヘッダー文字</span></td>
+                    <td>クリックで直接編集できます</td>
+                </tr>
             </table>
         </div>
 
-        <div class="card">
-            <div class="card-title">ボックスパーツ</div>
-            <table>
-                <tr><th>パーツ名</th><th>説明</th></tr>
-                <tr><td>🕐 時計（独立）</td><td>自由配置できる独立した時計ボックス</td></tr>
-                <tr><td>⏱ ストップウォッチ</td><td>▶ 開始・⏸ 停止・↺ リセット付きのタイマー</td></tr>
-                <tr><td>🔢 カウンター</td><td>＋／－／リセット付き。ステップ値を変更可能</td></tr>
-                <tr><td>📝 メモボックス</td><td>メモ用テキスト入力ボックス</td></tr>
-                <tr><td>▭ テキスト入力</td><td>ヘッダーなしのシンプルなテキスト欄</td></tr>
-                <tr><td>◻ 図形（四角形）</td><td>リサイズ・色変更できる角丸四角形</td></tr>
-                <tr><td>○ 図形（円）</td><td>リサイズ・色変更できる円形</td></tr>
-                <tr><td>🏷 タイトルボックス</td><td>大きな文字のタイトル表示ボックス</td></tr>
-                <tr><td>🖼 画像ボックス</td><td>クリックまたはドラッグ＆ドロップで画像を表示</td></tr>
+        <!-- パーツ一覧 -->
+        <div class="section">
+            <div class="section-title"><span class="icon">🧩</span> パーツ一覧 / Parts</div>
+
+            <div class="card">
+                <div class="card-title">ヘッダーパーツ</div>
+                <table>
+                    <tr>
+                        <th>パーツ名</th>
+                        <th>説明</th>
+                    </tr>
+                    <tr>
+                        <td>🔴 配信中バッジ</td>
+                        <td>点滅する LIVE ラベル。文字は直接編集可能。丸みのあるピル形状</td>
+                    </tr>
+                    <tr>
+                        <td>👤 プロフィール欄</td>
+                        <td>複数行を自動スクロール表示。ダブルクリックで編集</td>
+                    </tr>
+                    <tr>
+                        <td>✉️ メッセージ入力欄</td>
+                        <td>自由にテキストを入力できる横長バー</td>
+                    </tr>
+                    <tr>
+                        <td>🕐 時計（バー埋め込み型）</td>
+                        <td>日付＋時刻を常時表示する時計バー</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">ボックスパーツ</div>
+                <table>
+                    <tr>
+                        <th>パーツ名</th>
+                        <th>説明</th>
+                    </tr>
+                    <tr>
+                        <td>🕐 時計（独立）</td>
+                        <td>自由配置できる独立した時計ボックス</td>
+                    </tr>
+                    <tr>
+                        <td>⏱ ストップウォッチ</td>
+                        <td>▶ 開始・⏸ 停止・↺ リセット付きのタイマー</td>
+                    </tr>
+                    <tr>
+                        <td>🔢 カウンター</td>
+                        <td>＋／－／リセット付き。ステップ値を変更可能</td>
+                    </tr>
+                    <tr>
+                        <td>📝 メモボックス</td>
+                        <td>メモ用テキスト入力ボックス</td>
+                    </tr>
+                    <tr>
+                        <td>▭ テキスト入力</td>
+                        <td>ヘッダーなしのシンプルなテキスト欄</td>
+                    </tr>
+                    <tr>
+                        <td>◻ 図形（四角形）</td>
+                        <td>リサイズ・色変更できる角丸四角形</td>
+                    </tr>
+                    <tr>
+                        <td>○ 図形（円）</td>
+                        <td>リサイズ・色変更できる円形</td>
+                    </tr>
+                    <tr>
+                        <td>🏷 タイトルボックス</td>
+                        <td>大きな文字のタイトル表示ボックス</td>
+                    </tr>
+                    <tr>
+                        <td>🖼 画像ボックス</td>
+                        <td>クリックまたはドラッグ＆ドロップで画像を表示</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">背景パーツ</div>
+                <div class="bg-swatches" style="margin-top:8px;">
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-stripe"></div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">╱ ストライプ</div>
+                            <div class="bg-swatch-desc">斜めのさりげないストライプ模様</div>
+                        </div>
+                    </div>
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-stars">★ ✦ ✧ ✩ ★ ✦</div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">★ 星</div>
+                            <div class="bg-swatch-desc">回転アニメーション付きの星をランダム配置</div>
+                        </div>
+                    </div>
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-dots"></div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">· 水玉ドット</div>
+                            <div class="bg-swatch-desc">規則正しい水玉のドットパターン</div>
+                        </div>
+                    </div>
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-gradient"></div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">🌈 グラデーション</div>
+                            <div class="bg-swatch-desc">ピンク × ブルーの淡いグラデーション</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hint" style="margin-top:14px;">
+                    複数の背景パーツを重ねて使用できます（ストライプ＋星が特にオススメ！）。<br>
+                    <strong>≡ メニュー → 削除</strong> で個別に取り除けます。<br>
+                    <strong>背景削除</strong> を選ぶとすべての背景パーツが消えます。<br>
+                    <strong>背景画像アップロード</strong> では任意の画像を背景として使えます。
+                </div>
+            </div>
+        </div>
+
+        <!-- 設定の保存と読み込み -->
+        <div class="section">
+            <div class="section-title"><span class="icon">💾</span> 設定の保存と読み込み / Save &amp; Load</div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body"><strong>設定を保存</strong> — パーツの配置・内容をブラウザのローカルストレージに保存します。次回読み込み時に自動的に復元されます。
+                    </div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body"><strong>設定をエクスポート</strong> — <code>pop-overlay-config_日時.json</code>
+                        としてダウンロードします。PC 間の移行やバックアップに使用できます。</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body"><strong>設定をインポート</strong> — エクスポートした JSON ファイルを選択して復元します。</div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-body"><strong>画面リセット</strong> — ページをリロードして初期状態に戻します。保存データは消えません。</div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- リアルタイムプレビュー -->
+        <div class="section">
+            <div class="section-title"><span class="icon">📡</span> リアルタイムプレビュー / Real-time Preview</div>
+            <div class="card">
+                <div class="card-title">📡 表示更新（別タブに反映）</div>
+                <p>パーツメニューの「表示更新」を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">条件：同一オリジン</div>
+                <p>2つのタブが同じオリジン（同じURL）で開かれている必要があります。ファイルをダブルクリックして <code>file://</code>
+                    で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code> または <code>https://</code>
+                    経由で開いてください。</p>
+            </div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body">同梱の <code>サーバー起動.bat</code> をダブルクリックする（要 Python）。</div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body">自動でブラウザタブが2つ開く（編集用・確認用、どちらも同じURL）。</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body">片方のタブで編集し、メニューから「表示更新」を押す。</div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-body">もう一方のタブに変更が即座に反映される。</div>
+                </li>
+                <li>
+                    <div class="step-num">5</div>
+                    <div class="step-body">終わったら、開いたウィンドウで何かキーを押すとローカルサーバーが停止する。</div>
+                </li>
+            </ul>
+            <div class="card">
+                <div class="card-title">Pythonが必要です</div>
+                <p>このPCにPythonが入っていない場合、<code>サーバー起動.bat</code> を実行してもエラーになります。<a
+                        href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a>
+                    からダウンロード・インストールしてください（インストール時に「Add python.exe to PATH」に必ずチェック）。インストール後、
+                    <code>サーバー起動.bat</code> を再度実行すれば起動します。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">配信本番では</div>
+                <p>OBSの「Custom Browser Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。</p>
+            </div>
+        </div>
+
+        <!-- カスタマイズ -->
+        <div class="section">
+            <div class="section-title"><span class="icon">🎨</span> カスタマイズ / Customization</div>
+            <div class="card">
+                <div class="card-title">CONFIG 設定（HTML 内）</div>
+                <p>ファイル上部の <code>const CONFIG = { ... }</code> ブロックを編集することで、色・テキスト・アニメーション速度などを変更できます。</p>
+            </div>
+            <table style="margin-top:0;">
+                <tr>
+                    <th>設定項目</th>
+                    <th>初期値</th>
+                    <th>説明</th>
+                </tr>
+                <tr>
+                    <td><code>color.accent</code></td>
+                    <td><code>#7ec8e3</code></td>
+                    <td>枠線・バッジなどのメインカラー（スカイブルー）</td>
+                </tr>
+                <tr>
+                    <td><code>color.sub</code></td>
+                    <td><code>#ff9ecb</code></td>
+                    <td>コーナー星・サブカラー（ピンク）</td>
+                </tr>
+                <tr>
+                    <td><code>color.liveBadge</code></td>
+                    <td><code>#5bb3d8</code></td>
+                    <td>配信中バッジの背景色</td>
+                </tr>
+                <tr>
+                    <td><code>color.background</code></td>
+                    <td><code>#f0faff</code></td>
+                    <td>画面の背景色（水色）</td>
+                </tr>
+                <tr>
+                    <td><code>color.bodyText</code></td>
+                    <td><code>#3a8bb5</code></td>
+                    <td>コメント・メモの文字色</td>
+                </tr>
+                <tr>
+                    <td><code>text.liveBadge</code></td>
+                    <td><code>LIVE</code></td>
+                    <td>バッジに表示する文字</td>
+                </tr>
+                <tr>
+                    <td><code>text.titleBoxHeader</code></td>
+                    <td><code>タイトル ★</code></td>
+                    <td>タイトルボックスのヘッダー</td>
+                </tr>
+                <tr>
+                    <td><code>text.commentBoxHeader</code></td>
+                    <td><code>コメント ✨</code></td>
+                    <td>コメントボックスのヘッダー</td>
+                </tr>
+                <tr>
+                    <td><code>text.memoBoxHeader</code></td>
+                    <td><code>メモ 📝</code></td>
+                    <td>メモボックスのヘッダー</td>
+                </tr>
+                <tr>
+                    <td><code>profile</code></td>
+                    <td>3行の配列</td>
+                    <td>プロフィール欄に表示する文字列リスト</td>
+                </tr>
+                <tr>
+                    <td><code>animation.starSpeed</code></td>
+                    <td><code>8s</code></td>
+                    <td>コーナー星の回転速度</td>
+                </tr>
+                <tr>
+                    <td><code>animation.profileInterval</code></td>
+                    <td><code>3000</code>（ms）</td>
+                    <td>プロフィールの切替間隔</td>
+                </tr>
+                <tr>
+                    <td><code>features.autoLoad</code></td>
+                    <td><code>true</code></td>
+                    <td>ページを開いたとき保存済み設定を自動で読み込む（<code>false</code> にすると手動のみ）</td>
+                </tr>
+                <tr>
+                    <td><code>features.saveConfigEnabled</code></td>
+                    <td><code>true</code></td>
+                    <td>設定の保存・読み込み機能を有効にする（<code>false</code> で「設定を保存」ボタン非表示）</td>
+                </tr>
             </table>
         </div>
 
-        <div class="card">
-            <div class="card-title">背景パーツ</div>
-            <div class="bg-swatches" style="margin-top:8px;">
-                <div class="bg-swatch">
-                    <div class="bg-swatch-preview bg-swatch-stripe"></div>
-                    <div class="bg-swatch-body">
-                        <div class="bg-swatch-name">╱ ストライプ</div>
-                        <div class="bg-swatch-desc">斜めのさりげないストライプ模様</div>
-                    </div>
-                </div>
-                <div class="bg-swatch">
-                    <div class="bg-swatch-preview bg-swatch-stars">★ ✦ ✧ ✩ ★ ✦</div>
-                    <div class="bg-swatch-body">
-                        <div class="bg-swatch-name">★ 星</div>
-                        <div class="bg-swatch-desc">回転アニメーション付きの星をランダム配置</div>
-                    </div>
-                </div>
-                <div class="bg-swatch">
-                    <div class="bg-swatch-preview bg-swatch-dots"></div>
-                    <div class="bg-swatch-body">
-                        <div class="bg-swatch-name">· 水玉ドット</div>
-                        <div class="bg-swatch-desc">規則正しい水玉のドットパターン</div>
-                    </div>
-                </div>
-                <div class="bg-swatch">
-                    <div class="bg-swatch-preview bg-swatch-gradient"></div>
-                    <div class="bg-swatch-body">
-                        <div class="bg-swatch-name">🌈 グラデーション</div>
-                        <div class="bg-swatch-desc">ピンク × ブルーの淡いグラデーション</div>
-                    </div>
-                </div>
-            </div>
-            <div class="hint" style="margin-top:14px;">
-                複数の背景パーツを重ねて使用できます（ストライプ＋星が特にオススメ！）。<br>
-                <strong>≡ メニュー → 削除</strong> で個別に取り除けます。<br>
-                <strong>背景削除</strong> を選ぶとすべての背景パーツが消えます。<br>
-                <strong>背景画像アップロード</strong> では任意の画像を背景として使えます。
-            </div>
-        </div>
-    </div>
-
-    <!-- 設定の保存と読み込み -->
-    <div class="section">
-        <div class="section-title"><span class="icon">💾</span> 設定の保存と読み込み / Save &amp; Load</div>
-        <ul class="steps">
-            <li>
-                <div class="step-num">1</div>
-                <div class="step-body"><strong>設定を保存</strong> — パーツの配置・内容をブラウザのローカルストレージに保存します。次回読み込み時に自動的に復元されます。</div>
-            </li>
-            <li>
-                <div class="step-num">2</div>
-                <div class="step-body"><strong>設定をエクスポート</strong> — <code>pop-overlay-config_日時.json</code> としてダウンロードします。PC 間の移行やバックアップに使用できます。</div>
-            </li>
-            <li>
-                <div class="step-num">3</div>
-                <div class="step-body"><strong>設定をインポート</strong> — エクスポートした JSON ファイルを選択して復元します。</div>
-            </li>
-            <li>
-                <div class="step-num">4</div>
-                <div class="step-body"><strong>画面リセット</strong> — ページをリロードして初期状態に戻します。保存データは消えません。</div>
-            </li>
-        </ul>
-    </div>
-
-    <!-- リアルタイムプレビュー -->
-    <div class="section">
-        <div class="section-title"><span class="icon">📡</span> リアルタイムプレビュー / Real-time Preview</div>
-        <div class="card">
-            <div class="card-title">📡 表示更新（別タブに反映）</div>
-            <p>パーツメニューの「表示更新」を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。</p>
-        </div>
-        <div class="card">
-            <div class="card-title">条件：同一オリジン</div>
-            <p>2つのタブが同じオリジン（同じURL）で開かれている必要があります。ファイルをダブルクリックして <code>file://</code> で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code> または <code>https://</code> 経由で開いてください。</p>
-        </div>
-        <ul class="steps">
-            <li>
-                <div class="step-num">1</div>
-                <div class="step-body">同梱の <code>サーバー起動.bat</code> をダブルクリックする（要 Python）。</div>
-            </li>
-            <li>
-                <div class="step-num">2</div>
-                <div class="step-body">自動でブラウザタブが2つ開く（編集用・確認用、どちらも同じURL）。</div>
-            </li>
-            <li>
-                <div class="step-num">3</div>
-                <div class="step-body">片方のタブで編集し、メニューから「表示更新」を押す。</div>
-            </li>
-            <li>
-                <div class="step-num">4</div>
-                <div class="step-body">もう一方のタブに変更が即座に反映される。</div>
-            </li>
-            <li>
-                <div class="step-num">5</div>
-                <div class="step-body">終わったら、開いたウィンドウで何かキーを押すとローカルサーバーが停止する。</div>
-            </li>
-        </ul>
-        <div class="card">
-            <div class="card-title">配信本番では</div>
-            <p>OBSの「Custom Browser Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。</p>
-        </div>
-    </div>
-
-    <!-- カスタマイズ -->
-    <div class="section">
-        <div class="section-title"><span class="icon">🎨</span> カスタマイズ / Customization</div>
-        <div class="card">
-            <div class="card-title">CONFIG 設定（HTML 内）</div>
-            <p>ファイル上部の <code>const CONFIG = { ... }</code> ブロックを編集することで、色・テキスト・アニメーション速度などを変更できます。</p>
-        </div>
-        <table style="margin-top:0;">
-            <tr><th>設定項目</th><th>初期値</th><th>説明</th></tr>
-            <tr><td><code>color.accent</code></td><td><code>#7ec8e3</code></td><td>枠線・バッジなどのメインカラー（スカイブルー）</td></tr>
-            <tr><td><code>color.sub</code></td><td><code>#ff9ecb</code></td><td>コーナー星・サブカラー（ピンク）</td></tr>
-            <tr><td><code>color.liveBadge</code></td><td><code>#5bb3d8</code></td><td>配信中バッジの背景色</td></tr>
-            <tr><td><code>color.background</code></td><td><code>#f0faff</code></td><td>画面の背景色（水色）</td></tr>
-            <tr><td><code>color.bodyText</code></td><td><code>#3a8bb5</code></td><td>コメント・メモの文字色</td></tr>
-            <tr><td><code>text.liveBadge</code></td><td><code>LIVE</code></td><td>バッジに表示する文字</td></tr>
-            <tr><td><code>text.titleBoxHeader</code></td><td><code>タイトル ★</code></td><td>タイトルボックスのヘッダー</td></tr>
-            <tr><td><code>text.commentBoxHeader</code></td><td><code>コメント ✨</code></td><td>コメントボックスのヘッダー</td></tr>
-            <tr><td><code>text.memoBoxHeader</code></td><td><code>メモ 📝</code></td><td>メモボックスのヘッダー</td></tr>
-            <tr><td><code>profile</code></td><td>3行の配列</td><td>プロフィール欄に表示する文字列リスト</td></tr>
-            <tr><td><code>animation.starSpeed</code></td><td><code>8s</code></td><td>コーナー星の回転速度</td></tr>
-            <tr><td><code>animation.profileInterval</code></td><td><code>3000</code>（ms）</td><td>プロフィールの切替間隔</td></tr>
-            <tr><td><code>features.autoLoad</code></td><td><code>true</code></td><td>ページを開いたとき保存済み設定を自動で読み込む（<code>false</code> にすると手動のみ）</td></tr>
-            <tr><td><code>features.saveConfigEnabled</code></td><td><code>true</code></td><td>設定の保存・読み込み機能を有効にする（<code>false</code> で「設定を保存」ボタン非表示）</td></tr>
-        </table>
-    </div>
-
-    <!-- カラーパレット -->
-    <div class="section">
-        <div class="section-title"><span class="icon">🎀</span> カラーパレット / Color Palette</div>
-        <div class="card">
-            <div class="color-row">
-                <div class="color-chip" style="background:#7ec8e3;"></div>
-                <div class="color-meta">
-                    <div class="color-name">Sky Blue（メインアクセント）</div>
-                    <div class="color-code">#7ec8e3</div>
-                </div>
-            </div>
-            <div class="color-row">
-                <div class="color-chip" style="background:#ff9ecb;"></div>
-                <div class="color-meta">
-                    <div class="color-name">Pink（サブカラー・星）</div>
-                    <div class="color-code">#ff9ecb</div>
-                </div>
-            </div>
-            <div class="color-row">
-                <div class="color-chip" style="background:#5bb3d8;"></div>
-                <div class="color-meta">
-                    <div class="color-name">Deep Sky（バッジ）</div>
-                    <div class="color-code">#5bb3d8</div>
-                </div>
-            </div>
-            <div class="color-row">
-                <div class="color-chip" style="background:#f0faff;border:2px solid #cce;"></div>
-                <div class="color-meta">
-                    <div class="color-name">Sky White（背景）</div>
-                    <div class="color-code">#f0faff</div>
-                </div>
-            </div>
-            <div class="color-row">
-                <div class="color-chip" style="background:#3a8bb5;"></div>
-                <div class="color-meta">
-                    <div class="color-name">Ocean（本文テキスト）</div>
-                    <div class="color-code">#3a8bb5</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- OBS 設定 -->
-    <div class="section">
-        <div class="section-title"><span class="icon">📡</span> OBS 設定 / OBS Setup</div>
-        <ul class="steps">
-            <li>
-                <div class="step-num">1</div>
-                <div class="step-body">OBS の <strong>ソース追加 → ブラウザ</strong> を選択し、<strong>「ローカルファイル」</strong> にチェックを入れる</div>
-            </li>
-            <li>
-                <div class="step-num">2</div>
-                <div class="step-body"><code>pop.html</code> を選択する（このフォルダ内のファイル）</div>
-            </li>
-            <li>
-                <div class="step-num">3</div>
-                <div class="step-body">幅 <strong>1920</strong>、高さ <strong>1080</strong> に設定する</div>
-            </li>
-            <li>
-                <div class="step-num">4</div>
-                <div class="step-body"><strong>「OBSと同じ解像度を使用する」</strong> を有効にする（推奨）</div>
-            </li>
-            <li>
-                <div class="step-num">5</div>
-                <div class="step-body">ソースを右クリック → <strong>「インタラクト」</strong> でブラウザ内を操作できます</div>
-            </li>
-        </ul>
-        <div class="hint">
-            <strong>背景を透明にする場合：</strong>「カスタム CSS」欄に <code>body { background-color: transparent !important; }</code> を追加し、「ページが表示されていない場合にソースをシャットダウン」のチェックを外してください。
-        </div>
-    </div>
-
-    <!-- フォント -->
-    <div class="section">
-        <div class="section-title"><span class="icon">✍️</span> 使用フォント / Fonts</div>
-        <div class="two-col">
+        <!-- カラーパレット -->
+        <div class="section">
+            <div class="section-title"><span class="icon">🎀</span> カラーパレット / Color Palette</div>
             <div class="card">
-                <div class="card-title">Quicksand</div>
-                <p>ヘッダー・ラベル・ボタンに使用。丸みのある太字でポップな印象を演出。</p>
-            </div>
-            <div class="card">
-                <div class="card-title">Nunito</div>
-                <p>本文・入力テキストに使用。Quicksandと相性抜群の可愛らしいゴシック体。</p>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#7ec8e3;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">Sky Blue（メインアクセント）</div>
+                        <div class="color-code">#7ec8e3</div>
+                    </div>
+                </div>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#ff9ecb;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">Pink（サブカラー・星）</div>
+                        <div class="color-code">#ff9ecb</div>
+                    </div>
+                </div>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#5bb3d8;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">Deep Sky（バッジ）</div>
+                        <div class="color-code">#5bb3d8</div>
+                    </div>
+                </div>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#f0faff;border:2px solid #cce;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">Sky White（背景）</div>
+                        <div class="color-code">#f0faff</div>
+                    </div>
+                </div>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#3a8bb5;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">Ocean（本文テキスト）</div>
+                        <div class="color-code">#3a8bb5</div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="hint">フォントはGoogle Fontsから読み込みます。オフライン環境ではシステムのデフォルトフォントが使用されます。</div>
-    </div>
 
-    <!-- フッター -->
-    <div class="doc-footer">
-        <div class="credit">donnma（どんま）★</div>
-        <p>WEB: <a href="https://donnma.com/" target="_blank">donnma.com</a> &nbsp;／&nbsp; X: <a href="https://twitter.com/donnma777" target="_blank">@donnma777</a></p>
-        <p style="margin-top:8px;font-size:12px;opacity:0.6;">POP ★ Stream Overlay — ポップかわいい配信オーバーレイ</p>
-        <p style="margin-top:6px;font-size:12px;opacity:0.55;">注意：二次配布および改変しての配布を禁じます。</p>
-    </div>
+        <!-- OBS 設定 -->
+        <div class="section">
+            <div class="section-title"><span class="icon">📡</span> OBS 設定 / OBS Setup</div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body">OBS の <strong>ソース追加 → ブラウザ</strong> を選択し、<strong>「ローカルファイル」</strong>
+                        にチェックを入れる</div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body"><code>pop.html</code> を選択する（このフォルダ内のファイル）</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body">幅 <strong>1920</strong>、高さ <strong>1080</strong> に設定する</div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-body"><strong>「OBSと同じ解像度を使用する」</strong> を有効にする（推奨）</div>
+                </li>
+                <li>
+                    <div class="step-num">5</div>
+                    <div class="step-body">ソースを右クリック → <strong>「インタラクト」</strong> でブラウザ内を操作できます</div>
+                </li>
+            </ul>
+            <div class="hint">
+                <strong>背景を透明にする場合：</strong>「カスタム CSS」欄に <code>body { background-color: transparent !important; }</code>
+                を追加し、「ページが表示されていない場合にソースをシャットダウン」のチェックを外してください。
+            </div>
+        </div>
 
-</div>
+        <!-- フォント -->
+        <div class="section">
+            <div class="section-title"><span class="icon">✍️</span> 使用フォント / Fonts</div>
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-title">Quicksand</div>
+                    <p>ヘッダー・ラベル・ボタンに使用。丸みのある太字でポップな印象を演出。</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Nunito</div>
+                    <p>本文・入力テキストに使用。Quicksandと相性抜群の可愛らしいゴシック体。</p>
+                </div>
+            </div>
+            <div class="hint">フォントはGoogle Fontsから読み込みます。オフライン環境ではシステムのデフォルトフォントが使用されます。</div>
+        </div>
+
+        <!-- フッター -->
+        <div class="doc-footer">
+            <div class="credit">donnma（どんま）★</div>
+            <p>WEB: <a href="https://donnma.com/" target="_blank">donnma.com</a> &nbsp;／&nbsp; X: <a
+                    href="https://twitter.com/donnma777" target="_blank">@donnma777</a></p>
+            <p style="margin-top:8px;font-size:12px;opacity:0.6;">POP ★ Stream Overlay — ポップかわいい配信オーバーレイ</p>
+            <p style="margin-top:6px;font-size:12px;opacity:0.55;">注意：二次配布および改変しての配布を禁じます。</p>
+        </div>
+
+    </div>
 </body>
+
 </html>

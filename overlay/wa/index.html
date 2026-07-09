@@ -1,523 +1,814 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-<meta charset="UTF-8">
-  <meta name="robots" content="noindex">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>和 WA オーバーレイ — 説明書</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-    :root {
-        --accent: #b5627e;
-        --accent-dark: #8b3a56;
-        --bg: #faf6f0;
-        --card-bg: #fff8f4;
-        --border: rgba(181, 98, 126, 0.22);
-        --text: #3d2b1f;
-        --sub: #7a5a6a;
-        --code-bg: rgba(181, 98, 126, 0.06);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-        background: var(--bg);
-        color: var(--text);
-        font-family: 'Noto Sans JP', sans-serif;
-        font-size: 15px;
-        line-height: 1.85;
-        padding: 48px 24px 80px;
-    }
-    .wrap { max-width: 820px; margin: 0 auto; }
+    <meta charset="UTF-8">
+    <meta name="robots">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>和 WA オーバーレイ — 説明書</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --accent: #b5627e;
+            --accent-dark: #8b3a56;
+            --bg: #faf6f0;
+            --card-bg: #fff8f4;
+            --border: rgba(181, 98, 126, 0.22);
+            --text: #3d2b1f;
+            --sub: #7a5a6a;
+            --code-bg: rgba(181, 98, 126, 0.06);
+        }
 
-    /* ヘッダー */
-    .doc-header {
-        text-align: center;
-        padding: 40px 0 36px;
-        border-bottom: 1px solid var(--border);
-        margin-bottom: 48px;
-    }
-    .doc-kamon {
-        font-size: 40px;
-        color: var(--accent);
-        margin-bottom: 10px;
-        letter-spacing: 4px;
-        opacity: 0.7;
-    }
-    .doc-title {
-        font-family: 'Noto Serif JP', serif;
-        font-size: 28px;
-        font-weight: 900;
-        color: var(--accent);
-        letter-spacing: 6px;
-        margin-bottom: 6px;
-    }
-    .doc-sub {
-        font-size: 13px;
-        color: var(--sub);
-        letter-spacing: 2px;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* セクション */
-    .section { margin-bottom: 44px; }
-    .section-title {
-        font-family: 'Noto Serif JP', serif;
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--accent);
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 8px;
-        margin-bottom: 18px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .section-title::before {
-        content: '';
-        display: inline-block;
-        width: 3px; height: 13px;
-        background: var(--accent);
-        border-radius: 2px;
-        flex-shrink: 0;
-    }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 15px;
+            line-height: 1.85;
+            padding: 48px 24px 80px;
+        }
 
-    /* カード */
-    .card {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 2px;
-        padding: 20px 24px;
-        margin-bottom: 14px;
-        position: relative;
-    }
-    .card::before {
-        content: '';
-        position: absolute;
-        left: 0; top: 0; bottom: 0;
-        width: 2px;
-        background: var(--accent);
-        border-radius: 2px 0 0 2px;
-    }
-    .card-title {
-        font-family: 'Noto Serif JP', serif;
-        font-weight: 700;
-        font-size: 15px;
-        color: var(--accent);
-        margin-bottom: 8px;
-        letter-spacing: 1px;
-    }
-    .card p { color: var(--sub); font-size: 14px; }
+        .wrap {
+            max-width: 820px;
+            margin: 0 auto;
+        }
 
-    /* テーブル */
-    table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
-    th, td { padding: 10px 14px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--border); }
-    th {
-        font-family: 'Noto Serif JP', serif;
-        font-weight: 700; font-size: 12px;
-        color: var(--accent); letter-spacing: 1px;
-        background: rgba(181, 98, 126, 0.04);
-    }
-    td { color: var(--sub); }
-    td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
-    tr:last-child td { border-bottom: none; }
+        /* ヘッダー */
+        .doc-header {
+            text-align: center;
+            padding: 40px 0 36px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 48px;
+        }
 
-    /* コードブロック */
-    code {
-        font-family: 'Consolas', 'Courier New', monospace;
-        background: var(--code-bg);
-        border: 1px solid var(--border);
-        padding: 2px 7px;
-        font-size: 12px;
-        color: var(--accent-dark);
-        border-radius: 2px;
-    }
+        .doc-kamon {
+            font-size: 40px;
+            color: var(--accent);
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+            opacity: 0.7;
+        }
 
-    /* ステップリスト */
-    .steps { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .steps li {
-        display: flex; align-items: flex-start; gap: 14px;
-        background: var(--card-bg); border: 1px solid var(--border);
-        border-radius: 2px; padding: 14px 18px;
-    }
-    .step-num {
-        font-family: 'Noto Serif JP', serif;
-        font-size: 12px; font-weight: 700;
-        color: #fff;
-        background: var(--accent);
-        width: 22px; height: 22px;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 2px; flex-shrink: 0; margin-top: 2px;
-    }
-    .step-body { flex: 1; font-size: 14px; color: var(--sub); }
-    .step-body strong { color: var(--text); }
+        .doc-title {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--accent);
+            letter-spacing: 6px;
+            margin-bottom: 6px;
+        }
 
-    /* キーバッジ */
-    .key {
-        display: inline-block;
-        font-family: 'Noto Serif JP', serif;
-        font-size: 11px; font-weight: 700;
-        color: var(--accent);
-        background: rgba(181, 98, 126, 0.06);
-        border: 1px solid rgba(181, 98, 126, 0.3);
-        padding: 2px 10px; border-radius: 2px;
-        white-space: nowrap;
-    }
+        .doc-sub {
+            font-size: 13px;
+            color: var(--sub);
+            letter-spacing: 2px;
+        }
 
-    /* 背景パーツ説明 */
-    .bg-swatches { display: flex; flex-wrap: wrap; gap: 12px; }
-    .bg-swatch {
-        flex: 1; min-width: 200px;
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 2px; overflow: hidden;
-    }
-    .bg-swatch-preview {
-        height: 56px; width: 100%;
-        position: relative;
-    }
-    .bg-swatch-koshi {
-        background-image:
-            linear-gradient(rgba(181, 98, 126, 0.15) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(181, 98, 126, 0.15) 1px, transparent 1px);
-        background-size: 24px 24px;
-        background-color: #faf6f0;
-    }
-    .bg-swatch-take {
-        background-image:
-            repeating-linear-gradient(
-                90deg,
-                rgba(70, 110, 55, 0.13) 0px,
-                rgba(70, 110, 55, 0.2) 3px,
-                transparent 3px, transparent 29px
-            );
-        background-color: #faf6f0;
-    }
-    .bg-swatch-sakura {
-        background:
-            radial-gradient(ellipse at 25% 30%, rgba(234, 180, 198, 0.5) 0%, transparent 55%),
-            radial-gradient(ellipse at 75% 70%, rgba(210, 155, 180, 0.4) 0%, transparent 50%),
-            #faf6f0;
-    }
-    .bg-swatch-body { padding: 10px 14px 14px; }
-    .bg-swatch-name {
-        font-family: 'Noto Serif JP', serif;
-        font-size: 13px; font-weight: 700;
-        color: var(--accent); margin-bottom: 2px;
-    }
-    .bg-swatch-desc { font-size: 12px; color: var(--sub); }
+        /* セクション */
+        .section {
+            margin-bottom: 44px;
+        }
 
-    /* カラー */
-    .color-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .color-row:last-child { border-bottom: none; }
-    .color-chip { width: 36px; height: 36px; border-radius: 4px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.08); }
-    .color-meta { flex: 1; }
-    .color-name { font-weight: 700; font-size: 14px; color: var(--text); }
-    .color-code { font-family: 'Consolas', monospace; font-size: 12px; color: var(--sub); }
+        .section-title {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    /* フッター */
-    .doc-footer {
-        text-align: center;
-        margin-top: 60px; padding-top: 28px;
-        border-top: 1px solid var(--border);
-        font-size: 13px; color: var(--sub);
-    }
-    .doc-footer a { color: var(--accent); text-decoration: none; }
-    .doc-footer a:hover { text-decoration: underline; }
-    .doc-footer .credit {
-        font-family: 'Noto Serif JP', serif;
-        font-size: 15px; font-weight: 700;
-        color: var(--accent); margin-bottom: 6px;
-    }
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 13px;
+            background: var(--accent);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
 
-    /* ヒントボックス */
-    .hint {
-        background: rgba(181, 98, 126, 0.05);
-        border: 1px solid rgba(181, 98, 126, 0.2);
-        border-left: 3px solid var(--accent);
-        padding: 12px 16px; margin-top: 10px;
-        font-size: 13px; color: var(--sub); border-radius: 0 2px 2px 0;
-    }
-    .hint strong { color: var(--text); }
+        /* カード */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 20px 24px;
+            margin-bottom: 14px;
+            position: relative;
+        }
 
-    /* 2カラム */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
-</style>
+        .card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent);
+            border-radius: 2px 0 0 2px;
+        }
+
+        .card-title {
+            font-family: 'Noto Serif JP', serif;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .card p {
+            color: var(--sub);
+            font-size: 14px;
+        }
+
+        /* テーブル */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Noto Serif JP', serif;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--accent);
+            letter-spacing: 1px;
+            background: rgba(181, 98, 126, 0.04);
+        }
+
+        td {
+            color: var(--sub);
+        }
+
+        td:first-child {
+            color: var(--text);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* コードブロック */
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            padding: 2px 7px;
+            font-size: 12px;
+            color: var(--accent-dark);
+            border-radius: 2px;
+        }
+
+        /* ステップリスト */
+        .steps {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .steps li {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 14px 18px;
+        }
+
+        .step-num {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--accent);
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-body {
+            flex: 1;
+            font-size: 14px;
+            color: var(--sub);
+        }
+
+        .step-body strong {
+            color: var(--text);
+        }
+
+        /* キーバッジ */
+        .key {
+            display: inline-block;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+            background: rgba(181, 98, 126, 0.06);
+            border: 1px solid rgba(181, 98, 126, 0.3);
+            padding: 2px 10px;
+            border-radius: 2px;
+            white-space: nowrap;
+        }
+
+        /* 背景パーツ説明 */
+        .bg-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .bg-swatch {
+            flex: 1;
+            min-width: 200px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .bg-swatch-preview {
+            height: 56px;
+            width: 100%;
+            position: relative;
+        }
+
+        .bg-swatch-koshi {
+            background-image:
+                linear-gradient(rgba(181, 98, 126, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(181, 98, 126, 0.15) 1px, transparent 1px);
+            background-size: 24px 24px;
+            background-color: #faf6f0;
+        }
+
+        .bg-swatch-take {
+            background-image:
+                repeating-linear-gradient(90deg,
+                    rgba(70, 110, 55, 0.13) 0px,
+                    rgba(70, 110, 55, 0.2) 3px,
+                    transparent 3px, transparent 29px);
+            background-color: #faf6f0;
+        }
+
+        .bg-swatch-sakura {
+            background:
+                radial-gradient(ellipse at 25% 30%, rgba(234, 180, 198, 0.5) 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 70%, rgba(210, 155, 180, 0.4) 0%, transparent 50%),
+                #faf6f0;
+        }
+
+        .bg-swatch-body {
+            padding: 10px 14px 14px;
+        }
+
+        .bg-swatch-name {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 2px;
+        }
+
+        .bg-swatch-desc {
+            font-size: 12px;
+            color: var(--sub);
+        }
+
+        /* カラー */
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .color-row:last-child {
+            border-bottom: none;
+        }
+
+        .color-chip {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .color-meta {
+            flex: 1;
+        }
+
+        .color-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .color-code {
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            color: var(--sub);
+        }
+
+        /* フッター */
+        .doc-footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--sub);
+        }
+
+        .doc-footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .doc-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .doc-footer .credit {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        /* ヒントボックス */
+        .hint {
+            background: rgba(181, 98, 126, 0.05);
+            border: 1px solid rgba(181, 98, 126, 0.2);
+            border-left: 3px solid var(--accent);
+            padding: 12px 16px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--sub);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .hint strong {
+            color: var(--text);
+        }
+
+        /* 2カラム */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+
 <body>
-<div class="wrap">
+    <div class="wrap">
 
-    <div class="doc-header">
-        <div class="doc-kamon">✿ ── ✿</div>
-        <div class="doc-title">和 WA 説明書</div>
-        <div class="doc-sub">Japanese Stream Overlay — User Guide</div>
-    </div>
-
-    <!-- 概要 -->
-    <div class="section">
-        <div class="section-title">概要 / Overview</div>
-        <div class="card">
-            <div class="card-title">和 WA について</div>
-            <p>桜・竹・格子をモチーフにした和風ストリーミングオーバーレイです。OBS の「ブラウザソース」に読み込んで使用します。すべての設定はブラウザ内に保存されるため、外部ファイルは不要です。</p>
+        <div class="doc-header">
+            <div class="doc-kamon">✿ ── ✿</div>
+            <div class="doc-title">和 WA 説明書</div>
+            <div class="doc-sub">Japanese Stream Overlay — User Guide</div>
         </div>
-        <div class="hint">
-            <strong>推奨設定：</strong> キャンバスサイズ 1920 × 1080 px、OBS ブラウザソース幅 1920・高さ 1080、「OBSと同じ解像度を使用する」を有効に。
+
+        <!-- 概要 -->
+        <div class="section">
+            <div class="section-title">概要 / Overview</div>
+            <div class="card">
+                <div class="card-title">和 WA について</div>
+                <p>桜・竹・格子をモチーフにした和風ストリーミングオーバーレイです。OBS の「ブラウザソース」に読み込んで使用します。すべての設定はブラウザ内に保存されるため、外部ファイルは不要です。</p>
+            </div>
+            <div class="hint">
+                <strong>推奨設定：</strong> キャンバスサイズ 1920 × 1080 px、OBS ブラウザソース幅 1920・高さ 1080、「OBSと同じ解像度を使用する」を有効に。
+            </div>
         </div>
-    </div>
 
-    <!-- 基本操作 -->
-    <div class="section">
-        <div class="section-title">基本操作 / Basic Operations</div>
-        <table>
-            <tr><th>操作</th><th>内容</th></tr>
-            <tr><td><span class="key">ダブルクリック</span></td><td>何もない場所でパーツ追加メニューを開く</td></tr>
-            <tr><td><span class="key">ヘッダーをドラッグ</span></td><td>ボックスを移動する</td></tr>
-            <tr><td><span class="key">長押し（0.2秒）</span></td><td>ボックス内のどこでも長押し → そのままドラッグで移動</td></tr>
-            <tr><td><span class="key">角・辺のハンドル</span></td><td>ホバーで表示、ドラッグでリサイズ</td></tr>
-            <tr><td><span class="key">≡ ボタン</span></td><td>ボックス右上に出現 → 複製・文字サイズ・色変更・削除</td></tr>
-            <tr><td><span class="key">ヘッダー文字</span></td><td>クリックで直接編集できます</td></tr>
-        </table>
-    </div>
-
-    <!-- パーツ一覧 -->
-    <div class="section">
-        <div class="section-title">パーツ一覧 / Parts</div>
-
-        <div class="card">
-            <div class="card-title">ヘッダーパーツ</div>
+        <!-- 基本操作 -->
+        <div class="section">
+            <div class="section-title">基本操作 / Basic Operations</div>
             <table>
-                <tr><th>パーツ名</th><th>説明</th></tr>
-                <tr><td>🔴 配信中バッジ</td><td>点滅する「配信中」ラベル。文字は直接編集可能</td></tr>
-                <tr><td>👤 プロフィール欄</td><td>複数行を自動スクロール表示。ダブルクリックで編集</td></tr>
-                <tr><td>✉️ メッセージ入力欄</td><td>自由にテキストを入力できる横長バー</td></tr>
-                <tr><td>🕐 時計（バー埋め込み型）</td><td>日付＋時刻を常時表示する時計バー</td></tr>
+                <tr>
+                    <th>操作</th>
+                    <th>内容</th>
+                </tr>
+                <tr>
+                    <td><span class="key">ダブルクリック</span></td>
+                    <td>何もない場所でパーツ追加メニューを開く</td>
+                </tr>
+                <tr>
+                    <td><span class="key">ヘッダーをドラッグ</span></td>
+                    <td>ボックスを移動する</td>
+                </tr>
+                <tr>
+                    <td><span class="key">長押し（0.2秒）</span></td>
+                    <td>ボックス内のどこでも長押し → そのままドラッグで移動</td>
+                </tr>
+                <tr>
+                    <td><span class="key">角・辺のハンドル</span></td>
+                    <td>ホバーで表示、ドラッグでリサイズ</td>
+                </tr>
+                <tr>
+                    <td><span class="key">≡ ボタン</span></td>
+                    <td>ボックス右上に出現 → 複製・文字サイズ・色変更・削除</td>
+                </tr>
+                <tr>
+                    <td><span class="key">ヘッダー文字</span></td>
+                    <td>クリックで直接編集できます</td>
+                </tr>
             </table>
         </div>
 
-        <div class="card">
-            <div class="card-title">ボックスパーツ</div>
-            <table>
-                <tr><th>パーツ名</th><th>説明</th></tr>
-                <tr><td>🕐 時計（独立）</td><td>自由配置できる独立した時計ボックス</td></tr>
-                <tr><td>⏱ ストップウォッチ</td><td>開始・停止・リセット付きのタイマー</td></tr>
-                <tr><td>🔢 カウンター</td><td>＋／－／リセット付き。ステップ値を変更可能</td></tr>
-                <tr><td>📝 覚書ボックス</td><td>メモ用テキスト入力ボックス</td></tr>
-                <tr><td>▭ テキスト入力</td><td>ヘッダーなしのシンプルなテキスト欄</td></tr>
-                <tr><td>◻ 図形（四角形）</td><td>リサイズ・色変更できる四角形</td></tr>
-                <tr><td>○ 図形（円）</td><td>リサイズ・色変更できる円形</td></tr>
-                <tr><td>🏷 演目ボックス</td><td>タイトル表示用の大きな文字ボックス</td></tr>
-                <tr><td>🖼 画像ボックス</td><td>クリックまたはドラッグ＆ドロップで画像を表示</td></tr>
+        <!-- パーツ一覧 -->
+        <div class="section">
+            <div class="section-title">パーツ一覧 / Parts</div>
+
+            <div class="card">
+                <div class="card-title">ヘッダーパーツ</div>
+                <table>
+                    <tr>
+                        <th>パーツ名</th>
+                        <th>説明</th>
+                    </tr>
+                    <tr>
+                        <td>🔴 配信中バッジ</td>
+                        <td>点滅する「配信中」ラベル。文字は直接編集可能</td>
+                    </tr>
+                    <tr>
+                        <td>👤 プロフィール欄</td>
+                        <td>複数行を自動スクロール表示。ダブルクリックで編集</td>
+                    </tr>
+                    <tr>
+                        <td>✉️ メッセージ入力欄</td>
+                        <td>自由にテキストを入力できる横長バー</td>
+                    </tr>
+                    <tr>
+                        <td>🕐 時計（バー埋め込み型）</td>
+                        <td>日付＋時刻を常時表示する時計バー</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">ボックスパーツ</div>
+                <table>
+                    <tr>
+                        <th>パーツ名</th>
+                        <th>説明</th>
+                    </tr>
+                    <tr>
+                        <td>🕐 時計（独立）</td>
+                        <td>自由配置できる独立した時計ボックス</td>
+                    </tr>
+                    <tr>
+                        <td>⏱ ストップウォッチ</td>
+                        <td>開始・停止・リセット付きのタイマー</td>
+                    </tr>
+                    <tr>
+                        <td>🔢 カウンター</td>
+                        <td>＋／－／リセット付き。ステップ値を変更可能</td>
+                    </tr>
+                    <tr>
+                        <td>📝 覚書ボックス</td>
+                        <td>メモ用テキスト入力ボックス</td>
+                    </tr>
+                    <tr>
+                        <td>▭ テキスト入力</td>
+                        <td>ヘッダーなしのシンプルなテキスト欄</td>
+                    </tr>
+                    <tr>
+                        <td>◻ 図形（四角形）</td>
+                        <td>リサイズ・色変更できる四角形</td>
+                    </tr>
+                    <tr>
+                        <td>○ 図形（円）</td>
+                        <td>リサイズ・色変更できる円形</td>
+                    </tr>
+                    <tr>
+                        <td>🏷 演目ボックス</td>
+                        <td>タイトル表示用の大きな文字ボックス</td>
+                    </tr>
+                    <tr>
+                        <td>🖼 画像ボックス</td>
+                        <td>クリックまたはドラッグ＆ドロップで画像を表示</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">背景パーツ</div>
+                <div class="bg-swatches" style="margin-top:8px;">
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-koshi"></div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">▦ 格子 (bg-koshi)</div>
+                            <div class="bg-swatch-desc">桜色の細い格子模様。和の空間を演出</div>
+                        </div>
+                    </div>
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-take"></div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">▸ 竹林 (bg-take)</div>
+                            <div class="bg-swatch-desc">縦縞の竹をモチーフにした背景模様</div>
+                        </div>
+                    </div>
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-sakura"></div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">🌸 桜霞 (bg-sakura)</div>
+                            <div class="bg-swatch-desc">桜色のやわらかいグラデーション</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hint" style="margin-top:14px;">
+                    複数の背景パーツを重ねて使用できます。<strong>≡ メニュー → 削除</strong> で個別に取り除けます。<br>
+                    <strong>背景削除</strong> を選ぶとすべての背景パーツが消えます。<br>
+                    <strong>背景画像アップロード</strong> では任意の画像を背景として使えます。
+                </div>
+            </div>
+        </div>
+
+        <!-- 設定の保存と読み込み -->
+        <div class="section">
+            <div class="section-title">設定の保存と読み込み / Save &amp; Load</div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body"><strong>設定を保存</strong> — パーツの配置・内容をブラウザのローカルストレージに保存します。次回読み込み時に自動的に復元されます。
+                    </div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body"><strong>設定をエクスポート</strong> — <code>wa-overlay-config_日時.json</code>
+                        としてダウンロードします。PC 間の移行やバックアップに使用できます。</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body"><strong>設定をインポート</strong> — エクスポートした JSON ファイルを選択して復元します。</div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-body"><strong>画面リセット</strong> — ページをリロードして初期状態に戻します。保存データは消えません。</div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- リアルタイムプレビュー -->
+        <div class="section">
+            <div class="section-title">リアルタイムプレビュー / Real-time Preview</div>
+            <div class="card">
+                <div class="card-title">📡 表示更新（別タブに反映）</div>
+                <p>パーツメニューの「表示更新」を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">条件：同一オリジン</div>
+                <p>2つのタブが同じオリジン（同じURL）で開かれている必要があります。ファイルをダブルクリックして <code>file://</code>
+                    で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code> または <code>https://</code>
+                    経由で開いてください。</p>
+            </div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body">同梱の <code>サーバー起動.bat</code> をダブルクリックする（要 Python）。</div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body">自動でブラウザタブが2つ開く（編集用・確認用、どちらも同じURL）。</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body">片方のタブで編集し、メニューから「表示更新」を押す。</div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-body">もう一方のタブに変更が即座に反映される。</div>
+                </li>
+                <li>
+                    <div class="step-num">5</div>
+                    <div class="step-body">終わったら、開いたウィンドウで何かキーを押すとローカルサーバーが停止する。</div>
+                </li>
+            </ul>
+            <div class="card">
+                <div class="card-title">Pythonが必要です</div>
+                <p>このPCにPythonが入っていない場合、<code>サーバー起動.bat</code> を実行してもエラーになります。<a
+                        href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a>
+                    からダウンロード・インストールしてください（インストール時に「Add python.exe to PATH」に必ずチェック）。インストール後、
+                    <code>サーバー起動.bat</code> を再度実行すれば起動します。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">配信本番では</div>
+                <p>OBSの「Custom Browser Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。</p>
+            </div>
+        </div>
+
+        <!-- カスタマイズ -->
+        <div class="section">
+            <div class="section-title">カスタマイズ / Customization</div>
+            <div class="card">
+                <div class="card-title">CONFIG 設定（HTML 内）</div>
+                <p>ファイル上部の <code>const CONFIG = { ... }</code> ブロックを編集することで、色・テキスト・アニメーション間隔などを変更できます。</p>
+            </div>
+            <table style="margin-top:0;">
+                <tr>
+                    <th>設定項目</th>
+                    <th>初期値</th>
+                    <th>説明</th>
+                </tr>
+                <tr>
+                    <td><code>color.accent</code></td>
+                    <td><code>#b5627e</code></td>
+                    <td>枠線・バッジなどのメインカラー（桜色）</td>
+                </tr>
+                <tr>
+                    <td><code>color.liveBadge</code></td>
+                    <td><code>#8b3a56</code></td>
+                    <td>配信中バッジの背景色</td>
+                </tr>
+                <tr>
+                    <td><code>color.background</code></td>
+                    <td><code>#faf6f0</code></td>
+                    <td>画面の背景色（和紙風クリーム）</td>
+                </tr>
+                <tr>
+                    <td><code>color.bodyText</code></td>
+                    <td><code>#5a3a4a</code></td>
+                    <td>コメント・メモの文字色</td>
+                </tr>
+                <tr>
+                    <td><code>text.liveBadge</code></td>
+                    <td><code>配信中</code></td>
+                    <td>バッジに表示する文字</td>
+                </tr>
+                <tr>
+                    <td><code>text.titleBoxHeader</code></td>
+                    <td><code>演目</code></td>
+                    <td>演目ボックスのヘッダー</td>
+                </tr>
+                <tr>
+                    <td><code>text.commentBoxHeader</code></td>
+                    <td><code>声</code></td>
+                    <td>コメントボックスのヘッダー</td>
+                </tr>
+                <tr>
+                    <td><code>text.memoBoxHeader</code></td>
+                    <td><code>覚書</code></td>
+                    <td>覚書ボックスのヘッダー</td>
+                </tr>
+                <tr>
+                    <td><code>profile</code></td>
+                    <td>3行の配列</td>
+                    <td>プロフィール欄に表示する文字列リスト</td>
+                </tr>
+                <tr>
+                    <td><code>animation.profileInterval</code></td>
+                    <td><code>3000</code>（ms）</td>
+                    <td>プロフィールの切替間隔</td>
+                </tr>
+                <tr>
+                    <td><code>features.autoLoad</code></td>
+                    <td><code>true</code></td>
+                    <td>ページを開いたとき保存済み設定を自動で読み込む（<code>false</code> にすると手動のみ）</td>
+                </tr>
+                <tr>
+                    <td><code>features.saveConfigEnabled</code></td>
+                    <td><code>true</code></td>
+                    <td>設定の保存・読み込み機能を有効にする（<code>false</code> で「設定を保存」ボタン非表示）</td>
+                </tr>
             </table>
         </div>
 
-        <div class="card">
-            <div class="card-title">背景パーツ</div>
-            <div class="bg-swatches" style="margin-top:8px;">
-                <div class="bg-swatch">
-                    <div class="bg-swatch-preview bg-swatch-koshi"></div>
-                    <div class="bg-swatch-body">
-                        <div class="bg-swatch-name">▦ 格子 (bg-koshi)</div>
-                        <div class="bg-swatch-desc">桜色の細い格子模様。和の空間を演出</div>
-                    </div>
-                </div>
-                <div class="bg-swatch">
-                    <div class="bg-swatch-preview bg-swatch-take"></div>
-                    <div class="bg-swatch-body">
-                        <div class="bg-swatch-name">▸ 竹林 (bg-take)</div>
-                        <div class="bg-swatch-desc">縦縞の竹をモチーフにした背景模様</div>
-                    </div>
-                </div>
-                <div class="bg-swatch">
-                    <div class="bg-swatch-preview bg-swatch-sakura"></div>
-                    <div class="bg-swatch-body">
-                        <div class="bg-swatch-name">🌸 桜霞 (bg-sakura)</div>
-                        <div class="bg-swatch-desc">桜色のやわらかいグラデーション</div>
-                    </div>
-                </div>
-            </div>
-            <div class="hint" style="margin-top:14px;">
-                複数の背景パーツを重ねて使用できます。<strong>≡ メニュー → 削除</strong> で個別に取り除けます。<br>
-                <strong>背景削除</strong> を選ぶとすべての背景パーツが消えます。<br>
-                <strong>背景画像アップロード</strong> では任意の画像を背景として使えます。
-            </div>
-        </div>
-    </div>
-
-    <!-- 設定の保存と読み込み -->
-    <div class="section">
-        <div class="section-title">設定の保存と読み込み / Save &amp; Load</div>
-        <ul class="steps">
-            <li>
-                <div class="step-num">1</div>
-                <div class="step-body"><strong>設定を保存</strong> — パーツの配置・内容をブラウザのローカルストレージに保存します。次回読み込み時に自動的に復元されます。</div>
-            </li>
-            <li>
-                <div class="step-num">2</div>
-                <div class="step-body"><strong>設定をエクスポート</strong> — <code>wa-overlay-config_日時.json</code> としてダウンロードします。PC 間の移行やバックアップに使用できます。</div>
-            </li>
-            <li>
-                <div class="step-num">3</div>
-                <div class="step-body"><strong>設定をインポート</strong> — エクスポートした JSON ファイルを選択して復元します。</div>
-            </li>
-            <li>
-                <div class="step-num">4</div>
-                <div class="step-body"><strong>画面リセット</strong> — ページをリロードして初期状態に戻します。保存データは消えません。</div>
-            </li>
-        </ul>
-    </div>
-
-    <!-- リアルタイムプレビュー -->
-    <div class="section">
-        <div class="section-title">リアルタイムプレビュー / Real-time Preview</div>
-        <div class="card">
-            <div class="card-title">📡 表示更新（別タブに反映）</div>
-            <p>パーツメニューの「表示更新」を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。</p>
-        </div>
-        <div class="card">
-            <div class="card-title">条件：同一オリジン</div>
-            <p>2つのタブが同じオリジン（同じURL）で開かれている必要があります。ファイルをダブルクリックして <code>file://</code> で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code> または <code>https://</code> 経由で開いてください。</p>
-        </div>
-        <ul class="steps">
-            <li>
-                <div class="step-num">1</div>
-                <div class="step-body">同梱の <code>サーバー起動.bat</code> をダブルクリックする（要 Python）。</div>
-            </li>
-            <li>
-                <div class="step-num">2</div>
-                <div class="step-body">自動でブラウザタブが2つ開く（編集用・確認用、どちらも同じURL）。</div>
-            </li>
-            <li>
-                <div class="step-num">3</div>
-                <div class="step-body">片方のタブで編集し、メニューから「表示更新」を押す。</div>
-            </li>
-            <li>
-                <div class="step-num">4</div>
-                <div class="step-body">もう一方のタブに変更が即座に反映される。</div>
-            </li>
-            <li>
-                <div class="step-num">5</div>
-                <div class="step-body">終わったら、開いたウィンドウで何かキーを押すとローカルサーバーが停止する。</div>
-            </li>
-        </ul>
-        <div class="card">
-            <div class="card-title">配信本番では</div>
-            <p>OBSの「Custom Browser Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。</p>
-        </div>
-    </div>
-
-    <!-- カスタマイズ -->
-    <div class="section">
-        <div class="section-title">カスタマイズ / Customization</div>
-        <div class="card">
-            <div class="card-title">CONFIG 設定（HTML 内）</div>
-            <p>ファイル上部の <code>const CONFIG = { ... }</code> ブロックを編集することで、色・テキスト・アニメーション間隔などを変更できます。</p>
-        </div>
-        <table style="margin-top:0;">
-            <tr><th>設定項目</th><th>初期値</th><th>説明</th></tr>
-            <tr><td><code>color.accent</code></td><td><code>#b5627e</code></td><td>枠線・バッジなどのメインカラー（桜色）</td></tr>
-            <tr><td><code>color.liveBadge</code></td><td><code>#8b3a56</code></td><td>配信中バッジの背景色</td></tr>
-            <tr><td><code>color.background</code></td><td><code>#faf6f0</code></td><td>画面の背景色（和紙風クリーム）</td></tr>
-            <tr><td><code>color.bodyText</code></td><td><code>#5a3a4a</code></td><td>コメント・メモの文字色</td></tr>
-            <tr><td><code>text.liveBadge</code></td><td><code>配信中</code></td><td>バッジに表示する文字</td></tr>
-            <tr><td><code>text.titleBoxHeader</code></td><td><code>演目</code></td><td>演目ボックスのヘッダー</td></tr>
-            <tr><td><code>text.commentBoxHeader</code></td><td><code>声</code></td><td>コメントボックスのヘッダー</td></tr>
-            <tr><td><code>text.memoBoxHeader</code></td><td><code>覚書</code></td><td>覚書ボックスのヘッダー</td></tr>
-            <tr><td><code>profile</code></td><td>3行の配列</td><td>プロフィール欄に表示する文字列リスト</td></tr>
-            <tr><td><code>animation.profileInterval</code></td><td><code>3000</code>（ms）</td><td>プロフィールの切替間隔</td></tr>
-            <tr><td><code>features.autoLoad</code></td><td><code>true</code></td><td>ページを開いたとき保存済み設定を自動で読み込む（<code>false</code> にすると手動のみ）</td></tr>
-            <tr><td><code>features.saveConfigEnabled</code></td><td><code>true</code></td><td>設定の保存・読み込み機能を有効にする（<code>false</code> で「設定を保存」ボタン非表示）</td></tr>
-        </table>
-    </div>
-
-    <!-- カラーパレット -->
-    <div class="section">
-        <div class="section-title">カラーパレット / Color Palette</div>
-        <div class="card">
-            <div class="color-row">
-                <div class="color-chip" style="background:#b5627e;"></div>
-                <div class="color-meta">
-                    <div class="color-name">桜 Sakura（アクセント）</div>
-                    <div class="color-code">#b5627e</div>
-                </div>
-            </div>
-            <div class="color-row">
-                <div class="color-chip" style="background:#8b3a56;"></div>
-                <div class="color-meta">
-                    <div class="color-name">深桜 Fukabeni（バッジ）</div>
-                    <div class="color-code">#8b3a56</div>
-                </div>
-            </div>
-            <div class="color-row">
-                <div class="color-chip" style="background:#faf6f0;border:1px solid #ddd;"></div>
-                <div class="color-meta">
-                    <div class="color-name">和紙 Washi（背景）</div>
-                    <div class="color-code">#faf6f0</div>
-                </div>
-            </div>
-            <div class="color-row">
-                <div class="color-chip" style="background:#5a3a4a;"></div>
-                <div class="color-meta">
-                    <div class="color-name">紫鳶 Murasaki-tobi（本文）</div>
-                    <div class="color-code">#5a3a4a</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- OBS 設定 -->
-    <div class="section">
-        <div class="section-title">OBS 設定 / OBS Setup</div>
-        <ul class="steps">
-            <li>
-                <div class="step-num">1</div>
-                <div class="step-body">OBS の <strong>ソース追加 → ブラウザ</strong> を選択し、<strong>「ローカルファイル」</strong> にチェックを入れる</div>
-            </li>
-            <li>
-                <div class="step-num">2</div>
-                <div class="step-body"><code>wa.html</code> を選択する（このフォルダ内のファイル）</div>
-            </li>
-            <li>
-                <div class="step-num">3</div>
-                <div class="step-body">幅 <strong>1920</strong>、高さ <strong>1080</strong> に設定する</div>
-            </li>
-            <li>
-                <div class="step-num">4</div>
-                <div class="step-body"><strong>「OBSと同じ解像度を使用する」</strong> を有効にする（推奨）</div>
-            </li>
-            <li>
-                <div class="step-num">5</div>
-                <div class="step-body">ソースを右クリック → <strong>「インタラクト」</strong> でブラウザ内を操作できます</div>
-            </li>
-        </ul>
-        <div class="hint">
-            <strong>背景を透明にする場合：</strong>「カスタム CSS」欄に <code>body { background-color: transparent !important; }</code> を追加し、「ページが表示されていない場合にソースをシャットダウン」のチェックを外してください。
-        </div>
-    </div>
-
-    <!-- フォント -->
-    <div class="section">
-        <div class="section-title">使用フォント / Fonts</div>
-        <div class="two-col">
+        <!-- カラーパレット -->
+        <div class="section">
+            <div class="section-title">カラーパレット / Color Palette</div>
             <div class="card">
-                <div class="card-title">Noto Serif JP</div>
-                <p>ヘッダー・ラベル・装飾テキストに使用。明朝体で和の雰囲気を演出。</p>
-            </div>
-            <div class="card">
-                <div class="card-title">Noto Sans JP</div>
-                <p>本文・入力テキストに使用。可読性の高いゴシック体。</p>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#b5627e;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">桜 Sakura（アクセント）</div>
+                        <div class="color-code">#b5627e</div>
+                    </div>
+                </div>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#8b3a56;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">深桜 Fukabeni（バッジ）</div>
+                        <div class="color-code">#8b3a56</div>
+                    </div>
+                </div>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#faf6f0;border:1px solid #ddd;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">和紙 Washi（背景）</div>
+                        <div class="color-code">#faf6f0</div>
+                    </div>
+                </div>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#5a3a4a;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">紫鳶 Murasaki-tobi（本文）</div>
+                        <div class="color-code">#5a3a4a</div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="hint">フォントはGoogle Fontsから読み込みます。オフライン環境ではシステムのデフォルトフォントが使用されます。</div>
-    </div>
 
-    <!-- フッター -->
-    <div class="doc-footer">
-        <div class="credit">donnma（どんま）</div>
-        <p>WEB: <a href="https://donnma.com/" target="_blank">donnma.com</a> &nbsp;／&nbsp; X: <a href="https://twitter.com/donnma777" target="_blank">@donnma777</a></p>
-        <p style="margin-top:8px;font-size:12px;opacity:0.65;">和 WA Stream Overlay — 和風配信オーバーレイ</p>
-        <p style="margin-top:6px;font-size:12px;opacity:0.55;">注意：二次配布および改変しての配布を禁じます。</p>
-    </div>
+        <!-- OBS 設定 -->
+        <div class="section">
+            <div class="section-title">OBS 設定 / OBS Setup</div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body">OBS の <strong>ソース追加 → ブラウザ</strong> を選択し、<strong>「ローカルファイル」</strong>
+                        にチェックを入れる</div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body"><code>wa.html</code> を選択する（このフォルダ内のファイル）</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body">幅 <strong>1920</strong>、高さ <strong>1080</strong> に設定する</div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-body"><strong>「OBSと同じ解像度を使用する」</strong> を有効にする（推奨）</div>
+                </li>
+                <li>
+                    <div class="step-num">5</div>
+                    <div class="step-body">ソースを右クリック → <strong>「インタラクト」</strong> でブラウザ内を操作できます</div>
+                </li>
+            </ul>
+            <div class="hint">
+                <strong>背景を透明にする場合：</strong>「カスタム CSS」欄に <code>body { background-color: transparent !important; }</code>
+                を追加し、「ページが表示されていない場合にソースをシャットダウン」のチェックを外してください。
+            </div>
+        </div>
 
-</div>
+        <!-- フォント -->
+        <div class="section">
+            <div class="section-title">使用フォント / Fonts</div>
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-title">Noto Serif JP</div>
+                    <p>ヘッダー・ラベル・装飾テキストに使用。明朝体で和の雰囲気を演出。</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Noto Sans JP</div>
+                    <p>本文・入力テキストに使用。可読性の高いゴシック体。</p>
+                </div>
+            </div>
+            <div class="hint">フォントはGoogle Fontsから読み込みます。オフライン環境ではシステムのデフォルトフォントが使用されます。</div>
+        </div>
+
+        <!-- フッター -->
+        <div class="doc-footer">
+            <div class="credit">donnma（どんま）</div>
+            <p>WEB: <a href="https://donnma.com/" target="_blank">donnma.com</a> &nbsp;／&nbsp; X: <a
+                    href="https://twitter.com/donnma777" target="_blank">@donnma777</a></p>
+            <p style="margin-top:8px;font-size:12px;opacity:0.65;">和 WA Stream Overlay — 和風配信オーバーレイ</p>
+            <p style="margin-top:6px;font-size:12px;opacity:0.55;">注意：二次配布および改変しての配布を禁じます。</p>
+        </div>
+
+    </div>
 </body>
+
 </html>
