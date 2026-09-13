@@ -563,6 +563,51 @@
       color: #fc4d50;
     }
 
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 48px 0 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      appearance: none;
+      background: none;
+      border: none;
+      font-family: 'Orbitron', monospace;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 12px 4px;
+      margin-bottom: -1px;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .tab-btn + .tab-btn {
+      margin-left: 20px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.is-active {
+      color: #00fff7;
+      border-color: #00fff7;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.is-active {
+      display: block;
+    }
+
     /* ── Tool cards (non-overlay) ── */
     .tool-card {
       background: var(--surface);
@@ -648,6 +693,20 @@
         border-right: none;
         border-bottom: 1px solid var(--border);
       }
+
+      .tabs {
+        gap: 0;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      .tab-btn {
+        font-size: 10px;
+      }
+
+      .tab-btn + .tab-btn {
+        margin-left: 14px;
+      }
     }
   </style>
 </head>
@@ -701,7 +760,13 @@
       </a>
     </div>
 
-    <p class="section-title" style="margin-top: 48px;">Overlay — オーバーレイテーマ</p>
+    <!-- Tabs -->
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab-btn is-active" data-tab="overlay" role="tab" aria-selected="true">Overlay — オーバーレイテーマ</button>
+      <button type="button" class="tab-btn" data-tab="tools" role="tab" aria-selected="false">Plugin & Extension — プラグイン・拡張機能</button>
+    </div>
+
+    <div class="tab-panel is-active" id="panel-overlay" role="tabpanel">
 
     <div class="grid">
 
@@ -1025,8 +1090,11 @@
       </div>
     </div>
 
-    <!-- Plugin & Extension section -->
-    <p class="section-title" style="margin-top: 64px;">Plugin & Extension — プラグイン・拡張機能</p>
+    </div>
+    <!-- /panel-overlay -->
+
+    <!-- Plugin & Extension panel -->
+    <div class="tab-panel" id="panel-tools" role="tabpanel">
 
     <div style="display: flex; flex-direction: column; gap: 16px;">
 
@@ -1063,7 +1131,26 @@
 
     </div>
 
+    </div>
+    <!-- /panel-tools -->
+
   </main>
+
+  <script>
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => {
+          b.classList.remove('is-active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('is-active'));
+
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-selected', 'true');
+        document.getElementById('panel-' + btn.dataset.tab).classList.add('is-active');
+      });
+    });
+  </script>
 
   <!-- AdSense -->
   <div style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
