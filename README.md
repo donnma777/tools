@@ -2,7 +2,7 @@
 
 配信者向けのツールやアセットを無料公開しているリポジトリです。
 
-- サイト: https://donnma.com/live-tool/
+- サイト: https://donnma.com/tool/
 - 公式サイト: https://donnma.com/
 - BOOTH: https://donnma.booth.pm/item_lists/nevT9GeV
 
