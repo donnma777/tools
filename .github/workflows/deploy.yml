@@ -1,0 +1,38 @@
+name: Deploy to Xserver
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-tool
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.XSERVER_SSH_KEY }}" > ~/.ssh/xserver_key
+          chmod 600 ~/.ssh/xserver_key
+          ssh-keyscan -p ${{ secrets.XSERVER_PORT }} ${{ secrets.XSERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy via rsync
+        run: |
+          rsync -avz \
+            -e "ssh -i ~/.ssh/xserver_key -p ${{ secrets.XSERVER_PORT }}" \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='CNAME' \
+            --exclude='README.md' \
+            ./ ${{ secrets.XSERVER_USER }}@${{ secrets.XSERVER_HOST }}:${{ secrets.XSERVER_REMOTE_PATH }}/
+
+      - name: Clean up SSH key
+        if: always()
+        run: rm -f ~/.ssh/xserver_key
