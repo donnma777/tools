@@ -6,9 +6,9 @@
   <meta name="robots" content="noindex">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>どんまうんど-Tools</title>
-  <meta name="description" content="OBS Studio用配信オーバーレイのテーマ集。サイバーパンク、ゲーミング、ガーリーネオン、スウィートロリータ、和風など5つのテーマを無料公開中。">
+  <meta name="description" content="配信者向けの無料ツール・アセット集。OBS Studio用配信オーバーレイテーマ、WordPressプラグイン、Chrome拡張機能などを公開中。">
   <meta property="og:title" content="どんまうんど-Tools">
-  <meta property="og:description" content="OBS Studio用配信オーバーレイのテーマ集。5種類のデザインを無料公開中。">
+  <meta property="og:description" content="配信者向けの無料ツール・アセット集。OBS Studio用配信オーバーレイテーマ、WordPressプラグイン、Chrome拡張機能などを公開中。">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="@donnma777">
@@ -188,7 +188,7 @@
       background: currentColor;
     }
 
-    /* ── Themes grid ── */
+    /* ── Sections ── */
     .section {
       max-width: 1100px;
       margin: 0 auto;
@@ -201,7 +201,7 @@
       letter-spacing: 0.2em;
       color: var(--muted);
       text-transform: uppercase;
-      margin-bottom: 32px;
+      margin: 48px 0 20px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -212,239 +212,6 @@
       flex: 1;
       height: 1px;
       background: var(--border);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-    }
-
-    /* ── Card ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      border-color: var(--card-accent, rgba(255, 255, 255, 0.15));
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--card-accent, transparent);
-    }
-
-    /* Mini screen preview */
-    .preview {
-      position: relative;
-      height: 160px;
-      overflow: hidden;
-      background: var(--card-bg, #111);
-    }
-
-    .preview-inner {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      padding: 14px;
-      gap: 8px;
-    }
-
-    .preview-topbar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .preview-live {
-      font-family: 'Orbitron', monospace;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      background: var(--card-livebadge, #ff3333);
-      color: #fff;
-      padding: 2px 8px;
-      border-radius: 3px;
-    }
-
-    .preview-title-text {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--card-accent, #fff);
-      letter-spacing: 0.05em;
-      opacity: 0.9;
-    }
-
-    .preview-boxes {
-      display: flex;
-      gap: 8px;
-      flex: 1;
-    }
-
-    .preview-box {
-      flex: 1;
-      border: 1px solid var(--card-accent, rgba(255, 255, 255, 0.3));
-      border-radius: 6px;
-      padding: 6px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      opacity: 0.7;
-    }
-
-    .preview-box-label {
-      font-family: 'Orbitron', monospace;
-      font-size: 7px;
-      letter-spacing: 0.15em;
-      color: var(--card-accent, #fff);
-    }
-
-    .preview-box-bar {
-      height: 3px;
-      border-radius: 99px;
-      background: var(--card-accent, rgba(255, 255, 255, 0.4));
-      opacity: 0.5;
-    }
-
-    .preview-box-bar:last-child {
-      width: 65%;
-    }
-
-    .preview-glow {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 100%, var(--card-accent, transparent) 0%, transparent 70%);
-      opacity: 0.08;
-      pointer-events: none;
-    }
-
-    /* Card body */
-    .card-body {
-      padding: 20px;
-    }
-
-    .card-tag {
-      font-family: 'Orbitron', monospace;
-      font-size: 9px;
-      letter-spacing: 0.2em;
-      color: var(--card-accent, var(--muted));
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
-    .card-name {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-
-    .card-desc {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 18px;
-      line-height: 1.5;
-    }
-
-    .card-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: opacity 0.15s ease, transform 0.15s ease;
-      white-space: nowrap;
-    }
-
-    .btn:hover {
-      opacity: 0.85;
-      transform: translateY(-1px);
-    }
-
-    .btn-primary {
-      background: var(--card-accent, #444);
-      color: var(--card-bg, #000);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    /* Light-theme card override */
-    .card--light .preview-live {
-      color: #fff;
-    }
-
-    .card--light .preview-box {
-      background: rgba(0, 0, 0, 0.06);
-    }
-
-    .card--light .preview-glow {
-      opacity: 0.04;
-    }
-
-    /* ── Usage section ── */
-    .usage {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 32px;
-      margin-top: 48px;
-    }
-
-    .usage h2 {
-      font-family: 'Orbitron', monospace;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 20px;
-      letter-spacing: 0.05em;
-    }
-
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
-    }
-
-    .step {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-    }
-
-    .step-num {
-      flex-shrink: 0;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: rgba(0, 255, 247, 0.12);
-      border: 1px solid rgba(0, 255, 247, 0.25);
-      color: #00fff7;
-      font-family: 'Orbitron', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .step-text {
-      font-size: 0.82rem;
-      color: var(--muted);
-      padding-top: 4px;
     }
 
     /* ── Footer ── */
@@ -563,58 +330,20 @@
       color: #fc4d50;
     }
 
-    /* ── Tabs ── */
-    .tabs {
+    /* ── Tool cards ── */
+    .tool-list {
       display: flex;
-      gap: 8px;
-      margin: 48px 0 32px;
-      border-bottom: 1px solid var(--border);
+      flex-direction: column;
+      gap: 16px;
     }
 
-    .tab-btn {
-      appearance: none;
-      background: none;
-      border: none;
-      font-family: 'Orbitron', monospace;
-      font-size: 12px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 12px 4px;
-      margin-bottom: -1px;
-      border-bottom: 2px solid transparent;
-      cursor: pointer;
-      transition: color 0.15s, border-color 0.15s;
-    }
-
-    .tab-btn + .tab-btn {
-      margin-left: 20px;
-    }
-
-    .tab-btn:hover {
-      color: var(--text);
-    }
-
-    .tab-btn.is-active {
-      color: #00fff7;
-      border-color: #00fff7;
-    }
-
-    .tab-panel {
-      display: none;
-    }
-
-    .tab-panel.is-active {
-      display: block;
-    }
-
-    /* ── Tool cards (non-overlay) ── */
     .tool-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
       overflow: hidden;
       display: flex;
+      text-decoration: none;
       transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
@@ -665,6 +394,40 @@
       margin-bottom: 10px;
     }
 
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--tool-accent, #444);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
     @media (max-width: 600px) {
       .hero {
         padding: 60px 20px 52px;
@@ -692,20 +455,6 @@
         height: 64px;
         border-right: none;
         border-bottom: 1px solid var(--border);
-      }
-
-      .tabs {
-        gap: 0;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-
-      .tab-btn {
-        font-size: 10px;
-      }
-
-      .tab-btn + .tab-btn {
-        margin-left: 14px;
       }
     }
   </style>
@@ -736,7 +485,6 @@
     </div>
   </header>
 
-  <!-- Theme cards -->
   <main class="section">
 
     <!-- Official site banner -->
@@ -760,343 +508,24 @@
       </a>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs" role="tablist">
-      <button type="button" class="tab-btn is-active" data-tab="overlay" role="tab" aria-selected="true">Overlay — オーバーレイテーマ</button>
-      <button type="button" class="tab-btn" data-tab="tools" role="tab" aria-selected="false">Plugin & Extension — プラグイン・拡張機能</button>
-    </div>
+    <!-- Tools list -->
+    <p class="section-title">Tools — ツール一覧</p>
 
-    <div class="tab-panel is-active" id="panel-overlay" role="tabpanel">
+    <div class="tool-list">
 
-    <div class="grid">
-
-      <!-- GAMING -->
-      <div class="card" style="--card-accent:#00fff7; --card-bg:#0a0a0f; --card-livebadge:#ff3c3c;">
-        <div class="preview" style="background:#0a0a0f;">
-          <div class="preview-inner">
-            <div class="preview-topbar">
-              <span class="preview-live">LIVE</span>
-              <span class="preview-title-text" style="font-family:'Orbitron',monospace;">GAMING OVERLAY</span>
-            </div>
-            <div class="preview-boxes">
-              <div class="preview-box">
-                <div class="preview-box-label">TITLE</div>
-                <div class="preview-box-bar"></div>
-                <div class="preview-box-bar"></div>
-              </div>
-              <div class="preview-box">
-                <div class="preview-box-label">COMMENT</div>
-                <div class="preview-box-bar"></div>
-                <div class="preview-box-bar"></div>
-              </div>
-            </div>
-          </div>
-          <div class="preview-glow"></div>
-        </div>
-        <div class="card-body">
-          <div class="card-tag">Gaming</div>
-          <div class="card-name">GAMING</div>
-          <div class="card-desc">シャープなサイバー系ダークデザイン。シアン×ブラックのゲーミングスタイル。</div>
+      <!-- Overlay themes (full showcase lives on the dedicated overlay page) -->
+      <a class="tool-card" style="--tool-accent:#00fff7; --tool-accent-bg:rgba(0,255,247,0.08);"
+        href="overlay/index.html">
+        <div class="tool-icon">🎬</div>
+        <div class="tool-body">
+          <div class="tool-tag">OBS Studio Overlay</div>
+          <div class="tool-name">配信オーバーレイテーマ（8種類）</div>
+          <div class="tool-desc">サイバーパンク、ゲーミング、和風など8つのOBS用オーバーレイテーマを無料公開中。テーマ一覧・使い方は専用ページで確認できます。</div>
           <div class="card-actions">
-            <a class="btn btn-primary" href="overlay/gaming/gaming.html">オーバーレイを見る</a>
-            <a class="btn btn-secondary" href="overlay/gaming/index.html">説明書</a>
-            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/gaming"
-              target="_blank" rel="noopener">GitHub</a>
+            <span class="btn btn-primary">オーバーレイ一覧を見る →</span>
           </div>
         </div>
-      </div>
-
-      <!-- CYBERPUNK VAPORWAVE -->
-      <div class="card" style="--card-accent:#ff007f; --card-bg:#0b071a; --card-livebadge:#ff007f;">
-        <div class="preview" style="background:#0b071a;">
-          <div class="preview-inner">
-            <div class="preview-topbar">
-              <span class="preview-live" style="background:#ff007f;">LIVE</span>
-              <span class="preview-title-text" style="font-family:'Orbitron',monospace;color:#ff007f;">CYBERPUNK</span>
-            </div>
-            <div class="preview-boxes">
-              <div class="preview-box">
-                <div class="preview-box-label">TITLE</div>
-                <div class="preview-box-bar"></div>
-                <div class="preview-box-bar"></div>
-              </div>
-              <div class="preview-box">
-                <div class="preview-box-label">COMMENT</div>
-                <div class="preview-box-bar"></div>
-                <div class="preview-box-bar"></div>
-              </div>
-            </div>
-          </div>
-          <div class="preview-glow"></div>
-        </div>
-        <div class="card-body">
-          <div class="card-tag">Cyberpunk</div>
-          <div class="card-name">CYBERPUNK VAPORWAVE</div>
-          <div class="card-desc">ネオンピンク×ダークパープルの退廃的なサイバーパンク×ヴェイパーウェイブデザイン。</div>
-          <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;"
-              href="overlay/cyberpunk-gaming/cyberpunk-gaming.html">オーバーレイを見る</a>
-            <a class="btn btn-secondary" href="overlay/cyberpunk-gaming/index.html">説明書</a>
-            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/cyberpunk-gaming"
-              target="_blank" rel="noopener">GitHub</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- GAMING GIRLY NEON -->
-      <div class="card" style="--card-accent:#ff6ec7; --card-bg:#0d0010; --card-livebadge:#c92b8a;">
-        <div class="preview" style="background:#0d0010;">
-          <div class="preview-inner">
-            <div class="preview-topbar">
-              <span class="preview-live" style="background:#c92b8a;">LIVE</span>
-              <span class="preview-title-text" style="color:#ff6ec7;">GIRLY NEON</span>
-            </div>
-            <div class="preview-boxes">
-              <div class="preview-box">
-                <div class="preview-box-label" style="color:#ff6ec7;">TITLE</div>
-                <div class="preview-box-bar"></div>
-                <div class="preview-box-bar"></div>
-              </div>
-              <div class="preview-box">
-                <div class="preview-box-label" style="color:#ff6ec7;">COMMENT</div>
-                <div class="preview-box-bar"></div>
-                <div class="preview-box-bar"></div>
-              </div>
-            </div>
-          </div>
-          <div class="preview-glow"></div>
-        </div>
-        <div class="card-body">
-          <div class="card-tag">Girly Neon</div>
-          <div class="card-name">GAMING GIRLY NEON</div>
-          <div class="card-desc">ダーク背景にポップなネオンカラーが映えるガーリーゲーミングデザイン。</div>
-          <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;"
-              href="overlay/gaming_girly_neon/gaming_girly_neon.html">オーバーレイを見る</a>
-            <a class="btn btn-secondary" href="overlay/gaming_girly_neon/index.html">説明書</a>
-            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/gaming_girly_neon"
-              target="_blank" rel="noopener">GitHub</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- SWEET LOLITA ROSE -->
-      <div class="card card--light" style="--card-accent:#df6ba6; --card-bg:#fff0f7; --card-livebadge:#df6ba6;">
-        <div class="preview" style="background:#fff0f7;">
-          <div class="preview-inner">
-            <div class="preview-topbar">
-              <span class="preview-live" style="background:#df6ba6; color:#fff;">LIVE</span>
-              <span class="preview-title-text" style="color:#df6ba6;">SWEET LOLITA</span>
-            </div>
-            <div class="preview-boxes">
-              <div class="preview-box" style="border-color:rgba(223,107,166,0.4); background:rgba(223,107,166,0.06);">
-                <div class="preview-box-label" style="color:#df6ba6;">TITLE</div>
-                <div class="preview-box-bar" style="background:#df6ba6;"></div>
-                <div class="preview-box-bar" style="background:#df6ba6;"></div>
-              </div>
-              <div class="preview-box" style="border-color:rgba(223,107,166,0.4); background:rgba(223,107,166,0.06);">
-                <div class="preview-box-label" style="color:#df6ba6;">COMMENT</div>
-                <div class="preview-box-bar" style="background:#df6ba6;"></div>
-                <div class="preview-box-bar" style="background:#df6ba6;"></div>
-              </div>
-            </div>
-          </div>
-          <div class="preview-glow"></div>
-        </div>
-        <div class="card-body">
-          <div class="card-tag">Sweet Lolita</div>
-          <div class="card-name">SWEET LOLITA ROSE</div>
-          <div class="card-desc">ピンク×白のふんわりロリータデザイン。かわいらしい配信画面を演出。</div>
-          <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;"
-              href="overlay/sweet_lolita_rose/sweet_lolita_rose.html">オーバーレイを見る</a>
-            <a class="btn btn-secondary" href="overlay/sweet_lolita_rose/index.html">説明書</a>
-            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/sweet_lolita_rose"
-              target="_blank" rel="noopener">GitHub</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- WA -->
-      <div class="card card--light" style="--card-accent:#b5627e; --card-bg:#faf6f0; --card-livebadge:#8b3a56;">
-        <div class="preview" style="background:#faf6f0;">
-          <div class="preview-inner">
-            <div class="preview-topbar">
-              <span class="preview-live"
-                style="background:#8b3a56; color:#fff; font-family:'Noto Sans JP',sans-serif; font-size:9px; letter-spacing:0;">配信中</span>
-              <span class="preview-title-text"
-                style="color:#b5627e; font-family:'Noto Sans JP',sans-serif; letter-spacing:0.1em;">和　WA</span>
-            </div>
-            <div class="preview-boxes">
-              <div class="preview-box" style="border-color:rgba(181,98,126,0.4); background:rgba(181,98,126,0.06);">
-                <div class="preview-box-label"
-                  style="color:#b5627e; font-family:'Noto Sans JP',sans-serif; letter-spacing:0;">タイトル</div>
-                <div class="preview-box-bar" style="background:#b5627e;"></div>
-                <div class="preview-box-bar" style="background:#b5627e;"></div>
-              </div>
-              <div class="preview-box" style="border-color:rgba(181,98,126,0.4); background:rgba(181,98,126,0.06);">
-                <div class="preview-box-label"
-                  style="color:#b5627e; font-family:'Noto Sans JP',sans-serif; letter-spacing:0;">コメント</div>
-                <div class="preview-box-bar" style="background:#b5627e;"></div>
-                <div class="preview-box-bar" style="background:#b5627e;"></div>
-              </div>
-            </div>
-          </div>
-          <div class="preview-glow"></div>
-        </div>
-        <div class="card-body">
-          <div class="card-tag">Japanese Style</div>
-          <div class="card-name">和 WA</div>
-          <div class="card-desc">くすみローズ×ベージュの落ち着いた和風デザイン。上品な配信画面を演出。</div>
-          <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;" href="overlay/wa/wa.html">オーバーレイを見る</a>
-            <a class="btn btn-secondary" href="overlay/wa/index.html">説明書</a>
-            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/wa" target="_blank"
-              rel="noopener">GitHub</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- DONNMA -->
-      <div class="card card--light" style="--card-accent:#8B4513; --card-bg:#f5ede0; --card-livebadge:#8B4513;">
-        <div class="preview" style="background:#f5ede0;">
-          <div class="preview-inner">
-            <div class="preview-topbar">
-              <span class="preview-live" style="background:#8B4513;">LIVE</span>
-              <span class="preview-title-text" style="color:#8B4513;">DONNMA 和風</span>
-            </div>
-            <div class="preview-boxes">
-              <div class="preview-box" style="border-color:rgba(139,69,19,0.4); background:rgba(139,69,19,0.06);">
-                <div class="preview-box-label" style="color:#8B4513;">TITLE</div>
-                <div class="preview-box-bar" style="background:#8B4513;"></div>
-                <div class="preview-box-bar" style="background:#8B4513;"></div>
-              </div>
-              <div class="preview-box" style="border-color:rgba(176,80,112,0.4); background:rgba(176,80,112,0.06);">
-                <div class="preview-box-label" style="color:#b05070;">COMMENT</div>
-                <div class="preview-box-bar" style="background:#b05070;"></div>
-                <div class="preview-box-bar" style="background:#b05070;"></div>
-              </div>
-            </div>
-          </div>
-          <div class="preview-glow"></div>
-        </div>
-        <div class="card-body">
-          <div class="card-tag">Japanese Style</div>
-          <div class="card-name">DONNMA 和風</div>
-          <div class="card-desc">ブラウン×ローズの2色展開の和風デザイン。donnma-01（ブラウン）／donnma-02（ローズ）を収録。</div>
-          <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;" href="overlay/donnma/donnma-01.html">オーバーレイを見る</a>
-            <a class="btn btn-secondary" href="overlay/donnma/index.html">説明書</a>
-            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/donnma"
-              target="_blank" rel="noopener">GitHub</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- POP -->
-      <div class="card card--light" style="--card-accent:#7ec8e3; --card-bg:#f0faff; --card-livebadge:#5bb3d8;">
-        <div class="preview" style="background:#f0faff;">
-          <div class="preview-inner">
-            <div class="preview-topbar">
-              <span class="preview-live" style="background:#5bb3d8; color:#fff;">LIVE</span>
-              <span class="preview-title-text" style="color:#3a8bb5;">POP ★</span>
-            </div>
-            <div class="preview-boxes">
-              <div class="preview-box" style="border-color:rgba(126,200,227,0.5); background:rgba(126,200,227,0.08);">
-                <div class="preview-box-label" style="color:#3a8bb5;">TITLE</div>
-                <div class="preview-box-bar" style="background:#7ec8e3;"></div>
-                <div class="preview-box-bar" style="background:#7ec8e3;"></div>
-              </div>
-              <div class="preview-box" style="border-color:rgba(126,200,227,0.5); background:rgba(126,200,227,0.08);">
-                <div class="preview-box-label" style="color:#3a8bb5;">COMMENT</div>
-                <div class="preview-box-bar" style="background:#7ec8e3;"></div>
-                <div class="preview-box-bar" style="background:#7ec8e3;"></div>
-              </div>
-            </div>
-          </div>
-          <div class="preview-glow"></div>
-        </div>
-        <div class="card-body">
-          <div class="card-tag">Pop</div>
-          <div class="card-name">POP</div>
-          <div class="card-desc">水色×白の明るいポップデザイン。元気で親しみやすい配信画面を演出。</div>
-          <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;" href="overlay/pop/pop.html">オーバーレイを見る</a>
-            <a class="btn btn-secondary" href="overlay/pop/index.html">説明書</a>
-            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/pop" target="_blank"
-              rel="noopener">GitHub</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- CITY POP -->
-      <div class="card" style="--card-accent:#f59e0b; --card-bg:#1c0a00; --card-livebadge:#c2410c;">
-        <div class="preview" style="background:#1c0a00;">
-          <div class="preview-inner">
-            <div class="preview-topbar">
-              <span class="preview-live" style="background:#c2410c;">ON AIR</span>
-              <span class="preview-title-text" style="color:#f59e0b;">CITY POP</span>
-            </div>
-            <div class="preview-boxes">
-              <div class="preview-box" style="border-color:rgba(245,158,11,0.4); background:rgba(245,158,11,0.06);">
-                <div class="preview-box-label" style="color:#f59e0b;">TITLE</div>
-                <div class="preview-box-bar" style="background:#f59e0b;"></div>
-                <div class="preview-box-bar" style="background:#f59e0b;"></div>
-              </div>
-              <div class="preview-box" style="border-color:rgba(245,158,11,0.4); background:rgba(245,158,11,0.06);">
-                <div class="preview-box-label" style="color:#f59e0b;">COMMENT</div>
-                <div class="preview-box-bar" style="background:#f59e0b;"></div>
-                <div class="preview-box-bar" style="background:#f59e0b;"></div>
-              </div>
-            </div>
-          </div>
-          <div class="preview-glow"></div>
-        </div>
-        <div class="card-body">
-          <div class="card-tag">City Pop</div>
-          <div class="card-name">CITY POP</div>
-          <div class="card-desc">レトロな80年代シティポップデザイン。オレンジ×深いブラウンで大人っぽい配信画面を演出。</div>
-          <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;" href="overlay/citypop/citypop.html">オーバーレイを見る</a>
-            <a class="btn btn-secondary" href="overlay/citypop/index.html">説明書</a>
-            <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/citypop"
-              target="_blank" rel="noopener">GitHub</a>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Usage -->
-    <div class="usage">
-      <h2>使い方</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-text">好きなテーマを選び「オーバーレイを見る」でHTMLを開く</div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-text">OBS Studio の「ブラウザソース」でそのファイルを読み込む</div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-text">HTMLファイル冒頭の CONFIG を編集してテキスト・カラーをカスタマイズ</div>
-        </div>
-        <div class="step">
-          <div class="step-num">4</div>
-          <div class="step-text">「説明書」で各テーマの詳細な使い方を確認する</div>
-        </div>
-      </div>
-    </div>
-
-    </div>
-    <!-- /panel-overlay -->
-
-    <!-- Plugin & Extension panel -->
-    <div class="tab-panel" id="panel-tools" role="tabpanel">
-
-    <div style="display: flex; flex-direction: column; gap: 16px;">
+      </a>
 
       <!-- smart-access-control -->
       <div class="tool-card" style="--tool-accent:#5b8dee; --tool-accent-bg:rgba(91,141,238,0.08);">
@@ -1107,8 +536,8 @@
           <div class="tool-desc">
             クローラー・User-Agent・IPアドレスを組み合わせてアクセスを精密に制御するWPプラグイン。AIクローラーやスクレイピングツールの許可/拒否、AIへの画像非表示やテキスト最適化表示に対応。</div>
           <div class="card-actions">
-            <a class="btn btn-primary" style="background:#5b8dee; color:#fff;"
-              href="https://donnma.com/public-app-smart-access-control-v4-0-0/" target="_blank" rel="noopener">解説ブログ</a>
+            <a class="btn btn-primary" href="https://donnma.com/public-app-smart-access-control-v4-0-0/"
+              target="_blank" rel="noopener">解説ブログ</a>
             <a class="btn btn-secondary" href="https://github.com/donnma777/smart-access-control/releases/tag/v4.0.1"
               target="_blank" rel="noopener">GitHub (v4.0.1)</a>
           </div>
@@ -1123,7 +552,7 @@
           <div class="tool-name">便利ツール拡張機能まとめ</div>
           <div class="tool-desc">広告ブロック・強制ダークモード・スクリーンショットなどを単体または統合版でまとめたChrome拡張機能リポジトリ。</div>
           <div class="card-actions">
-            <a class="btn btn-primary" style="background:#4eca8b; color:#0c1a12;"
+            <a class="btn btn-primary" style="color:#0c1a12;"
               href="https://github.com/donnma777/feature-browser-benri-tools" target="_blank" rel="noopener">GitHub</a>
           </div>
         </div>
@@ -1131,26 +560,7 @@
 
     </div>
 
-    </div>
-    <!-- /panel-tools -->
-
   </main>
-
-  <script>
-    document.querySelectorAll('.tab-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach((b) => {
-          b.classList.remove('is-active');
-          b.setAttribute('aria-selected', 'false');
-        });
-        document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('is-active'));
-
-        btn.classList.add('is-active');
-        btn.setAttribute('aria-selected', 'true');
-        document.getElementById('panel-' + btn.dataset.tab).classList.add('is-active');
-      });
-    });
-  </script>
 
   <!-- AdSense -->
   <div style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
