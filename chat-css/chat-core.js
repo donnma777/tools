@@ -71,6 +71,9 @@
     scAnimIn: 'impact', scAnimDur: 0.7, scEffect: 'shine', scEffectCount: '3', scGlowColor: '#ffd54f',
     scKeep: true, scFxMember: false,
 
+    // リアクション（YouTube）: hide / inline（チャット欄に重ねる）/ separate（リアクション専用のブラウザソース）
+    reactMode: 'hide', reactScale: 3, reactRight: 40, reactBottom: 40,
+
     animIn: 'slide-left', animDur: 0.4,
     fadeOut: false, animOut: 'fade', fadeOutDelay: 20, fadeOutDur: 0.6,
 
@@ -340,13 +343,22 @@
     out.push('yt-live-chat-item-list-renderer #item-scroller::-webkit-scrollbar { display: none !important; }');
 
     head('不要な部分を非表示');
+    // リアクションは入力欄（#panel-pages）の中にあるので、重ねて表示するときは入力欄を消さずに見えなくするだけにする
+    const inlineReact = s.reactMode === 'inline';
     hide([
-      'yt-live-chat-header-renderer', 'yt-live-chat-message-input-renderer', 'yt-live-chat-ticker-renderer',
+      'yt-live-chat-header-renderer', 'yt-live-chat-ticker-renderer',
       'yt-live-chat-banner-manager', 'yt-live-chat-viewer-engagement-message-renderer',
       'yt-live-chat-mode-change-message-renderer', 'yt-live-chat-restricted-participation-renderer',
-      'yt-live-chat-docked-message', 'yt-reaction-control-panel-overlay-view-model',
-      '#panel-pages', '#show-more', `${T} #menu`, `${T} #inline-action-button-container`,
+      'yt-live-chat-docked-message', '#show-more', `${T} #menu`, `${T} #inline-action-button-container`,
+      ...(inlineReact ? [] : ['yt-live-chat-message-input-renderer', 'yt-reaction-control-panel-overlay-view-model', '#panel-pages']),
     ].join(',\n'));
+    if (inlineReact) {
+      head('リアクション');
+      rule('#panel-pages', {
+        visibility: 'hidden', height: '0', 'min-height': '0', margin: '0', padding: '0', border: 'none', overflow: 'visible',
+      });
+      writeReactionFountain(s, w);
+    }
 
     // 通常コメント
     head('通常コメント');
@@ -452,6 +464,31 @@
   //  Twitch のポップアウトチャット用 CSS
   //  Twitch の自動生成クラス（Layout-sc-xxx など）は使わず、
   //  固定のクラス名・data属性・要素の並びだけで指定しています。
+  // =====================================================
+  //  YouTube のリアクション（ハートなどが浮かぶ部分 #emoji-fountain）
+  //  途中の要素の名前に頼らないよう、まわりは visibility: hidden で隠し、
+  //  #emoji-fountain だけ visible に戻して画面の決まった位置に固定します。
+  // =====================================================
+  function writeReactionFountain(s, w) {
+    w.rule('#emoji-fountain, #emoji-fountain *', { visibility: 'visible' });
+    w.rule('#emoji-fountain', {
+      position: 'fixed', top: 'auto', left: 'auto', right: px(s.reactRight), bottom: px(s.reactBottom),
+      transform: `scale(${s.reactScale})`, 'transform-origin': 'bottom right', 'z-index': '100',
+    });
+  }
+
+  // リアクションだけを表示する、2つ目のブラウザソース用のCSS
+  function generateReactions(s) {
+    const w = writer();
+    w.out.push('/* どんまうんど チャットCSSジェネレーター（リアクション用） https://donnma.com/tool/chat-css/ */');
+    w.head('リアクション以外をすべて見えなくする');
+    w.rule('html, body', { 'background-color': 'transparent', overflow: 'hidden' });
+    w.rule('body', { visibility: 'hidden' });
+    w.head('リアクション');
+    writeReactionFountain(s, w);
+    return w.done();
+  }
+
   // =====================================================
   // バッジ画像の alt（英語・日本語）から立場を判定
   const TW_ROLE_BADGES = {
@@ -569,7 +606,8 @@
   const BASE_CSS = `
     html, body { margin: 0; height: 100%; }
     body { font-family: Roboto, Arial, "Noto Sans JP", sans-serif; font-size: 13px; color: #fff; }
-    yt-live-chat-app, yt-live-chat-renderer, yt-live-chat-item-list-renderer { display: block; height: 100%; }
+    yt-live-chat-app, yt-live-chat-renderer { display: flex; flex-direction: column; height: 100%; }
+    yt-live-chat-item-list-renderer { display: block; flex: 1; min-height: 0; }
     #item-scroller { height: 100%; overflow-y: auto; }
     #item-offset { min-height: 100%; display: flex; flex-direction: column; justify-content: flex-end; }
     #items { display: flex; flex-direction: column; padding: 8px 0; }
@@ -607,11 +645,29 @@
     yt-live-chat-paid-sticker-renderer #card { display: flex; align-items: center; gap: 16px; padding: 8px 16px; background: #00b8d4; color: #000; border-radius: 4px; }
     yt-live-chat-paid-sticker-renderer #author-photo { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; }
     yt-live-chat-paid-sticker-renderer #sticker { font-size: 48px; line-height: 1; margin-left: auto; }
+
+    #panel-pages { flex: none; padding: 8px 12px; background: #0f0f0f; border-top: 1px solid rgba(255,255,255,.1); }
+    #top { display: flex; align-items: center; gap: 8px; }
+    #input-container { flex: 1; padding: 6px 12px; border-radius: 16px; background: rgba(255,255,255,.1); color: #aaa; }
+    yt-reaction-control-panel-overlay-view-model { position: relative; display: block; }
+    #reaction-control-panel { font-size: 16px; }
+    #emoji-fountain { position: absolute; right: 0; bottom: 100%; width: 32px; height: 120px; pointer-events: none; }
+    #emoji-fountain .cc-emoji { position: absolute; bottom: 0; left: 8px; font-size: 16px; animation: cc-float 2.4s ease-out forwards; }
+    @keyframes cc-float {
+      0% { opacity: 0; transform: translateX(0) scale(.5); }
+      15% { opacity: 1; }
+      100% { opacity: 0; transform: translate(var(--dx, 0px), -110px) scale(1); }
+    }
   `;
 
   const FRAME_HTML = `<yt-live-chat-app><yt-live-chat-renderer><yt-live-chat-item-list-renderer>
     <div id="item-scroller"><div id="item-offset"><div id="items"></div></div></div>
-    </yt-live-chat-item-list-renderer></yt-live-chat-renderer></yt-live-chat-app>`;
+    </yt-live-chat-item-list-renderer>
+    <div id="panel-pages"><div id="input-panel"><yt-live-chat-message-input-renderer><div id="container"><div id="top">
+    <div id="input-container">チャット...</div><div id="right"><div id="picker-buttons">
+    <yt-reaction-control-panel-overlay-view-model><div id="reaction-control-panel">❤️</div><div id="emoji-fountain"></div>
+    </yt-reaction-control-panel-overlay-view-model></div></div></div></div></yt-live-chat-message-input-renderer></div></div>
+    </yt-live-chat-renderer></yt-live-chat-app>`;
 
   // --- 部品 ---
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -734,7 +790,7 @@
 
   global.ChatCore = {
     FONTS, WEIGHTS, DEFAULTS, COLOR_KEYS, IN_ANIMS, OUT_ANIMS, SC_IN_ANIMS, SC_EFFECTS,
-    sanitize, generate, generateTwitch,
+    sanitize, generate, generateTwitch, generateReactions,
     BASE_CSS, FRAME_HTML, esc, svgUri, avatar,
     textItem, paidItem, memberItem, stickerItem,
     TW_BASE_CSS, TW_FRAME_HTML, twTextItem, twNoticeItem,

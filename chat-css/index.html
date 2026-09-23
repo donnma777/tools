@@ -673,6 +673,10 @@
       border-radius: 0 0 14px 14px;
     }
 
+    .output-panel textarea.react-out {
+      height: 90px;
+    }
+
     .output-panel textarea:focus {
       outline: none;
     }
@@ -967,6 +971,16 @@
         </div>
         <textarea id="css-out" readonly spellcheck="false" aria-label="生成されたCSS"></textarea>
       </div>
+
+      <div class="panel output-panel" id="react-panel" hidden>
+        <div class="panel-head">
+          <span>リアクション用CSS <span class="out-meta">2つ目のブラウザソースに貼る</span></span>
+          <div class="preview-tools">
+            <button class="btn btn-sm btn-primary" id="btn-copy-react" type="button">📋 CSSをコピー</button>
+          </div>
+        </div>
+        <textarea id="react-out" class="react-out" readonly spellcheck="false" aria-label="リアクション用CSS"></textarea>
+      </div>
     </div>
   </div>
 
@@ -1022,6 +1036,17 @@
           </div>
           <p class="field-note">枠を立てるたびに動画IDが変わる場合は、配信ごとにURLを差し替えてください。</p>
         </div>
+      </div>
+    </div>
+
+    <div class="panel" data-for="youtube">
+      <div class="panel-body">
+        <h2>❤️ リアクションの表示（YouTube）</h2>
+        <ul class="notes">
+          <li>視聴者が送るハートなどのリアクションを、チャット欄に重ねたり、画面の好きな位置に大きく出したりできます（「リアクション」の設定）。</li>
+          <li><b>リアクションだけ表示</b>：OBSで2つ目のブラウザソースを作り、同じチャット欄のURLを入れて、幅 <code>1920</code>・高さ <code>1080</code> にします。カスタムCSSには「リアクション用CSS」を貼ります。</li>
+          <li>リアクションは、配信者がリアクションをオンにしている配信でだけ表示されます。YouTubeにログインしていないブラウザソースでは表示されないことがあります。</li>
+        </ul>
       </div>
     </div>
 
@@ -1214,6 +1239,21 @@
           ]
         },
         {
+          title: 'リアクション', icon: '❤️', when: isYT, fields: [
+            {
+              k: 'reactMode', l: 'ハートなどのリアクション', t: 'select', o: [
+                ['hide', '表示しない'], ['inline', 'チャット欄に重ねて表示'], ['separate', 'リアクションだけ表示（2つ目のブラウザソース用）'],
+              ],
+            },
+            { k: 'reactScale', l: '大きさ', t: 'range', min: 1, max: 10, step: 0.5, u: '倍', when: s => s.reactMode !== 'hide' },
+            {
+              k: 'reactRight', l: '右からの位置', t: 'range', min: 0, max: 1800, step: 10, u: 'px', when: s => s.reactMode !== 'hide',
+              note: 'ブラウザソースの右下を基準にした位置です（リアクションだけ表示のときは 1920×1080 の画面が基準）',
+            },
+            { k: 'reactBottom', l: '下からの位置', t: 'range', min: 0, max: 1000, step: 10, u: 'px', when: s => s.reactMode !== 'hide' },
+          ]
+        },
+        {
           title: 'スパチャの演出', icon: '🎉', when: s => isYT(s) && s.showSuperchat, fields: [
             {
               k: 'scAnimIn', l: '登場のしかた', t: 'select',
@@ -1340,6 +1380,7 @@
           b.setAttribute('aria-checked', String(b.dataset.platform === S.platform));
         });
         document.querySelectorAll('[data-for]').forEach(el => { el.hidden = !el.dataset.for.split(' ').includes(S.platform); });
+        $('react-panel').hidden = !(isYT(S) && S.reactMode === 'separate');
       }
 
       // =====================================================
@@ -1384,6 +1425,7 @@
         $('css-out').value = currentCSS;
         $('out-meta').textContent = `${currentCSS.length.toLocaleString()} 文字`;
         $('tw-url').value = twitchURL().url;
+        $('react-out').value = C.generateReactions(S);
         applyPreviewCSS();
         try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* ignore */ }
       }
@@ -1555,6 +1597,20 @@
         replayTimers = first.map((f, i) => setTimeout(() => push(f()), i * 140));
       }
 
+      // プレビューのリアクション（チャット欄に重ねて表示のときだけ流す）
+      const REACTIONS = ['❤️', '😂', '🎉', '😳', '💯'];
+      setInterval(() => {
+        if (!fdoc || dom !== DOMS.yt || !playing || !isYT(S) || S.reactMode !== 'inline') return;
+        const f = fdoc.getElementById('emoji-fountain');
+        if (!f) return;
+        const e = fdoc.createElement('span');
+        e.className = 'cc-emoji';
+        e.textContent = pick(REACTIONS);
+        e.style.setProperty('--dx', `${Math.round(Math.random() * 24 - 12)}px`);
+        e.addEventListener('animationend', () => e.remove());
+        f.appendChild(e);
+      }, 350);
+
       let playing = true, timer = null;
       function schedule() {
         clearTimeout(timer);
@@ -1610,6 +1666,10 @@
       $('btn-copy').addEventListener('click', async () => {
         await copyText(currentCSS, $('css-out'));
         toast('CSSをコピーしました！OBSのカスタムCSSに貼り付けてください');
+      });
+      $('btn-copy-react').addEventListener('click', async () => {
+        await copyText($('react-out').value, $('react-out'));
+        toast('リアクション用CSSをコピーしました！2つ目のブラウザソースに貼り付けてください');
       });
       $('btn-dl').addEventListener('click', () => download(isTW(S) ? 'twitch-chat.css' : 'youtube-chat.css', currentCSS, 'text/css'));
 
