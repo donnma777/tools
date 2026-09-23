@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>どんまうんど-Tools-Overlay</title>
+  <link rel="icon" href="../favicon.ico">
   <meta name="description"
     content="OBS Studio用配信オーバーレイのテーマ集。サイバーパンク、ゲーミング、ガーリーネオン、スウィートロリータ、和風、ナチュラルボタニカルなど8つのテーマを無料公開中。">
   <meta property="og:title" content="どんまうんど-Tools-Overlay">
@@ -72,6 +73,9 @@
     }
 
     .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
       font-family: 'Orbitron', monospace;
       font-size: 16px;
       font-weight: 900;
@@ -83,6 +87,12 @@
 
     .topnav-brand:hover {
       opacity: 0.7;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
     }
 
     .topnav-right {
@@ -607,7 +617,7 @@
   <!-- Topnav -->
   <nav class="topnav">
     <div class="topnav-inner">
-      <a class="topnav-brand" href="../">どんまうんど-Tools</a>
+      <a class="topnav-brand" href="../"><img src="../image/logo.png" alt="どんまうんど" width="720" height="151"><span>Tools</span></a>
       <div class="topnav-right">
         <a class="topnav-back" href="../">← トップに戻る</a>
         <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
