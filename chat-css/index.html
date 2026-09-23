@@ -932,6 +932,7 @@
             </select>
             <button class="btn btn-sm" id="btn-play" type="button">⏸ 停止</button>
             <button class="btn btn-sm" id="btn-add" type="button">＋ 追加</button>
+            <button class="btn btn-sm" id="btn-add-sc" type="button" data-for="youtube" title="スパチャを流す">💰 スパチャ</button>
             <button class="btn btn-sm" id="btn-replay" type="button" title="コメントを最初から流し直します">↻</button>
           </div>
         </div>
@@ -1087,7 +1088,7 @@
           font: 'Mochiy Pop One', msgWeight: '400', nameWeight: '400', textEffect: 'none',
           msgColor: '#3a8bb5', nameColor: '#ff7eb9', memberColor: '#2ba640', modColor: '#5e84f1', ownerColor: '#e0a100',
           bubble: true, bubbleColor: '#ffffff', bubbleAlpha: 0.95, bubbleRadius: 20, bubblePadding: 10,
-          animIn: 'zoom', scMode: 'custom', scHeader: '#7ec8e3', scBody: '#a8dcef', scText: '#ffffff',
+          animIn: 'pop', scMode: 'custom', scHeader: '#7ec8e3', scBody: '#a8dcef', scText: '#ffffff',
         }],
         ['和風', {
           font: 'Shippori Mincho', msgWeight: '600', nameWeight: '700', textEffect: 'none',
@@ -1097,7 +1098,7 @@
         }],
         ['コメントのみ', {
           showIcon: false, showName: false, msgSize: 24, textEffect: 'outline', effectWidth: 3,
-          fadeOut: true, fadeOutDelay: 15, animIn: 'slide-up',
+          fadeOut: true, animOut: 'float-up', fadeOutDelay: 15, animIn: 'slide-up',
         }],
       ];
 
@@ -1199,15 +1200,36 @@
         {
           title: 'アニメーション', icon: '✨', fields: [
             {
-              k: 'animIn', l: '表示されるとき', t: 'select', o: [
-                ['none', 'なし'], ['fade', 'ふわっと表示'], ['slide-left', '左からスライド'],
-                ['slide-right', '右からスライド'], ['slide-up', '下からスライド'], ['zoom', 'ポンッと拡大'],
-              ]
+              k: 'animIn', l: '表示されるとき', t: 'select',
+              o: [['none', 'なし'], ...Object.entries(C.IN_ANIMS).map(([v, a]) => [v, a.l])],
             },
             { k: 'animDur', l: '表示アニメーションの時間', t: 'range', min: 0.1, max: 2, step: 0.1, u: '秒', when: s => s.animIn !== 'none' },
             { k: 'fadeOut', l: '一定時間でコメントを消す', t: 'check' },
-            { k: 'fadeOutDelay', l: '消えるまでの時間', t: 'range', min: 3, max: 120, step: 1, u: '秒', when: s => s.fadeOut },
+            {
+              k: 'animOut', l: '消えるとき', t: 'select', when: s => s.fadeOut,
+              o: Object.entries(C.OUT_ANIMS).map(([v, a]) => [v, a.l]),
+            },
+            { k: 'fadeOutDelay', l: '消えるまでの時間', t: 'range', min: 3, max: 120, step: 1, u: '秒', when: s => s.fadeOut, note: 'プレビューで消え方を見るときは、いったん短くすると確認しやすいです' },
             { k: 'fadeOutDur', l: '消えるアニメーションの時間', t: 'range', min: 0.1, max: 3, step: 0.1, u: '秒', when: s => s.fadeOut },
+          ]
+        },
+        {
+          title: 'スパチャの演出', icon: '🎉', when: s => isYT(s) && s.showSuperchat, fields: [
+            {
+              k: 'scAnimIn', l: '登場のしかた', t: 'select',
+              o: [['same', '通常コメントと同じ'],
+                ...Object.entries(C.SC_IN_ANIMS).map(([v, a]) => [v, '★ ' + a.l]),
+                ...Object.entries(C.IN_ANIMS).map(([v, a]) => [v, a.l])],
+            },
+            { k: 'scAnimDur', l: '登場アニメーションの時間', t: 'range', min: 0.2, max: 2, step: 0.1, u: '秒', when: s => s.scAnimIn !== 'same' },
+            {
+              k: 'scEffect', l: '登場したあとの演出', t: 'select',
+              o: [['none', 'なし'], ...Object.entries(C.SC_EFFECTS).map(([v, a]) => [v, a.l])],
+            },
+            { k: 'scEffectCount', l: '演出の回数', t: 'select', o: [['1', '1回'], ['3', '3回'], ['infinite', 'ずっと']], when: s => s.scEffect !== 'none' },
+            { k: 'scGlowColor', l: '光の色', t: 'color', when: s => s.scEffect === 'glow' },
+            { k: 'scKeep', l: 'スパチャは消さずに残す', t: 'check', when: s => s.fadeOut, note: '「一定時間でコメントを消す」を使っているときの設定です' },
+            { k: 'scFxMember', l: 'メンバー加入にも同じ演出を使う', t: 'check', when: s => s.showMembership },
           ]
         },
       ];
@@ -1331,6 +1353,15 @@
         refreshVisibility();
         scheduleRender();
         if (S.platform !== before) setupFrame();
+        else if (ANIM_KEYS.includes(k)) replaySoon();
+      }
+
+      const ANIM_KEYS = ['animIn', 'animDur', 'fadeOut', 'animOut', 'fadeOutDelay', 'fadeOutDur',
+        'scAnimIn', 'scAnimDur', 'scEffect', 'scEffectCount', 'scGlowColor', 'scKeep', 'scFxMember'];
+      let replayTimer = null;
+      function replaySoon() {
+        clearTimeout(replayTimer);
+        replayTimer = setTimeout(replayPreview, 300);
       }
 
       function scheduleRender() {
@@ -1536,6 +1567,7 @@
         schedule();
       });
       $('btn-add').addEventListener('click', addRandom);
+      $('btn-add-sc').addEventListener('click', () => push(sample.paid(pick(people()), pick(PAID_LINES))));
       $('btn-replay').addEventListener('click', replayPreview);
       $('stage-bg').addEventListener('change', e => {
         $('stage').className = 'stage bg-' + e.target.value;

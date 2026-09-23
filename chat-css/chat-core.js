@@ -67,8 +67,12 @@
 
     showMembership: true, memHeaderText: true,
 
+    // スパチャの演出（YouTube）
+    scAnimIn: 'impact', scAnimDur: 0.7, scEffect: 'shine', scEffectCount: '3', scGlowColor: '#ffd54f',
+    scKeep: true, scFxMember: false,
+
     animIn: 'slide-left', animDur: 0.4,
-    fadeOut: false, fadeOutDelay: 20, fadeOutDur: 0.6,
+    fadeOut: false, animOut: 'fade', fadeOutDelay: 20, fadeOutDur: 0.6,
 
     // Twitch 専用
     twUserColor: true, twHideUsers: '',
@@ -154,23 +158,158 @@
     return font;
   }
 
+  // =====================================================
+  //  アニメーションのテンプレート
+  //  { 表示名, キーフレーム, イージング }。ここに足すとジェネレーターの選択肢にも出ます。
+  // =====================================================
+  const SMOOTH = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
+  const IN_ANIMS = {
+    fade: { l: 'ふわっと表示', ease: 'ease-out', kf: ['from { opacity: 0; }', 'to { opacity: 1; }'] },
+    'slide-left': { l: '左からスライド', ease: SMOOTH, kf: ['from { opacity: 0; transform: translateX(-40px); }', 'to { opacity: 1; transform: none; }'] },
+    'slide-right': { l: '右からスライド', ease: SMOOTH, kf: ['from { opacity: 0; transform: translateX(40px); }', 'to { opacity: 1; transform: none; }'] },
+    'slide-up': { l: '下からスライド', ease: SMOOTH, kf: ['from { opacity: 0; transform: translateY(24px); }', 'to { opacity: 1; transform: none; }'] },
+    zoom: { l: 'ポンッと拡大', ease: SMOOTH, kf: ['from { opacity: 0; transform: scale(0.8); }', 'to { opacity: 1; transform: none; }'] },
+    pop: {
+      l: 'ぷるんと弾む', ease: 'ease-out', kf: [
+        '0% { opacity: 0; transform: scale(0.3); }', '55% { opacity: 1; transform: scale(1.1); }',
+        '75% { transform: scale(0.95); }', '100% { opacity: 1; transform: none; }'],
+    },
+    bounce: {
+      l: '下からぴょんっと跳ねる', ease: 'ease-out', kf: [
+        '0% { opacity: 0; transform: translateY(30px); }', '50% { opacity: 1; transform: translateY(-10px); }',
+        '75% { transform: translateY(3px); }', '100% { opacity: 1; transform: none; }'],
+    },
+    drop: {
+      l: '上から落ちてくる', ease: 'ease-out', kf: [
+        '0% { opacity: 0; transform: translateY(-30px); }', '60% { opacity: 1; transform: translateY(6px); }',
+        '80% { transform: translateY(-2px); }', '100% { opacity: 1; transform: none; }'],
+    },
+    jelly: {
+      l: 'ぷにっと伸び縮み', ease: 'ease-out', kf: [
+        '0% { opacity: 0; transform: scale(0.6, 0.6); }', '30% { opacity: 1; transform: scale(1.2, 0.8); }',
+        '50% { transform: scale(0.9, 1.1); }', '70% { transform: scale(1.05, 0.95); }', '100% { opacity: 1; transform: none; }'],
+    },
+    flip: {
+      l: 'くるっとめくれる', ease: SMOOTH, kf: [
+        'from { opacity: 0; transform-origin: top center; transform: perspective(400px) rotateX(-90deg); }',
+        'to { opacity: 1; transform-origin: top center; transform: none; }'],
+    },
+    swing: {
+      l: 'ゆらっと揺れて登場', ease: 'ease-out', kf: [
+        '0% { opacity: 0; transform-origin: left center; transform: translateX(-20px) rotate(-8deg); }',
+        '60% { opacity: 1; transform-origin: left center; transform: rotate(3deg); }',
+        '100% { opacity: 1; transform-origin: left center; transform: none; }'],
+    },
+    blur: { l: 'ぼかしからくっきり', ease: 'ease-out', kf: ['from { opacity: 0; filter: blur(8px); transform: scale(1.05); }', 'to { opacity: 1; filter: none; transform: none; }'] },
+  };
+  const OUT_ANIMS = {
+    fade: { l: 'ふわっと消える', ease: 'ease-in', kf: ['to { opacity: 0; }'] },
+    'float-up': { l: '上に浮かんで消える', ease: 'ease-in', kf: ['to { opacity: 0; transform: translateY(-20px); }'] },
+    'slide-left': { l: '左へ流れて消える', ease: 'ease-in', kf: ['to { opacity: 0; transform: translateX(-60px); }'] },
+    'slide-right': { l: '右へ流れて消える', ease: 'ease-in', kf: ['to { opacity: 0; transform: translateX(60px); }'] },
+    shrink: { l: 'しゅっと縮んで消える', ease: 'ease-in', kf: ['to { opacity: 0; transform: scale(0.6); }'] },
+    blur: { l: 'ぼやけて消える', ease: 'ease-in', kf: ['to { opacity: 0; filter: blur(8px); }'] },
+  };
+
+  // スパチャ専用の登場アニメーション（通常コメント用の IN_ANIMS も選べます）
+  const SC_IN_ANIMS = {
+    impact: {
+      l: 'ドーンと登場', ease: 'ease-out', kf: [
+        '0% { opacity: 0; transform: scale(2.2); }', '55% { opacity: 1; transform: scale(0.92); }',
+        '75% { transform: scale(1.04); }', '100% { opacity: 1; transform: none; }'],
+    },
+    slam: {
+      l: '上から叩きつける', ease: 'ease-out', kf: [
+        '0% { opacity: 0; transform: translateY(-120px); }', '50% { opacity: 1; transform: translateY(0) scale(1.06, 0.88); }',
+        '70% { transform: translateY(-8px) scale(0.98, 1.03); }', '100% { opacity: 1; transform: none; }'],
+    },
+    spin: { l: 'くるっと回って登場', ease: SMOOTH, kf: ['from { opacity: 0; transform: rotate(-200deg) scale(0.2); }', 'to { opacity: 1; transform: none; }'] },
+    rise: { l: '下からせり上がる', ease: SMOOTH, kf: ['from { opacity: 0; transform: translateY(80px) scale(0.9); }', 'to { opacity: 1; transform: none; }'] },
+  };
+
+  // スパチャのカード（#card）にかける登場後の演出。dur は1回分の長さ（秒）
+  const SC_EFFECTS = {
+    shine: {
+      l: 'キラッと光が走る', dur: 2.4, ease: 'ease-in-out', pseudo: '::after',
+      card: { position: 'relative', overflow: 'hidden' },
+      props: () => ({
+        content: '""', position: 'absolute', top: '0', bottom: '0', left: '0', width: '45%', 'pointer-events': 'none',
+        background: 'linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.6) 50%, transparent 100%)',
+      }),
+      kf: () => ['0% { transform: translateX(-150%) skewX(-20deg); }', '45%, 100% { transform: translateX(350%) skewX(-20deg); }'],
+    },
+    glow: {
+      l: 'ふちが光る', dur: 1.6, ease: 'ease-in-out',
+      kf: s => [`0%, 100% { box-shadow: 0 0 0 0 ${hexToRgba(s.scGlowColor, 0)}; }`, `50% { box-shadow: 0 0 16px 4px ${s.scGlowColor}; }`],
+    },
+    shake: {
+      l: 'ブルブル揺れる', dur: 1.6, ease: 'linear',
+      kf: () => ['0%, 40%, 100% { transform: none; }', '5%, 15%, 25%, 35% { transform: translateX(-4px) rotate(-1deg); }',
+        '10%, 20%, 30% { transform: translateX(4px) rotate(1deg); }'],
+    },
+    pulse: {
+      l: 'ドクンと脈打つ', dur: 1.4, ease: 'ease-in-out',
+      kf: () => ['0%, 30%, 60%, 100% { transform: none; }', '15% { transform: scale(1.06); }', '45% { transform: scale(1.04); }'],
+    },
+    rainbow: {
+      l: 'ゲーミング発光（虹色）', dur: 3, ease: 'linear',
+      kf: () => ['from { filter: hue-rotate(0deg); }', 'to { filter: hue-rotate(360deg); }'],
+    },
+  };
+
+  const keyframes = (name, kf) => `@keyframes ${name} {\n  ${kf.join('\n  ')}\n}`;
+
   function writeAnimation(s, w, selector) {
     const anims = [];
-    const from = {
-      fade: 'none', 'slide-left': 'translateX(-40px)', 'slide-right': 'translateX(40px)',
-      'slide-up': 'translateY(24px)', zoom: 'scale(0.8)',
-    }[s.animIn];
-    if (from || s.fadeOut) w.head('アニメーション');
-    if (from) {
-      w.out.push(`@keyframes cc-in {\n  from { opacity: 0; transform: ${from}; }\n  to { opacity: 1; transform: none; }\n}`);
-      anims.push(`cc-in ${s.animDur}s cubic-bezier(0.2, 0.8, 0.2, 1) both`);
+    const inAnim = IN_ANIMS[s.animIn];
+    const outAnim = s.fadeOut ? (OUT_ANIMS[s.animOut] || OUT_ANIMS.fade) : null;
+    if (inAnim || outAnim) w.head('アニメーション');
+    if (inAnim) {
+      w.out.push(keyframes('cc-in', inAnim.kf));
+      anims.push(`cc-in ${s.animDur}s ${inAnim.ease} both`);
     }
-    if (s.fadeOut) {
-      w.out.push('@keyframes cc-out {\n  from { opacity: 1; }\n  to { opacity: 0; }\n}');
-      const delay = +(s.fadeOutDelay + (from ? s.animDur : 0)).toFixed(2);
-      anims.push(`cc-out ${s.fadeOutDur}s ease-in ${delay}s forwards`);
+    if (outAnim) {
+      w.out.push(keyframes('cc-out', outAnim.kf));
+      const delay = +(s.fadeOutDelay + (inAnim ? s.animDur : 0)).toFixed(2);
+      anims.push(`cc-out ${s.fadeOutDur}s ${outAnim.ease} ${delay}s forwards`);
     }
     if (anims.length) w.rule(selector, { animation: anims.join(', ') });
+  }
+
+  // スパチャだけ通常コメントと別の動きにする（writeAnimation の後に書いて上書き）
+  function writeSuperchatFx(s, w, sels) {
+    const inAnim = s.scAnimIn === 'same' ? null : (SC_IN_ANIMS[s.scAnimIn] || IN_ANIMS[s.scAnimIn]);
+    const normalIn = IN_ANIMS[s.animIn];
+    const keep = s.fadeOut && s.scKeep;
+    const fx = SC_EFFECTS[s.scEffect];
+    if (!inAnim && !keep && !fx) return;
+    w.head('スパチャの演出');
+    const sel = sels.join(',\n');
+    const inDur = inAnim ? s.scAnimDur : (normalIn ? s.animDur : 0);
+
+    if (inAnim || keep) {
+      const anims = [];
+      if (inAnim) {
+        w.out.push(keyframes('cc-sc-in', inAnim.kf));
+        anims.push(`cc-sc-in ${s.scAnimDur}s ${inAnim.ease} both`);
+      } else if (normalIn) {
+        anims.push(`cc-in ${s.animDur}s ${normalIn.ease} both`);
+      }
+      if (s.fadeOut && !s.scKeep) {
+        const out = OUT_ANIMS[s.animOut] || OUT_ANIMS.fade;
+        anims.push(`cc-out ${s.fadeOutDur}s ${out.ease} ${+(s.fadeOutDelay + inDur).toFixed(2)}s forwards`);
+      }
+      w.rule(sel, { animation: anims.length ? anims.join(', ') : 'none' });
+    }
+
+    if (fx) {
+      w.out.push(keyframes('cc-sc-fx', fx.kf(s)));
+      if (fx.card) w.rule(sels.map(x => `${x} #card`).join(',\n'), fx.card);
+      w.rule(sels.map(x => `${x} #card${fx.pseudo || ''}`).join(',\n'), {
+        ...(fx.props ? fx.props(s) : {}),
+        animation: `cc-sc-fx ${fx.dur}s ${fx.ease} ${+inDur.toFixed(2)}s ${s.scEffectCount} both`,
+      });
+    }
   }
 
   // 吹き出しのしっぽ（左向きの三角）。吹き出しの左外側に付きます
@@ -305,6 +444,7 @@
     }
 
     writeAnimation(s, w, `${T},\n${P},\n${M},\n${ST}`);
+    if (s.showSuperchat) writeSuperchatFx(s, w, [P, ST, ...(s.scFxMember && s.showMembership ? [M] : [])]);
     return w.done();
   }
 
@@ -593,7 +733,7 @@
   }
 
   global.ChatCore = {
-    FONTS, WEIGHTS, DEFAULTS, COLOR_KEYS,
+    FONTS, WEIGHTS, DEFAULTS, COLOR_KEYS, IN_ANIMS, OUT_ANIMS, SC_IN_ANIMS, SC_EFFECTS,
     sanitize, generate, generateTwitch,
     BASE_CSS, FRAME_HTML, esc, svgUri, avatar,
     textItem, paidItem, memberItem, stickerItem,
