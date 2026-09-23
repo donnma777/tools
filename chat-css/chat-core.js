@@ -54,7 +54,7 @@
 
     showTime: false, timeSize: 12, timeColor: '#bbbbbb',
 
-    bubble: false, bubbleColor: '#000000', bubbleAlpha: 0.5, bubbleRadius: 12, bubblePadding: 8,
+    bubble: false, bubbleTail: true, bubbleColor: '#000000', bubbleAlpha: 0.5, bubbleRadius: 12, bubblePadding: 8,
     roleBg: false, ownerBg: '#b58900', modBg: '#2b4fb8', memberBg: '#1d7a37', roleBgAlpha: 0.6,
     chatBg: '#000000', chatBgAlpha: 0,
 
@@ -173,6 +173,14 @@
     if (anims.length) w.rule(selector, { animation: anims.join(', ') });
   }
 
+  // 吹き出しのしっぽ（左向きの三角）。吹き出しの左外側に付きます
+  const TAIL_W = 8;
+  const tailProps = (color, top) => ({
+    content: '""', position: 'absolute', top: px(top), left: px(-TAIL_W), width: '0', height: '0',
+    'border-style': 'solid', 'border-width': `6px ${TAIL_W}px 6px 0`,
+    'border-color': `transparent ${color} transparent transparent`,
+  });
+
   // YouTube のチャット欄用
   function generate(s) {
     const T = 'yt-live-chat-text-message-renderer';
@@ -211,7 +219,8 @@
       const radius = { circle: '50%', rounded: '25%', square: '0' }[s.iconShape] || '50%';
       const sz = px(s.iconSize);
       rule(`${T} #author-photo`, {
-        width: sz, height: sz, 'min-width': sz, 'margin-right': px(Math.max(6, s.iconSize / 3)),
+        width: sz, height: sz, 'min-width': sz,
+        'margin-right': px(Math.max(s.bubble && s.bubbleTail ? TAIL_W + 4 : 6, s.iconSize / 3)),
         'border-radius': radius, overflow: 'hidden',
       });
       rule(`${T} #author-photo img`, { width: sz, height: sz, 'border-radius': radius });
@@ -225,16 +234,21 @@
         'border-radius': px(s.bubbleRadius),
         padding: `${px(s.bubblePadding)} ${px(s.bubblePadding * 1.5)}`,
         flex: '0 1 auto',
+        position: s.bubbleTail ? 'relative' : null,
       });
     }
     rule(`${T} #content`, content);
+    const ytTail = s.bubble && s.bubbleTail;
+    // しっぽの高さはアイコンの中央に合わせる
+    if (ytTail) rule(`${T} #content::before`, tailProps(hexToRgba(s.bubbleColor, s.bubbleAlpha), s.showIcon ? Math.max(6, s.iconSize / 2 - 6) : 8));
 
     if (s.roleBg) {
       const target = type => s.bubble ? `${T}[author-type="${type}"] #content` : `${T}[author-type="${type}"]`;
       const roleProps = c => ({ 'background-color': hexToRgba(c, s.roleBgAlpha), 'border-radius': px(s.bubbleRadius) });
-      rule(target('owner'), roleProps(s.ownerBg));
-      rule(target('moderator'), roleProps(s.modBg));
-      rule(target('member'), roleProps(s.memberBg));
+      for (const [type, c] of [['owner', s.ownerBg], ['moderator', s.modBg], ['member', s.memberBg]]) {
+        rule(target(type), roleProps(c));
+        if (ytTail) rule(`${target(type)}::before`, { 'border-right-color': hexToRgba(c, s.roleBgAlpha) });
+      }
     }
 
     if (s.showTime) rule(`${T} #timestamp`, { display: 'inline', 'font-size': px(s.timeSize), color: s.timeColor, 'margin-right': '0.5em' });
@@ -350,22 +364,28 @@
     const rowPad = `${px(s.itemGap / 2)} ${px(s.sidePad)}`;
     rule(MSG, { padding: rowPad, overflow: 'visible' });
     const line = { 'line-height': String(s.lineHeight), 'text-shadow': textShadow(s) || null };
+    const twTail = s.bubble && s.bubbleTail;
     if (s.bubble) {
       Object.assign(line, {
-        display: 'block', width: 'fit-content', 'max-width': '100%', 'box-sizing': 'border-box',
+        display: 'block', width: 'fit-content', 'box-sizing': 'border-box',
+        'max-width': twTail ? `calc(100% - ${TAIL_W}px)` : '100%',
+        'margin-left': twTail ? px(TAIL_W) : null,
+        position: twTail ? 'relative' : null,
         'background-color': hexToRgba(s.bubbleColor, s.bubbleAlpha),
         'border-radius': px(s.bubbleRadius),
         padding: `${px(s.bubblePadding)} ${px(s.bubblePadding * 1.5)}`,
       });
     }
     rule(LINE, line);
+    if (twTail) rule(`${LINE}::before`, tailProps(hexToRgba(s.bubbleColor, s.bubbleAlpha), s.bubblePadding + 2));
 
     if (s.roleBg) {
-      const tail = s.bubble ? ` ${LINE}` : '';
+      const target = type => role(type, s.bubble ? ` ${LINE}` : '');
       const roleProps = c => ({ 'background-color': hexToRgba(c, s.roleBgAlpha), 'border-radius': px(s.bubbleRadius) });
-      rule(role('member', tail), roleProps(s.memberBg));
-      rule(role('moderator', tail), roleProps(s.modBg));
-      rule(role('owner', tail), roleProps(s.ownerBg));
+      for (const [type, c] of [['member', s.memberBg], ['moderator', s.modBg], ['owner', s.ownerBg]]) {
+        rule(target(type), roleProps(c));
+        if (twTail) rule(`${target(type)}::before`, { 'border-right-color': hexToRgba(c, s.roleBgAlpha) });
+      }
     }
 
     if (!s.showName) hide(`.chat-line__username-container,\n${COLON}`);

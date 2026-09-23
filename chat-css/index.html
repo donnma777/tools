@@ -1157,6 +1157,7 @@
         {
           title: '背景・吹き出し', icon: '🗨️', fields: [
             { k: 'bubble', l: 'コメントを吹き出しで囲む', t: 'check' },
+            { k: 'bubbleTail', l: '吹き出しのしっぽを付ける', t: 'check', when: s => s.bubble },
             { k: 'bubbleColor', l: '吹き出しの色', t: 'color', when: s => s.bubble },
             { k: 'bubbleAlpha', l: '吹き出しの不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.bubble },
             { k: 'bubbleRadius', l: '角の丸み', t: 'range', min: 0, max: 30, step: 1, u: 'px', when: s => s.bubble || s.roleBg },
