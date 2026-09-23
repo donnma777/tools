@@ -5,32 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>404 — どんまうんど-Tools</title>
   <link rel="icon" href="/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* donnma.com と同じ配色（プラム × ピンク） */
     :root {
-      --bg: #0c0c14;
-      --surface: #13131f;
-      --border: rgba(255,255,255,0.07);
-      --text: #e8e8f0;
-      --muted: #7a7a9a;
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --border: #46162e;
+      --border-strong: #a03060;
+      --accent: #ff85a1;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --text: #f6e9ef;
+      --muted: #c4a2b3;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
     }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Noto Sans JP', sans-serif;
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
     .topnav {
+      background: var(--bg-deep);
       border-bottom: 1px solid var(--border);
       padding: 0 24px;
-      background: rgba(12,12,20,0.85);
-      backdrop-filter: blur(12px);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -43,22 +52,22 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
     }
 
     .topnav-brand {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      font-family: 'Orbitron', monospace;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 900;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       color: var(--text);
       text-decoration: none;
       transition: opacity 0.15s;
     }
 
-    .topnav-brand:hover { opacity: 0.7; }
+    .topnav-brand:hover { opacity: 0.8; }
 
     .topnav-brand img {
       display: block;
@@ -71,97 +80,82 @@
       align-items: center;
       gap: 8px;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--muted);
       text-decoration: none;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 14px;
+      border-radius: 999px;
+      padding: 5px 14px;
       transition: color 0.15s, border-color 0.15s;
     }
 
     .topnav-site:hover {
       color: var(--text);
-      border-color: rgba(255,255,255,0.2);
+      border-color: var(--accent);
     }
 
     .topnav-site-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #00fff7;
+      background: var(--accent);
       flex-shrink: 0;
     }
 
+    /* ページ全体をトップのヒーローと同じうさぎ柄にする */
     main {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 48px 24px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    main::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 25% 40%, rgba(0,200,255,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 50% at 75% 60%, rgba(255,0,127,0.08) 0%, transparent 70%);
-      pointer-events: none;
+      background: var(--cream) url("/image/pattern.webp") center top / 256px 256px repeat;
     }
 
     .container {
       text-align: center;
       max-width: 560px;
-      position: relative;
+      padding: 32px 40px 36px;
+      background: rgba(246, 242, 226, 0.94);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .error-icon {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 8px;
+      border-radius: 50%;
+      background: #fff url("/image/icon.png") 50% 20% / 110% auto no-repeat;
+      box-shadow: 0 0 0 3px var(--accent);
     }
 
     .error-code {
-      font-family: 'Orbitron', monospace;
-      font-size: clamp(6rem, 20vw, 10rem);
+      font-size: clamp(4rem, 16vw, 6.5rem);
       font-weight: 900;
+      color: var(--accent);
+      line-height: 1.1;
       letter-spacing: 0.05em;
-      background: linear-gradient(135deg, #ffffff 0%, #a0a0c8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-
-    .error-label {
-      display: inline-block;
-      font-family: 'Orbitron', monospace;
-      font-size: 11px;
-      letter-spacing: 0.25em;
-      color: #00fff7;
-      border: 1px solid rgba(0,255,247,0.3);
-      padding: 4px 14px;
-      border-radius: 999px;
-      text-transform: uppercase;
-      margin-bottom: 24px;
     }
 
     .error-title {
-      font-size: clamp(1rem, 3vw, 1.4rem);
-      font-weight: 700;
-      color: var(--text);
+      font-size: clamp(1.05rem, 3vw, 1.35rem);
+      font-weight: 900;
+      color: var(--plum-ink);
       margin-bottom: 12px;
     }
 
     .error-desc {
-      font-size: 0.9rem;
-      color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 40px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--plum-ink);
+      line-height: 1.8;
+      margin-bottom: 28px;
     }
 
     .actions {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       justify-content: center;
       flex-wrap: wrap;
     }
@@ -170,31 +164,35 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 10px 20px;
-      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 9px 22px;
+      border-radius: 999px;
       text-decoration: none;
-      transition: opacity 0.15s ease, transform 0.15s ease;
+      transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
     }
 
-    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn:hover { transform: translateY(-1px); }
 
     .btn-primary {
-      background: #00fff7;
-      color: #0c0c14;
+      background: var(--accent);
+      color: var(--on-accent);
     }
+
+    .btn-primary:hover { background: #ff9db3; }
 
     .btn-secondary {
-      background: rgba(255,255,255,0.06);
-      color: var(--text);
-      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--plum-ink);
+      border: 1.5px solid #f3c3d0;
     }
 
+    .btn-secondary:hover { border-color: var(--accent); }
+
     footer {
+      background: var(--bg-deep);
       border-top: 1px solid var(--border);
       padding: 24px;
-      text-align: center;
       font-size: 12px;
       color: var(--muted);
     }
@@ -202,12 +200,45 @@
     footer a {
       color: var(--muted);
       text-decoration: none;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1px;
+      border-bottom: 1px solid var(--border-strong);
       transition: color 0.15s;
     }
 
-    footer a:hover { color: var(--text); }
+    footer a:hover { color: var(--accent); }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      border-bottom: none;
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover { opacity: 0.8; }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    @media (max-width: 600px) {
+      .topnav { padding: 0 16px; }
+      .topnav-brand img { height: 22px; }
+      main { padding: 32px 16px; }
+      .container { padding: 26px 20px 28px; }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -224,22 +255,25 @@
 
   <main>
     <div class="container">
+      <div class="error-icon" aria-hidden="true"></div>
       <div class="error-code">404</div>
-      <div class="error-label">Page Not Found</div>
-      <div class="error-title">ページが見つかりませんでした</div>
+      <h1 class="error-title">ページが見つかりませんでした</h1>
       <p class="error-desc">
         お探しのページは存在しないか、移動・削除された可能性があります。<br>
         URLをご確認のうえ、トップページからお探しください。
       </p>
       <div class="actions">
         <a class="btn btn-primary" href="/">トップページへ戻る</a>
-        <a class="btn btn-secondary" href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a>
+        <a class="btn btn-secondary" href="https://donnma.com/" target="_blank" rel="noopener">オフィシャルサイト</a>
       </div>
     </div>
   </main>
 
   <footer>
-    © 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a>
+    <div class="footer-inner">
+      <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="/image/logo.png" alt="どんまうんど" width="720" height="151"></a>
+      <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+    </div>
   </footer>
 
 </body>
