@@ -1,3 +1,6 @@
+# main への push で2か所へ公開します（詳しくは README の「公開・デプロイ」）
+#   deploy        … 本番 https://donnma.com/tool/（Xserver・検索エンジンにインデックスさせる）
+#   publish-pages … GitHub Pages https://tools.donnma.com/（gh-pages ブランチ・noindex 付き）
 name: Deploy to Xserver
 
 on:
@@ -10,6 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # 本番（Xserver）: main をそのままアップロード。noindex は付けない。
+  # --delete なしのため、リポジトリで削除したファイルはサーバーに残る。
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -37,6 +42,8 @@ jobs:
         if: always()
         run: rm -f ~/.ssh/xserver_key
 
+  # GitHub Pages: 全HTMLに noindex を入れたコピーを gh-pages ブランチへ強制 push する。
+  # 検索結果に本番（donnma.com）だけが出るようにするため。gh-pages は直接編集しないこと。
   publish-pages:
     runs-on: ubuntu-latest
     permissions:

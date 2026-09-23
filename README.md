@@ -68,4 +68,21 @@ Chrome拡張機能をまとめたリポジトリ。広告ブロック・強制�
 
 ---
 
+## 公開・デプロイ
+
+`main` ブランチに push すると、GitHub Actions（`.github/workflows/deploy.yml`）が次の2か所へ自動で公開します。
+
+| 公開先 | URL | 検索エンジン | 中身 |
+|--------|-----|--------------|------|
+| 本番（Xserver） | https://donnma.com/tool/ | インデックスさせる | `main` をそのまま rsync |
+| GitHub Pages | https://tools.donnma.com/ | `noindex` | `gh-pages` ブランチ |
+
+- `gh-pages` ブランチは自動生成です。直接編集せず、`main` を更新してください（push のたびに上書きされます）。
+- GitHub Pages 用のコピーは、すべての HTML の `<head>` に `<meta name="robots" content="noindex">` を自動で追加しています。検索結果には本番（donnma.com）だけが出るようにするためです。
+- 本番へのアップロードでは `.git/`・`.github/`・`CNAME`・`README.md` を除外しています。`CNAME` は GitHub Pages 専用です。
+- 本番への rsync は `--delete` なしのため、リポジトリから削除・移動したファイルはサーバーに残ります。不要になったファイルはサーバー側でも削除してください。
+- 新しいページを追加したら `sitemap.xml` にも追記してください（`robots.txt` から参照しています）。
+
+---
+
 © 2026 [donnma.com](https://donnma.com/)
