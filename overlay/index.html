@@ -24,8 +24,11 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
     crossorigin="anonymous"></script>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Orbitron はテーマのプレビュー表示にだけ使う -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+JP:wght@400;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Orbitron:wght@700&display=swap"
     rel="stylesheet">
   <style>
     *,
@@ -36,28 +39,36 @@
       padding: 0;
     }
 
+    /* donnma.com と同じ配色（プラム × ピンク） */
     :root {
-      --bg: #0c0c14;
-      --surface: #13131f;
-      --border: rgba(255, 255, 255, 0.07);
-      --text: #e8e8f0;
-      --muted: #7a7a9a;
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --border: #46162e;
+      --border-strong: #a03060;
+      --accent: #ff85a1;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --text: #f6e9ef;
+      --muted: #c4a2b3;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
     }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Noto Sans JP', sans-serif;
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
       min-height: 100vh;
-      line-height: 1.6;
+      line-height: 1.7;
     }
 
     /* ── Topnav ── */
     .topnav {
+      background: var(--bg-deep);
       border-bottom: 1px solid var(--border);
       padding: 0 24px;
-      background: rgba(12, 12, 20, 0.85);
-      backdrop-filter: blur(12px);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -70,23 +81,23 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
     }
 
     .topnav-brand {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      font-family: 'Orbitron', monospace;
       font-size: 16px;
       font-weight: 900;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       color: var(--text);
       text-decoration: none;
       transition: opacity 0.15s;
     }
 
     .topnav-brand:hover {
-      opacity: 0.7;
+      opacity: 0.8;
     }
 
     .topnav-brand img {
@@ -102,20 +113,16 @@
     }
 
     .topnav-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       color: var(--muted);
       text-decoration: none;
-      padding: 6px 12px;
-      border-radius: 8px;
+      padding: 5px 10px;
       transition: color 0.15s;
     }
 
     .topnav-back:hover {
-      color: var(--text);
+      color: var(--accent);
     }
 
     .topnav-site {
@@ -123,128 +130,108 @@
       align-items: center;
       gap: 8px;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--muted);
       text-decoration: none;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 14px;
+      border-radius: 999px;
+      padding: 5px 14px;
       transition: color 0.15s, border-color 0.15s;
     }
 
     .topnav-site:hover {
       color: var(--text);
-      border-color: rgba(255, 255, 255, 0.2);
+      border-color: var(--accent);
     }
 
     .topnav-site-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #00fff7;
+      background: var(--accent);
       flex-shrink: 0;
     }
 
-    /* ── Hero ── */
+    /* ── Hero（トップと同じうさぎ柄） ── */
     .hero {
       position: relative;
-      padding: 64px 24px 56px;
+      padding: 48px 24px 56px;
       text-align: center;
-      overflow: hidden;
+      background: var(--cream) url("../image/pattern.webp") center top / 256px 256px repeat;
     }
 
-    .hero::before {
+    /* 下端をスカラップ（波）にして本文へつなぐ */
+    .hero::after {
       content: '';
       position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 25% 40%, rgba(0, 200, 255, 0.10) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 50% at 75% 60%, rgba(255, 0, 127, 0.12) 0%, transparent 70%);
-      pointer-events: none;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
     }
 
-    .hero-label {
+    .hero-inner {
+      position: relative;
       display: inline-block;
-      font-family: 'Orbitron', monospace;
-      font-size: 11px;
-      letter-spacing: 0.25em;
-      color: #00fff7;
-      border: 1px solid rgba(0, 255, 247, 0.3);
-      padding: 4px 14px;
-      border-radius: 999px;
-      margin-bottom: 20px;
-      text-transform: uppercase;
+      max-width: 640px;
+      padding: 26px 40px 28px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
     }
 
     .hero h1 {
-      font-family: 'Orbitron', monospace;
-      font-size: clamp(1.6rem, 5vw, 3rem);
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
       font-weight: 900;
+      color: var(--accent);
       letter-spacing: 0.05em;
-      background: linear-gradient(135deg, #ffffff 0%, #a0a0c8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 12px;
+      line-height: 1.4;
+      margin-bottom: 10px;
     }
 
     .hero p {
-      font-size: clamp(0.9rem, 2vw, 1rem);
-      color: var(--muted);
-      max-width: 480px;
-      margin: 0 auto 32px;
+      font-size: clamp(0.92rem, 2vw, 1.02rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      margin-bottom: 18px;
     }
 
-    .hero-badges {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .badge {
+    .hero-link {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 14px;
-      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--plum-ink);
+      text-decoration: none;
+      background: #fff;
+      border: 1.5px solid #f3c3d0;
+      border-radius: 999px;
+      padding: 5px 18px;
+      transition: border-color 0.15s, color 0.15s;
     }
 
-    .badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: currentColor;
+    .hero-link:hover {
+      color: #d94f77;
+      border-color: var(--accent);
     }
 
     /* ── Section ── */
     .section {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 0 24px 80px;
+      padding: 56px 24px 64px;
     }
 
+    /* 本家と同じ「左にピンクの縦線」の見出し */
     .section-title {
-      font-size: 11px;
-      font-family: 'Orbitron', monospace;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin-bottom: 32px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--text);
+      border-left: 5px solid var(--accent);
+      padding: 6px 0 6px 16px;
+      margin: 48px 0 20px;
     }
 
     /* ── Banner row ── */
@@ -252,49 +239,57 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
-      margin-bottom: 48px;
     }
 
     .official-banner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 28px;
-      background: linear-gradient(135deg, rgba(0, 255, 247, 0.06) 0%, rgba(255, 0, 127, 0.06) 100%);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      gap: 12px;
+      padding: 18px 24px;
+      background: var(--surface);
+      border: 2px solid var(--border);
       border-radius: 16px;
       text-decoration: none;
-      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+      transition: border-color 0.2s, transform 0.2s;
     }
 
     .official-banner:hover {
-      border-color: rgba(0, 255, 247, 0.35);
-      background: linear-gradient(135deg, rgba(0, 255, 247, 0.10) 0%, rgba(255, 0, 127, 0.08) 100%);
+      border-color: var(--accent);
       transform: translateY(-2px);
     }
 
     .official-banner-left {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       flex-wrap: wrap;
     }
 
+    /* favicon と同じキャラを丸く切り抜いたアイコン */
+    .official-icon {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--cream) url("../image/icon.png") 50% 8% / 150% auto no-repeat;
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
     .official-badge {
-      font-family: 'Orbitron', monospace;
-      font-size: 9px;
-      letter-spacing: 0.2em;
-      color: #00fff7;
-      border: 1px solid rgba(0, 255, 247, 0.4);
-      border-radius: 4px;
-      padding: 3px 10px;
-      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      padding: 2px 12px;
       white-space: nowrap;
     }
 
     .official-name {
-      font-size: 1.1rem;
-      font-weight: 700;
+      font-size: 1.15rem;
+      font-weight: 900;
       color: var(--text);
     }
 
@@ -312,16 +307,7 @@
 
     .official-banner:hover .official-arrow {
       transform: translateX(4px);
-      color: #00fff7;
-    }
-
-    .booth-banner:hover {
-      border-color: rgba(252, 77, 80, 0.35);
-      background: linear-gradient(135deg, rgba(252, 77, 80, 0.08) 0%, rgba(255, 140, 0, 0.06) 100%);
-    }
-
-    .booth-banner:hover .official-arrow {
-      color: #fc4d50;
+      color: var(--accent);
     }
 
     /* ── Grid ── */
@@ -331,25 +317,27 @@
       gap: 20px;
     }
 
-    /* ── Card ── */
+    /* ── Card（枠はサイト共通、プレビューだけ各テーマの色） ── */
     .card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      border: 2px solid var(--border);
+      border-radius: 20px;
       overflow: hidden;
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
     .card:hover {
-      transform: translateY(-4px);
-      border-color: var(--card-accent, rgba(255, 255, 255, 0.15));
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--card-accent, transparent);
+      transform: translateY(-3px);
+      border-color: var(--border-strong);
     }
 
     .preview {
       position: relative;
       height: 160px;
       overflow: hidden;
+      border-bottom: 2px solid var(--border);
     }
 
     .preview-inner {
@@ -438,123 +426,146 @@
     }
 
     .card-body {
-      padding: 20px;
+      padding: 18px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
     .card-tag {
-      font-family: 'Orbitron', monospace;
-      font-size: 9px;
-      letter-spacing: 0.2em;
-      color: var(--card-accent, var(--muted));
-      text-transform: uppercase;
-      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    /* テーマカラーを小さな丸で示す */
+    .card-tag::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--card-accent, var(--accent));
     }
 
     .card-name {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 8px;
+      font-size: 1.05rem;
+      font-weight: 900;
+      margin-bottom: 6px;
       color: var(--text);
     }
 
     .card-desc {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: var(--muted);
-      margin-bottom: 18px;
-      line-height: 1.5;
+      margin-bottom: 16px;
+      line-height: 1.7;
+      flex: 1;
     }
 
     .card-actions {
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 999px;
       text-decoration: none;
-      transition: opacity 0.15s ease, transform 0.15s ease;
+      transition: background 0.15s ease, transform 0.15s ease;
       white-space: nowrap;
     }
 
     .btn:hover {
-      opacity: 0.85;
       transform: translateY(-1px);
     }
 
     .btn-primary {
-      background: var(--card-accent, #444);
-      color: var(--card-bg, #000);
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      background: #ff9db3;
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.06);
       color: var(--text);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border-strong);
+    }
+
+    .btn-secondary:hover {
+      background: var(--accent-soft);
+    }
+
+    /* 3 列でもボタン 3 つが 1 行に収まるサイズ */
+    .card .btn {
+      font-size: 12px;
+      padding: 6px 12px;
     }
 
     /* ── Usage ── */
     .usage {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 32px;
-      margin-top: 48px;
-    }
-
-    .usage h2 {
-      font-family: 'Orbitron', monospace;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 20px;
-      letter-spacing: 0.05em;
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
     }
 
     .steps {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
     }
 
     .step {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       align-items: flex-start;
     }
 
     .step-num {
       flex-shrink: 0;
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
-      background: rgba(0, 255, 247, 0.12);
-      border: 1px solid rgba(0, 255, 247, 0.25);
-      color: #00fff7;
-      font-family: 'Orbitron', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: var(--accent);
+      color: var(--on-accent);
+      font-size: 14px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
     }
 
     .step-text {
-      font-size: 0.82rem;
-      color: var(--muted);
-      padding-top: 4px;
+      font-size: 0.88rem;
+      color: var(--text);
+      padding-top: 3px;
+    }
+
+    /* ── Ad ── */
+    .ad-slot {
+      max-width: 1100px;
+      margin: 0 auto 40px;
+      padding: 0 24px;
     }
 
     /* ── Footer ── */
     footer {
+      background: var(--bg-deep);
       border-top: 1px solid var(--border);
-      padding: 32px 24px;
-      text-align: center;
+      padding: 28px 24px;
       font-size: 12px;
       color: var(--muted);
     }
@@ -562,13 +573,34 @@
     footer a {
       color: var(--muted);
       text-decoration: none;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1px;
+      border-bottom: 1px solid var(--border-strong);
       transition: color 0.15s;
     }
 
     footer a:hover {
-      color: var(--text);
+      color: var(--accent);
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      border-bottom: none;
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
     }
 
     .footer-inner {
@@ -581,32 +613,51 @@
       gap: 12px;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 760px) {
       .banner-row {
         grid-template-columns: 1fr;
       }
     }
 
     @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back {
+        display: none;
+      }
+
       .hero {
-        padding: 48px 20px 40px;
+        padding: 36px 16px 44px;
       }
 
-      .card-actions {
-        flex-direction: column;
+      .hero-inner {
+        padding: 22px 18px 24px;
       }
 
-      .btn {
-        justify-content: center;
+      .section,
+      .ad-slot {
+        padding-left: 16px;
+        padding-right: 16px;
       }
 
-      .footer-inner {
+      .official-banner {
+        padding: 16px 18px;
+      }
+
+      .usage {
+        padding: 22px 18px;
+      }
+
+      .footer-inner,
+      .footer-brand {
         flex-direction: column;
         text-align: center;
-      }
-
-      .topnav-back span {
-        display: none;
       }
     }
   </style>
@@ -630,13 +681,10 @@
 
   <!-- Hero -->
   <header class="hero">
-    <div class="hero-label">OBS Studio Overlay</div>
-    <h1>どんまうんど-Tools-Overlay</h1>
-    <p>配信をもっとかっこよく、かわいく。<br>OBS Studio 向け配信オーバーレイのテーマ集です。</p>
-    <div class="hero-badges">
-      <span class="badge"><span class="badge-dot" style="color:#00fff7"></span>全8テーマ</span>
-      <span class="badge"><span class="badge-dot" style="color:#a0e090"></span>1920×1080 対応</span>
-      <span class="badge"><span class="badge-dot" style="color:#ff6ec7"></span>ドラッグ&amp;ドロップ対応</span>
+    <div class="hero-inner">
+      <h1>配信オーバーレイテーマ</h1>
+      <p>OBS Studio 向け配信オーバーレイのテーマ集です。</p>
+      <a class="hero-link" href="https://donnma.com/tools/live-tool-overlay/" target="_blank" rel="noopener">解説ページを読む →</a>
     </div>
   </header>
 
@@ -646,16 +694,15 @@
     <div class="banner-row">
       <a class="official-banner" href="https://donnma.com/" target="_blank" rel="noopener">
         <div class="official-banner-left">
-          <span class="official-badge">Official Site</span>
-          <span class="official-name">どんまうんど</span>
+          <span class="official-icon" aria-hidden="true"></span>
+          <span class="official-name">どんまうんど-オフィシャルサイト</span>
           <span class="official-url">donnma.com</span>
         </div>
         <span class="official-arrow">→</span>
       </a>
-      <a class="official-banner booth-banner" href="https://donnma.booth.pm/item_lists/nevT9GeV" target="_blank"
-        rel="noopener">
+      <a class="official-banner" href="https://donnma.booth.pm/item_lists/nevT9GeV" target="_blank" rel="noopener">
         <div class="official-banner-left">
-          <span class="official-badge" style="color:#fc4d50; border-color:rgba(252,77,80,0.4);">BOOTH</span>
+          <span class="official-badge">BOOTH</span>
           <span class="official-name">配信素材ショップ</span>
           <span class="official-url">donnma.booth.pm</span>
         </div>
@@ -663,7 +710,7 @@
       </a>
     </div>
 
-    <p class="section-title">テーマを選ぶ</p>
+    <h2 class="section-title">テーマを選ぶ</h2>
 
     <div class="grid">
 
@@ -731,7 +778,7 @@
           <div class="card-name">CYBERPUNK VAPORWAVE</div>
           <div class="card-desc">ネオンピンク×ダークパープルの退廃的なサイバーパンク×ヴェイパーウェイブデザイン。</div>
           <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;" href="cyberpunk-gaming/cyberpunk-gaming.html">オーバーレイを見る</a>
+            <a class="btn btn-primary" href="cyberpunk-gaming/cyberpunk-gaming.html">オーバーレイを見る</a>
             <a class="btn btn-secondary" href="cyberpunk-gaming/index.html">説明書</a>
             <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/cyberpunk-gaming"
               target="_blank" rel="noopener">GitHub</a>
@@ -767,7 +814,7 @@
           <div class="card-name">GAMING GIRLY NEON</div>
           <div class="card-desc">ダーク背景にポップなネオンカラーが映えるガーリーゲーミングデザイン。</div>
           <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;" href="gaming_girly_neon/gaming_girly_neon.html">オーバーレイを見る</a>
+            <a class="btn btn-primary" href="gaming_girly_neon/gaming_girly_neon.html">オーバーレイを見る</a>
             <a class="btn btn-secondary" href="gaming_girly_neon/index.html">説明書</a>
             <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/gaming_girly_neon"
               target="_blank" rel="noopener">GitHub</a>
@@ -803,7 +850,7 @@
           <div class="card-name">SWEET LOLITA ROSE</div>
           <div class="card-desc">ピンク×白のふんわりロリータデザイン。かわいらしい配信画面を演出。</div>
           <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;" href="sweet_lolita_rose/sweet_lolita_rose.html">オーバーレイを見る</a>
+            <a class="btn btn-primary" href="sweet_lolita_rose/sweet_lolita_rose.html">オーバーレイを見る</a>
             <a class="btn btn-secondary" href="sweet_lolita_rose/index.html">説明書</a>
             <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/sweet_lolita_rose"
               target="_blank" rel="noopener">GitHub</a>
@@ -843,7 +890,7 @@
           <div class="card-name">和 WA</div>
           <div class="card-desc">くすみローズ×ベージュの落ち着いた和風デザイン。上品な配信画面を演出。</div>
           <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;" href="wa/wa.html">オーバーレイを見る</a>
+            <a class="btn btn-primary" href="wa/wa.html">オーバーレイを見る</a>
             <a class="btn btn-secondary" href="wa/index.html">説明書</a>
             <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/wa" target="_blank"
               rel="noopener">GitHub</a>
@@ -879,7 +926,7 @@
           <div class="card-name">POP</div>
           <div class="card-desc">水色×白の明るいポップデザイン。元気で親しみやすい配信画面を演出。</div>
           <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;" href="pop/pop.html">オーバーレイを見る</a>
+            <a class="btn btn-primary" href="pop/pop.html">オーバーレイを見る</a>
             <a class="btn btn-secondary" href="pop/index.html">説明書</a>
             <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/pop" target="_blank"
               rel="noopener">GitHub</a>
@@ -919,7 +966,7 @@
           <div class="card-name">NATURAL BOTANICA</div>
           <div class="card-desc">グリーン×生成りのナチュラル植物系デザイン。落ち着いた癒し系の配信画面を演出。</div>
           <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;" href="natural_botanica/natural_botanica.html">オーバーレイを見る</a>
+            <a class="btn btn-primary" href="natural_botanica/natural_botanica.html">オーバーレイを見る</a>
             <a class="btn btn-secondary" href="natural_botanica/index.html">説明書</a>
             <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/natural_botanica"
               target="_blank" rel="noopener">GitHub</a>
@@ -956,7 +1003,7 @@
           <div class="card-name">CITY POP</div>
           <div class="card-desc">レトロな80年代シティポップデザイン。オレンジ×深いブラウンで大人っぽい配信画面を演出。</div>
           <div class="card-actions">
-            <a class="btn btn-primary" style="color:#fff;" href="citypop/citypop.html">オーバーレイを見る</a>
+            <a class="btn btn-primary" href="citypop/citypop.html">オーバーレイを見る</a>
             <a class="btn btn-secondary" href="citypop/index.html">説明書</a>
             <a class="btn btn-secondary" href="https://github.com/donnma777/tools/tree/main/overlay/citypop"
               target="_blank" rel="noopener">GitHub</a>
@@ -967,8 +1014,8 @@
     </div>
 
     <!-- Usage -->
+    <h2 class="section-title">使い方</h2>
     <div class="usage">
-      <h2>使い方</h2>
       <div class="steps">
         <div class="step">
           <div class="step-num">1</div>
@@ -992,7 +1039,7 @@
   </main>
 
   <!-- AdSense -->
-  <div style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
+  <div class="ad-slot">
     <!-- どんまうんど -->
     <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
       data-ad-format="auto" data-full-width-responsive="true"></ins>
@@ -1004,8 +1051,12 @@
   <!-- Footer -->
   <footer>
     <div class="footer-inner">
-      <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a
-          href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.png"
+            alt="どんまうんど" width="720" height="151"></a>
+        <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a
+            href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+      </div>
       <span>
         <a href="https://github.com/donnma777/tools" target="_blank" rel="noopener">GitHub</a>
         &nbsp;·&nbsp;
