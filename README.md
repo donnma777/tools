@@ -36,6 +36,21 @@ OBS Studio のブラウザソースで使える配信オーバーレイのテー
 
 ---
 
+## チャットCSSジェネレーター (YouTube / Twitch × OBS)
+
+`chat-css/` — YouTubeライブ・Twitchのチャット欄をOBSのブラウザソースで表示するときの見た目を、プレビューを見ながら作成できるツールです。
+フォント・縁取り・吹き出し・名前の色・スーパーチャット・表示/フェードアウトアニメーションなどを設定し、生成されたCSSをOBSのブラウザソースの「カスタムCSS」に貼り付けて使います。
+
+| ファイル | 内容 |
+|----------|------|
+| `chat-css/index.html` | ジェネレーター本体 |
+| `chat-css/chat-core.js` | CSS生成・プレビュー用の見本DOM |
+
+- **YouTube**: ポップアウトチャット（`https://www.youtube.com/live_chat?is_popout=1&v=動画ID`）を読み込んだブラウザソースに貼り付けます。
+- **Twitch**: ポップアウトチャット（`https://www.twitch.tv/popout/チャンネル名/chat?popout=`）を読み込んだブラウザソースに貼り付けます。Twitchの自動生成クラスは使わず、固定のクラス名・data属性だけで指定しています。
+
+---
+
 ## Plugin & Extension
 
 ### Smart Access Control

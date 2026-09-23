@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>チャットCSSジェネレーター | どんまうんど-Tools</title>
+  <meta name="description"
+    content="YouTubeライブ・Twitchのチャット欄をOBSのブラウザソースでおしゃれに表示するための設定を、プレビューを見ながら作れる無料ツール。フォント・縁取り・吹き出し・スパチャ・Bits・アニメーションに対応。">
+  <meta property="og:title" content="チャットCSSジェネレーター | どんまうんど-Tools">
+  <meta property="og:description" content="YouTubeライブ・Twitchのチャット欄をOBSでおしゃれに表示するための設定を、プレビューを見ながら作れる無料ツール。">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@donnma777">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+JP:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0c0c14;
+      --surface: #13131f;
+      --surface-2: #1a1a2a;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --text: #e8e8f0;
+      --muted: #7a7a9a;
+      --accent: #ff6ec7;
+      --accent-2: #00fff7;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans JP', sans-serif;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent-2);
+    }
+
+    /* ── Topnav ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: rgba(12, 12, 20, 0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      font-family: 'Orbitron', monospace;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    .topnav-brand:hover {
+      opacity: 0.7;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--text);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00fff7;
+      flex-shrink: 0;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      padding: 48px 24px 32px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 25% 40%, rgba(0, 200, 255, 0.09) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 75% 60%, rgba(255, 0, 127, 0.11) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: var(--accent);
+      border: 1px solid rgba(255, 110, 199, 0.35);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 460px;
+      grid-template-areas: "settings side";
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings {
+      grid-area: settings;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .side {
+      grid-area: side;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: calc(100vh - 88px);
+      min-height: 560px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .kicker {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    /* platform switch */
+    .seg {
+      display: inline-flex;
+      padding: 3px;
+      gap: 3px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+
+    .seg button {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+      padding: 7px 18px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .seg button:hover {
+      color: var(--text);
+    }
+
+    .seg button[aria-checked="true"][data-platform="youtube"] {
+      background: #ff3b3b;
+      color: #fff;
+    }
+
+    .seg button[aria-checked="true"][data-platform="twitch"] {
+      background: #9147ff;
+      color: #fff;
+    }
+
+    [data-for][hidden],
+    details.sec[hidden] {
+      display: none;
+    }
+
+    .tw-out {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tw-out textarea {
+      width: 100%;
+      height: 76px;
+      resize: vertical;
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 11.5px;
+      color: #cfe8ff;
+      background: #0a0a12;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+      word-break: break-all;
+    }
+
+    /* presets */
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip-btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .chip-btn:hover {
+      border-color: var(--accent);
+      background: rgba(255, 110, 199, 0.08);
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: filter 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #1a0612;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      border-color: var(--accent);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .btn-danger:hover {
+      border-color: #ff5a5a;
+      color: #ff8a8a;
+    }
+
+    .data-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    /* settings sections */
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 4px 20px;
+      padding: 12px 16px 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 0;
+      min-width: 0;
+    }
+
+    .field[hidden] {
+      display: none;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #c4c4d8;
+    }
+
+    .field-val {
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 12px;
+      color: var(--accent-2);
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select,
+    input[type=text] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    select:focus,
+    input[type=text]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .color-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .color-row input[type=color] {
+      width: 40px;
+      height: 34px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .color-row input[type=text] {
+      font-family: ui-monospace, Consolas, monospace;
+      text-transform: lowercase;
+    }
+
+    /* toggle */
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #c4c4d8;
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle .sw {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: #2a2a3e;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .toggle .sw::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.15s;
+    }
+
+    .toggle input:checked+.sw {
+      background: var(--accent);
+    }
+
+    .toggle input:checked+.sw::after {
+      transform: translateX(18px);
+    }
+
+    .toggle input:focus-visible+.sw {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    /* preview */
+    .preview-panel {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .preview-tools {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .preview-tools select {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    .stage {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      border-radius: 0 0 14px 14px;
+      overflow: hidden;
+    }
+
+    .stage iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: transparent;
+      color-scheme: normal;
+    }
+
+    .bg-checker {
+      background-color: #2a2a36;
+      background-image:
+        linear-gradient(45deg, #353544 25%, transparent 25%),
+        linear-gradient(-45deg, #353544 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #353544 75%),
+        linear-gradient(-45deg, transparent 75%, #353544 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    }
+
+    .bg-dark {
+      background: #111;
+    }
+
+    .bg-light {
+      background: #f2f2f2;
+    }
+
+    .bg-green {
+      background: #00b140;
+    }
+
+    .bg-game {
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255, 190, 90, 0.55), transparent 45%),
+        radial-gradient(circle at 70% 70%, rgba(80, 160, 255, 0.55), transparent 50%),
+        linear-gradient(160deg, #3b6d3a 0%, #7aa6c8 55%, #d9c7a0 100%);
+    }
+
+    /* output */
+    .output-panel {
+      flex: 0 0 auto;
+    }
+
+    .output-panel textarea {
+      display: block;
+      width: 100%;
+      height: 150px;
+      resize: vertical;
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: #cfe8ff;
+      background: #0a0a12;
+      border: 0;
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .output-panel textarea:focus {
+      outline: none;
+    }
+
+    .out-meta {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .guide h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: #c4c4d8;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255, 110, 199, 0.15);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    code {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      word-break: break-all;
+    }
+
+    .url-tool {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .url-out {
+      display: flex;
+      gap: 8px;
+    }
+
+    .url-out input {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    footer a {
+      color: var(--muted);
+    }
+
+    footer a:hover {
+      color: var(--text);
+    }
+
+    @media (max-width: 1000px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "side" "settings";
+        padding: 0 16px 40px;
+      }
+
+      .side {
+        position: static;
+        height: auto;
+        min-height: 0;
+      }
+
+      .stage {
+        height: 420px;
+        flex: none;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+      }
+
+      .guide {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      .topnav-back {
+        display: none;
+      }
+
+      .fields {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../">どんまうんど-Tools</a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">← トップに戻る</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-label">YouTube / Twitch Chat × OBS</div>
+    <h1>チャットCSSジェネレーター</h1>
+    <p>YouTubeライブ・Twitchのチャット欄をOBSで表示するときの見た目を、プレビューを見ながら作れます。できたCSSをOBSのブラウザソースに貼り付けるだけ。</p>
+  </header>
+
+  <div class="workspace">
+
+    <!-- Settings column -->
+    <div class="settings" id="settings">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="kicker">Platform — 配信サイト</div>
+          <div class="seg" role="radiogroup" aria-label="配信サイト" id="platform">
+            <button type="button" role="radio" data-platform="youtube">▶ YouTube</button>
+            <button type="button" role="radio" data-platform="twitch">◆ Twitch</button>
+          </div>
+          <div class="kicker">Templates — テンプレート</div>
+          <div class="preset-row" id="presets"></div>
+          <div class="data-row">
+            <button class="btn btn-sm" id="btn-save" type="button">💾 設定をファイルに保存</button>
+            <button class="btn btn-sm" id="btn-load" type="button">📂 ファイルから復元</button>
+            <button class="btn btn-sm btn-danger" id="btn-reset-color" type="button">色だけリセット</button>
+            <button class="btn btn-sm btn-danger" id="btn-reset" type="button">すべてリセット</button>
+            <input type="file" id="file-load" accept=".json,application/json" hidden>
+          </div>
+        </div>
+      </div>
+      <!-- sections are generated from SECTIONS below -->
+    </div>
+
+    <!-- Preview + output column -->
+    <div class="side">
+      <div class="panel preview-panel">
+        <div class="panel-head">
+          <span>プレビュー</span>
+          <div class="preview-tools">
+            <select id="stage-bg" aria-label="プレビュー背景">
+              <option value="checker">背景: 透過</option>
+              <option value="game">背景: ゲーム画面風</option>
+              <option value="dark">背景: 黒</option>
+              <option value="light">背景: 白</option>
+              <option value="green">背景: グリーンバック</option>
+            </select>
+            <button class="btn btn-sm" id="btn-play" type="button">⏸ 停止</button>
+            <button class="btn btn-sm" id="btn-add" type="button">＋ 追加</button>
+            <button class="btn btn-sm" id="btn-replay" type="button" title="コメントを最初から流し直します">↻</button>
+          </div>
+        </div>
+        <div class="stage bg-checker" id="stage">
+          <iframe id="preview" title="チャットのプレビュー"></iframe>
+        </div>
+      </div>
+
+      <div class="panel output-panel" data-for="twitch">
+        <div class="panel-head">
+          <span>OBSに貼るURL</span>
+          <div class="preview-tools">
+            <button class="btn btn-sm btn-primary" id="btn-copy-tw" type="button">📋 URLをコピー</button>
+          </div>
+        </div>
+        <div class="panel-body tw-out">
+          <label class="field-label" for="tw-channel"><span>Twitch チャンネル名</span></label>
+          <input type="text" id="tw-channel" placeholder="例: donnma777（twitch.tv/◯◯◯ の部分）" spellcheck="false"
+            autocomplete="off">
+          <textarea id="tw-url" readonly spellcheck="false" aria-label="OBSに貼るURL"></textarea>
+          <p class="field-note">このURLはずっと同じです。見た目を変えたときは、下のCSSだけ貼り替えます。</p>
+        </div>
+      </div>
+
+      <div class="panel output-panel" data-for="youtube twitch">
+        <div class="panel-head">
+          <span>生成されたCSS <span class="out-meta" id="out-meta"></span></span>
+          <div class="preview-tools">
+            <button class="btn btn-sm" id="btn-dl" type="button">⬇ .css</button>
+            <button class="btn btn-sm btn-primary" id="btn-copy" type="button">📋 CSSをコピー</button>
+          </div>
+        </div>
+        <textarea id="css-out" readonly spellcheck="false" aria-label="生成されたCSS"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <div class="panel" data-for="twitch">
+      <div class="panel-body">
+        <h2>🎥 OBSでの使い方（Twitch）</h2>
+        <ol class="steps">
+          <li>右の <b>「Twitch チャンネル名」</b> に自分のチャンネル名を入れて、ポップアウトチャットのURLをコピーします。</li>
+          <li>OBSで <b>ソース ＋ → ブラウザ</b> を追加し、URLに貼り付けます。幅 <code>400</code>・高さ <code>600〜1000</code> くらいが目安です。</li>
+          <li>このページで見た目を決めて <b>「CSSをコピー」</b>。</li>
+          <li>ブラウザソースのプロパティにある <b>カスタムCSS</b> の中身をすべて消して、コピーしたCSSを貼り付けて「OK」。</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel" data-for="twitch">
+      <div class="panel-body">
+        <h2>◆ Twitch版について</h2>
+        <ul class="notes">
+          <li>Twitch公式のチャット欄にCSSを当てるので、チャンネル独自のサブスクバッジやエモートもそのまま表示されます。</li>
+          <li>Twitchのチャット欄にはアイコンが無いため、「アイコン」の設定はありません。Bitsは通常のコメントとして表示されます。</li>
+          <li>配信者・モデレーター・サブスク/VIPの色分けは、バッジの名前（日本語・英語）から判定しています。新しめのOBSが必要です。</li>
+        </ul>
+      </div>
+    </div>
+
+
+
+    <div class="panel" data-for="youtube">
+      <div class="panel-body">
+        <h2>🎥 OBSでの使い方（YouTube）</h2>
+        <ol class="steps">
+          <li>右の<b>「URL作成」</b>に配信のURLを入れて、チャット欄のURL（ポップアウト版）を作ります。</li>
+          <li>OBSで <b>ソース ＋ → ブラウザ</b> を追加し、URLに貼り付けます。幅 <code>400</code>・高さ <code>600〜1000</code> くらいが目安です。</li>
+          <li>このページで見た目を決めて <b>「CSSをコピー」</b>。</li>
+          <li>ブラウザソースのプロパティにある <b>カスタムCSS</b> の中身をすべて消して、コピーしたCSSを貼り付けて「OK」。</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel" data-for="youtube">
+      <div class="panel-body">
+        <h2>🔗 チャット欄URL作成</h2>
+        <div class="url-tool">
+          <input type="text" id="yt-url" placeholder="配信URL または 動画ID（例: https://www.youtube.com/live/xxxxxxxxxxx）"
+            aria-label="配信URL または 動画ID">
+          <div class="url-out">
+            <input type="text" id="chat-url" readonly placeholder="ここにチャット欄のURLが表示されます"
+              aria-label="チャット欄のURL">
+            <button class="btn btn-sm" id="btn-copy-url" type="button">コピー</button>
+          </div>
+          <p class="field-note">枠を立てるたびに動画IDが変わる場合は、配信ごとにURLを差し替えてください。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body">
+        <h2>💡 ヒント・注意点</h2>
+        <ul class="notes">
+          <li>設定はこのブラウザに自動で保存されます。別のPCで使うときは「設定をファイルに保存」→「ファイルから復元」。</li>
+          <li>フェードアウトを使うと、一定時間経ったコメントが自然に消えます。ゲーム画面の上に重ねるときにおすすめ。</li>
+          <li>YouTube・Twitch側の仕様変更で、一部の見た目が反映されなくなることがあります。</li>
+          <li>「手動で指定」のフォントは、配信するPCにインストールされている必要があります。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a
+          href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+      <span>
+        <a href="https://github.com/donnma777/tools" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="chat-core.js"></script>
+  <script>
+    (() => {
+      'use strict';
+      const C = window.ChatCore;
+      const { DEFAULTS, COLOR_KEYS, FONTS, WEIGHTS } = C;
+
+      const PRESETS = [
+        ['標準', {}],
+        ['シンプル縁取り', {
+          showIcon: false, nameBreak: false, nameColon: true, msgSize: 20, nameSize: 16,
+          textEffect: 'outline', effectWidth: 2.5, animIn: 'fade',
+        }],
+        ['吹き出し', {
+          font: 'Zen Maru Gothic', textEffect: 'none', bubble: true, bubbleColor: '#000000', bubbleAlpha: 0.55,
+          bubbleRadius: 14, bubblePadding: 8, msgSize: 17, iconSize: 36, nameColor: '#b8c4ff',
+        }],
+        ['ネオン', {
+          font: 'Zen Kaku Gothic New', textEffect: 'glow', effectWidth: 3, effectColor: '#ff00c8',
+          msgColor: '#ffffff', nameColor: '#00fff7', memberColor: '#7dffb0', modColor: '#b9a8ff',
+          bubble: true, bubbleColor: '#12001f', bubbleAlpha: 0.6, bubbleRadius: 4, animIn: 'slide-right',
+          scMode: 'custom', scHeader: '#9b00ff', scBody: '#ff00c8', scText: '#ffffff',
+        }],
+        ['ポップ', {
+          font: 'Mochiy Pop One', msgWeight: '400', nameWeight: '400', textEffect: 'none',
+          msgColor: '#3a8bb5', nameColor: '#ff7eb9', memberColor: '#2ba640', modColor: '#5e84f1', ownerColor: '#e0a100',
+          bubble: true, bubbleColor: '#ffffff', bubbleAlpha: 0.95, bubbleRadius: 20, bubblePadding: 10,
+          animIn: 'zoom', scMode: 'custom', scHeader: '#7ec8e3', scBody: '#a8dcef', scText: '#ffffff',
+        }],
+        ['和風', {
+          font: 'Shippori Mincho', msgWeight: '600', nameWeight: '700', textEffect: 'none',
+          msgColor: '#f5f0e1', nameColor: '#d9b777', iconShape: 'square',
+          bubble: true, bubbleColor: '#1b1410', bubbleAlpha: 0.75, bubbleRadius: 2, animIn: 'fade', animDur: 0.8,
+          scMode: 'custom', scHeader: '#8c1c13', scBody: '#b2342a', scText: '#fff6e5',
+        }],
+        ['コメントのみ', {
+          showIcon: false, showName: false, msgSize: 24, textEffect: 'outline', effectWidth: 3,
+          fadeOut: true, fadeOutDelay: 15, animIn: 'slide-up',
+        }],
+      ];
+
+      // =====================================================
+      //  設定項目の定義（ここからUIを自動生成）
+      // =====================================================
+      const effOn = s => s.textEffect !== 'none';
+      const isYT = s => s.platform === 'youtube';
+      const isTW = s => s.platform === 'twitch';
+      const showSC = s => s.showSuperchat && isYT(s);
+      const SECTIONS = [
+        {
+          title: 'Twitch の設定', icon: '◆', open: true, when: isTW, fields: [
+            { k: 'twUserColor', l: '名前をTwitchで設定された色で表示', t: 'check', note: 'オンの間は「名前」の色設定より優先されます' },
+            { k: 'twHideUsers', l: '表示しないユーザー（カンマ区切り）', t: 'text', ph: '例: nightbot, streamelements' },
+          ]
+        },
+        {
+          title: 'フォント・文字効果', icon: '🔤', open: true, fields: [
+            { k: 'font', l: 'フォント', t: 'select', o: FONTS.map(f => [f[0], f[1]]) },
+            { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
+            { k: 'textEffect', l: '文字効果', t: 'select', o: [['none', 'なし'], ['outline', '縁取り'], ['shadow', '影'], ['glow', '発光（ネオン）']] },
+            { k: 'effectWidth', l: '縁取り・影の太さ', t: 'range', min: 0.5, max: 8, step: 0.5, u: 'px', when: effOn },
+            { k: 'effectColor', l: '縁取り・影の色', t: 'color', when: effOn },
+          ]
+        },
+        {
+          title: 'コメント本文', icon: '💬', open: true, fields: [
+            { k: 'msgSize', l: '文字サイズ', t: 'range', min: 10, max: 48, step: 1, u: 'px' },
+            { k: 'msgWeight', l: '文字の太さ', t: 'select', o: WEIGHTS, note: 'フォントによっては対応していない太さがあります' },
+            { k: 'msgColor', l: '文字色', t: 'color' },
+            { k: 'lineHeight', l: '行の高さ', t: 'range', min: 1, max: 2.5, step: 0.05, u: '' },
+            { k: 'emojiSize', l: '絵文字・エモートの大きさ', t: 'range', min: 12, max: 64, step: 1, u: 'px' },
+          ]
+        },
+        {
+          title: 'アイコン', icon: '🙂', when: isYT, fields: [
+            { k: 'showIcon', l: 'アイコンを表示', t: 'check' },
+            { k: 'iconSize', l: '大きさ', t: 'range', min: 16, max: 72, step: 1, u: 'px', when: s => s.showIcon },
+            { k: 'iconShape', l: '形', t: 'select', o: [['circle', '丸'], ['rounded', '角丸'], ['square', '四角']], when: s => s.showIcon },
+          ]
+        },
+        {
+          title: '名前', icon: '🏷️', fields: [
+            { k: 'showName', l: '名前を表示', t: 'check' },
+            { k: 'nameBreak', l: '名前のあとで改行する', t: 'check', when: s => s.showName },
+            { k: 'nameColon', l: '名前のあとに「:」を付ける', t: 'check', when: s => s.showName },
+            { k: 'showBadges', l: 'バッジを表示', t: 'check', when: s => s.showName },
+            { k: 'nameSize', l: '文字サイズ', t: 'range', min: 8, max: 40, step: 1, u: 'px', when: s => s.showName },
+            { k: 'nameWeight', l: '文字の太さ', t: 'select', o: WEIGHTS, when: s => s.showName },
+            { k: 'nameColor', l: '名前の色（一般）', t: 'color', when: s => s.showName },
+            { k: 'memberColor', l: '名前の色（メンバー・サブスク・VIP）', t: 'color', when: s => s.showName },
+            { k: 'modColor', l: '名前の色（モデレーター）', t: 'color', when: s => s.showName },
+            { k: 'ownerColor', l: '名前の色（配信者本人）', t: 'color', when: s => s.showName },
+          ]
+        },
+        {
+          title: '背景・吹き出し', icon: '🗨️', fields: [
+            { k: 'bubble', l: 'コメントを吹き出しで囲む', t: 'check' },
+            { k: 'bubbleColor', l: '吹き出しの色', t: 'color', when: s => s.bubble },
+            { k: 'bubbleAlpha', l: '吹き出しの不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.bubble },
+            { k: 'bubbleRadius', l: '角の丸み', t: 'range', min: 0, max: 30, step: 1, u: 'px', when: s => s.bubble || s.roleBg },
+            { k: 'bubblePadding', l: '吹き出しの内側の余白', t: 'range', min: 2, max: 24, step: 1, u: 'px', when: s => s.bubble },
+            { k: 'roleBg', l: '配信者・モデレーター・メンバーの背景色を変える', t: 'check' },
+            { k: 'ownerBg', l: '背景色（配信者本人）', t: 'color', when: s => s.roleBg },
+            { k: 'modBg', l: '背景色（モデレーター）', t: 'color', when: s => s.roleBg },
+            { k: 'memberBg', l: '背景色（メンバー・サブスク・VIP）', t: 'color', when: s => s.roleBg },
+            { k: 'roleBgAlpha', l: '上記の不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.roleBg },
+            { k: 'chatBg', l: 'チャット欄全体の背景色', t: 'color' },
+            { k: 'chatBgAlpha', l: 'チャット欄全体の不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', note: '0 で完全に透明' },
+          ]
+        },
+        {
+          title: '間隔・タイムスタンプ', icon: '📐', fields: [
+            { k: 'itemGap', l: 'コメント同士の間隔', t: 'range', min: 0, max: 40, step: 1, u: 'px' },
+            { k: 'sidePad', l: '左右の余白', t: 'range', min: 0, max: 48, step: 1, u: 'px' },
+            { k: 'showTime', l: 'タイムスタンプを表示', t: 'check', when: isYT },
+            { k: 'timeSize', l: 'タイムスタンプの文字サイズ', t: 'range', min: 8, max: 24, step: 1, u: 'px', when: s => s.showTime && isYT(s) },
+            { k: 'timeColor', l: 'タイムスタンプの色', t: 'color', when: s => s.showTime && isYT(s) },
+          ]
+        },
+        {
+          title: 'スパチャ・Bits／メンバー・サブスク', icon: '💰', fields: [
+            { k: 'showSuperchat', l: 'スーパーチャットを表示', t: 'check', when: isYT },
+            { k: 'showStickers', l: 'スーパーステッカーを表示', t: 'check', when: isYT },
+            { k: 'showMembership', l: s => isTW(s) ? 'サブスク・ギフト・レイドの通知を表示' : 'メンバー加入・マイルストーンを表示', t: 'check' },
+            { k: 'memHeaderText', l: 'マイルストーンの「○か月」表示', t: 'check', when: s => s.showMembership && isYT(s) },
+            { k: 'scMode', l: '色', t: 'select', o: [['youtube', '標準（金額ごとの色）'], ['custom', 'すべて同じ色にする']], when: showSC },
+            { k: 'scHeader', l: '上部（名前・金額）の背景', t: 'color', when: s => showSC(s) && s.scMode === 'custom' },
+            { k: 'scBody', l: '下部（メッセージ）の背景', t: 'color', when: s => showSC(s) && s.scMode === 'custom' },
+            { k: 'scText', l: '文字色', t: 'color', when: s => showSC(s) && s.scMode === 'custom' },
+            { k: 'scRadius', l: '角の丸み', t: 'range', min: 0, max: 30, step: 1, u: 'px', when: s => showSC(s) || s.showMembership },
+            { k: 'scNameSize', l: '名前の文字サイズ', t: 'range', min: 10, max: 36, step: 1, u: 'px', when: showSC },
+            { k: 'scAmountSize', l: '金額の文字サイズ', t: 'range', min: 10, max: 40, step: 1, u: 'px', when: showSC },
+            { k: 'scMsgSize', l: s => isTW(s) ? '通知の文字サイズ' : 'メッセージの文字サイズ', t: 'range', min: 10, max: 40, step: 1, u: 'px', when: s => showSC(s) || s.showMembership },
+          ]
+        },
+        {
+          title: 'アニメーション', icon: '✨', fields: [
+            {
+              k: 'animIn', l: '表示されるとき', t: 'select', o: [
+                ['none', 'なし'], ['fade', 'ふわっと表示'], ['slide-left', '左からスライド'],
+                ['slide-right', '右からスライド'], ['slide-up', '下からスライド'], ['zoom', 'ポンッと拡大'],
+              ]
+            },
+            { k: 'animDur', l: '表示アニメーションの時間', t: 'range', min: 0.1, max: 2, step: 0.1, u: '秒', when: s => s.animIn !== 'none' },
+            { k: 'fadeOut', l: '一定時間でコメントを消す', t: 'check' },
+            { k: 'fadeOutDelay', l: '消えるまでの時間', t: 'range', min: 3, max: 120, step: 1, u: '秒', when: s => s.fadeOut },
+            { k: 'fadeOutDur', l: '消えるアニメーションの時間', t: 'range', min: 0.1, max: 3, step: 0.1, u: '秒', when: s => s.fadeOut },
+          ]
+        },
+      ];
+
+      // =====================================================
+      //  状態
+      // =====================================================
+      const STORE_KEY = 'donnma-chat-css-v1';
+      let S = { ...DEFAULTS };
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+        if (saved && typeof saved === 'object') S = C.sanitize(saved);
+      } catch (e) { /* storage unavailable */ }
+
+      // =====================================================
+      //  設定UIの生成
+      // =====================================================
+      const $ = id => document.getElementById(id);
+      const settingsEl = $('settings');
+      const inputs = {}; // key -> {f, wrap, set, labelEl}
+      const sectionEls = [];
+
+      function buildUI() {
+        for (const sec of SECTIONS) {
+          const det = document.createElement('details');
+          det.className = 'sec';
+          if (sec.open) det.open = true;
+          det.innerHTML = `<summary><span class="sec-icon">${sec.icon}</span>${sec.title}</summary>`;
+          const grid = document.createElement('div');
+          grid.className = 'fields';
+          for (const f of sec.fields) grid.appendChild(buildField(f));
+          det.appendChild(grid);
+          settingsEl.appendChild(det);
+          sectionEls.push([sec, det]);
+        }
+      }
+
+      function buildField(f) {
+        const wrap = document.createElement('div');
+        wrap.className = 'field';
+        const id = 'f-' + f.k;
+        let set;
+
+        if (f.t === 'check') {
+          wrap.innerHTML = `<label class="toggle" for="${id}"><span></span><input type="checkbox" id="${id}"><span class="sw"></span></label>`;
+          const el = wrap.querySelector('input');
+          el.addEventListener('change', () => update(f.k, el.checked));
+          set = v => { el.checked = v; };
+        } else if (f.t === 'range') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span><span class="field-val"></span></label>
+            <input type="range" id="${id}" min="${f.min}" max="${f.max}" step="${f.step}">`;
+          const el = wrap.querySelector('input'), val = wrap.querySelector('.field-val');
+          const show = v => { val.textContent = `${+(+v).toFixed(2)}${f.u}`; };
+          el.addEventListener('input', () => { show(el.value); update(f.k, parseFloat(el.value)); });
+          set = v => { el.value = v; show(v); };
+        } else if (f.t === 'select') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label><select id="${id}"></select>`;
+          const el = wrap.querySelector('select');
+          for (const [v, label] of f.o) el.add(new Option(label, v));
+          el.addEventListener('change', () => update(f.k, el.value));
+          set = v => { el.value = v; };
+        } else if (f.t === 'color') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label>
+            <div class="color-row"><input type="color" id="${id}"><input type="text" maxlength="7" spellcheck="false"></div>`;
+          const [pick, hex] = wrap.querySelectorAll('input');
+          hex.setAttribute('aria-label', 'カラーコード');
+          pick.addEventListener('input', () => { hex.value = pick.value; update(f.k, pick.value); });
+          hex.addEventListener('input', () => {
+            let v = hex.value.trim();
+            if (!v.startsWith('#')) v = '#' + v;
+            if (/^#[0-9a-f]{6}$/i.test(v)) { pick.value = v.toLowerCase(); update(f.k, v.toLowerCase()); }
+          });
+          hex.addEventListener('blur', () => { hex.value = S[f.k]; });
+          set = v => { pick.value = v; hex.value = v; };
+        } else {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label>
+            <input type="text" id="${id}">`;
+          const el = wrap.querySelector('input');
+          el.placeholder = f.ph || '';
+          el.addEventListener('input', () => update(f.k, el.value));
+          set = v => { el.value = v; };
+        }
+
+        if (f.note) {
+          const n = document.createElement('div');
+          n.className = 'field-note';
+          n.textContent = f.note;
+          wrap.appendChild(n);
+        }
+        inputs[f.k] = { f, wrap, set, labelEl: wrap.querySelector('label > span') };
+        return wrap;
+      }
+
+      function syncUI() {
+        for (const k in inputs) inputs[k].set(S[k]);
+        refreshVisibility();
+      }
+
+      // 表示・非表示、配信サイトごとの文言、配信サイト切り替えの反映
+      function refreshVisibility() {
+        for (const k in inputs) {
+          const { f, wrap, labelEl } = inputs[k];
+          wrap.hidden = f.when ? !f.when(S) : false;
+          labelEl.textContent = typeof f.l === 'function' ? f.l(S) : f.l;
+        }
+        for (const [sec, det] of sectionEls) det.hidden = sec.when ? !sec.when(S) : false;
+        document.querySelectorAll('#platform button').forEach(b => {
+          b.setAttribute('aria-checked', String(b.dataset.platform === S.platform));
+        });
+        document.querySelectorAll('[data-for]').forEach(el => { el.hidden = !el.dataset.for.split(' ').includes(S.platform); });
+      }
+
+      // =====================================================
+      //  反映・保存
+      // =====================================================
+      let renderQueued = false;
+      let currentCSS = '';
+      function update(k, v) {
+        const before = S.platform;
+        S[k] = v;
+        refreshVisibility();
+        scheduleRender();
+        if (S.platform !== before) setupFrame();
+      }
+
+      function scheduleRender() {
+        if (renderQueued) return;
+        renderQueued = true;
+        requestAnimationFrame(() => {
+          renderQueued = false;
+          render();
+        });
+      }
+
+      // Twitch のポップアウトチャットのURL
+      function twitchURL() {
+        const ch = S.twChannel.trim().toLowerCase().replace(/^.*twitch\.tv\/(popout\/)?/, '').replace(/[^a-z0-9_].*$/, '');
+        return { url: `https://www.twitch.tv/popout/${ch || 'チャンネル名'}/chat?popout=`, ok: !!ch };
+      }
+
+      function render() {
+        currentCSS = isTW(S) ? C.generateTwitch(S) : C.generate(S);
+        $('css-out').value = currentCSS;
+        $('out-meta').textContent = `${currentCSS.length.toLocaleString()} 文字`;
+        $('tw-url').value = twitchURL().url;
+        applyPreviewCSS();
+        try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* ignore */ }
+      }
+
+      function applyAll(next) {
+        S = C.sanitize(next);
+        syncUI();
+        $('tw-channel').value = S.twChannel;
+        render();
+        setupFrame();
+      }
+
+      // =====================================================
+      //  プレビュー
+      // =====================================================
+      const frame = $('preview');
+      let fdoc = null;
+
+      // 配信サイトごとのチャット欄の見本DOM
+      const DOMS = {
+        yt: { css: C.BASE_CSS, html: C.FRAME_HTML, items: '#items', scroller: '#item-scroller' },
+        tw: { css: C.TW_BASE_CSS, html: C.TW_FRAME_HTML, items: '.chat-scrollable-area__message-container', scroller: '.scrollable-area' },
+      };
+      let dom = null;
+      function setupFrame() {
+        const next = isTW(S) ? DOMS.tw : DOMS.yt;
+        if (next === dom) { replayPreview(); return; }
+        dom = next;
+        fdoc = null;
+        frame.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${dom.css}</style><style id="gen"></style></head>
+          <body>${dom.html}</body></html>`;
+      }
+
+      frame.addEventListener('load', () => {
+        fdoc = frame.contentDocument;
+        applyPreviewCSS();
+        replayPreview();
+      });
+
+      function applyPreviewCSS() {
+        if (!fdoc) return;
+        const el = fdoc.getElementById('gen');
+        if (el && el.textContent !== currentCSS) el.textContent = currentCSS;
+      }
+
+      // --- サンプルデータ ---
+      const emoji = ch => `<img class="emoji" alt="${ch}" src="${C.svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><text x="12" y="20" font-size="20" text-anchor="middle">${ch}</text></svg>`)}">`;
+      const fmt = m => C.esc(m).replace(/\[(.+?)\]/g, (_, ch) => emoji(ch));
+      const pick = a => a[Math.floor(Math.random() * a.length)];
+
+      // [名前, 色, 種類, Twitchのバッジ]
+      const PEOPLE_YT = [
+        ['さくら', '#e57373', ''], ['たろう', '#64b5f6', ''], ['ねこまる', '#ffb74d', 'member'],
+        ['Kenta', '#81c784', ''], ['みかん', '#ba68c8', 'member'], ['モデ太郎', '#4db6ac', 'moderator'],
+        ['ゆずぽん', '#f06292', ''], ['GameLover', '#7986cb', 'member'], ['しろくま', '#90a4ae', ''],
+      ];
+      const PEOPLE_TW = [
+        ['sakura_gg', '#ff69b4', '', []], ['taro_1234', '#1e90ff', '', []],
+        ['nekomaru', '#daa520', 'member', ['tw-subscriber']], ['KentaPlays', '#2e8b57', '', []],
+        ['mikan_chan', '#ff7f50', 'member', ['tw-vip']], ['mod_taro', '#00c864', 'moderator', ['tw-moderator', 'tw-subscriber']],
+        ['yuzupon', '#9acd32', '', []], ['GameLover', '#8a2be2', 'member', ['tw-subscriber']], ['shirokuma', '#5f9ea0', '', []],
+      ];
+      const OWNER_YT = ['どんま', '#ff6ec7', 'owner'];
+      const OWNER_TW = ['donnma777', '#ff6ec7', 'owner', ['tw-broadcaster']];
+      const LINES = [
+        'こんばんは！[👋]', 'きたー！待ってました[🎉]', '今日もかわいい', 'ナイス！！[👏][👏]', 'ｗｗｗｗｗ',
+        'それはずるいｗ', '初見です！よろしくお願いします', 'いまのプレイうますぎる[😳]', 'がんばれー[🔥]',
+        'BGMいいね', '888888', '草', 'もう一回見たい！', 'おつかれさまです[🍵]', 'えっ、そこ行くの！？',
+        '明日も配信ありますか？', 'かわいい[💕][💕]', '神回確定', 'このゲーム気になってた', 'Nice play!! [🙌]',
+      ];
+      const OWNER_LINES = ['みんなありがとう！', 'ゆっくりしていってね[✨]', 'つぎいくよー！'];
+      const SC_TIERS = [
+        ['¥200', ['#00b8d4', '#00e5ff', '#000000']],
+        ['¥500', ['#00bfa5', '#1de9b6', '#000000']],
+        ['¥1,000', ['#ffb300', '#ffca28', '#000000']],
+        ['¥5,000', ['#e65100', '#f57c00', '#ffffff']],
+        ['¥10,000', ['#d00000', '#e62117', '#ffffff']],
+      ];
+      const BITS = [100, 500, 1000, 5000, 10000];
+      const PAID_LINES = ['いつも楽しい配信ありがとう！', 'おめでとうございます[🎉]', '飲み物代にどうぞ[☕]', '応援してます！'];
+
+      // 配信サイトごとの見本コメント
+      const person = p => ({
+        name: p[0], avatarColor: p[1], type: p[2],
+        badges: p[2] === 'moderator' ? ['yt-moderator'] : p[2] === 'member' ? ['yt-member'] : [],
+      });
+      const people = () => isTW(S) ? PEOPLE_TW : PEOPLE_YT;
+      const owner = () => isTW(S) ? OWNER_TW : OWNER_YT;
+
+      // Twitch の本文（.text-fragment とエモート画像）
+      const twFmt = m => m.split(/(\[.+?\])/).filter(Boolean).map(part => {
+        const e = part.match(/^\[(.+)\]$/);
+        return e
+          ? emoji(e[1]).replace('class="emoji"', 'class="chat-image chat-line__message--emote"')
+          : `<span class="text-fragment" data-a-target="chat-message-text">${C.esc(part)}</span>`;
+      }).join('');
+      // Twitch 公式のチャット欄は名前の色を必ず付けるので、見本も常に色付き
+      const twPerson = p => ({ name: p[0], login: p[0].toLowerCase(), userColor: p[1], badges: p[3] });
+
+      const sample = {
+        text: (p, msg) => isTW(S)
+          ? C.twTextItem({ ...twPerson(p), html: twFmt(msg) })
+          : C.textItem({ ...person(p), html: fmt(msg) }),
+        paid: (p, msg, i) => {
+          if (isTW(S)) {
+            // Twitch では Bits も通常のコメントとして表示されます
+            const bits = i === undefined ? pick(BITS) : BITS[i];
+            return C.twTextItem({ ...twPerson(p), html: twFmt(`Cheer${bits} ${msg}`) });
+          }
+          const [amount, colors] = i === undefined ? pick(SC_TIERS) : SC_TIERS[i];
+          return C.paidItem({ ...person(p), amount, colors, html: fmt(msg) });
+        },
+        member: (p, months) => {
+          if (isTW(S)) {
+            return C.twNoticeItem({
+              title: months
+                ? `${p[0]} さんがサブスクしました。${months} か月連続です！`
+                : pick([`${p[0]} さんがサブスクしました！`, `${p[0]} さんが 5 個のサブスクをギフトしました！`, `${p[0]} さんが 25 人でレイドしています！`]),
+              html: months ? twFmt('これからもよろしく[🎂]') : '',
+            });
+          }
+          return C.memberItem({
+            ...person(p),
+            primary: months ? `メンバー歴 ${months} か月` : '',
+            sub: months ? '' : '新規メンバーへようこそ！',
+            html: months ? fmt('これからもよろしく[🎂]') : '',
+          });
+        },
+        sticker: p => C.stickerItem({ ...person(p), amount: '¥300', sticker: '🐱' }),
+      };
+
+      function push(html) {
+        if (!fdoc) return;
+        const items = fdoc.querySelector(dom.items);
+        items.insertAdjacentHTML('beforeend', html);
+        while (items.children.length > 40) items.firstElementChild.remove();
+        const sc = fdoc.querySelector(dom.scroller);
+        sc.scrollTop = sc.scrollHeight;
+      }
+
+      let tick = 0;
+      function addRandom() {
+        tick++;
+        const ppl = people();
+        if (tick % 9 === 0) push(sample.paid(pick(ppl), pick(PAID_LINES)));
+        else if (tick % 13 === 0) push(sample.member(pick(ppl), Math.random() < 0.5 ? 0 : pick([2, 6, 12, 24])));
+        else if (tick % 17 === 0 && isYT(S)) push(sample.sticker(pick(ppl)));
+        else if (tick % 11 === 0) push(sample.text(owner(), pick(OWNER_LINES)));
+        else push(sample.text(pick(ppl), pick(LINES)));
+      }
+
+      let replayTimers = [];
+      function replayPreview() {
+        if (!fdoc) return;
+        replayTimers.forEach(clearTimeout);
+        fdoc.querySelector(dom.items).innerHTML = '';
+        tick = 0;
+        const ppl = people();
+        const tw = isTW(S);
+        const first = [
+          () => sample.text(ppl[0], 'こんばんは！[👋]'),
+          () => sample.text(ppl[2], tw ? 'サブスク勢のコメントはこんな感じ[💕]' : 'メンバーのコメントはこんな感じ[💕]'),
+          () => sample.text(ppl[5], 'モデレーターです。ルールを守って楽しもう！'),
+          () => sample.text(owner(), '配信者本人のコメント！'),
+          () => sample.paid(ppl[4], 'いつも楽しい配信ありがとう！', 2),
+          () => sample.member(ppl[7], 6),
+          () => sample.text(ppl[3], '長いコメントの折り返しはこうなります。長いコメントの折り返しはこうなります。[🎮]'),
+        ];
+        replayTimers = first.map((f, i) => setTimeout(() => push(f()), i * 140));
+      }
+
+      let playing = true, timer = null;
+      function schedule() {
+        clearTimeout(timer);
+        if (!playing) return;
+        timer = setTimeout(() => { addRandom(); schedule(); }, 1400 + Math.random() * 1600);
+      }
+      $('btn-play').addEventListener('click', () => {
+        playing = !playing;
+        $('btn-play').textContent = playing ? '⏸ 停止' : '▶ 再生';
+        schedule();
+      });
+      $('btn-add').addEventListener('click', addRandom);
+      $('btn-replay').addEventListener('click', replayPreview);
+      $('stage-bg').addEventListener('change', e => {
+        $('stage').className = 'stage bg-' + e.target.value;
+      });
+
+      // =====================================================
+      //  ボタン類
+      // =====================================================
+      const toastEl = $('toast');
+      let toastTimer;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1800);
+      }
+
+      async function copyText(text, input) {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (e) {
+          input.select();
+          document.execCommand('copy');
+        }
+      }
+
+      function download(name, text, type) {
+        const url = URL.createObjectURL(new Blob([text], { type }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      document.querySelectorAll('#platform button').forEach(b => {
+        b.addEventListener('click', () => update('platform', b.dataset.platform));
+      });
+
+      $('btn-copy').addEventListener('click', async () => {
+        await copyText(currentCSS, $('css-out'));
+        toast('CSSをコピーしました！OBSのカスタムCSSに貼り付けてください');
+      });
+      $('btn-dl').addEventListener('click', () => download(isTW(S) ? 'twitch-chat.css' : 'youtube-chat.css', currentCSS, 'text/css'));
+
+      $('tw-channel').addEventListener('input', e => update('twChannel', e.target.value));
+      $('btn-copy-tw').addEventListener('click', async () => {
+        const { url, ok } = twitchURL();
+        if (!ok) { toast('先にTwitchのチャンネル名を入力してください'); $('tw-channel').focus(); return; }
+        await copyText(url, $('tw-url'));
+        toast('URLをコピーしました！OBSのブラウザソースに貼り付けてください');
+      });
+
+      // テンプレート・リセットでは配信サイトとチャンネル名は変えない
+      const keepLocal = () => ({ platform: S.platform, twChannel: S.twChannel });
+
+      const presetsEl = $('presets');
+      for (const [name, p] of PRESETS) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip-btn';
+        b.textContent = name;
+        b.addEventListener('click', () => {
+          applyAll({ ...DEFAULTS, ...p, ...keepLocal() });
+          toast(`テンプレート「${name}」を適用しました`);
+        });
+        presetsEl.appendChild(b);
+      }
+
+      $('btn-save').addEventListener('click', () => {
+        download('chat-css-settings.json', JSON.stringify({ tool: 'donnma-chat-css', version: 1, settings: S }, null, 2), 'application/json');
+      });
+      $('btn-load').addEventListener('click', () => $('file-load').click());
+      $('file-load').addEventListener('change', async e => {
+        const file = e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        try {
+          const data = JSON.parse(await file.text());
+          applyAll(data.settings || data);
+          toast('設定を復元しました');
+        } catch (err) {
+          toast('読み込めませんでした（ファイル形式を確認してください）');
+        }
+      });
+      $('btn-reset-color').addEventListener('click', () => {
+        if (!confirm('色の設定だけ初期値に戻しますか？')) return;
+        const next = { ...S };
+        for (const k of COLOR_KEYS) next[k] = DEFAULTS[k];
+        applyAll(next);
+      });
+      $('btn-reset').addEventListener('click', () => {
+        if (!confirm('すべての設定を初期値に戻しますか？')) return;
+        applyAll({ ...DEFAULTS, ...keepLocal() });
+      });
+
+      // YouTube チャット欄URL作成
+      function videoId(input) {
+        const s = input.trim();
+        if (/^[\w-]{11}$/.test(s)) return s;
+        try {
+          const u = new URL(s);
+          if (u.searchParams.get('v')) return u.searchParams.get('v');
+          const m = u.pathname.match(/\/(?:live|embed|shorts)\/([\w-]{11})/) || (u.hostname === 'youtu.be' && u.pathname.match(/^\/([\w-]{11})/));
+          if (m) return m[1];
+        } catch (e) { /* not a URL */ }
+        return '';
+      }
+      $('yt-url').addEventListener('input', e => {
+        const id = videoId(e.target.value);
+        $('chat-url').value = id ? `https://www.youtube.com/live_chat?is_popout=1&v=${id}` : '';
+      });
+      $('btn-copy-url').addEventListener('click', async () => {
+        if (!$('chat-url').value) return toast('先に配信URLを入力してください');
+        await copyText($('chat-url').value, $('chat-url'));
+        toast('チャット欄のURLをコピーしました');
+      });
+
+      // 起動
+      buildUI();
+      syncUI();
+      $('tw-channel').value = S.twChannel;
+      render();
+      setupFrame();
+      schedule();
+    })();
+  </script>
+
+</body>
+
+</html>
