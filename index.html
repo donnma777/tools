@@ -338,6 +338,19 @@
       color: var(--accent);
     }
 
+    .pc-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 0 8px;
+      margin-left: 6px;
+      vertical-align: 1px;
+    }
+
     .tool-name {
       font-size: 1.05rem;
       font-weight: 900;
@@ -558,7 +571,7 @@
             </svg>
           </div>
           <div>
-            <div class="tool-tag">OBS Studio オーバーレイ</div>
+            <div class="tool-tag">OBS Studio オーバーレイ<span class="pc-tag">PC向け</span></div>
             <div class="tool-name">配信オーバーレイテーマ</div>
           </div>
         </div>
@@ -581,7 +594,7 @@
             </svg>
           </div>
           <div>
-            <div class="tool-tag">YouTube / Twitch チャット × OBS</div>
+            <div class="tool-tag">YouTube / Twitch チャット × OBS<span class="pc-tag">PC向け</span></div>
             <div class="tool-name">チャットCSSジェネレーター</div>
           </div>
         </div>

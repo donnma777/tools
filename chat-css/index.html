@@ -162,6 +162,25 @@
       flex-shrink: 0;
     }
 
+    /* スマホで開いたときだけ出すお知らせ */
+    .pc-notice {
+      display: none;
+      background: var(--accent-soft);
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.6;
+      padding: 10px 16px;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .pc-notice {
+        display: block;
+      }
+    }
+
     /* ── Hero（トップと同じうさぎ柄） ── */
     .hero {
       position: relative;
@@ -943,6 +962,8 @@
       </div>
     </div>
   </nav>
+
+  <p class="pc-notice" role="note">このツールはPCのOBSで使う前提です。スマホでは正しく表示されません。</p>
 
   <!-- Hero -->
   <header class="hero">
