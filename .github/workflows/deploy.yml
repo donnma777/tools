@@ -14,7 +14,8 @@ concurrency:
 
 jobs:
   # 本番（Xserver）: main をそのままアップロード。noindex は付けない。
-  # --delete なしのため、リポジトリで削除したファイルはサーバーに残る。
+  # --delete 付きのため、リポジトリで削除したファイルはサーバーからも消える。
+  # サーバーに手動で置いているファイルは P（protect）で削除対象から外すこと。
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -30,8 +31,14 @@ jobs:
 
       - name: Deploy via rsync
         run: |
-          rsync -avz \
+          # --delete の誤爆防止: 転送先が tool ディレクトリでなければ中止
+          case "${{ secrets.XSERVER_REMOTE_PATH }}" in
+            */tool|*/tool/) ;;
+            *) echo "XSERVER_REMOTE_PATH が /tool で終わっていません" >&2; exit 1 ;;
+          esac
+          rsync -avz --delete \
             -e "ssh -i ~/.ssh/xserver_key -p ${{ secrets.XSERVER_PORT }}" \
+            --filter='P /overlay/donnma/' \
             --exclude='.git/' \
             --exclude='.github/' \
             --exclude='CNAME' \
