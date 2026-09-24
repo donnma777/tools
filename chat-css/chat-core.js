@@ -70,6 +70,7 @@
     // スパチャの演出（YouTube）
     scAnimIn: 'impact', scAnimDur: 0.7, scEffect: 'shine', scEffectCount: '3', scGlowColor: '#ffd54f',
     scKeep: true, scFxMember: false,
+    scFxMinTier: '1', scScaleByTier: false, scScaleMax: 1.4, scTopEffect: 'rainbow',
 
     // リアクション（YouTube）: hide / inline（チャット欄に重ねる）/ separate（リアクション専用のブラウザソース）
     reactMode: 'hide', reactScale: 3, reactRight: 40, reactBottom: 40,
@@ -279,39 +280,79 @@
     if (anims.length) w.rule(selector, { animation: anims.join(', ') });
   }
 
+  // =====================================================
+  //  スパチャの金額帯
+  //  YouTube は金額帯ごとの色を各スパチャ要素の style 属性に
+  //  「--yt-live-chat-paid-message-primary-color: rgba(...)」として書き込むので、
+  //  その色で金額帯を見分けます（通貨が違っても段階は共通）。
+  //  [目安の金額, 下部の色, 上部の色, 文字色]
+  // =====================================================
+  const SC_TIERS = [
+    ['¥100', 'rgba(30,136,229,1)', 'rgba(21,101,192,1)', '#ffffff'],
+    ['¥200', 'rgba(0,229,255,1)', 'rgba(0,184,212,1)', '#000000'],
+    ['¥500', 'rgba(29,233,182,1)', 'rgba(0,191,165,1)', '#000000'],
+    ['¥1,000', 'rgba(255,202,40,1)', 'rgba(255,179,0,1)', '#000000'],
+    ['¥2,000', 'rgba(245,124,0,1)', 'rgba(230,81,0,1)', '#ffffff'],
+    ['¥5,000', 'rgba(233,30,99,1)', 'rgba(194,24,91,1)', '#ffffff'],
+    ['¥10,000', 'rgba(230,33,23,1)', 'rgba(208,0,0,1)', '#ffffff'],
+  ];
+  const tierSel = (P, i) => `${P}[style*="${SC_TIERS[i][1]}"]`;
+
   // スパチャだけ通常コメントと別の動きにする（writeAnimation の後に書いて上書き）
-  function writeSuperchatFx(s, w, sels) {
+  function writeSuperchatFx(s, w, { P, ST, M }) {
     const inAnim = s.scAnimIn === 'same' ? null : (SC_IN_ANIMS[s.scAnimIn] || IN_ANIMS[s.scAnimIn]);
     const normalIn = IN_ANIMS[s.animIn];
     const keep = s.fadeOut && s.scKeep;
     const fx = SC_EFFECTS[s.scEffect];
-    if (!inAnim && !keep && !fx) return;
+    const top = SC_EFFECTS[s.scTopEffect];
+    const member = s.scFxMember && s.showMembership ? [M] : [];
+    if (!inAnim && !keep && !fx && !top && !s.scScaleByTier) return;
     w.head('スパチャの演出');
-    const sel = sels.join(',\n');
-    const inDur = inAnim ? s.scAnimDur : (normalIn ? s.animDur : 0);
 
-    if (inAnim || keep) {
-      const anims = [];
-      if (inAnim) {
-        w.out.push(keyframes('cc-sc-in', inAnim.kf));
-        anims.push(`cc-sc-in ${s.scAnimDur}s ${inAnim.ease} both`);
-      } else if (normalIn) {
-        anims.push(`cc-in ${s.animDur}s ${normalIn.ease} both`);
-      }
+    // 演出を付けるスパチャ（金額の下限が「すべて」のときはステッカーも含める）
+    const minTier = Math.min(Math.max(parseInt(s.scFxMinTier, 10) || 1, 1), SC_TIERS.length);
+    const fxSels = [...(minTier <= 1 ? [P, ST] : SC_TIERS.slice(minTier - 1).map((_, i) => tierSel(P, minTier - 1 + i))), ...member];
+    const join = sels => sels.join(',\n');
+    const normalDur = normalIn ? s.animDur : 0;
+    const inDur = inAnim ? s.scAnimDur : normalDur;
+
+    // 消さずに残す: すべてのスパチャから消えるアニメーションを外す
+    if (keep) w.rule(join([P, ST, ...member]), { animation: normalIn ? `cc-in ${s.animDur}s ${normalIn.ease} both` : 'none' });
+
+    if (inAnim) {
+      w.out.push(keyframes('cc-sc-in', inAnim.kf));
+      const anims = [`cc-sc-in ${s.scAnimDur}s ${inAnim.ease} both`];
       if (s.fadeOut && !s.scKeep) {
         const out = OUT_ANIMS[s.animOut] || OUT_ANIMS.fade;
         anims.push(`cc-out ${s.fadeOutDur}s ${out.ease} ${+(s.fadeOutDelay + inDur).toFixed(2)}s forwards`);
       }
-      w.rule(sel, { animation: anims.length ? anims.join(', ') : 'none' });
+      w.rule(join(fxSels), { animation: anims.join(', ') });
     }
 
-    if (fx) {
-      w.out.push(keyframes('cc-sc-fx', fx.kf(s)));
-      if (fx.card) w.rule(sels.map(x => `${x} #card`).join(',\n'), fx.card);
-      w.rule(sels.map(x => `${x} #card${fx.pseudo || ''}`).join(',\n'), {
-        ...(fx.props ? fx.props(s) : {}),
-        animation: `cc-sc-fx ${fx.dur}s ${fx.ease} ${+inDur.toFixed(2)}s ${s.scEffectCount} both`,
+    const writeCardFx = (name, effect, sels, count, delay) => {
+      w.out.push(keyframes(name, effect.kf(s)));
+      if (effect.card) w.rule(join(sels.map(x => `${x} #card`)), effect.card);
+      w.rule(join(sels.map(x => `${x} #card${effect.pseudo || ''}`)), {
+        ...(effect.props ? effect.props(s) : {}),
+        animation: `${name} ${effect.dur}s ${effect.ease} ${+delay.toFixed(2)}s ${count} both`,
       });
+    };
+    if (fx) writeCardFx('cc-sc-fx', fx, fxSels, s.scEffectCount, inDur);
+
+    // ¥10,000以上だけの特別演出（ずっと続く）
+    if (top) {
+      const topTier = SC_TIERS.length - 1;
+      w.head('スパチャの演出（' + SC_TIERS[topTier][0] + '以上）');
+      writeCardFx('cc-sc-top', top, [tierSel(P, topTier)], 'infinite', minTier - 1 <= topTier && inAnim ? s.scAnimDur : normalDur);
+    }
+
+    // 金額が高いほど大きく表示
+    if (s.scScaleByTier) {
+      w.head('スパチャの大きさ（金額が高いほど大きく）');
+      for (let i = 1; i < SC_TIERS.length; i++) {
+        const z = 1 + (s.scScaleMax - 1) * i / (SC_TIERS.length - 1);
+        w.rule(tierSel(P, i), { zoom: String(+z.toFixed(3)) });
+      }
     }
   }
 
@@ -456,7 +497,7 @@
     }
 
     writeAnimation(s, w, `${T},\n${P},\n${M},\n${ST}`);
-    if (s.showSuperchat) writeSuperchatFx(s, w, [P, ST, ...(s.scFxMember && s.showMembership ? [M] : [])]);
+    if (s.showSuperchat) writeSuperchatFx(s, w, { P, ST, M });
     return w.done();
   }
 
@@ -708,7 +749,7 @@
   function paidItem({ name, avatarColor, amount, colors, html }) {
     const [hdr, bdy, txt] = colors;
     const body = html ? `<div id="content"><div id="message">${html}</div></div>` : '';
-    return `<yt-live-chat-paid-message-renderer style="--hdr:${hdr};--bdy:${bdy};--txt:${txt}"><div id="card">
+    return `<yt-live-chat-paid-message-renderer style="--yt-live-chat-paid-message-primary-color: ${bdy}; --yt-live-chat-paid-message-secondary-color: ${hdr}; --hdr:${hdr};--bdy:${bdy};--txt:${txt}"><div id="card">
       <div id="header">${photo(name, avatarColor)}<div id="header-content"><span id="author-name">${esc(name)}</span>
       <div id="purchase-amount">${esc(amount)}</div></div></div>${body}</div></yt-live-chat-paid-message-renderer>`;
   }
@@ -789,7 +830,7 @@
   }
 
   global.ChatCore = {
-    FONTS, WEIGHTS, DEFAULTS, COLOR_KEYS, IN_ANIMS, OUT_ANIMS, SC_IN_ANIMS, SC_EFFECTS,
+    FONTS, WEIGHTS, DEFAULTS, COLOR_KEYS, IN_ANIMS, OUT_ANIMS, SC_IN_ANIMS, SC_EFFECTS, SC_TIERS,
     sanitize, generate, generateTwitch, generateReactions,
     BASE_CSS, FRAME_HTML, esc, svgUri, avatar,
     textItem, paidItem, memberItem, stickerItem,

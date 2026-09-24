@@ -1168,7 +1168,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- chat-core.js を変えたら v を上げる（サーバーとブラウザのキャッシュ対策） -->
-  <script src="chat-core.js?v=20260924"></script>
+  <script src="chat-core.js?v=20260924b"></script>
   <script>
     (() => {
       'use strict';
@@ -1349,7 +1349,18 @@
               o: [['none', 'なし'], ...Object.entries(C.SC_EFFECTS).map(([v, a]) => [v, a.l])],
             },
             { k: 'scEffectCount', l: '演出の回数', t: 'select', o: [['1', '1回'], ['3', '3回'], ['infinite', 'ずっと']], when: s => s.scEffect !== 'none' },
-            { k: 'scGlowColor', l: '光の色', t: 'color', when: s => s.scEffect === 'glow' },
+            { k: 'scGlowColor', l: '光の色', t: 'color', when: s => s.scEffect === 'glow' || s.scTopEffect === 'glow' },
+            {
+              k: 'scFxMinTier', l: '演出を付ける金額', t: 'select',
+              o: C.SC_TIERS.map(([amount], i) => [String(i + 1), i === 0 ? 'すべてのスパチャ' : amount + ' 以上']),
+              note: 'これより安いスパチャは通常コメントと同じ動きになります。金額は日本円の目安で、ほかの通貨も同じ色の段階で判定します',
+            },
+            {
+              k: 'scTopEffect', l: s => C.SC_TIERS[C.SC_TIERS.length - 1][0] + ' 以上だけの特別演出（ずっと続く）', t: 'select',
+              o: [['none', 'なし'], ...Object.entries(C.SC_EFFECTS).map(([v, a]) => [v, a.l])],
+            },
+            { k: 'scScaleByTier', l: '金額が高いほど大きく表示', t: 'check' },
+            { k: 'scScaleMax', l: '最高額のときの大きさ', t: 'range', min: 1.1, max: 2, step: 0.05, u: '倍', when: s => s.scScaleByTier },
             { k: 'scKeep', l: 'スパチャは消さずに残す', t: 'check', when: s => s.fadeOut, note: '「一定時間でコメントを消す」を使っているときの設定です' },
             { k: 'scFxMember', l: 'メンバー加入にも同じ演出を使う', t: 'check', when: s => s.showMembership },
           ]
@@ -1480,7 +1491,8 @@
       }
 
       const ANIM_KEYS = ['animIn', 'animDur', 'fadeOut', 'animOut', 'fadeOutDelay', 'fadeOutDur',
-        'scAnimIn', 'scAnimDur', 'scEffect', 'scEffectCount', 'scGlowColor', 'scKeep', 'scFxMember'];
+        'scAnimIn', 'scAnimDur', 'scEffect', 'scEffectCount', 'scGlowColor', 'scKeep', 'scFxMember',
+        'scFxMinTier', 'scTopEffect', 'scScaleByTier', 'scScaleMax'];
       let replayTimer = null;
       function replaySoon() {
         clearTimeout(replayTimer);
@@ -1579,13 +1591,8 @@
         '明日も配信ありますか？', 'かわいい[💕][💕]', '神回確定', 'このゲーム気になってた', 'Nice play!! [🙌]',
       ];
       const OWNER_LINES = ['みんなありがとう！', 'ゆっくりしていってね[✨]', 'つぎいくよー！'];
-      const SC_TIERS = [
-        ['¥200', ['#00b8d4', '#00e5ff', '#000000']],
-        ['¥500', ['#00bfa5', '#1de9b6', '#000000']],
-        ['¥1,000', ['#ffb300', '#ffca28', '#000000']],
-        ['¥5,000', ['#e65100', '#f57c00', '#ffffff']],
-        ['¥10,000', ['#d00000', '#e62117', '#ffffff']],
-      ];
+      // YouTube と同じ金額帯の色（[金額, [上部, 下部, 文字]]）
+      const SC_TIERS = C.SC_TIERS.map(([amount, body, header, text]) => [amount, [header, body, text]]);
       const BITS = [100, 500, 1000, 5000, 10000];
       const PAID_LINES = ['いつも楽しい配信ありがとう！', 'おめでとうございます[🎉]', '飲み物代にどうぞ[☕]', '応援してます！'];
 
@@ -1614,7 +1621,7 @@
         paid: (p, msg, i) => {
           if (isTW(S)) {
             // Twitch では Bits も通常のコメントとして表示されます
-            const bits = i === undefined ? pick(BITS) : BITS[i];
+            const bits = i === undefined ? pick(BITS) : BITS[Math.min(i, BITS.length - 1)];
             return C.twTextItem({ ...twPerson(p), html: twFmt(`Cheer${bits} ${msg}`) });
           }
           const [amount, colors] = i === undefined ? pick(SC_TIERS) : SC_TIERS[i];
@@ -1672,7 +1679,8 @@
           () => sample.text(ppl[2], tw ? 'サブスク勢のコメントはこんな感じ[💕]' : 'メンバーのコメントはこんな感じ[💕]'),
           () => sample.text(ppl[5], 'モデレーターです。ルールを守って楽しもう！'),
           () => sample.text(owner(), '配信者本人のコメント！'),
-          () => sample.paid(ppl[4], 'いつも楽しい配信ありがとう！', 2),
+          () => sample.paid(ppl[4], 'いつも楽しい配信ありがとう！', 3),
+          () => sample.paid(ppl[1], '高額スパチャです！おめでとう[🎉]', 6),
           () => sample.member(ppl[7], 6),
           () => sample.text(ppl[3], '長いコメントの折り返しはこうなります。長いコメントの折り返しはこうなります。[🎮]'),
         ];
