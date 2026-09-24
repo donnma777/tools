@@ -104,12 +104,43 @@
     // リアクション（YouTube）: hide / inline（チャット欄に重ねる）/ separate（リアクション専用のブラウザソース）
     reactMode: 'hide', reactScale: 3, reactRight: 40, reactBottom: 40,
 
+    // スタンプ: メンバースタンプ（YouTube）と、名前を指定したスタンプ・エモート
+    stampSize: 0, stampAnim: 'none', stampNames: '', stampNamedSize: 48, stampNamedAnim: 'bounce',
+
+    // 表示するコメント: 件数の上限・上のほうを薄く・一行おきの色・ピン留め（YouTube）
+    maxItems: 0, fadeTop: 0,
+    stripe: false, stripeColor: '#ffffff', stripeAlpha: 0.1,
+    showPinned: false, pinnedBg: '#000000', pinnedBgAlpha: 0.6,
+
+    // 画像（URL）
+    bubbleImg: '', bubbleImgFit: 'cover', iconFrameImg: '', iconFrameScale: 1.4,
+
+    // 枠: 吹き出しの枠線・吹き出しの枠画像・チャット欄全体の枠
+    bubbleBorder: false, bubbleBorderWidth: 2, bubbleBorderStyle: 'solid', bubbleBorderColor: '#ffffff',
+    bubbleFrameImg: '', bubbleFrameSlice: 24, bubbleFrameWidth: 12, bubbleFrameRepeat: 'stretch', bubbleFrameFill: true,
+    frameOn: false, frameWidth: 3, frameStyle: 'solid', frameColor: '#ff85a1', frameRadius: 16, framePadding: 8,
+    frameBg: '#000000', frameBgAlpha: 0.35, frameTitle: '',
+    frameImg: '', frameImgSlice: 30, frameImgWidth: 16,
+
+    // 配信者・モデレーター・メンバーのコメント（登場のしかたの時間は共通）
+    roAnimDur: 0.6,
+
     animIn: 'slide-left', animDur: 0.4,
     fadeOut: false, animOut: 'fade', fadeOutDelay: 20, fadeOutDur: 0.6,
 
     // Twitch 専用
     twUserColor: true, twHideUsers: '',
   };
+  // 配信者・モデレーター・メンバー: [author-type, キー, 表示名, 縁取りの色]
+  const ROLES = [
+    ['owner', 'Owner', '配信者', '#ffd600'],
+    ['moderator', 'Mod', 'モデレーター', '#5e84f1'],
+    ['member', 'Member', 'メンバー', '#2ba640'],
+  ];
+  for (const [, k, , color] of ROLES) {
+    Object.assign(DEFAULTS, { [`ro${k}In`]: 'same', [`ro${k}Scale`]: 1, [`ro${k}Border`]: false, [`ro${k}BorderColor`]: color });
+  }
+
   for (const g of SC_GROUPS) {
     const [inAnim, fx, count, scale] = SC_GROUP_DEFAULTS[g.id];
     Object.assign(DEFAULTS, {
@@ -337,6 +368,21 @@
     },
   };
 
+  // スタンプ・エモートにずっとかける動き
+  const STAMP_ANIMS = {
+    bounce: { l: 'ぴょこぴょこ跳ねる', dur: 0.8, ease: 'ease-in-out', kf: ['0%, 100% { transform: translateY(0); }', '50% { transform: translateY(-25%); }'] },
+    pulse: { l: 'ドクドク脈打つ', dur: 1, ease: 'ease-in-out', kf: ['0%, 100% { transform: scale(1); }', '50% { transform: scale(1.2); }'] },
+    swing: { l: 'ゆらゆら揺れる', dur: 1.2, ease: 'ease-in-out', kf: ['0%, 100% { transform: rotate(-12deg); }', '50% { transform: rotate(12deg); }'] },
+    spin: { l: 'くるくる回る', dur: 2, ease: 'linear', kf: ['from { transform: rotate(0deg); }', 'to { transform: rotate(360deg); }'] },
+    jelly: { l: 'ぷにぷに', dur: 1, ease: 'ease-in-out', kf: ['0%, 100% { transform: scale(1, 1); }', '30% { transform: scale(1.2, 0.85); }', '60% { transform: scale(0.9, 1.1); }'] },
+  };
+
+  // 画像のURLは http(s) のものだけ使う（CSSを壊す文字は受け付けない）
+  const cleanUrl = u => { u = String(u || '').trim(); return /^https?:\/\/[^\s"'()<>\\]+$/.test(u) ? u : ''; };
+  // 「:_はーと:」「はーと」どちらの書き方でも受け付ける
+  const stampNameList = s => s.stampNames.split(/[,、\n]+/)
+    .map(x => x.trim().replace(/^:_?/, '').replace(/:$/, '').replace(/["\\\[\]]/g, '')).filter(Boolean);
+
   const keyframes = (name, kf) => `@keyframes ${name} {\n  ${kf.join('\n  ')}\n}`;
 
   function writeAnimation(s, w, selector) {
@@ -357,6 +403,71 @@
   }
 
   const tierSel = (P, i) => `${P}[style*="${SC_TIERS[i][1]}"]`;
+
+  // スタンプ・エモート。base はメッセージ本文の要素（YouTube は #message、Twitch は本文の span）
+  function writeStamps(s, w, base, yt) {
+    const names = stampNameList(s);
+    const member = yt && (s.stampSize > 0 || STAMP_ANIMS[s.stampAnim]);
+    if (!member && !names.length) return;
+    w.head('スタンプ');
+    const used = new Set();
+    const anim = key => {
+      const a = STAMP_ANIMS[key];
+      if (!a) return null;
+      if (!used.has(key)) { used.add(key); w.out.push(keyframes(`cc-stamp-${key}`, a.kf)); }
+      return `cc-stamp-${key} ${a.dur}s ${a.ease} infinite`;
+    };
+    if (member) {
+      // メンバースタンプは shared-tooltip-text が「:_」で始まる
+      const sz = s.stampSize > 0 ? px(s.stampSize) : null;
+      w.rule(`${base} img[shared-tooltip-text^=":_"]`, { width: sz, height: sz, animation: anim(s.stampAnim) });
+    }
+    if (names.length) {
+      const sel = names.flatMap(n => yt
+        ? [`${base} img[shared-tooltip-text=":_${n}:"]`, `${base} img[shared-tooltip-text=":${n}:"]`]
+        : [`${base} img[alt="${n}"]`]).join(',\n');
+      w.rule(sel, { width: yt ? px(s.stampNamedSize) : 'auto', height: px(s.stampNamedSize), animation: anim(s.stampNamedAnim) });
+    }
+  }
+
+  // 最新N件だけ表示・上のほうのコメントを薄く
+  function writeListLimits(s, w, list, scroller) {
+    if (s.maxItems > 0) {
+      w.head(`表示するコメント数（最新${s.maxItems}件）`);
+      w.hide(`${list} > :nth-last-child(n+${s.maxItems + 1})`);
+    }
+    if (s.fadeTop > 0) {
+      const g = `linear-gradient(to bottom, transparent 0%, #000 ${s.fadeTop}%)`;
+      w.head('上のほうのコメントを薄く');
+      w.rule(scroller, { '-webkit-mask-image': g, 'mask-image': g });
+    }
+  }
+
+  // 配信者・モデレーター・メンバーのコメントを目立たせる
+  // sel(type) はそのコメント全体、frame(type) は縁取りを付ける要素
+  function writeRoleFx(s, w, sel, frame) {
+    const out = OUT_ANIMS[s.animOut] || OUT_ANIMS.fade;
+    let wroteHead = false;
+    // 後に書いたものが優先されるよう、メンバー → モデレーター → 配信者 の順に書く
+    for (const [type, k, label] of [...ROLES].reverse()) {
+      const inKey = s[`ro${k}In`];
+      const inAnim = inKey === 'same' ? null : (SC_IN_ANIMS[inKey] || IN_ANIMS[inKey]);
+      const scale = s[`ro${k}Scale`];
+      const border = s[`ro${k}Border`];
+      if (!inAnim && scale === 1 && !border) continue;
+      if (!wroteHead) { w.head('配信者・モデレーター・メンバーのコメント'); wroteHead = true; }
+      w.out.push(`/* ${label} */`);
+      if (inAnim) {
+        w.out.push(keyframes(`cc-role-in-${k}`, inAnim.kf));
+        const anims = [`cc-role-in-${k} ${s.roAnimDur}s ${inAnim.ease} both`];
+        if (s.fadeOut) anims.push(`cc-out ${s.fadeOutDur}s ${out.ease} ${+(s.fadeOutDelay + s.roAnimDur).toFixed(2)}s forwards`);
+        w.rule(sel(type), { animation: anims.join(', ') });
+      }
+      if (scale !== 1) w.rule(sel(type), { zoom: String(scale) });
+      // 縁取りは box-shadow で描く（レイアウトがずれず、しっぽとも重ならない）
+      if (border) w.rule(frame(type), { 'box-shadow': `0 0 0 2px ${s[`ro${k}BorderColor`]}`, 'border-radius': px(s.bubbleRadius) });
+    }
+  }
 
   // スパチャ・ステッカー・メンバー加入の演出を、グループ（金額帯など）ごとに書く
   // writeAnimation の後に書いて、通常コメントの動きを上書きします
@@ -417,13 +528,75 @@
     }
   }
 
+  // 吹き出しの背景画像
+  const bubbleImage = s => {
+    const url = cleanUrl(s.bubbleImg);
+    if (!url) return {};
+    const repeat = s.bubbleImgFit === 'repeat';
+    return {
+      'background-image': `url("${url}")`, 'background-size': repeat ? 'auto' : s.bubbleImgFit,
+      'background-repeat': repeat ? 'repeat' : 'no-repeat', 'background-position': 'center',
+    };
+  };
+
   // 吹き出しのしっぽ（左向きの三角）。吹き出しの左外側に付きます
   const TAIL_W = 8;
-  const tailProps = (color, top) => ({
-    content: '""', position: 'absolute', top: px(top), left: px(-TAIL_W), width: '0', height: '0',
-    'border-style': 'solid', 'border-width': `6px ${TAIL_W}px 6px 0`,
+  const tailProps = (color, top, w = TAIL_W, h = 6, left = -TAIL_W) => ({
+    content: '""', position: 'absolute', top: px(top), left: px(left), width: '0', height: '0',
+    'border-style': 'solid', 'border-width': `${px(h)} ${px(w)} ${px(h)} 0`,
     'border-color': `transparent ${color} transparent transparent`,
   });
+
+  // 吹き出しの枠（画像の枠 > 枠線 の順に優先）
+  const bubbleFrameUrl = s => s.bubble ? cleanUrl(s.bubbleFrameImg) : '';
+  const borderImage = (url, slice, width, repeat, fill) => ({
+    'border-style': 'solid', 'border-width': px(width), 'border-color': 'transparent',
+    'border-image': `url("${url}") ${slice}${fill ? ' fill' : ''} / ${px(width)} / 0 ${repeat}`,
+  });
+  function bubbleBorderProps(s) {
+    const url = bubbleFrameUrl(s);
+    if (url) return borderImage(url, s.bubbleFrameSlice, s.bubbleFrameWidth, s.bubbleFrameRepeat, s.bubbleFrameFill);
+    if (s.bubble && s.bubbleBorder) return { border: `${px(s.bubbleBorderWidth)} ${s.bubbleBorderStyle} ${s.bubbleBorderColor}` };
+    return {};
+  }
+  // しっぽの情報: 画像の枠のときはしっぽを付けない。枠線があるときは外側（枠線の色）と内側（吹き出しの色）の2枚重ね
+  function tailInfo(s) {
+    const on = s.bubble && s.bubbleTail && !bubbleFrameUrl(s);
+    const bw = on && s.bubbleBorder ? s.bubbleBorderWidth : 0;
+    return { on, bw, fill: bw ? '::after' : '::before', width: TAIL_W + 2 * bw };
+  }
+  function writeTail(s, w, sel, top) {
+    const t = tailInfo(s);
+    if (!t.on) return;
+    const fill = hexToRgba(s.bubbleColor, s.bubbleAlpha);
+    if (!t.bw) { w.rule(`${sel}::before`, tailProps(fill, top)); return; }
+    w.rule(`${sel}::before`, tailProps(s.bubbleBorderColor, top - t.bw, TAIL_W + t.bw, 6 + t.bw, -(TAIL_W + 2 * t.bw)));
+    w.rule(`${sel}::after`, tailProps(fill, top, TAIL_W + t.bw, 6, -(TAIL_W + t.bw)));
+  }
+
+  // チャット欄全体の枠と見出し。box はチャット欄全体の要素、inner はその中身（残りの高さを使う）
+  function writeChatFrame(s, w, box, inner) {
+    if (!s.frameOn) return;
+    w.head('チャット欄の枠');
+    const url = cleanUrl(s.frameImg);
+    w.rule(box, {
+      'box-sizing': 'border-box', display: 'flex', 'flex-direction': 'column', overflow: 'hidden',
+      'border-radius': px(s.frameRadius), padding: px(s.framePadding),
+      'background-color': s.frameBgAlpha > 0 ? hexToRgba(s.frameBg, s.frameBgAlpha) : 'transparent',
+      ...(url ? borderImage(url, s.frameImgSlice, s.frameImgWidth, 'stretch', false)
+        : { border: `${px(s.frameWidth)} ${s.frameStyle} ${s.frameColor}` }),
+    });
+    w.rule(inner, { flex: '1 1 auto', 'min-height': '0' });
+    const title = s.frameTitle.replace(/[\r\n]+/g, ' ').trim();
+    if (title) {
+      w.rule(`${box}::before`, {
+        content: JSON.stringify(title), display: 'block', flex: 'none',
+        padding: `0 ${px(s.sidePad)} ${px(6)}`, 'margin-bottom': px(4),
+        color: s.frameColor, 'font-size': px(s.nameSize + 4), 'font-weight': '700', 'text-shadow': textShadow(s) || null,
+        'border-bottom': `${px(Math.max(1, s.frameWidth / 2))} ${s.frameStyle} ${s.frameColor}`,
+      });
+    }
+  }
 
   // YouTube のチャット欄用
   function generate(s) {
@@ -443,13 +616,15 @@
     if (font) rule('yt-live-chat-renderer, yt-live-chat-renderer *', { 'font-family': font.family });
     rule('yt-live-chat-item-list-renderer #item-scroller', { overflow: 'hidden' });
     out.push('yt-live-chat-item-list-renderer #item-scroller::-webkit-scrollbar { display: none !important; }');
+    writeListLimits(s, w, 'yt-live-chat-item-list-renderer #items', 'yt-live-chat-item-list-renderer #item-scroller');
+    writeChatFrame(s, w, 'yt-live-chat-renderer', 'yt-live-chat-renderer > #contents');
 
     head('不要な部分を非表示');
     // リアクションは入力欄（#panel-pages）の中にあるので、重ねて表示するときは入力欄を消さずに見えなくするだけにする
     const inlineReact = s.reactMode === 'inline';
     hide([
       'yt-live-chat-header-renderer', 'yt-live-chat-ticker-renderer',
-      'yt-live-chat-banner-manager', 'yt-live-chat-viewer-engagement-message-renderer',
+      ...(s.showPinned ? [] : ['yt-live-chat-banner-manager']), 'yt-live-chat-viewer-engagement-message-renderer',
       'yt-live-chat-mode-change-message-renderer', 'yt-live-chat-restricted-participation-renderer',
       'yt-live-chat-docked-message', '#show-more', `${T} #menu`, `${T} #inline-action-button-container`,
       ...(inlineReact ? [] : ['yt-live-chat-message-input-renderer', 'yt-reaction-control-panel-overlay-view-model', '#panel-pages']),
@@ -460,6 +635,23 @@
         visibility: 'hidden', height: '0', 'min-height': '0', margin: '0', padding: '0', border: 'none', overflow: 'visible',
       });
       writeReactionFountain(s, w);
+    }
+
+    if (s.showPinned) {
+      head('ピン留めメッセージ');
+      // YouTube ではチャット一覧より後ろに置かれているので、order で上に移す
+      rule('yt-live-chat-banner-manager', {
+        order: '-1', 'background-color': 'transparent', 'box-shadow': 'none', border: 'none',
+        margin: `4px ${px(s.sidePad)}`,
+      });
+      rule('yt-live-chat-banner-renderer', {
+        'background-color': hexToRgba(s.pinnedBg, s.pinnedBgAlpha), 'border-radius': px(s.bubbleRadius),
+        'box-shadow': 'none', border: 'none', height: 'auto',
+      });
+      // 折りたたまれたピン留めは1行で切れるので、折り返して全文を出す
+      rule([`${T}[in-banner] #content`, `${T}[in-banner] #message-container`, `${T}[in-banner] #message`].join(',\n'),
+        { 'white-space': 'normal', overflow: 'visible' });
+      rule('yt-live-chat-banner-renderer #header', { display: 'none' });
     }
 
     // 通常コメント
@@ -473,10 +665,19 @@
       const sz = px(s.iconSize);
       rule(`${T} #author-photo`, {
         width: sz, height: sz, 'min-width': sz,
-        'margin-right': px(Math.max(s.bubble && s.bubbleTail ? TAIL_W + 4 : 6, s.iconSize / 3)),
+        'margin-right': px(Math.max(tailInfo(s).on ? tailInfo(s).width + 4 : 6, s.iconSize / 3)),
         'border-radius': radius, overflow: 'hidden',
       });
       rule(`${T} #author-photo img`, { width: sz, height: sz, 'border-radius': radius });
+      const frameUrl = cleanUrl(s.iconFrameImg);
+      if (frameUrl) {
+        const off = px(-(s.iconSize * (s.iconFrameScale - 1)) / 2);
+        rule(`${T} #author-photo`, { position: 'relative', overflow: 'visible' });
+        rule(`${T} #author-photo::after`, {
+          content: '""', position: 'absolute', top: off, right: off, bottom: off, left: off,
+          background: `url("${frameUrl}") center / contain no-repeat`, 'pointer-events': 'none',
+        });
+      }
     }
 
     const shadow = textShadow(s);
@@ -488,19 +689,30 @@
         padding: `${px(s.bubblePadding)} ${px(s.bubblePadding * 1.5)}`,
         flex: '0 1 auto',
         position: s.bubbleTail ? 'relative' : null,
+        ...bubbleImage(s),
+        ...bubbleBorderProps(s),
       });
     }
     rule(`${T} #content`, content);
-    const ytTail = s.bubble && s.bubbleTail;
+    const tail = tailInfo(s);
+    const ytTail = tail.on;
     // しっぽの高さはアイコンの中央に合わせる
-    if (ytTail) rule(`${T} #content::before`, tailProps(hexToRgba(s.bubbleColor, s.bubbleAlpha), s.showIcon ? Math.max(6, s.iconSize / 2 - 6) : 8));
+    writeTail(s, w, `${T} #content`, s.showIcon ? Math.max(6, s.iconSize / 2 - 6) : 8);
+
+    // 一行おきの色（:where で詳細度を上げず、立場ごとの背景色が優先されるようにする）
+    if (s.stripe) {
+      const c = hexToRgba(s.stripeColor, s.stripeAlpha);
+      const even = `${T}:where(:nth-child(even))`;
+      rule(s.bubble ? `${even} #content` : even, { 'background-color': c, 'border-radius': px(s.bubbleRadius) });
+      if (ytTail) rule(`${even} #content${tail.fill}`, { 'border-right-color': c });
+    }
 
     if (s.roleBg) {
       const target = type => s.bubble ? `${T}[author-type="${type}"] #content` : `${T}[author-type="${type}"]`;
       const roleProps = c => ({ 'background-color': hexToRgba(c, s.roleBgAlpha), 'border-radius': px(s.bubbleRadius) });
       for (const [type, c] of [['owner', s.ownerBg], ['moderator', s.modBg], ['member', s.memberBg]]) {
         rule(target(type), roleProps(c));
-        if (ytTail) rule(`${target(type)}::before`, { 'border-right-color': hexToRgba(c, s.roleBgAlpha) });
+        if (ytTail) rule(`${target(type)}${tail.fill}`, { 'border-right-color': hexToRgba(c, s.roleBgAlpha) });
       }
     }
 
@@ -557,8 +769,20 @@
       rule(`${M} #message img`, { width: px(s.emojiSize), height: px(s.emojiSize), 'vertical-align': 'middle' });
     }
 
+    writeStamps(s, w, '#message', true);
     writeAnimation(s, w, `${T},\n${P},\n${M},\n${ST}`);
     writeSuperchatFx(s, w, { P, ST, M });
+    const roleSel = type => `${T}[author-type="${type}"]:not([in-banner])`;
+    writeRoleFx(s, w, roleSel, type => s.bubble ? `${roleSel(type)} #content` : roleSel(type));
+    if (s.showPinned) {
+      // ピン留めは通常のコメントと同じ部品（in-banner 付き）なので、動きや消える設定を外して目印を付ける
+      head('ピン留めメッセージ（中のコメント）');
+      rule(`${T}[in-banner]`, { animation: 'none', zoom: '1', padding: '4px 8px' });
+      rule(`${T}[in-banner]::before`, { content: '"📌"', 'margin-right': '6px', 'font-size': px(s.nameSize), 'line-height': '1.8' });
+      rule(`${T}[in-banner] #content`, { 'background-color': 'transparent', 'background-image': 'none', 'box-shadow': 'none' });
+      if (ytTail) rule(`${T}[in-banner] #content::before, ${T}[in-banner] #content::after`, { display: 'none' });
+      rule(`${T}[in-banner] #content`, { border: 'none', 'border-image': 'none' });
+    }
     return w.done();
   }
 
@@ -620,6 +844,8 @@
       { 'background-color': 'transparent', 'background-image': 'none', border: 'none' });
     if (font) rule(`${MSG}, ${MSG} *, .user-notice-line, .user-notice-line *`, { 'font-family': font.family });
     rule('.scrollable-area', { overflow: 'hidden' });
+    writeListLimits(s, w, '.chat-scrollable-area__message-container', '.scrollable-area');
+    writeChatFrame(s, w, '.chat-room', '.chat-room__content');
     out.push('.scrollable-area::-webkit-scrollbar { display: none !important; }');
 
     head('不要な部分を非表示');
@@ -643,27 +869,37 @@
     const rowPad = `${px(s.itemGap / 2)} ${px(s.sidePad)}`;
     rule(MSG, { padding: rowPad, overflow: 'visible' });
     const line = { 'line-height': String(s.lineHeight), 'text-shadow': textShadow(s) || null };
-    const twTail = s.bubble && s.bubbleTail;
+    const tail = tailInfo(s);
+    const twTail = tail.on;
     if (s.bubble) {
       Object.assign(line, {
         display: 'block', width: 'fit-content', 'box-sizing': 'border-box',
-        'max-width': twTail ? `calc(100% - ${TAIL_W}px)` : '100%',
-        'margin-left': twTail ? px(TAIL_W) : null,
+        'max-width': twTail ? `calc(100% - ${tail.width}px)` : '100%',
+        'margin-left': twTail ? px(tail.width) : null,
         position: twTail ? 'relative' : null,
         'background-color': hexToRgba(s.bubbleColor, s.bubbleAlpha),
         'border-radius': px(s.bubbleRadius),
         padding: `${px(s.bubblePadding)} ${px(s.bubblePadding * 1.5)}`,
+        ...bubbleImage(s),
+        ...bubbleBorderProps(s),
       });
     }
     rule(LINE, line);
-    if (twTail) rule(`${LINE}::before`, tailProps(hexToRgba(s.bubbleColor, s.bubbleAlpha), s.bubblePadding + 2));
+    writeTail(s, w, LINE, s.bubblePadding + 2);
+
+    if (s.stripe) {
+      const c = hexToRgba(s.stripeColor, s.stripeAlpha);
+      const even = `.chat-scrollable-area__message-container > :where(:nth-child(even))`;
+      rule(s.bubble ? `${even} ${LINE}` : `${even} ${MSG}`, { 'background-color': c, 'border-radius': px(s.bubbleRadius) });
+      if (twTail) rule(`${even} ${LINE}${tail.fill}`, { 'border-right-color': c });
+    }
 
     if (s.roleBg) {
       const target = type => role(type, s.bubble ? ` ${LINE}` : '');
       const roleProps = c => ({ 'background-color': hexToRgba(c, s.roleBgAlpha), 'border-radius': px(s.bubbleRadius) });
       for (const [type, c] of [['member', s.memberBg], ['moderator', s.modBg], ['owner', s.ownerBg]]) {
         rule(target(type), roleProps(c));
-        if (twTail) rule(`${target(type)}::before`, { 'border-right-color': hexToRgba(c, s.roleBgAlpha) });
+        if (twTail) rule(`${target(type)}${tail.fill}`, { 'border-right-color': hexToRgba(c, s.roleBgAlpha) });
       }
     }
 
@@ -687,6 +923,7 @@
     });
     rule(`${BODY} .text-fragment, ${BODY} a`, { color: s.msgColor, 'font-size': px(s.msgSize), 'font-weight': s.msgWeight });
     rule(`${BODY} img`, { height: px(s.emojiSize), width: 'auto', 'vertical-align': 'middle', margin: '0 1px' });
+    writeStamps(s, w, BODY, false);
 
     head('サブスク・ギフト・レイドの通知');
     if (!s.showMembership) hide(NOTICE);
@@ -698,6 +935,7 @@
     }
 
     writeAnimation(s, w, `${MSG},\n.user-notice-line`);
+    writeRoleFx(s, w, type => role(type), type => s.bubble ? role(type, ` ${LINE}`) : role(type));
     return w.done();
   }
 
@@ -748,6 +986,13 @@
     yt-live-chat-paid-sticker-renderer #author-photo { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; }
     yt-live-chat-paid-sticker-renderer #sticker { font-size: 48px; line-height: 1; margin-left: auto; }
 
+    yt-live-chat-banner-manager { display: block; flex: none; padding: 8px 12px 0; }
+    yt-live-chat-banner-renderer { display: block; padding: 4px; border-radius: 8px; background: #3a3a3a; }
+    #banner-container { display: flex; align-items: center; }
+    yt-live-chat-banner-renderer #header { flex: none; width: 24px; text-align: center; color: #aaa; }
+    #banner-container > #contents { flex: 1; min-width: 0; }
+    #message img[shared-tooltip-text^=":_"] { width: 24px; height: 24px; }
+
     #panel-pages { flex: none; padding: 8px 12px; background: #0f0f0f; border-top: 1px solid rgba(255,255,255,.1); }
     #top { display: flex; align-items: center; gap: 8px; }
     #input-container { flex: 1; padding: 6px 12px; border-radius: 16px; background: rgba(255,255,255,.1); color: #aaa; }
@@ -762,7 +1007,8 @@
     }
   `;
 
-  const FRAME_HTML = `<yt-live-chat-app><yt-live-chat-renderer><yt-live-chat-item-list-renderer>
+  const FRAME_HTML = `<yt-live-chat-app><yt-live-chat-renderer>
+    <yt-live-chat-banner-manager id="live-chat-banner"></yt-live-chat-banner-manager><yt-live-chat-item-list-renderer>
     <div id="item-scroller"><div id="item-offset"><div id="items"></div></div></div>
     </yt-live-chat-item-list-renderer>
     <div id="panel-pages"><div id="input-panel"><yt-live-chat-message-input-renderer><div id="container"><div id="top">
@@ -799,8 +1045,8 @@
   const clock = d => `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
 
   // 通常コメント。html はエスケープ済みのメッセージ本文
-  function textItem({ name, avatarColor, type = '', badges = [], html, time = new Date() }) {
-    return `<yt-live-chat-text-message-renderer author-type="${type}">${photo(name, avatarColor)}
+  function textItem({ name, avatarColor, type = '', badges = [], html, time = new Date(), extra = '' }) {
+    return `<yt-live-chat-text-message-renderer author-type="${type}"${extra}>${photo(name, avatarColor)}
       <div id="content"><span id="timestamp">${clock(time)}</span><yt-live-chat-author-chip>
       <span id="author-name" class="${type === 'owner' ? 'owner' : ''}">${esc(name)}</span>${badgesHtml(badges)}</yt-live-chat-author-chip>
       <span id="message">${html}</span></div></yt-live-chat-text-message-renderer>`;
@@ -823,6 +1069,12 @@
     return `<yt-live-chat-membership-item-renderer><div id="card"><div id="header">${photo(name, avatarColor)}
       <div id="header-content"><span id="author-name">${esc(name)}</span>${head}</div></div>${body}</div>
       </yt-live-chat-membership-item-renderer>`;
+  }
+
+  // ピン留めメッセージ（配信者のコメントがバナーに入ったもの）
+  function pinnedBanner(item) {
+    return `<div id="visible-banners"><yt-live-chat-banner-renderer><div id="banner-container">
+      <div id="header">⋮</div><div id="contents">${item}</div></div></yt-live-chat-banner-renderer></div>`;
   }
 
   // スーパーステッカー（YouTubeのみ）
@@ -894,7 +1146,7 @@
     FONTS, WEIGHTS, DEFAULTS, COLOR_KEYS, IN_ANIMS, OUT_ANIMS, SC_IN_ANIMS, SC_EFFECTS, SC_TIERS, SC_GROUPS,
     sanitize, generate, generateTwitch, generateReactions,
     BASE_CSS, FRAME_HTML, esc, svgUri, avatar,
-    textItem, paidItem, memberItem, stickerItem,
+    textItem, paidItem, memberItem, stickerItem, pinnedBanner, STAMP_ANIMS,
     TW_BASE_CSS, TW_FRAME_HTML, twTextItem, twNoticeItem,
   };
 })(window);
