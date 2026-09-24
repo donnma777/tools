@@ -312,6 +312,21 @@
       transition: background 0.15s, color 0.15s;
     }
 
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
+    .sc-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 0;
+    }
+
+    .sc-tabs button[aria-selected="true"] {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
     .seg button:hover {
       color: var(--text);
     }
@@ -1168,7 +1183,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- chat-core.js を変えたら v を上げる（サーバーとブラウザのキャッシュ対策） -->
-  <script src="chat-core.js?v=20260924b"></script>
+  <script src="chat-core.js?v=20260924c"></script>
   <script>
     (() => {
       'use strict';
@@ -1216,6 +1231,15 @@
       const isYT = s => s.platform === 'youtube';
       const isTW = s => s.platform === 'twitch';
       const showSC = s => s.showSuperchat && isYT(s);
+      // スパチャの演出（金額帯ごと）: いま表示しているタブ
+      let scTab = '1';
+      const tabGroups = s => C.SC_GROUPS.filter(g =>
+        g.tier !== undefined ? s.showSuperchat : g.id === 'St' ? s.showStickers : s.showMembership);
+      const SC_IN_OPTS = [['same', '通常コメントと同じ'],
+        ...Object.entries(C.SC_IN_ANIMS).map(([v, a]) => [v, '★ ' + a.l]),
+        ...Object.entries(C.IN_ANIMS).map(([v, a]) => [v, a.l])];
+      const SC_FX_OPTS = [['none', 'なし'], ...Object.entries(C.SC_EFFECTS).map(([v, a]) => [v, a.l])];
+
       const SECTIONS = [
         {
           title: 'Twitch の設定', icon: '◆', open: true, when: isTW, fields: [
@@ -1336,33 +1360,35 @@
           ]
         },
         {
-          title: 'スパチャの演出', icon: '🎉', when: s => isYT(s) && s.showSuperchat, fields: [
+          title: 'スパチャの演出（金額帯ごと）', icon: '🎉', when: s => isYT(s) && tabGroups(s).length > 0, fields: [
             {
-              k: 'scAnimIn', l: '登場のしかた', t: 'select',
-              o: [['same', '通常コメントと同じ'],
-                ...Object.entries(C.SC_IN_ANIMS).map(([v, a]) => [v, '★ ' + a.l]),
-                ...Object.entries(C.IN_ANIMS).map(([v, a]) => [v, a.l])],
+              k: '_scTabs', l: '設定する金額帯', t: 'tabs',
+              note: 'タブを押すと、その金額帯のスパチャがプレビューに流れます。金額は日本円の目安で、ほかの通貨も同じ色の段階で判定します',
             },
-            { k: 'scAnimDur', l: '登場アニメーションの時間', t: 'range', min: 0.2, max: 2, step: 0.1, u: '秒', when: s => s.scAnimIn !== 'same' },
-            {
-              k: 'scEffect', l: '登場したあとの演出', t: 'select',
-              o: [['none', 'なし'], ...Object.entries(C.SC_EFFECTS).map(([v, a]) => [v, a.l])],
-            },
-            { k: 'scEffectCount', l: '演出の回数', t: 'select', o: [['1', '1回'], ['3', '3回'], ['infinite', 'ずっと']], when: s => s.scEffect !== 'none' },
-            { k: 'scGlowColor', l: '光の色', t: 'color', when: s => s.scEffect === 'glow' || s.scTopEffect === 'glow' },
-            {
-              k: 'scFxMinTier', l: '演出を付ける金額', t: 'select',
-              o: C.SC_TIERS.map(([amount], i) => [String(i + 1), i === 0 ? 'すべてのスパチャ' : amount + ' 以上']),
-              note: 'これより安いスパチャは通常コメントと同じ動きになります。金額は日本円の目安で、ほかの通貨も同じ色の段階で判定します',
-            },
-            {
-              k: 'scTopEffect', l: s => C.SC_TIERS[C.SC_TIERS.length - 1][0] + ' 以上だけの特別演出（ずっと続く）', t: 'select',
-              o: [['none', 'なし'], ...Object.entries(C.SC_EFFECTS).map(([v, a]) => [v, a.l])],
-            },
-            { k: 'scScaleByTier', l: '金額が高いほど大きく表示', t: 'check' },
-            { k: 'scScaleMax', l: '最高額のときの大きさ', t: 'range', min: 1.1, max: 2, step: 0.05, u: '倍', when: s => s.scScaleByTier },
-            { k: 'scKeep', l: 'スパチャは消さずに残す', t: 'check', when: s => s.fadeOut, note: '「一定時間でコメントを消す」を使っているときの設定です' },
-            { k: 'scFxMember', l: 'メンバー加入にも同じ演出を使う', t: 'check', when: s => s.showMembership },
+            ...C.SC_GROUPS.flatMap(g => {
+              const k = x => `sc${g.id}${x}`;
+              const on = s => scTab === g.id;
+              const fields = [
+                { k: k('In'), l: '登場のしかた', t: 'select', o: SC_IN_OPTS, when: on },
+                { k: k('Fx'), l: '登場したあとの演出', t: 'select', o: SC_FX_OPTS, when: on },
+                { k: k('Count'), l: '演出の回数', t: 'select', o: [['1', '1回'], ['3', '3回'], ['infinite', 'ずっと']], when: s => on(s) && s[k('Fx')] !== 'none' },
+                { k: k('Scale'), l: '大きさ', t: 'range', min: 1, max: 2, step: 0.05, u: '倍', when: on },
+                { k: k('Keep'), l: '消さずに残す', t: 'check', when: s => on(s) && s.fadeOut, note: '「一定時間でコメントを消す」を使っているときの設定です' },
+              ];
+              if (g.tier !== undefined) {
+                const custom = s => on(s) && s[k('Color')] === 'custom';
+                fields.push(
+                  { k: k('Color'), l: 'カードの色', t: 'select', o: [['default', '標準の色'], ['custom', 'この金額帯だけ色を変える']], when: on },
+                  { k: k('Header'), l: '上部（名前・金額）の背景', t: 'color', when: custom },
+                  { k: k('Body'), l: '下部（メッセージ）の背景', t: 'color', when: custom },
+                  { k: k('Text'), l: '文字色', t: 'color', when: custom },
+                );
+              }
+              return fields;
+            }),
+            { k: '_scCopy', l: 'この金額帯の動きを、ほかの金額帯すべてにコピー', t: 'action', when: s => /^\d$/.test(scTab), run: copyTierToAll },
+            { k: 'scAnimDur', l: '登場アニメーションの時間（共通）', t: 'range', min: 0.2, max: 2, step: 0.1, u: '秒' },
+            { k: 'scGlowColor', l: '「ふちが光る」の色（共通）', t: 'color', when: s => C.SC_GROUPS.some(g => s[`sc${g.id}Fx`] === 'glow') },
           ]
         },
       ];
@@ -1406,7 +1432,36 @@
         const id = 'f-' + f.k;
         let set;
 
-        if (f.t === 'check') {
+        if (f.t === 'tabs') {
+          wrap.classList.add('field-wide');
+          wrap.innerHTML = `<label class="field-label"><span></span></label><div class="seg sc-tabs" role="tablist"></div>`;
+          const bar = wrap.querySelector('.sc-tabs');
+          for (const g of C.SC_GROUPS) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.setAttribute('role', 'tab');
+            b.dataset.group = g.id;
+            b.textContent = g.label;
+            b.addEventListener('click', () => {
+              scTab = g.id;
+              refreshVisibility();
+              pushGroupSample(g.id);
+            });
+            bar.appendChild(b);
+          }
+          set = () => {
+            const vis = tabGroups(S);
+            if (vis.length && !vis.some(g => g.id === scTab)) scTab = vis[0].id;
+            bar.querySelectorAll('button').forEach(b => {
+              b.hidden = !vis.some(g => g.id === b.dataset.group);
+              b.setAttribute('aria-selected', String(b.dataset.group === scTab));
+            });
+          };
+        } else if (f.t === 'action') {
+          wrap.innerHTML = `<button type="button" class="btn btn-sm"><span></span></button>`;
+          wrap.querySelector('button').addEventListener('click', () => f.run());
+          set = () => {};
+        } else if (f.t === 'check') {
           wrap.innerHTML = `<label class="toggle" for="${id}"><span></span><input type="checkbox" id="${id}"><span class="sw"></span></label>`;
           const el = wrap.querySelector('input');
           el.addEventListener('change', () => update(f.k, el.checked));
@@ -1452,7 +1507,7 @@
           n.textContent = f.note;
           wrap.appendChild(n);
         }
-        inputs[f.k] = { f, wrap, set, labelEl: wrap.querySelector('label > span') };
+        inputs[f.k] = { f, wrap, set, labelEl: wrap.querySelector('label > span, button > span') };
         return wrap;
       }
 
@@ -1469,6 +1524,7 @@
           labelEl.textContent = typeof f.l === 'function' ? f.l(S) : f.l;
         }
         for (const [sec, det] of sectionEls) det.hidden = sec.when ? !sec.when(S) : false;
+        if (inputs._scTabs) inputs._scTabs.set();
         document.querySelectorAll('#platform button').forEach(b => {
           b.setAttribute('aria-checked', String(b.dataset.platform === S.platform));
         });
@@ -1488,11 +1544,16 @@
         scheduleRender();
         if (S.platform !== before) setupFrame();
         else if (ANIM_KEYS.includes(k)) replaySoon();
+        else if (/^sc(\d|St|Mem)[A-Z]/.test(k)) pushGroupSoon(k.match(/^sc(\d|St|Mem)/)[1]);
       }
 
-      const ANIM_KEYS = ['animIn', 'animDur', 'fadeOut', 'animOut', 'fadeOutDelay', 'fadeOutDur',
-        'scAnimIn', 'scAnimDur', 'scEffect', 'scEffectCount', 'scGlowColor', 'scKeep', 'scFxMember',
-        'scFxMinTier', 'scTopEffect', 'scScaleByTier', 'scScaleMax'];
+      const ANIM_KEYS = ['animIn', 'animDur', 'fadeOut', 'animOut', 'fadeOutDelay', 'fadeOutDur', 'scAnimDur', 'scGlowColor'];
+      // sc1In / scStFx / scMemScale などグループごとの設定を変えたら、そのグループの見本を流す
+      let groupTimer = null;
+      function pushGroupSoon(id) {
+        clearTimeout(groupTimer);
+        groupTimer = setTimeout(() => pushGroupSample(id), 300);
+      }
       let replayTimer = null;
       function replaySoon() {
         clearTimeout(replayTimer);
@@ -1712,6 +1773,26 @@
         $('btn-play').textContent = playing ? '⏸ 停止' : '▶ 再生';
         schedule();
       });
+      function pushGroupSample(id) {
+        if (!fdoc || !isYT(S)) return;
+        const g = C.SC_GROUPS.find(x => x.id === id);
+        const p = pick(people());
+        if (g.tier !== undefined) push(sample.paid(p, pick(PAID_LINES), g.tier));
+        else if (id === 'St') push(sample.sticker(p));
+        else push(sample.member(p, 6));
+      }
+
+      // いま表示している金額帯の「動き」（色以外）をほかの金額帯すべてにコピー
+      function copyTierToAll() {
+        const next = { ...S };
+        for (const g of C.SC_GROUPS) {
+          if (g.tier === undefined || g.id === scTab) continue;
+          for (const x of ['In', 'Fx', 'Count', 'Scale', 'Keep']) next[`sc${g.id}${x}`] = S[`sc${scTab}${x}`];
+        }
+        applyAll(next);
+        toast('ほかの金額帯にコピーしました');
+      }
+
       $('btn-add').addEventListener('click', addRandom);
       $('btn-add-sc').addEventListener('click', () => push(sample.paid(pick(people()), pick(PAID_LINES))));
       $('btn-replay').addEventListener('click', replayPreview);

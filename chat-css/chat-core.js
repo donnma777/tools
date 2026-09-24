@@ -36,6 +36,37 @@
   ];
 
   // =====================================================
+  //  スパチャの金額帯
+  //  YouTube は金額帯ごとの色を各スパチャ要素の style 属性に
+  //  「--yt-live-chat-paid-message-primary-color: rgba(...)」として書き込むので、
+  //  その色で金額帯を見分けます（通貨が違っても段階は共通）。
+  //  [目安の金額, 下部の色, 上部の色, 文字色, 下部の色(hex), 上部の色(hex)]
+  // =====================================================
+  const SC_TIERS = [
+    ['¥100', 'rgba(30,136,229,1)', 'rgba(21,101,192,1)', '#ffffff', '#1e88e5', '#1565c0'],
+    ['¥200', 'rgba(0,229,255,1)', 'rgba(0,184,212,1)', '#000000', '#00e5ff', '#00b8d4'],
+    ['¥500', 'rgba(29,233,182,1)', 'rgba(0,191,165,1)', '#000000', '#1de9b6', '#00bfa5'],
+    ['¥1,000', 'rgba(255,202,40,1)', 'rgba(255,179,0,1)', '#000000', '#ffca28', '#ffb300'],
+    ['¥2,000', 'rgba(245,124,0,1)', 'rgba(230,81,0,1)', '#ffffff', '#f57c00', '#e65100'],
+    ['¥5,000', 'rgba(233,30,99,1)', 'rgba(194,24,91,1)', '#ffffff', '#e91e63', '#c2185b'],
+    ['¥10,000', 'rgba(230,33,23,1)', 'rgba(208,0,0,1)', '#ffffff', '#e62117', '#d00000'],
+  ];
+
+  // 演出を個別に設定できるグループ（金額帯7つ＋ステッカー＋メンバー加入）
+  // 設定のキーは sc{id}In / sc{id}Fx / sc{id}Count / sc{id}Scale / sc{id}Keep（金額帯は色も）
+  const SC_GROUPS = [
+    ...SC_TIERS.map((t, i) => ({ id: String(i + 1), label: t[0], tier: i })),
+    { id: 'St', label: 'ステッカー' },
+    { id: 'Mem', label: 'メンバー加入' },
+  ];
+  // [登場のしかた, 登場後の演出, 回数, 大きさ]
+  const SC_GROUP_DEFAULTS = {
+    1: ['same', 'none', '3', 1], 2: ['same', 'none', '3', 1], 3: ['pop', 'none', '3', 1],
+    4: ['impact', 'shine', '3', 1.05], 5: ['impact', 'shine', '3', 1.1], 6: ['slam', 'glow', '3', 1.2],
+    7: ['impact', 'rainbow', 'infinite', 1.3], St: ['pop', 'none', '3', 1], Mem: ['same', 'none', '3', 1],
+  };
+
+  // =====================================================
   //  初期値
   // =====================================================
   const DEFAULTS = {
@@ -67,10 +98,8 @@
 
     showMembership: true, memHeaderText: true,
 
-    // スパチャの演出（YouTube）
-    scAnimIn: 'impact', scAnimDur: 0.7, scEffect: 'shine', scEffectCount: '3', scGlowColor: '#ffd54f',
-    scKeep: true, scFxMember: false,
-    scFxMinTier: '1', scScaleByTier: false, scScaleMax: 1.4, scTopEffect: 'rainbow',
+    // スパチャの演出（YouTube）。金額帯ごとの設定は下の SC_GROUPS から追加
+    scAnimDur: 0.7, scGlowColor: '#ffd54f',
 
     // リアクション（YouTube）: hide / inline（チャット欄に重ねる）/ separate（リアクション専用のブラウザソース）
     reactMode: 'hide', reactScale: 3, reactRight: 40, reactBottom: 40,
@@ -81,13 +110,60 @@
     // Twitch 専用
     twUserColor: true, twHideUsers: '',
   };
+  for (const g of SC_GROUPS) {
+    const [inAnim, fx, count, scale] = SC_GROUP_DEFAULTS[g.id];
+    Object.assign(DEFAULTS, {
+      [`sc${g.id}In`]: inAnim, [`sc${g.id}Fx`]: fx, [`sc${g.id}Count`]: count, [`sc${g.id}Scale`]: scale,
+      [`sc${g.id}Keep`]: g.id !== 'Mem',
+    });
+    if (g.tier !== undefined) {
+      const t = SC_TIERS[g.tier];
+      Object.assign(DEFAULTS, {
+        [`sc${g.id}Color`]: 'default', [`sc${g.id}Header`]: t[5], [`sc${g.id}Body`]: t[4], [`sc${g.id}Text`]: t[3],
+      });
+    }
+  }
 
   const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
+
+  // 以前の「スパチャの演出」（全金額帯共通の設定）を、金額帯ごとの設定に引き継ぐ
+  function migrate(o) {
+    if (!('scAnimIn' in o || 'scEffect' in o) || 'sc1In' in o) return o;
+    const m = { ...o };
+    const min = parseInt(o.scFxMinTier, 10) || 1;
+    SC_TIERS.forEach((_, i) => {
+      const id = i + 1, on = id >= min;
+      if (typeof o.scAnimIn === 'string') m[`sc${id}In`] = on ? o.scAnimIn : 'same';
+      if (typeof o.scEffect === 'string') m[`sc${id}Fx`] = on ? o.scEffect : 'none';
+      if (typeof o.scEffectCount === 'string') m[`sc${id}Count`] = o.scEffectCount;
+      if (typeof o.scKeep === 'boolean') m[`sc${id}Keep`] = o.scKeep;
+      m[`sc${id}Scale`] = o.scScaleByTier ? +(1 + ((o.scScaleMax || 1.4) - 1) * i / (SC_TIERS.length - 1)).toFixed(2) : 1;
+    });
+    if (typeof o.scTopEffect === 'string' && o.scTopEffect !== 'none') {
+      m[`sc${SC_TIERS.length}Fx`] = o.scTopEffect;
+      m[`sc${SC_TIERS.length}Count`] = 'infinite';
+    }
+    // 下限が「すべて」のときはステッカーも同じ演出だった
+    if (typeof o.scAnimIn === 'string') {
+      m.scStIn = min <= 1 ? o.scAnimIn : 'same';
+      m.scStFx = min <= 1 && typeof o.scEffect === 'string' ? o.scEffect : 'none';
+      if (typeof o.scEffectCount === 'string') m.scStCount = o.scEffectCount;
+      if (typeof o.scKeep === 'boolean') m.scStKeep = o.scKeep;
+    }
+    if (o.scFxMember === true) {
+      if (typeof o.scAnimIn === 'string') m.scMemIn = o.scAnimIn;
+      if (typeof o.scEffect === 'string') m.scMemFx = o.scEffect;
+      if (typeof o.scEffectCount === 'string') m.scMemCount = o.scEffectCount;
+      if (typeof o.scKeep === 'boolean') m.scMemKeep = o.scKeep;
+    }
+    return m;
+  }
 
   // 既知のキー・型だけ取り込む
   function sanitize(obj) {
     const out = { ...DEFAULTS };
     if (!obj || typeof obj !== 'object') return out;
+    obj = migrate(obj);
     for (const k of Object.keys(DEFAULTS)) {
       if (!(k in obj)) continue;
       const d = DEFAULTS[k], v = obj[k];
@@ -280,78 +356,63 @@
     if (anims.length) w.rule(selector, { animation: anims.join(', ') });
   }
 
-  // =====================================================
-  //  スパチャの金額帯
-  //  YouTube は金額帯ごとの色を各スパチャ要素の style 属性に
-  //  「--yt-live-chat-paid-message-primary-color: rgba(...)」として書き込むので、
-  //  その色で金額帯を見分けます（通貨が違っても段階は共通）。
-  //  [目安の金額, 下部の色, 上部の色, 文字色]
-  // =====================================================
-  const SC_TIERS = [
-    ['¥100', 'rgba(30,136,229,1)', 'rgba(21,101,192,1)', '#ffffff'],
-    ['¥200', 'rgba(0,229,255,1)', 'rgba(0,184,212,1)', '#000000'],
-    ['¥500', 'rgba(29,233,182,1)', 'rgba(0,191,165,1)', '#000000'],
-    ['¥1,000', 'rgba(255,202,40,1)', 'rgba(255,179,0,1)', '#000000'],
-    ['¥2,000', 'rgba(245,124,0,1)', 'rgba(230,81,0,1)', '#ffffff'],
-    ['¥5,000', 'rgba(233,30,99,1)', 'rgba(194,24,91,1)', '#ffffff'],
-    ['¥10,000', 'rgba(230,33,23,1)', 'rgba(208,0,0,1)', '#ffffff'],
-  ];
   const tierSel = (P, i) => `${P}[style*="${SC_TIERS[i][1]}"]`;
 
-  // スパチャだけ通常コメントと別の動きにする（writeAnimation の後に書いて上書き）
+  // スパチャ・ステッカー・メンバー加入の演出を、グループ（金額帯など）ごとに書く
+  // writeAnimation の後に書いて、通常コメントの動きを上書きします
   function writeSuperchatFx(s, w, { P, ST, M }) {
-    const inAnim = s.scAnimIn === 'same' ? null : (SC_IN_ANIMS[s.scAnimIn] || IN_ANIMS[s.scAnimIn]);
     const normalIn = IN_ANIMS[s.animIn];
-    const keep = s.fadeOut && s.scKeep;
-    const fx = SC_EFFECTS[s.scEffect];
-    const top = SC_EFFECTS[s.scTopEffect];
-    const member = s.scFxMember && s.showMembership ? [M] : [];
-    if (!inAnim && !keep && !fx && !top && !s.scScaleByTier) return;
-    w.head('スパチャの演出');
-
-    // 演出を付けるスパチャ（金額の下限が「すべて」のときはステッカーも含める）
-    const minTier = Math.min(Math.max(parseInt(s.scFxMinTier, 10) || 1, 1), SC_TIERS.length);
-    const fxSels = [...(minTier <= 1 ? [P, ST] : SC_TIERS.slice(minTier - 1).map((_, i) => tierSel(P, minTier - 1 + i))), ...member];
+    const out = OUT_ANIMS[s.animOut] || OUT_ANIMS.fade;
     const join = sels => sels.join(',\n');
-    const normalDur = normalIn ? s.animDur : 0;
-    const inDur = inAnim ? s.scAnimDur : normalDur;
+    const emitted = new Set();
+    const kf = (name, frames) => { if (!emitted.has(name)) { emitted.add(name); w.out.push(keyframes(name, frames)); } };
+    let wroteHead = false;
 
-    // 消さずに残す: すべてのスパチャから消えるアニメーションを外す
-    if (keep) w.rule(join([P, ST, ...member]), { animation: normalIn ? `cc-in ${s.animDur}s ${normalIn.ease} both` : 'none' });
+    for (const g of SC_GROUPS) {
+      const sel = g.tier !== undefined ? (s.showSuperchat ? tierSel(P, g.tier) : null)
+        : g.id === 'St' ? (s.showStickers ? ST : null) : (s.showMembership ? M : null);
+      if (!sel) continue;
+      const v = k => s[`sc${g.id}${k}`];
+      const inKey = v('In');
+      const inAnim = inKey === 'same' ? null : (SC_IN_ANIMS[inKey] || IN_ANIMS[inKey]);
+      const fx = SC_EFFECTS[v('Fx')];
+      const keep = s.fadeOut && v('Keep');
+      const scale = v('Scale');
+      const custom = g.tier !== undefined && v('Color') === 'custom';
+      if (!inAnim && !fx && !keep && scale === 1 && !custom) continue;
+      if (!wroteHead) { w.head('スパチャの演出（金額帯ごと）'); wroteHead = true; }
+      w.out.push(`/* ${g.label} */`);
 
-    if (inAnim) {
-      w.out.push(keyframes('cc-sc-in', inAnim.kf));
-      const anims = [`cc-sc-in ${s.scAnimDur}s ${inAnim.ease} both`];
-      if (s.fadeOut && !s.scKeep) {
-        const out = OUT_ANIMS[s.animOut] || OUT_ANIMS.fade;
-        anims.push(`cc-out ${s.fadeOutDur}s ${out.ease} ${+(s.fadeOutDelay + inDur).toFixed(2)}s forwards`);
+      // 登場のしかた・消えるかどうか
+      const inDur = inAnim ? s.scAnimDur : (normalIn ? s.animDur : 0);
+      if (inAnim || keep) {
+        const anims = [];
+        if (inAnim) {
+          kf(`cc-sc-in-${inKey}`, inAnim.kf);
+          anims.push(`cc-sc-in-${inKey} ${s.scAnimDur}s ${inAnim.ease} both`);
+        } else if (normalIn) {
+          anims.push(`cc-in ${s.animDur}s ${normalIn.ease} both`);
+        }
+        if (s.fadeOut && !keep) anims.push(`cc-out ${s.fadeOutDur}s ${out.ease} ${+(s.fadeOutDelay + inDur).toFixed(2)}s forwards`);
+        w.rule(sel, { animation: anims.length ? anims.join(', ') : 'none' });
       }
-      w.rule(join(fxSels), { animation: anims.join(', ') });
-    }
 
-    const writeCardFx = (name, effect, sels, count, delay) => {
-      w.out.push(keyframes(name, effect.kf(s)));
-      if (effect.card) w.rule(join(sels.map(x => `${x} #card`)), effect.card);
-      w.rule(join(sels.map(x => `${x} #card${effect.pseudo || ''}`)), {
-        ...(effect.props ? effect.props(s) : {}),
-        animation: `${name} ${effect.dur}s ${effect.ease} ${+delay.toFixed(2)}s ${count} both`,
-      });
-    };
-    if (fx) writeCardFx('cc-sc-fx', fx, fxSels, s.scEffectCount, inDur);
+      // 登場後の演出（カードにかける）
+      if (fx) {
+        kf(`cc-sc-fx-${v('Fx')}`, fx.kf(s));
+        if (fx.card) w.rule(`${sel} #card`, fx.card);
+        w.rule(`${sel} #card${fx.pseudo || ''}`, {
+          ...(fx.props ? fx.props(s) : {}),
+          animation: `cc-sc-fx-${v('Fx')} ${fx.dur}s ${fx.ease} ${+inDur.toFixed(2)}s ${v('Count')} both`,
+        });
+      }
 
-    // ¥10,000以上だけの特別演出（ずっと続く）
-    if (top) {
-      const topTier = SC_TIERS.length - 1;
-      w.head('スパチャの演出（' + SC_TIERS[topTier][0] + '以上）');
-      writeCardFx('cc-sc-top', top, [tierSel(P, topTier)], 'infinite', minTier - 1 <= topTier && inAnim ? s.scAnimDur : normalDur);
-    }
+      if (scale !== 1) w.rule(sel, { zoom: String(scale) });
 
-    // 金額が高いほど大きく表示
-    if (s.scScaleByTier) {
-      w.head('スパチャの大きさ（金額が高いほど大きく）');
-      for (let i = 1; i < SC_TIERS.length; i++) {
-        const z = 1 + (s.scScaleMax - 1) * i / (SC_TIERS.length - 1);
-        w.rule(tierSel(P, i), { zoom: String(+z.toFixed(3)) });
+      if (custom) {
+        w.rule(`${sel} #header`, { 'background-color': v('Header') });
+        w.rule(`${sel} #content`, { 'background-color': v('Body') });
+        w.rule(`${sel} #author-name, ${sel} #purchase-amount, ${sel} #message`, { color: v('Text') });
       }
     }
   }
@@ -497,7 +558,7 @@
     }
 
     writeAnimation(s, w, `${T},\n${P},\n${M},\n${ST}`);
-    if (s.showSuperchat) writeSuperchatFx(s, w, { P, ST, M });
+    writeSuperchatFx(s, w, { P, ST, M });
     return w.done();
   }
 
@@ -830,7 +891,7 @@
   }
 
   global.ChatCore = {
-    FONTS, WEIGHTS, DEFAULTS, COLOR_KEYS, IN_ANIMS, OUT_ANIMS, SC_IN_ANIMS, SC_EFFECTS, SC_TIERS,
+    FONTS, WEIGHTS, DEFAULTS, COLOR_KEYS, IN_ANIMS, OUT_ANIMS, SC_IN_ANIMS, SC_EFFECTS, SC_TIERS, SC_GROUPS,
     sanitize, generate, generateTwitch, generateReactions,
     BASE_CSS, FRAME_HTML, esc, svgUri, avatar,
     textItem, paidItem, memberItem, stickerItem,
