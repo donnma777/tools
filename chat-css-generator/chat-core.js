@@ -264,7 +264,7 @@
 
   function writeHeader(s, w) {
     const font = fontInfo(s);
-    w.out.push('/* どんまうんど チャットCSSジェネレーター https://donnma.com/tool/chat-css/ */');
+    w.out.push('/* どんまうんど チャットCSSジェネレーター https://donnma.com/tool/chat-css-generator/ */');
     if (font && font.url) w.out.push(`@import url("${font.url}");`);
     return font;
   }
@@ -806,7 +806,7 @@
   // リアクションだけを表示する、2つ目のブラウザソース用のCSS
   function generateReactions(s) {
     const w = writer();
-    w.out.push('/* どんまうんど チャットCSSジェネレーター（リアクション用） https://donnma.com/tool/chat-css/ */');
+    w.out.push('/* どんまうんど チャットCSSジェネレーター（リアクション用） https://donnma.com/tool/chat-css-generator/ */');
     w.head('リアクション以外をすべて見えなくする');
     w.rule('html, body', { 'background-color': 'transparent', overflow: 'hidden' });
     w.rule('body', { visibility: 'hidden' });
@@ -1145,6 +1145,8 @@
   global.ChatCore = {
     FONTS, WEIGHTS, DEFAULTS, COLOR_KEYS, IN_ANIMS, OUT_ANIMS, SC_IN_ANIMS, SC_EFFECTS, SC_TIERS, SC_GROUPS,
     sanitize, generate, generateTwitch, generateReactions,
+    // 登録者数カウンター（youtube-subscribers/）でも使う部品
+    fontInfo, textShadow, hexToRgba, cleanUrl,
     BASE_CSS, FRAME_HTML, esc, svgUri, avatar,
     textItem, paidItem, memberItem, stickerItem, pinnedBanner, STAMP_ANIMS,
     TW_BASE_CSS, TW_FRAME_HTML, twTextItem, twNoticeItem,

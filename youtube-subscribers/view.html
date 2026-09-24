@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <!-- APIキーがURLに入るので、ほかのサイトへ URL を送らない -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>登録者数カウンター</title>
+  <!-- OBSのブラウザソースで表示するページ。URLの # 以降に APIキー・チャンネル・見た目の設定が入る。
+       アクセス解析や広告は読み込まない（URLにAPIキーが入っているため） -->
+  <style>
+    html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+    #msg {
+      position: fixed; left: 8px; top: 8px; max-width: calc(100% - 16px);
+      padding: 6px 10px; border-radius: 8px; background: rgba(20, 0, 10, 0.8); color: #fff;
+      font: 700 14px/1.5 'Meiryo', sans-serif;
+    }
+    #msg:empty { display: none; }
+  </style>
+  <style id="gen"></style>
+</head>
+
+<body>
+  <div id="box"><span class="cc-label"></span><span class="cc-num"></span><span class="cc-suffix"></span></div>
+  <div id="msg" role="status"></div>
+
+  <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
+  <script src="counter-core.js?v=20260924a"></script>
+  <script>
+    (() => {
+      'use strict';
+      const K = window.CounterCore;
+      const $ = s => document.querySelector(s);
+      const numEl = $('.cc-num');
+      let S = K.DEFAULTS, shown = null, anim = 0;
+
+      function applySettings(s) {
+        S = s;
+        $('#gen').textContent = K.generateCSS(s);
+        $('.cc-label').textContent = s.labelText;
+        $('.cc-suffix').textContent = s.suffixText;
+      }
+
+      const fmt = n => Math.round(n).toLocaleString('en-US');
+      // 数が変わったら、カウントアップしながら新しい数へ（増えたときは弾ませる）
+      function setCount(n) {
+        const from = shown;
+        shown = n;
+        cancelAnimationFrame(anim);
+        if (from === null || !S.countUp || from === n) {
+          numEl.textContent = fmt(n);
+        } else {
+          const t0 = performance.now(), dur = Math.min(2000, 600 + Math.abs(n - from) * 40);
+          const step = now => {
+            const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+            numEl.textContent = fmt(from + (n - from) * e);
+            if (p < 1) anim = requestAnimationFrame(step);
+          };
+          anim = requestAnimationFrame(step);
+        }
+        if (from !== null && n > from && S.pop) {
+          numEl.classList.remove('pop');
+          void numEl.offsetWidth;
+          numEl.classList.add('pop');
+        }
+      }
+      numEl.addEventListener('animationend', e => { if (e.animationName === 'cc-pop') numEl.classList.remove('pop'); });
+
+      const cfg = K.decodeHash(location.hash);
+      applySettings(cfg.s);
+
+      if (cfg.demo) {
+        // 設定ページのプレビュー用：設定と数は親ページから受け取る
+        setCount(12345);
+        window.addEventListener('message', e => {
+          if (e.source !== window.parent || !e.data) return;
+          if (e.data.type === 'cc-settings') applySettings(K.sanitize(e.data.s));
+          if (e.data.type === 'cc-count') setCount(e.data.n);
+        });
+        return;
+      }
+
+      const msg = t => { $('#msg').textContent = t; };
+      // 取得できなかったときは、最後に取れた数を出したまま、理由を左上に出す
+      async function tick() {
+        try {
+          const r = await K.fetchChannel(cfg.conn.key, cfg.conn.channel);
+          msg('');
+          setCount(r.count);
+        } catch (err) {
+          msg(err.message || String(err));
+        }
+      }
+      if (!cfg.conn.key || !cfg.conn.channel) {
+        msg('URLが正しくありません。設定ページで「URLをコピー」し直してください');
+        return;
+      }
+      tick();
+      setInterval(tick, Math.max(10, cfg.conn.interval) * 1000);
+    })();
+  </script>
+</body>
+
+</html>

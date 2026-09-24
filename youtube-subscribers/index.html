@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登録者数カウンター（OBS用） | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="YouTubeチャンネルの登録者数を自動で取得して、OBSのブラウザソースでおしゃれに表示できる無料ツール。グラデーション・縁取り・見出し・単位・背景の箱を、プレビューを見ながら設定できます。">
+  <meta property="og:title" content="登録者数カウンター（OBS用） | どんまうんど-Tools">
+  <meta property="og:description" content="YouTubeの登録者数を、OBSでおしゃれに表示できる無料ツール。">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@donnma777">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --code-bg: #1a0a14;
+      --code-text: #f3dbe5;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* ── Topnav ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    .topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* スマホで開いたときだけ出すお知らせ */
+    .pc-notice {
+      display: none;
+      background: var(--accent-soft);
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.6;
+      padding: 10px 16px;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .pc-notice {
+        display: block;
+      }
+    }
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.webp") center top / 256px 256px repeat;
+    }
+
+    /* 下端をスカラップ（波）にして本文へつなぐ */
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 460px;
+      grid-template-areas: "settings side";
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings {
+      grid-area: settings;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .side {
+      grid-area: side;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: calc(100vh - 88px);
+      min-height: 560px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .kicker {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    /* platform switch */
+    .seg {
+      display: inline-flex;
+      padding: 3px;
+      gap: 3px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+
+    .seg button {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+      padding: 7px 18px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
+    .sc-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 0;
+    }
+
+    .sc-tabs button[aria-selected="true"] {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .seg button:hover {
+      color: var(--text);
+    }
+
+    .seg button[aria-checked="true"][data-platform="youtube"] {
+      background: #ff3b3b;
+      color: #fff;
+    }
+
+    .seg button[aria-checked="true"][data-platform="twitch"] {
+      background: #9147ff;
+      color: #fff;
+    }
+
+    [data-for][hidden],
+    details.sec[hidden] {
+      display: none;
+    }
+
+    .tw-out {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tw-out textarea {
+      width: 100%;
+      height: 52px;
+      resize: vertical;
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 11.5px;
+      color: var(--code-text);
+      background: var(--code-bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+      word-break: break-all;
+    }
+
+    /* presets */
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* テンプレートのブロック */
+    .preset-body {
+      padding: 14px 16px 16px;
+    }
+
+    .preset-count {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .chip-btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .chip-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: filter 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      border-color: var(--accent);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .btn-danger:hover {
+      border-color: #ff5a5a;
+      color: #ff8a8a;
+    }
+
+    .data-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    /* settings sections */
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 4px 20px;
+      padding: 12px 16px 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 0;
+      min-width: 0;
+    }
+
+    .field[hidden] {
+      display: none;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .field-val {
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 12px;
+      color: var(--accent-2);
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select,
+    input[type=text],
+    input[type=password] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    select:focus,
+    input[type=text]:focus,
+    input[type=password]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .color-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .color-row input[type=color] {
+      width: 40px;
+      height: 34px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .color-row input[type=text] {
+      font-family: ui-monospace, Consolas, monospace;
+      text-transform: lowercase;
+    }
+
+    /* toggle */
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle .sw {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--border-strong);
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .toggle .sw::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.15s;
+    }
+
+    .toggle input:checked+.sw {
+      background: var(--accent);
+    }
+
+    .toggle input:checked+.sw::after {
+      transform: translateX(18px);
+    }
+
+    .toggle input:focus-visible+.sw {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    /* preview */
+    .preview-panel {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .preview-tools {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .preview-tools select {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    /* テスト送信（プレビューの下。YouTube のチャット入力欄の位置） */
+    .test-bar {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 12px 10px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .test-tabs {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .test-label {
+      margin-right: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .test-tab {
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .test-tab:hover {
+      color: var(--text);
+    }
+
+    .test-tab[aria-selected="true"] {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .test-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-height: 26px;
+    }
+
+    .chip {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      line-height: 1.5;
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+    }
+
+    .test-free {
+      display: flex;
+      gap: 6px;
+    }
+
+    .test-free input {
+      flex: 1;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .test-free select {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    /* プレビューを大きく表示 */
+    body.preview-expanded {
+      overflow: hidden;
+    }
+
+    /* sticky の .side は重なり順が閉じるので、ヘッダー（z-index: 100）より手前に出す */
+    body.preview-expanded .side {
+      z-index: 400;
+    }
+
+    body.preview-expanded .preview-panel {
+      position: fixed;
+      inset: 24px;
+      z-index: 300;
+      box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.65);
+    }
+
+    .stage {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 240px;
+      overflow: hidden;
+    }
+
+    .stage iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: transparent;
+      color-scheme: normal;
+    }
+
+    .bg-checker {
+      background-color: #2a2a36;
+      background-image:
+        linear-gradient(45deg, #353544 25%, transparent 25%),
+        linear-gradient(-45deg, #353544 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #353544 75%),
+        linear-gradient(-45deg, transparent 75%, #353544 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    }
+
+    .bg-dark {
+      background: #111;
+    }
+
+    .bg-light {
+      background: #f2f2f2;
+    }
+
+    .bg-green {
+      background: #00b140;
+    }
+
+    .bg-game {
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255, 190, 90, 0.55), transparent 45%),
+        radial-gradient(circle at 70% 70%, rgba(80, 160, 255, 0.55), transparent 50%),
+        linear-gradient(160deg, #3b6d3a 0%, #7aa6c8 55%, #d9c7a0 100%);
+    }
+
+    /* output */
+    .output-panel {
+      flex: 0 0 auto;
+    }
+
+    .output-panel textarea {
+      display: block;
+      width: 100%;
+      height: 150px;
+      resize: vertical;
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: var(--code-text);
+      background: var(--code-bg);
+      border: 0;
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .output-panel textarea[hidden] {
+      display: none;
+    }
+
+    .output-panel textarea.react-out {
+      height: 90px;
+    }
+
+    .output-panel textarea:focus {
+      outline: none;
+    }
+
+    .out-meta {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .guide h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    code {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      word-break: break-all;
+    }
+
+    .url-tool {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .url-out {
+      display: flex;
+      gap: 8px;
+    }
+
+    .url-out input {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid #a03060;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      border-bottom: none;
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    @media (max-width: 1000px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "side" "settings";
+        padding: 40px 16px 40px;
+      }
+
+      .side {
+        position: static;
+        height: auto;
+        min-height: 0;
+      }
+
+      .stage {
+        height: 420px;
+        flex: none;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+      }
+
+      .guide {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      .topnav-back {
+        display: none;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .fields {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.png" alt="どんまうんど" width="720" height="151"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">← トップに戻る</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <p class="pc-notice" role="note">このツールはPCのOBSで使う前提です。スマホでは正しく表示されません。</p>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>登録者数カウンター（OBS用）</h1>
+      <p>YouTubeの登録者数を自動で取得して、OBSにおしゃれに表示できます。見た目はプレビューを見ながら決められます。</p>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- Settings column -->
+    <div class="settings" id="settings">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="data-row" style="margin-top: 0;">
+            <button class="btn btn-sm" id="btn-save" type="button">💾 設定をファイルに保存</button>
+            <button class="btn btn-sm" id="btn-load" type="button">📂 ファイルから復元</button>
+            <button class="btn btn-sm btn-danger" id="btn-reset" type="button">すべてリセット</button>
+            <input type="file" id="file-load" accept=".json,application/json" hidden>
+          </div>
+        </div>
+      </div>
+      <details class="sec preset-sec" data-key="counter-presets">
+        <summary><span class="sec-icon">🎭</span>テンプレート<span class="preset-count"></span></summary>
+        <div class="preset-row preset-body" id="presets"></div>
+      </details>
+      <!-- sections are generated from SECTIONS below -->
+    </div>
+
+    <!-- Preview + output column -->
+    <div class="side">
+      <div class="panel preview-panel">
+        <div class="panel-head">
+          <span>プレビュー</span>
+          <div class="preview-tools">
+            <select id="stage-bg" aria-label="プレビュー背景">
+              <option value="checker">背景: 透過</option>
+              <option value="game">背景: ゲーム画面風</option>
+              <option value="dark">背景: 黒</option>
+              <option value="light">背景: 白</option>
+              <option value="green">背景: グリーンバック</option>
+            </select>
+            <button class="btn btn-sm" id="btn-up" type="button" title="登録者が増えたときの動きを試します">＋1 増やす</button>
+            <button class="btn btn-sm" id="btn-up100" type="button">＋100</button>
+          </div>
+        </div>
+        <div class="stage bg-checker" id="stage">
+          <iframe id="preview" title="登録者数のプレビュー"></iframe>
+        </div>
+      </div>
+
+      <div class="panel output-panel">
+        <div class="panel-head">
+          <span>接続設定・OBSに貼るURL</span>
+          <div class="preview-tools">
+            <button class="btn btn-sm" id="btn-test" type="button">接続テスト</button>
+            <button class="btn btn-sm btn-primary" id="btn-copy-url" type="button">📋 URLをコピー</button>
+          </div>
+        </div>
+        <div class="panel-body tw-out">
+          <label class="field-label" for="api-key"><span>APIキー（YouTube Data API v3）</span></label>
+          <div class="color-row">
+            <input type="password" id="api-key" placeholder="AIza から始まる文字列" spellcheck="false" autocomplete="off">
+            <button class="btn btn-sm" id="btn-key-show" type="button" aria-pressed="false">表示</button>
+          </div>
+          <label class="field-label" for="channel"><span>チャンネル（@ハンドル か、UC から始まるチャンネルID）</span></label>
+          <input type="text" id="channel" placeholder="@donnma" spellcheck="false" autocomplete="off">
+          <label class="field-label" for="interval"><span>数を取りに行く間隔</span></label>
+          <select id="interval">
+            <option value="10">10秒ごと</option>
+            <option value="30">30秒ごと（おすすめ）</option>
+            <option value="60">1分ごと</option>
+            <option value="300">5分ごと</option>
+          </select>
+          <p class="field-note" id="test-result" role="status"></p>
+          <input type="text" id="obs-url" readonly hidden spellcheck="false" aria-label="OBSに貼るURL">
+          <p class="field-note">APIキーは、このブラウザとコピーしたURLの中にだけ保存されます。URLにキーが入るので、配信画面やSNSに映さないでください。APIキーの作り方は下の「使い方」にあります。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <div class="panel">
+      <div class="panel-body">
+        <h2>🎥 OBSでの使い方</h2>
+        <ol class="steps">
+          <li>下の「APIキーの作り方」で <b>APIキー</b> を用意します（無料・最初の1回だけ）。</li>
+          <li>右の「接続設定」に <b>APIキー</b> と <b>チャンネル</b>（<code>@ハンドル</code> か <code>UC…</code> のチャンネルID）を入れて、<b>「接続テスト」</b>。チャンネル名と登録者数が出ればOKです。</li>
+          <li>このページで見た目を決めて <b>「URLをコピー」</b>。</li>
+          <li>OBSで <b>ソース ＋ → ブラウザ</b> を追加し、URLに貼り付けます。幅 <code>800</code>・高さ <code>300</code> くらいが目安です。カスタムCSSは空のままでOKです。</li>
+          <li>あとで見た目を変えたときは、もう一度「URLをコピー」して、ブラウザソースのURLを貼り替えてください。</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body">
+        <h2>🔑 APIキーの作り方</h2>
+        <ol class="steps">
+          <li><a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud コンソール</a> にGoogleアカウントでログインし、<b>新しいプロジェクト</b>を作ります（名前は何でもOK）。</li>
+          <li>「APIとサービス」→「ライブラリ」で <b>YouTube Data API v3</b> を検索して、<b>「有効にする」</b>。</li>
+          <li>「APIとサービス」→「認証情報」→「認証情報を作成」→ <b>「APIキー」</b>。</li>
+          <li>できたキーの編集画面で制限をかけます。<b>「APIの制限」</b>は「YouTube Data API v3」だけを選び、<b>「アプリケーションの制限」</b>は「ウェブサイト」にして <code>https://donnma.com/*</code> を追加して保存。</li>
+          <li>キーをコピーして、右の「APIキー」に貼り付けます。クレジットカードの登録はいりません。</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body">
+        <h2>💡 ヒント・注意点</h2>
+        <ul class="notes">
+          <li>YouTubeの仕様で、APIで取れる登録者数は <b>1,000人を超えると上から3桁に丸められます</b>（例: 12,345人 → 12,300人）。表示もその数になります。</li>
+          <li>登録者が増えてから、APIの数が変わるまで少し時間がかかることがあります。</li>
+          <li>1回数を取りに行くと、APIの使用量を1使います。無料で使えるのは1日10,000までなので、10秒ごとでも足ります。同じキーをほかのツールでも使うなら、30秒以上がおすすめです。</li>
+          <li>OBSのブラウザソースで「表示されていないときにソースをシャットダウンする」をオンにすると、使っていないあいだは数を取りに行きません。</li>
+          <li>うまく取れないときは、カウンターの左上に理由が出ます。</li>
+          <li>設定はこのブラウザに自動で保存されます。「設定をファイルに保存」にはAPIキーは入りません。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.png"
+            alt="どんまうんど" width="720" height="151"></a>
+        <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a
+            href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+      </div>
+      <span>
+        <a href="https://github.com/donnma777/tools" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- フォント一覧・文字効果はチャットCSSジェネレーターと共通。chat-core.js / counter-core.js を変えたら v を上げる（view.html も） -->
+  <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
+  <script src="counter-core.js?v=20260924a"></script>
+  <script>
+    (() => {
+      'use strict';
+      const C = window.ChatCore;
+      const K = window.CounterCore;
+      const $ = id => document.getElementById(id);
+      const { DEFAULTS, sanitize, IDLE } = K;
+
+      // =====================================================
+      //  設定項目
+      // =====================================================
+      const WEIGHTS = C.WEIGHTS;
+      const BORDER_STYLES = [['solid', '実線'], ['dashed', '破線'], ['dotted', '点線'], ['double', '二重線']];
+      const effOn = s => s.textEffect !== 'none';
+      const SECTIONS = [
+        {
+          title: '数字', icon: '🔢', open: true, fields: [
+            { k: 'font', l: 'フォント', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]) },
+            { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
+            { k: 'weight', l: '文字の太さ', t: 'select', o: WEIGHTS },
+            { k: 'scale', l: '大きさ', t: 'range', min: 0.5, max: 6, step: 0.1, u: '倍' },
+            { k: 'spacing', l: '文字の間隔', t: 'range', min: -4, max: 20, step: 1, u: 'px' },
+            { k: 'tabular', l: '数字の幅をそろえる（増えるときにガタつかない）', t: 'check' },
+          ]
+        },
+        {
+          title: '数字の色・文字効果', icon: '🎨', open: true, fields: [
+            { k: 'colorMode', l: '色', t: 'select', o: [['solid', '単色'], ['gradient', 'グラデーション'], ['rainbow', 'レインボー（流れる）']] },
+            { k: 'color', l: '文字色', t: 'color', when: s => s.colorMode === 'solid' },
+            { k: 'grad1', l: 'グラデーションの色 1', t: 'color', when: s => s.colorMode === 'gradient' },
+            { k: 'grad2', l: 'グラデーションの色 2', t: 'color', when: s => s.colorMode === 'gradient' },
+            { k: 'grad3On', l: '3色目を使う', t: 'check', when: s => s.colorMode === 'gradient' },
+            { k: 'grad3', l: 'グラデーションの色 3', t: 'color', when: s => s.colorMode === 'gradient' && s.grad3On },
+            { k: 'gradAngle', l: 'グラデーションの向き', t: 'range', min: 0, max: 360, step: 5, u: '°', when: s => s.colorMode === 'gradient' },
+            { k: 'textEffect', l: '文字効果', t: 'select', o: [['none', 'なし'], ['outline', '縁取り'], ['shadow', '影'], ['glow', '発光（ネオン）']] },
+            { k: 'effectWidth', l: '縁取り・影の太さ', t: 'range', min: 0.5, max: 12, step: 0.5, u: 'px', when: effOn },
+            { k: 'effectColor', l: '縁取り・影の色', t: 'color', when: effOn },
+          ]
+        },
+        {
+          title: '見出し・単位', icon: '🏷️', fields: [
+            { k: 'labelPos', l: '見出しの位置', t: 'select', o: [['above', '数字の上'], ['left', '数字の左'], ['none', '表示しない']] },
+            { k: 'labelText', l: '見出しの文字', t: 'text', ph: 'チャンネル登録者数', when: s => s.labelPos !== 'none' },
+            { k: 'labelSize', l: '見出しの文字サイズ', t: 'range', min: 10, max: 120, step: 1, u: 'px', when: s => s.labelPos !== 'none' },
+            { k: 'labelColor', l: '見出しの色', t: 'color', when: s => s.labelPos !== 'none' },
+            { k: 'labelWeight', l: '見出し・単位の太さ', t: 'select', o: WEIGHTS },
+            { k: 'suffixText', l: '単位（数字のあと。空欄でなし）', t: 'text', ph: '人' },
+            { k: 'suffixSize', l: '単位の文字サイズ', t: 'range', min: 10, max: 160, step: 1, u: 'px', when: s => !!s.suffixText.trim() },
+            { k: 'suffixColor', l: '単位の色', t: 'color', when: s => !!s.suffixText.trim() },
+          ]
+        },
+        {
+          title: '背景の箱・枠', icon: '🖼️', fields: [
+            { k: 'boxOn', l: '背景の箱を付ける', t: 'check' },
+            { k: 'boxBg', l: '箱の色', t: 'color', when: s => s.boxOn },
+            { k: 'boxAlpha', l: '箱の不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.boxOn },
+            { k: 'boxRadius', l: '角の丸み', t: 'range', min: 0, max: 80, step: 1, u: 'px', when: s => s.boxOn },
+            { k: 'boxPadX', l: '左右の余白', t: 'range', min: 0, max: 120, step: 1, u: 'px', when: s => s.boxOn },
+            { k: 'boxPadY', l: '上下の余白', t: 'range', min: 0, max: 80, step: 1, u: 'px', when: s => s.boxOn },
+            { k: 'boxBorder', l: '枠線を付ける', t: 'check', when: s => s.boxOn },
+            { k: 'boxBorderWidth', l: '枠線の太さ', t: 'range', min: 1, max: 12, step: 0.5, u: 'px', when: s => s.boxOn && s.boxBorder },
+            { k: 'boxBorderStyle', l: '枠線の種類', t: 'select', o: BORDER_STYLES, when: s => s.boxOn && s.boxBorder },
+            { k: 'boxBorderColor', l: '枠線の色', t: 'color', when: s => s.boxOn && s.boxBorder },
+          ]
+        },
+        {
+          title: '置く場所・動き', icon: '✨', fields: [
+            { k: 'hAlign', l: '横の位置', t: 'select', o: [['left', '左'], ['center', '中央'], ['right', '右']] },
+            { k: 'vAlign', l: '縦の位置', t: 'select', o: [['top', '上'], ['center', '中央'], ['bottom', '下']] },
+            { k: 'edge', l: '端からの余白', t: 'range', min: 0, max: 200, step: 2, u: 'px' },
+            { k: 'countUp', l: '増えたときにカウントアップする', t: 'check' },
+            { k: 'pop', l: '増えたときに弾む', t: 'check' },
+            { k: 'idle', l: 'ずっと続く動き', t: 'select', o: [['none', 'なし'], ...Object.entries(IDLE).map(([v, a]) => [v, a.l])] },
+            { k: 'idleDur', l: '動きの速さ（1回の長さ）', t: 'range', min: 0.5, max: 6, step: 0.1, u: '秒', when: s => s.idle !== 'none' },
+          ]
+        },
+      ];
+
+      const PRESETS = [
+        ['シンプル白', {}],
+        ['グラデーション', { colorMode: 'gradient', grad1: '#ffec61', grad2: '#f321d7', textEffect: 'shadow', effectWidth: 3, effectColor: '#000000' }],
+        ['レインボー', { colorMode: 'rainbow', textEffect: 'outline', effectWidth: 3, effectColor: '#ffffff', font: 'Dela Gothic One', weight: '400', labelWeight: '400', labelColor: '#ff5f9e', suffixColor: '#ff5f9e' }],
+        ['ネオン', { color: '#ffffff', textEffect: 'glow', effectWidth: 4, effectColor: '#ff3fd2', labelColor: '#7ff9ff', suffixColor: '#7ff9ff', idle: 'glow', font: 'Zen Kaku Gothic New' }],
+        ['箱入り', { textEffect: 'none', boxOn: true, boxBg: '#2e1224', boxAlpha: 0.85, boxBorder: true, boxBorderColor: '#ff85a1', labelColor: '#ffb3c6', suffixColor: '#ffb3c6' }],
+        ['ポップ', { font: 'Mochiy Pop One', weight: '400', labelWeight: '400', color: '#3a8bb5', textEffect: 'outline', effectWidth: 4, effectColor: '#ffffff', labelColor: '#ff9ecb', suffixColor: '#ff9ecb', idle: 'float' }],
+        ['和風', { font: 'Shippori Mincho', weight: '800', color: '#f5f0e1', textEffect: 'shadow', effectWidth: 2, effectColor: '#1b1410', labelColor: '#d9b777', suffixColor: '#d9b777', labelText: '登録者', boxOn: true, boxBg: '#1b1410', boxAlpha: 0.75, boxRadius: 4 }],
+      ];
+
+      // =====================================================
+      //  状態・UI
+      // =====================================================
+      const STORE_KEY = 'donnma-youtube-subscribers-v1';
+      const CONN_KEY = 'donnma-youtube-subscribers-conn-v1';
+      let S = { ...DEFAULTS };
+      try { S = sanitize(JSON.parse(localStorage.getItem(STORE_KEY) || 'null')); } catch (e) { /* storage unavailable */ }
+      // 接続設定（APIキー・チャンネル・間隔）は見た目の設定とは別に保存する（設定ファイルやテンプレートに混ぜない）
+      let conn = { key: '', channel: '', interval: 30 };
+      try { conn = { ...conn, ...JSON.parse(localStorage.getItem(CONN_KEY) || '{}') }; } catch (e) { /* storage unavailable */ }
+
+      const inputs = {};
+      function buildField(f) {
+        const wrap = document.createElement('div');
+        wrap.className = 'field';
+        const id = 'f-' + f.k;
+        let set;
+        if (f.t === 'check') {
+          wrap.innerHTML = `<label class="toggle" for="${id}"><span></span><input type="checkbox" id="${id}"><span class="sw"></span></label>`;
+          const el = wrap.querySelector('input');
+          el.addEventListener('change', () => update(f.k, el.checked));
+          set = v => { el.checked = v; };
+        } else if (f.t === 'range') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span><span class="field-val"></span></label>
+            <input type="range" id="${id}" min="${f.min}" max="${f.max}" step="${f.step}">`;
+          const el = wrap.querySelector('input'), val = wrap.querySelector('.field-val');
+          const show = v => { val.textContent = `${+(+v).toFixed(2)}${f.u}`; };
+          el.addEventListener('input', () => { show(el.value); update(f.k, parseFloat(el.value)); });
+          set = v => { el.value = v; show(v); };
+        } else if (f.t === 'select') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label><select id="${id}"></select>`;
+          const el = wrap.querySelector('select');
+          for (const [v, label] of f.o) el.add(new Option(label, v));
+          el.addEventListener('change', () => update(f.k, el.value));
+          set = v => { el.value = v; };
+        } else if (f.t === 'color') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label>
+            <div class="color-row"><input type="color" id="${id}"><input type="text" maxlength="7" spellcheck="false"></div>`;
+          const [pick, hex] = wrap.querySelectorAll('input');
+          hex.setAttribute('aria-label', 'カラーコード');
+          pick.addEventListener('input', () => { hex.value = pick.value; update(f.k, pick.value); });
+          hex.addEventListener('input', () => {
+            let v = hex.value.trim();
+            if (!v.startsWith('#')) v = '#' + v;
+            if (/^#[0-9a-f]{6}$/i.test(v)) { pick.value = v.toLowerCase(); update(f.k, v.toLowerCase()); }
+          });
+          hex.addEventListener('blur', () => { hex.value = S[f.k]; });
+          set = v => { pick.value = v; hex.value = v; };
+        } else {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label><input type="text" id="${id}">`;
+          const el = wrap.querySelector('input');
+          el.placeholder = f.ph || '';
+          el.addEventListener('input', () => update(f.k, el.value));
+          set = v => { el.value = v; };
+        }
+        wrap.querySelector('label > span').textContent = f.l;
+        if (f.note) {
+          const n = document.createElement('div');
+          n.className = 'field-note';
+          n.textContent = f.note;
+          wrap.appendChild(n);
+        }
+        inputs[f.k] = { f, wrap, set };
+        return wrap;
+      }
+
+      function buildUI() {
+        for (const sec of SECTIONS) {
+          const det = document.createElement('details');
+          det.className = 'sec';
+          if (sec.open) det.open = true;
+          det.innerHTML = `<summary><span class="sec-icon">${sec.icon}</span>${sec.title}</summary>`;
+          const grid = document.createElement('div');
+          grid.className = 'fields';
+          for (const f of sec.fields) grid.appendChild(buildField(f));
+          det.appendChild(grid);
+          $('settings').appendChild(det);
+        }
+      }
+
+      const refreshVisibility = () => { for (const k in inputs) inputs[k].wrap.hidden = inputs[k].f.when ? !inputs[k].f.when(S) : false; };
+      function syncUI() {
+        for (const k in inputs) inputs[k].set(S[k]);
+        refreshVisibility();
+      }
+
+      let queued = false;
+      function update(k, v) {
+        S[k] = v;
+        refreshVisibility();
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => { queued = false; render(); });
+      }
+
+      const obsURL = () => new URL('view.html', location.href).href + '#' + K.encodeHash(conn, S);
+
+      function render() {
+        sendPreview({ type: 'cc-settings', s: S });
+        try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* ignore */ }
+      }
+
+      function applyAll(next) {
+        S = sanitize(next);
+        syncUI();
+        render();
+      }
+
+      // =====================================================
+      //  プレビュー（OBSに入れる view.html をそのまま使い、設定と数は postMessage で渡す）
+      // =====================================================
+      const frame = $('preview');
+      let count = 12345, frameReady = false;
+      function sendPreview(msg) { if (frameReady) frame.contentWindow.postMessage(msg, '*'); }
+      frame.addEventListener('load', () => {
+        frameReady = true;
+        sendPreview({ type: 'cc-settings', s: S });
+        sendPreview({ type: 'cc-count', n: count });
+      });
+      frame.src = 'view.html?v=20260924a#demo=1';
+      const bump = n => { count += n; sendPreview({ type: 'cc-count', n: count }); };
+      $('btn-up').addEventListener('click', () => bump(1));
+      $('btn-up100').addEventListener('click', () => bump(100));
+      $('stage-bg').addEventListener('change', e => { $('stage').className = 'stage bg-' + e.target.value; });
+      // 見本の登録者数も、ときどき少しずつ増やす
+      setInterval(() => { if (Math.random() < 0.3) bump(1); }, 4000);
+
+      // =====================================================
+      //  ボタン類
+      // =====================================================
+      const toastEl = $('toast');
+      let toastTimer;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+      }
+      async function copyText(text, input) {
+        try { await navigator.clipboard.writeText(text); } catch (e) { input.value = text; input.hidden = false; input.select(); document.execCommand('copy'); }
+      }
+      function download(name, text, type) {
+        const url = URL.createObjectURL(new Blob([text], { type }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      // ---- 接続設定
+      const saveConn = () => { try { localStorage.setItem(CONN_KEY, JSON.stringify(conn)); } catch (e) { /* ignore */ } };
+      $('api-key').value = conn.key;
+      $('channel').value = conn.channel;
+      $('interval').value = String(conn.interval);
+      $('api-key').addEventListener('input', e => { conn.key = e.target.value.trim(); saveConn(); });
+      $('channel').addEventListener('input', e => { conn.channel = e.target.value.trim(); saveConn(); });
+      $('interval').addEventListener('change', e => { conn.interval = +e.target.value; saveConn(); });
+      $('btn-key-show').addEventListener('click', e => {
+        const show = $('api-key').type === 'password';
+        $('api-key').type = show ? 'text' : 'password';
+        e.target.textContent = show ? '隠す' : '表示';
+        e.target.setAttribute('aria-pressed', String(show));
+      });
+
+      const connProblem = () => !conn.key ? 'APIキーを入れてください'
+        : !K.channelQuery(conn.channel) ? 'チャンネル（@ハンドル か UC から始まるID）を入れてください' : '';
+      $('btn-test').addEventListener('click', async () => {
+        const out = $('test-result');
+        const problem = connProblem();
+        if (problem) { out.textContent = '⚠️ ' + problem; return; }
+        out.textContent = '確認中…';
+        try {
+          const r = await K.fetchChannel(conn.key, conn.channel);
+          out.textContent = `✅ ${r.title}：${r.count.toLocaleString('en-US')}人（プレビューにも反映しました）`;
+          count = r.count;
+          sendPreview({ type: 'cc-count', n: count });
+        } catch (err) {
+          out.textContent = '⚠️ ' + (err.message || err);
+        }
+      });
+      $('btn-copy-url').addEventListener('click', async () => {
+        const problem = connProblem();
+        if (problem) { toast(problem); return; }
+        await copyText(obsURL(), $('obs-url'));
+        toast('URLをコピーしました！OBSのブラウザソースのURLに貼り付けてください');
+      });
+
+      for (const [name, p] of PRESETS) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip-btn';
+        b.textContent = name;
+        b.addEventListener('click', () => { applyAll({ ...DEFAULTS, ...p }); toast(`テンプレート「${name}」を適用しました`); });
+        $('presets').appendChild(b);
+      }
+      document.querySelectorAll('.preset-sec').forEach(group => {
+        const key = 'donnma-youtube-subscribers-open-' + group.dataset.key;
+        group.querySelector('.preset-count').textContent = `${group.querySelectorAll('.chip-btn').length}種類`;
+        try { group.open = localStorage.getItem(key) === '1'; } catch (e) { /* ignore */ }
+        group.addEventListener('toggle', () => { try { localStorage.setItem(key, group.open ? '1' : '0'); } catch (e) { /* ignore */ } });
+      });
+
+      $('btn-save').addEventListener('click', () => {
+        download('youtube-subscribers-settings.json', JSON.stringify({ tool: 'donnma-youtube-subscribers', version: 1, settings: S }, null, 2), 'application/json');
+      });
+      $('btn-load').addEventListener('click', () => $('file-load').click());
+      $('file-load').addEventListener('change', async e => {
+        const file = e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        try {
+          const data = JSON.parse(await file.text());
+          applyAll(data.settings || data);
+          toast('設定を復元しました');
+        } catch (err) {
+          toast('読み込めませんでした（ファイル形式を確認してください）');
+        }
+      });
+      $('btn-reset').addEventListener('click', () => {
+        if (!confirm('すべての設定を初期値に戻しますか？')) return;
+        applyAll({ ...DEFAULTS });
+      });
+
+      buildUI();
+      syncUI();
+      render();
+    })();
+  </script>
+
+</body>
+
+</html>

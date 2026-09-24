@@ -38,18 +38,30 @@ OBS Studio のブラウザソースで使える配信オーバーレイのテー
 
 ## チャットCSSジェネレーター (YouTube / Twitch × OBS)
 
-`chat-css/` — YouTubeライブ・Twitchのチャット欄をOBSのブラウザソースで表示するときの見た目を、プレビューを見ながら作成できるツールです。
+`chat-css-generator/` — YouTubeライブ・Twitchのチャット欄をOBSのブラウザソースで表示するときの見た目を、プレビューを見ながら作成できるツールです。
 フォント・縁取り・吹き出し・名前の色・スーパーチャット・表示/フェードアウトアニメーションなどを設定し、生成されたCSSをOBSのブラウザソースの「カスタムCSS」に貼り付けて使います。
 
 | ファイル | 内容 |
 |----------|------|
-| `chat-css/index.html` | ジェネレーター本体 |
-| `chat-css/chat-core.js` | CSS生成・プレビュー用の見本DOM |
+| `chat-css-generator/index.html` | ジェネレーター本体 |
+| `chat-css-generator/chat-core.js` | CSS生成・プレビュー用の見本DOM |
 
 - `chat-core.js` を変更したら、`index.html` の `<script src="chat-core.js?v=...">` の `v` も上げてください。本番サーバーは JS を長期間キャッシュするため、`v` を変えないと古い `chat-core.js` が配信され、ジェネレーターが動かなくなります。
 
 - **YouTube**: ポップアウトチャット（`https://www.youtube.com/live_chat?is_popout=1&v=動画ID`）を読み込んだブラウザソースに貼り付けます。
 - **Twitch**: ポップアウトチャット（`https://www.twitch.tv/popout/チャンネル名/chat?popout=`）を読み込んだブラウザソースに貼り付けます。Twitchの自動生成クラスは使わず、固定のクラス名・data属性だけで指定しています。
+
+---
+
+## 登録者数カウンター (YouTube × OBS)
+
+`youtube-subscribers/` — YouTube Data API v3 で登録者数を取得し、OBSのブラウザソースに表示するカウンターです。
+数字のフォント・色（単色／グラデーション／レインボー）・縁取り、見出しと単位、背景の箱と枠、置く場所、動きを設定できます。
+
+- `index.html` は見た目の設定ページ、`view.html` はOBSに入れる表示ページです。APIキー・チャンネル・見た目の設定は `view.html` のURLの `#` 以降に入ります（サーバーに送られないように）。
+- 利用者が自分のAPIキーを用意します。APIの登録者数は1,000人を超えると上から3桁に丸められます。
+- YouTube Studio の画面をOBSのカスタムCSSで加工する方式は、Studio のページでOBSのCSS差し込みが動かないため使えません。
+- フォント一覧・文字効果は `chat-css-generator/chat-core.js`、設定の読み書きとCSS生成は `youtube-subscribers/counter-core.js` にあります。どちらかを変更したら、`youtube-subscribers/index.html` と `youtube-subscribers/view.html` の `?v=` を上げてください。
 
 ---
 
