@@ -21,6 +21,14 @@
     hAlign: 'center', vAlign: 'center', edge: 24,
     countUp: true, pop: true,
     idle: 'none', idleDur: 2.4,
+    gaugeOn: false, showCount: true, gaugeBar: true, goal: 1000, goalAfter: 'next',
+    gaugeTitle: '目標 {goal}人', gaugeInfo: 'left', gaugeDoneText: '🎉 目標達成！',
+    gaugeTextSize: 24, gaugeTextColor: '#ffffff',
+    gaugeWidth: 560, gaugeHeight: 22, gaugeRadius: 11,
+    gaugeFillMode: 'gradient', gaugeFill1: '#ffec61', gaugeFill2: '#f321d7',
+    gaugeTrack: '#ffffff', gaugeTrackAlpha: 0.25,
+    gaugeBorder: false, gaugeBorderWidth: 2, gaugeBorderColor: '#ffffff',
+    gaugeShine: true,
   };
   const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
 
@@ -37,7 +45,19 @@
         out[k] = v;
       }
     }
+    out.goal = Math.max(1, Math.round(out.goal));
     return out;
+  }
+
+  // ---------------------------------------------------------------
+  //  目標ゲージ
+  //  goalAfter が 'next' なら、目標を超えたあとは次のキリのいい数（1・2・3・5 × 10の累乗）を目標にする
+  // ---------------------------------------------------------------
+  function nextMilestone(n) {
+    for (let p = 10; ; p *= 10) for (const m of [1, 2, 3, 5]) if (m * p > n) return m * p;
+  }
+  function goalFor(s, n) {
+    return s.goalAfter === 'next' && n >= s.goal ? nextMilestone(n) : s.goal;
   }
 
   // ---------------------------------------------------------------
@@ -117,9 +137,10 @@
   }
 
   // ---------------------------------------------------------------
-  //  見た目の CSS（view.html の #box > .cc-label / .cc-num / .cc-suffix 用）
+  //  見た目の CSS（view.html の #box > #count > .cc-label / .cc-num / .cc-suffix と、#box > .cc-gauge 用）
   // ---------------------------------------------------------------
   const px = n => `${+(+n).toFixed(2)}px`;
+  const RAINBOW = 'linear-gradient(90deg, #ff5f6d, #ffc371, #7dff9b, #47c8ff, #b06bff, #ff5f6d)';
   const IDLE = {
     pulse: { l: 'ドクンと脈打つ', kf: ['0%, 100% { transform: scale(1); }', '50% { transform: scale(1.06); }'] },
     float: { l: 'ふわふわ浮かぶ', kf: ['0%, 100% { transform: translateY(0); }', '50% { transform: translateY(-8px); }'] },
@@ -150,11 +171,13 @@
     const above = s.labelPos === 'above';
     const label = s.labelPos !== 'none' && s.labelText.trim();
     const suffix = s.suffixText.trim();
-    const box = {
+    const count = {
       display: 'grid', 'grid-auto-flow': 'column', 'align-items': 'baseline', 'justify-items': 'center',
       'column-gap': px(8), 'row-gap': px(4),
     };
-    if (above && label) Object.assign(box, { 'grid-auto-flow': 'row', 'grid-template-columns': suffix ? 'auto auto' : 'auto' });
+    if (above && label) Object.assign(count, { 'grid-auto-flow': 'row', 'grid-template-columns': suffix ? 'auto auto' : 'auto' });
+    // 背景の箱・ずっと続く動きは、数字とゲージをまとめた #box に付ける
+    const box = { display: 'flex', 'flex-direction': 'column', 'align-items': 'center', gap: px(12), 'max-width': '100%', 'box-sizing': 'border-box' };
     if (s.boxOn) {
       Object.assign(box, {
         'background-color': C.hexToRgba(s.boxBg, s.boxAlpha), 'border-radius': px(s.boxRadius),
@@ -167,6 +190,7 @@
       box.animation = `cc-idle ${s.idleDur}s ease-in-out infinite`;
     }
     rule('#box', box);
+    rule('#count', s.gaugeOn && !s.showCount ? { display: 'none' } : count);
 
     const num = {
       'font-family': ff, 'font-weight': s.weight, 'font-size': px(40 * s.scale), 'line-height': '1.15',
@@ -183,20 +207,16 @@
       const rainbow = s.colorMode === 'rainbow';
       Object.assign(num, {
         color: 'transparent', '-webkit-text-fill-color': 'transparent',
-        'background-image': rainbow
-          ? 'linear-gradient(90deg, #ff5f6d, #ffc371, #7dff9b, #47c8ff, #b06bff, #ff5f6d)'
-          : `linear-gradient(${s.gradAngle}deg, ${stops.join(', ')})`,
+        'background-image': rainbow ? RAINBOW : `linear-gradient(${s.gradAngle}deg, ${stops.join(', ')})`,
         'background-size': rainbow ? '200% 100%' : null,
         '-webkit-background-clip': 'text', 'background-clip': 'text',
       });
       if (s.textEffect === 'outline') num['-webkit-text-stroke'] = `${px(s.effectWidth / 2)} ${s.effectColor}`;
       if (s.textEffect === 'shadow') num.filter = `drop-shadow(${px(s.effectWidth)} ${px(s.effectWidth)} ${px(s.effectWidth)} ${s.effectColor})`;
       if (s.textEffect === 'glow') num.filter = `drop-shadow(0 0 ${px(s.effectWidth * 2)} ${s.effectColor})`;
-      if (rainbow) {
-        out.push('@keyframes cc-rainbow {\n  from { background-position: 0% 0; }\n  to { background-position: 200% 0; }\n}');
-        num.animation = 'cc-rainbow 4s linear infinite';
-      }
+      if (rainbow) num.animation = 'cc-rainbow 4s linear infinite';
     }
+    out.push('@keyframes cc-rainbow {\n  from { background-position: 0% 0; }\n  to { background-position: 200% 0; }\n}');
     rule('.cc-num', num);
     out.push('@keyframes cc-pop {\n  0% { transform: scale(1); }\n  30% { transform: scale(1.18); }\n  100% { transform: scale(1); }\n}');
     rule('.cc-num.pop', { animation: [num.animation, 'cc-pop 0.6s ease-out'].filter(Boolean).join(', ') });
@@ -211,8 +231,70 @@
     rule('.cc-suffix', suffix
       ? { ...textPart(s.suffixSize, s.suffixColor), 'justify-self': above && label ? 'start' : null }
       : { display: 'none' });
+
+    // ---- 目標ゲージ（.cc-fill の幅は view.html が --p に入れる）
+    if (!s.gaugeOn) {
+      rule('.cc-gauge', { display: 'none' });
+      return out.join('\n') + '\n';
+    }
+    // バーなしのときは、見出しと右側の文字だけを並べる（幅は文字に合わせる）
+    rule('.cc-gauge', { width: s.gaugeBar ? px(s.gaugeWidth) : null, 'max-width': '100%' });
+    rule('.cc-gauge-text', {
+      display: 'flex', 'justify-content': 'space-between', 'align-items': 'baseline', gap: px(s.gaugeBar ? 16 : 24),
+      'margin-bottom': s.gaugeBar ? px(6) : null,
+    });
+    rule('.cc-gauge-title, .cc-gauge-info', textPart(s.gaugeTextSize, s.gaugeTextColor));
+    rule('.cc-gauge-info', { 'margin-left': 'auto' });
+    rule('.cc-gauge-title:empty, .cc-gauge-info:empty', { display: 'none' });
+    rule('.cc-gauge-text.empty', { display: 'none' });
+    if (!s.gaugeBar) rule('.cc-bar', { display: 'none' });
+    else rule('.cc-bar', {
+      position: 'relative', height: px(s.gaugeHeight), 'border-radius': px(s.gaugeRadius), overflow: 'hidden',
+      'background-color': C.hexToRgba(s.gaugeTrack, s.gaugeTrackAlpha), 'box-sizing': 'border-box',
+      border: s.gaugeBorder ? `${px(s.gaugeBorderWidth)} solid ${s.gaugeBorderColor}` : null,
+    });
+    const fill = {
+      position: 'relative', height: '100%', width: 'var(--p, 0%)', 'border-radius': 'inherit', overflow: 'hidden',
+      transition: 'width 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)',
+    };
+    // 「数字と同じ色」は数字の単色・グラデーション・レインボーをそのままバーに使う
+    const same = s.gaugeFillMode === 'same';
+    const mode = same ? s.colorMode : s.gaugeFillMode;
+    if (mode === 'solid') fill['background-color'] = same ? s.color : s.gaugeFill1;
+    else if (mode === 'rainbow') Object.assign(fill, { 'background-image': RAINBOW, 'background-size': '200% 100%', animation: 'cc-rainbow 4s linear infinite' });
+    else {
+      const stops = same ? [s.grad1, s.grad2, ...(s.grad3On ? [s.grad3] : [])] : [s.gaugeFill1, s.gaugeFill2];
+      fill['background-image'] = `linear-gradient(90deg, ${stops.join(', ')})`;
+    }
+    rule('.cc-fill', fill);
+    if (s.gaugeShine) {
+      out.push('@keyframes cc-shine {\n  from { transform: translateX(-100%); }\n  to { transform: translateX(100%); }\n}');
+      rule('.cc-fill::after', {
+        content: '""', position: 'absolute', inset: '0',
+        'background-image': 'linear-gradient(100deg, transparent 25%, rgba(255, 255, 255, 0.55) 50%, transparent 75%)',
+        animation: 'cc-shine 2.4s ease-in-out infinite',
+      });
+    }
+    // 目標を超えた瞬間の演出
+    out.push('@keyframes cc-achieve {\n  0%, 100% { transform: scale(1); filter: brightness(1); }\n  25% { transform: scale(1.06); filter: brightness(1.6); }\n  50% { transform: scale(1); filter: brightness(1.2); }\n}');
+    rule('.cc-gauge.achieved', { animation: 'cc-achieve 0.9s ease-out 3' });
     return out.join('\n') + '\n';
   }
 
-  global.CounterCore = { DEFAULTS, sanitize, encodeHash, decodeHash, channelQuery, fetchChannel, generateCSS, IDLE };
+  // ゲージの文字（見出しと右側の表示）
+  function gaugeTexts(s, n, goal, done) {
+    const fmt = v => Math.round(v).toLocaleString('en-US');
+    const unit = s.suffixText.trim();
+    const title = s.gaugeTitle.replace(/\{goal\}/g, fmt(goal));
+    if (done) return { title, info: s.gaugeDoneText };
+    const info = {
+      left: `あと ${fmt(Math.max(0, goal - n))}${unit}`,
+      pct: `${Math.floor(Math.min(1, n / goal) * 100)}%`,
+      frac: `${fmt(n)} / ${fmt(goal)}`,
+      none: '',
+    }[s.gaugeInfo] || '';
+    return { title, info };
+  }
+
+  global.CounterCore = { DEFAULTS, sanitize, encodeHash, decodeHash, channelQuery, fetchChannel, generateCSS, IDLE, nextMilestone, goalFor, gaugeTexts };
 })(window);

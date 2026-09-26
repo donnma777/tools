@@ -23,31 +23,68 @@
 </head>
 
 <body>
-  <div id="box"><span class="cc-label"></span><span class="cc-num"></span><span class="cc-suffix"></span></div>
+  <div id="box">
+    <div id="count"><span class="cc-label"></span><span class="cc-num"></span><span class="cc-suffix"></span></div>
+    <div class="cc-gauge">
+      <div class="cc-gauge-text"><span class="cc-gauge-title"></span><span class="cc-gauge-info"></span></div>
+      <div class="cc-bar"><div class="cc-fill"></div></div>
+    </div>
+  </div>
   <div id="msg" role="status"></div>
 
   <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
-  <script src="counter-core.js?v=20260924a"></script>
+  <script src="counter-core.js?v=20260927b"></script>
   <script>
     (() => {
       'use strict';
       const K = window.CounterCore;
       const $ = s => document.querySelector(s);
-      const numEl = $('.cc-num');
+      const numEl = $('.cc-num'), gaugeEl = $('.cc-gauge');
       let S = K.DEFAULTS, shown = null, anim = 0;
+      // 「次の目標へ」のとき、超えた目標をしばらく「達成！」のまま見せてから次の目標に切り替える
+      let celebrate = null, celebrateTimer = 0;
 
       function applySettings(s) {
         S = s;
         $('#gen').textContent = K.generateCSS(s);
         $('.cc-label').textContent = s.labelText;
         $('.cc-suffix').textContent = s.suffixText;
+        renderGauge();
       }
+
+      function renderGauge() {
+        if (shown === null) return;
+        const goal = celebrate || K.goalFor(S, shown);
+        const done = !!celebrate || (S.goalAfter !== 'next' && shown >= goal);
+        $('.cc-fill').style.setProperty('--p', `${(Math.min(1, shown / goal) * 100).toFixed(2)}%`);
+        const t = K.gaugeTexts(S, shown, goal, done);
+        $('.cc-gauge-title').textContent = t.title;
+        $('.cc-gauge-info').textContent = t.info;
+        $('.cc-gauge-text').classList.toggle('empty', !t.title && !t.info);
+      }
+
+      function achieve(goal) {
+        if (S.goalAfter === 'next') {
+          celebrate = goal;
+          clearTimeout(celebrateTimer);
+          celebrateTimer = setTimeout(() => { celebrate = null; renderGauge(); }, 6000);
+        }
+        gaugeEl.classList.remove('achieved');
+        void gaugeEl.offsetWidth;
+        gaugeEl.classList.add('achieved');
+      }
+      gaugeEl.addEventListener('animationend', e => { if (e.animationName === 'cc-achieve') gaugeEl.classList.remove('achieved'); });
 
       const fmt = n => Math.round(n).toLocaleString('en-US');
       // 数が変わったら、カウントアップしながら新しい数へ（増えたときは弾ませる）
       function setCount(n) {
         const from = shown;
         shown = n;
+        if (from !== null && S.gaugeOn) {
+          const goal = K.goalFor(S, from);
+          if (from < goal && n >= goal) achieve(goal);
+        }
+        renderGauge();
         cancelAnimationFrame(anim);
         if (from === null || !S.countUp || from === n) {
           numEl.textContent = fmt(n);

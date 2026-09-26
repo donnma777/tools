@@ -4,12 +4,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>登録者数カウンター（OBS用） | どんまうんど-Tools</title>
+  <title>登録者数カウンター・目標ゲージ（OBS用） | どんまうんど-Tools</title>
   <link rel="icon" href="../favicon.ico">
   <meta name="description"
-    content="YouTubeチャンネルの登録者数を自動で取得して、OBSのブラウザソースでおしゃれに表示できる無料ツール。グラデーション・縁取り・見出し・単位・背景の箱を、プレビューを見ながら設定できます。">
-  <meta property="og:title" content="登録者数カウンター（OBS用） | どんまうんど-Tools">
-  <meta property="og:description" content="YouTubeの登録者数を、OBSでおしゃれに表示できる無料ツール。">
+    content="YouTubeチャンネルの登録者数を自動で取得して、OBSのブラウザソースでおしゃれに表示できる無料ツール。「目標まであと○人」の登録者目標ゲージも出せます。グラデーション・縁取り・見出し・単位・背景の箱を、プレビューを見ながら設定できます。">
+  <meta property="og:title" content="登録者数カウンター・目標ゲージ（OBS用） | どんまうんど-Tools">
+  <meta property="og:description" content="YouTubeの登録者数と目標ゲージを、OBSでおしゃれに表示できる無料ツール。">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="@donnma777">
@@ -552,6 +552,7 @@
 
     select,
     input[type=text],
+    input[type=number],
     input[type=password] {
       font: inherit;
       font-size: 13px;
@@ -566,6 +567,7 @@
 
     select:focus,
     input[type=text]:focus,
+    input[type=number]:focus,
     input[type=password]:focus {
       outline: none;
       border-color: var(--accent);
@@ -1103,8 +1105,8 @@
   <!-- Hero -->
   <header class="hero">
     <div class="hero-inner">
-      <h1>登録者数カウンター（OBS用）</h1>
-      <p>YouTubeの登録者数を自動で取得して、OBSにおしゃれに表示できます。見た目はプレビューを見ながら決められます。</p>
+      <h1>登録者数カウンター・目標ゲージ（OBS用）</h1>
+      <p>YouTubeの登録者数を自動で取得して、OBSにおしゃれに表示できます。「目標まであと○人」のゲージも出せます。見た目はプレビューを見ながら決められます。</p>
     </div>
   </header>
 
@@ -1144,6 +1146,7 @@
             </select>
             <button class="btn btn-sm" id="btn-up" type="button" title="登録者が増えたときの動きを試します">＋1 増やす</button>
             <button class="btn btn-sm" id="btn-up100" type="button">＋100</button>
+            <button class="btn btn-sm" id="btn-goal-test" type="button" title="目標を超えたときの動きを試します" style="display: none;">🎉 達成を試す</button>
           </div>
         </div>
         <div class="stage bg-checker" id="stage">
@@ -1191,7 +1194,7 @@
           <li>下の「APIキーの作り方」で <b>APIキー</b> を用意します（無料・最初の1回だけ）。</li>
           <li>右の「接続設定」に <b>APIキー</b> と <b>チャンネル</b>（<code>@ハンドル</code> か <code>UC…</code> のチャンネルID）を入れて、<b>「接続テスト」</b>。チャンネル名と登録者数が出ればOKです。</li>
           <li>このページで見た目を決めて <b>「URLをコピー」</b>。</li>
-          <li>OBSで <b>ソース ＋ → ブラウザ</b> を追加し、URLに貼り付けます。幅 <code>800</code>・高さ <code>300</code> くらいが目安です。カスタムCSSは空のままでOKです。</li>
+          <li>OBSで <b>ソース ＋ → ブラウザ</b> を追加し、URLに貼り付けます。幅 <code>800</code>・高さ <code>300</code> くらい（目標ゲージを出すなら高さ <code>400</code> くらい）が目安です。カスタムCSSは空のままでOKです。</li>
           <li>あとで見た目を変えたときは、もう一度「URLをコピー」して、ブラウザソースのURLを貼り替えてください。</li>
         </ol>
       </div>
@@ -1218,6 +1221,8 @@
           <li>登録者が増えてから、APIの数が変わるまで少し時間がかかることがあります。</li>
           <li>1回数を取りに行くと、APIの使用量を1使います。無料で使えるのは1日10,000までなので、10秒ごとでも足ります。同じキーをほかのツールでも使うなら、30秒以上がおすすめです。</li>
           <li>OBSのブラウザソースで「表示されていないときにソースをシャットダウンする」をオンにすると、使っていないあいだは数を取りに行きません。</li>
+          <li><b>目標ゲージ</b>は「🎯 目標ゲージ」でオンにします。目標を超えたら、次のキリのいい数（1,000 → 2,000 → 3,000 → 5,000…）に自動で切り替えることも、「達成」を出したままにすることもできます。プレビューの「🎉 達成を試す」で、超えたときの動きを確認できます。</li>
+          <li>1,000人を超えると登録者数が上から3桁に丸められるため、ゲージも少しずつではなく、まとまって進みます。</li>
           <li>うまく取れないときは、カウンターの左上に理由が出ます。</li>
           <li>設定はこのブラウザに自動で保存されます。「設定をファイルに保存」にはAPIキーは入りません。</li>
         </ul>
@@ -1254,7 +1259,7 @@
 
   <!-- フォント一覧・文字効果はチャットCSSジェネレーターと共通。chat-core.js / counter-core.js を変えたら v を上げる（view.html も） -->
   <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
-  <script src="counter-core.js?v=20260924a"></script>
+  <script src="counter-core.js?v=20260927b"></script>
   <script>
     (() => {
       'use strict';
@@ -1269,7 +1274,39 @@
       const WEIGHTS = C.WEIGHTS;
       const BORDER_STYLES = [['solid', '実線'], ['dashed', '破線'], ['dotted', '点線'], ['double', '二重線']];
       const effOn = s => s.textEffect !== 'none';
+      const gOn = s => s.gaugeOn;
+      const barOn = s => s.gaugeOn && s.gaugeBar;
       const SECTIONS = [
+        {
+          title: '目標ゲージ', icon: '🎯', fields: [
+            { k: 'gaugeOn', l: '目標ゲージを表示', t: 'check' },
+            { k: 'goal', l: '目標の人数', t: 'number', min: 1, max: 100000000, when: gOn },
+            {
+              k: 'goalAfter', l: '目標を超えたら', t: 'select', when: gOn, o: [
+                ['next', '次のキリのいい数を目標にする'], ['stay', '「達成」を表示したままにする']],
+              note: '「次のキリのいい数」は 1,000 → 2,000 → 3,000 → 5,000 → 10,000… のように自動で決まります',
+            },
+            { k: 'showCount', l: '大きな数字も表示する（オフでゲージだけ）', t: 'check', when: gOn },
+            { k: 'gaugeBar', l: 'バーを表示する（オフで目標の文字だけ）', t: 'check', when: gOn },
+            { k: 'gaugeTitle', l: 'ゲージの見出し', t: 'text', ph: '例: 収益化まで', when: gOn, note: '{goal} と書くと目標の人数に置き換わります' },
+            { k: 'gaugeInfo', l: 'ゲージの右側', t: 'select', o: [['left', 'あと○人'], ['pct', '○%'], ['frac', 'いまの数 / 目標'], ['none', '表示しない']], when: gOn },
+            { k: 'gaugeDoneText', l: '達成したときの文字', t: 'text', ph: '🎉 目標達成！', when: gOn },
+            { k: 'gaugeTextSize', l: 'ゲージの文字サイズ', t: 'range', min: 10, max: 80, step: 1, u: 'px', when: gOn },
+            { k: 'gaugeTextColor', l: 'ゲージの文字色', t: 'color', when: gOn },
+            { k: 'gaugeWidth', l: 'ゲージの長さ', t: 'range', min: 160, max: 1600, step: 10, u: 'px', when: barOn },
+            { k: 'gaugeHeight', l: 'ゲージの太さ', t: 'range', min: 4, max: 80, step: 1, u: 'px', when: barOn },
+            { k: 'gaugeRadius', l: 'ゲージの角の丸み', t: 'range', min: 0, max: 40, step: 1, u: 'px', when: barOn },
+            { k: 'gaugeFillMode', l: 'バーの色', t: 'select', o: [['same', '数字と同じ色'], ['solid', '単色'], ['gradient', 'グラデーション']], when: barOn },
+            { k: 'gaugeFill1', l: s => s.gaugeFillMode === 'solid' ? 'バーの色' : 'バーの色（左）', t: 'color', when: s => barOn(s) && s.gaugeFillMode !== 'same' },
+            { k: 'gaugeFill2', l: 'バーの色（右）', t: 'color', when: s => barOn(s) && s.gaugeFillMode === 'gradient' },
+            { k: 'gaugeTrack', l: 'バーの下地の色', t: 'color', when: barOn },
+            { k: 'gaugeTrackAlpha', l: '下地の不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: barOn },
+            { k: 'gaugeBorder', l: 'ゲージに枠線を付ける', t: 'check', when: barOn },
+            { k: 'gaugeBorderWidth', l: '枠線の太さ', t: 'range', min: 1, max: 8, step: 0.5, u: 'px', when: s => barOn(s) && s.gaugeBorder },
+            { k: 'gaugeBorderColor', l: '枠線の色', t: 'color', when: s => barOn(s) && s.gaugeBorder },
+            { k: 'gaugeShine', l: 'バーに光を流す', t: 'check', when: barOn },
+          ]
+        },
         {
           title: '数字', icon: '🔢', fields: [
             { k: 'font', l: 'フォント', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]) },
@@ -1341,6 +1378,9 @@
         ['箱入り', { textEffect: 'none', boxOn: true, boxBg: '#2e1224', boxAlpha: 0.85, boxBorder: true, boxBorderColor: '#ff85a1', labelColor: '#ffb3c6', suffixColor: '#ffb3c6' }],
         ['ポップ', { font: 'Mochiy Pop One', weight: '400', labelWeight: '400', color: '#3a8bb5', textEffect: 'outline', effectWidth: 4, effectColor: '#ffffff', labelColor: '#ff9ecb', suffixColor: '#ff9ecb', idle: 'float' }],
         ['和風', { font: 'Shippori Mincho', weight: '800', color: '#f5f0e1', textEffect: 'shadow', effectWidth: 2, effectColor: '#1b1410', labelColor: '#d9b777', suffixColor: '#d9b777', labelText: '登録者', boxOn: true, boxBg: '#1b1410', boxAlpha: 0.75, boxRadius: 4 }],
+        ['ゲージ（あと○人）', { gaugeOn: true, colorMode: 'gradient', grad1: '#ffec61', grad2: '#f321d7', gaugeFillMode: 'same', textEffect: 'shadow', effectWidth: 3, effectColor: '#000000', scale: 1.6 }],
+        ['ゲージだけ', { gaugeOn: true, showCount: false, gaugeInfo: 'frac', gaugeTitle: '登録者 目標 {goal}人', gaugeFillMode: 'gradient', gaugeFill1: '#7ff9ff', gaugeFill2: '#ff3fd2', gaugeHeight: 28, gaugeRadius: 14, gaugeBorder: true, gaugeBorderColor: '#7ff9ff', boxOn: true, boxBg: '#140a24', boxAlpha: 0.8, boxRadius: 20, textEffect: 'glow', effectWidth: 3, effectColor: '#ff3fd2' }],
+        ['収益化チャレンジ', { gaugeOn: true, goal: 1000, goalAfter: 'stay', gaugeTitle: '収益化まで', gaugeInfo: 'left', font: 'Mochiy Pop One', weight: '400', labelWeight: '400', color: '#ffffff', textEffect: 'outline', effectWidth: 4, effectColor: '#ff6f91', labelColor: '#ffe066', suffixColor: '#ffe066', gaugeTextColor: '#ffffff', gaugeFillMode: 'solid', gaugeFill1: '#ffe066', gaugeTrack: '#ff6f91', gaugeTrackAlpha: 0.45, gaugeBorder: true, gaugeBorderWidth: 3, gaugeBorderColor: '#ffffff', scale: 1.6 }],
       ];
 
       // =====================================================
@@ -1391,6 +1431,16 @@
           });
           hex.addEventListener('blur', () => { hex.value = S[f.k]; });
           set = v => { pick.value = v; hex.value = v; };
+        } else if (f.t === 'number') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label>
+            <input type="number" id="${id}" min="${f.min}" max="${f.max}" step="1" inputmode="numeric">`;
+          const el = wrap.querySelector('input');
+          el.addEventListener('input', () => {
+            const v = parseInt(el.value, 10);
+            if (v >= f.min && v <= f.max) update(f.k, v);
+          });
+          el.addEventListener('blur', () => { el.value = S[f.k]; });
+          set = v => { el.value = v; };
         } else {
           wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label><input type="text" id="${id}">`;
           const el = wrap.querySelector('input');
@@ -1398,14 +1448,15 @@
           el.addEventListener('input', () => update(f.k, el.value));
           set = v => { el.value = v; };
         }
-        wrap.querySelector('label > span').textContent = f.l;
+        const labelEl = wrap.querySelector('label > span');
+        labelEl.textContent = typeof f.l === 'function' ? f.l(S) : f.l;
         if (f.note) {
           const n = document.createElement('div');
           n.className = 'field-note';
           n.textContent = f.note;
           wrap.appendChild(n);
         }
-        inputs[f.k] = { f, wrap, set };
+        inputs[f.k] = { f, wrap, set, labelEl };
         return wrap;
       }
 
@@ -1423,7 +1474,14 @@
         }
       }
 
-      const refreshVisibility = () => { for (const k in inputs) inputs[k].wrap.hidden = inputs[k].f.when ? !inputs[k].f.when(S) : false; };
+      const refreshVisibility = () => {
+        for (const k in inputs) {
+          const { f, wrap, labelEl } = inputs[k];
+          wrap.hidden = f.when ? !f.when(S) : false;
+          if (typeof f.l === 'function') labelEl.textContent = f.l(S);
+        }
+        $('btn-goal-test').style.display = S.gaugeOn ? '' : 'none';
+      };
       function syncUI() {
         for (const k in inputs) inputs[k].set(S[k]);
         refreshVisibility();
@@ -1462,10 +1520,19 @@
         sendPreview({ type: 'cc-settings', s: S });
         sendPreview({ type: 'cc-count', n: count });
       });
-      frame.src = 'view.html?v=20260924a#demo=1';
+      frame.src = 'view.html?v=20260927b#demo=1';
       const bump = n => { count += n; sendPreview({ type: 'cc-count', n: count }); };
       $('btn-up').addEventListener('click', () => bump(1));
       $('btn-up100').addEventListener('click', () => bump(100));
+      // 目標の少し手前に戻してから、目標ちょうどまで増やす
+      let goalTestTimer;
+      $('btn-goal-test').addEventListener('click', () => {
+        const goal = K.goalFor(S, count);
+        clearTimeout(goalTestTimer);
+        count = Math.max(0, goal - 3);
+        sendPreview({ type: 'cc-count', n: count });
+        goalTestTimer = setTimeout(() => bump(goal - count), 1500);
+      });
       $('stage-bg').addEventListener('change', e => { $('stage').className = 'stage bg-' + e.target.value; });
       // 見本の登録者数も、ときどき少しずつ増やす
       setInterval(() => { if (Math.random() < 0.3) bump(1); }, 4000);
