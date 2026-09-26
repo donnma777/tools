@@ -1271,7 +1271,7 @@
       const effOn = s => s.textEffect !== 'none';
       const SECTIONS = [
         {
-          title: '数字', icon: '🔢', open: true, fields: [
+          title: '数字', icon: '🔢', fields: [
             { k: 'font', l: 'フォント', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]) },
             { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
             { k: 'weight', l: '文字の太さ', t: 'select', o: WEIGHTS },
@@ -1281,7 +1281,7 @@
           ]
         },
         {
-          title: '数字の色・文字効果', icon: '🎨', open: true, fields: [
+          title: '数字の色・文字効果', icon: '🎨', fields: [
             { k: 'colorMode', l: '色', t: 'select', o: [['solid', '単色'], ['gradient', 'グラデーション'], ['rainbow', 'レインボー（流れる）']] },
             { k: 'color', l: '文字色', t: 'color', when: s => s.colorMode === 'solid' },
             { k: 'grad1', l: 'グラデーションの色 1', t: 'color', when: s => s.colorMode === 'gradient' },
@@ -1542,7 +1542,7 @@
       document.querySelectorAll('.preset-sec').forEach(group => {
         const key = 'donnma-youtube-subscribers-open-' + group.dataset.key;
         group.querySelector('.preset-count').textContent = `${group.querySelectorAll('.chip-btn').length}種類`;
-        try { group.open = localStorage.getItem(key) === '1'; } catch (e) { /* ignore */ }
+        try { group.open = localStorage.getItem(key) !== '0'; } catch (e) { group.open = true; }
         group.addEventListener('toggle', () => { try { localStorage.setItem(key, group.open ? '1' : '0'); } catch (e) { /* ignore */ } });
       });
 

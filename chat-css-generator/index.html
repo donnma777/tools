@@ -1396,13 +1396,13 @@
 
       const SECTIONS = [
         {
-          title: 'Twitch の設定', icon: '◆', open: true, when: isTW, fields: [
+          title: 'Twitch の設定', icon: '◆', when: isTW, fields: [
             { k: 'twUserColor', l: '名前をTwitchで設定された色で表示', t: 'check', note: 'オンの間は「名前」の色設定より優先されます' },
             { k: 'twHideUsers', l: '表示しないユーザー（カンマ区切り）', t: 'text', ph: '例: nightbot, streamelements' },
           ]
         },
         {
-          title: 'フォント・文字効果', icon: '🔤', open: true, fields: [
+          title: 'フォント・文字効果', icon: '🔤', fields: [
             { k: 'font', l: 'フォント', t: 'select', o: FONTS.map(f => [f[0], f[1]]) },
             { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
             { k: 'textEffect', l: '文字効果', t: 'select', o: [['none', 'なし'], ['outline', '縁取り'], ['shadow', '影'], ['glow', '発光（ネオン）']] },
@@ -1411,7 +1411,7 @@
           ]
         },
         {
-          title: 'コメント本文', icon: '💬', open: true, fields: [
+          title: 'コメント本文', icon: '💬', fields: [
             { k: 'msgSize', l: '文字サイズ', t: 'range', min: 10, max: 48, step: 1, u: 'px' },
             { k: 'msgWeight', l: '文字の太さ', t: 'select', o: WEIGHTS, note: 'フォントによっては対応していない太さがあります' },
             { k: 'msgColor', l: '文字色', t: 'color' },
@@ -2281,11 +2281,11 @@
       addPresetButtons($('presets'), PRESETS);
       addPresetButtons($('presets-theme'), THEME_PRESETS);
 
-      // テンプレートの開閉（開いたかどうかはこのブラウザに覚えておく）
+      // テンプレートの開閉（最初は開いておき、閉じたらこのブラウザに覚えておく）
       document.querySelectorAll('.preset-sec').forEach(group => {
         const key = 'donnma-chat-css-open-' + group.dataset.key;
         group.querySelector('.preset-count').textContent = `${group.querySelectorAll('.chip-btn').length}種類`;
-        try { group.open = localStorage.getItem(key) === '1'; } catch (e) { /* ignore */ }
+        try { group.open = localStorage.getItem(key) !== '0'; } catch (e) { group.open = true; }
         group.addEventListener('toggle', () => {
           try { localStorage.setItem(key, group.open ? '1' : '0'); } catch (e) { /* ignore */ }
         });
