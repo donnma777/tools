@@ -561,42 +561,52 @@
                 </div>
                 <div class="hint" style="margin-top:14px;">
                     複数の背景パーツを重ねて使用できます。<strong>≡ メニュー → 削除</strong> で個別に取り除けます。<br>
-                    <strong>背景削除</strong> を選ぶとすべての背景パーツが消えます。<br>
-                    <strong>背景画像アップロード</strong> では任意の画像を背景として使えます。
+                    「🖼️ 背景を変える」の <strong>背景をすべて消す</strong> を選ぶとすべての背景パーツが消えます。<br>
+                    「🖼️ 背景を変える」の <strong>背景画像を選ぶ</strong> では任意の画像を背景として使えます。
                 </div>
             </div>
         </div>
 
-        <!-- 設定の保存と読み込み -->
+        <!-- 保存・プリセット -->
         <div class="section">
-            <div class="section-title">設定の保存と読み込み / Save &amp; Load</div>
+            <div class="section-title"><span class="icon">💾</span> 保存・プリセット / Save &amp; Presets</div>
             <ul class="steps">
                 <li>
                     <div class="step-num">1</div>
-                    <div class="step-body"><strong>設定を保存</strong> — パーツの配置・内容をブラウザのローカルストレージに保存します。次回読み込み時に自動的に復元されます。
-                    </div>
+                    <div class="step-body"><strong>自動保存</strong> — 今の画面は、操作するたびに自動でこのブラウザに保存されます。次に開いたときは続きから始まります。</div>
                 </li>
                 <li>
                     <div class="step-num">2</div>
-                    <div class="step-body"><strong>設定をエクスポート</strong> — <code>wa-overlay-config_日時.json</code>
-                        としてダウンロードします。PC 間の移行やバックアップに使用できます。</div>
+                    <div class="step-body"><strong>プリセット</strong> — 「⚙️ 設定」で今の画面に名前を付けて、いくつでも保存できます（例：雑談用・ゲーム実況用）。一覧から読み込む・上書き・削除ができます。</div>
                 </li>
                 <li>
                     <div class="step-num">3</div>
-                    <div class="step-body"><strong>設定をインポート</strong> — エクスポートした JSON ファイルを選択して復元します。</div>
+                    <div class="step-body"><strong>ファイルに書き出す</strong> — 今の画面とすべてのプリセットを、画像も含めて1つのJSONファイルにまとめてダウンロードします。別のPCへの持ち運びやバックアップに使えます。</div>
                 </li>
                 <li>
                     <div class="step-num">4</div>
-                    <div class="step-body"><strong>画面リセット</strong> — ページをリロードして初期状態に戻します。保存データは消えません。</div>
+                    <div class="step-body"><strong>ファイルから読み込む</strong> — 書き出したJSONファイルから、今の画面とプリセットを復元します。同じ名前のプリセットがあるときは上書きするか確認します。以前の形式のファイルも読み込めます。</div>
+                </li>
+                <li>
+                    <div class="step-num">5</div>
+                    <div class="step-body"><strong>画面リセット</strong> — 「⚙️ 設定」から、画面を初期状態に戻します（今の画面は消えます。プリセットは残ります）。</div>
+                </li>
+                <li>
+                    <div class="step-num">6</div>
+                    <div class="step-body"><strong>以前の「設定を保存」</strong> — 前のバージョンで「設定を保存」していた内容は、プリセット一覧の先頭に「以前の『設定を保存』」として残っています。</div>
                 </li>
             </ul>
+            <div class="card">
+                <div class="card-title">保存先について</div>
+                <p>保存先はこのブラウザの中（IndexedDB）です。<code>file://</code> で開いたときと <code>http://localhost</code> で開いたとき、またブラウザが違うときは、それぞれ別の保存になります。別のPCやブラウザへは「ファイルに書き出す」で持っていってください。</p>
+            </div>
         </div>
 
         <!-- リアルタイムプレビュー -->
         <div class="section">
             <div class="section-title">リアルタイムプレビュー / Real-time Preview</div>
             <div class="card">
-                <div class="card-title">📡 表示更新（別タブに反映）</div>
+                <div class="card-title">📡 表示更新（別タブ）</div>
                 <p>パーツメニューの「表示更新」を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。</p>
             </div>
             <div class="card">
@@ -637,6 +647,45 @@
             <div class="card">
                 <div class="card-title">配信本番では</div>
                 <p>OBSの「Custom Browser Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。</p>
+            </div>
+        </div>
+
+        <!-- OBS接続 -->
+        <div class="section">
+            <div class="section-title"><span class="icon">🔌</span> OBS接続 / OBS Connect</div>
+            <div class="card">
+                <div class="card-title">🔌 Chromeでの編集をOBSにそのまま反映</div>
+                <p>Chromeで開いたこの画面から、OBSのWebSocketサーバーに接続すると、編集内容をOBSのブラウザソースにそのまま反映できます。「対話」ウィンドウで操作する必要がなくなります（「表示更新」は同じブラウザのタブどうしでしか届かないため、OBSへはこちらを使います）。</p>
+            </div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body">OBSのメニュー <strong>「ツール → WebSocketサーバー設定」</strong> で「WebSocketサーバーを有効にする」をオンにし、「接続情報を表示」でポートとパスワードを確認する（最初の1回だけ）。</div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body">OBSのブラウザソースには、今までどおりこのHTMLファイルを入れておく。</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body">同じPCのChromeで同じHTMLファイルを開き、空いている場所をダブルクリック → <strong>「⚙️ 設定」</strong> → 「OBS接続」にポートとパスワードを入れて <strong>「接続」</strong>。</div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-body">Chromeで編集すると、OBSのブラウザソースにそのまま反映されます。OBS側にも保存されるので、OBSを再起動しても消えません。</div>
+                </li>
+            </ul>
+            <div class="card">
+                <div class="card-title">リアルタイム</div>
+                <p>編集すると、少しあとに自動でOBSへ送ります。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">確定したときだけ</div>
+                <p>メニューの「📤 OBSに反映」か Ctrl+Enter を押したときだけ送ります。配信中にこっそり直したいとき向けです。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">注意</div>
+                <p>ChromeとOBSは同じPCで動かしてください（スマホなど別の機器からは接続できません）。Chromeが「ローカルネットワークへのアクセス」を確認してきたら許可してください。ポート・パスワードはこのブラウザに保存され、次に開いたときは自動で再接続します。OBS 28 以降が必要です。</p>
             </div>
         </div>
 
@@ -706,14 +755,74 @@
                 <tr>
                     <td><code>features.autoLoad</code></td>
                     <td><code>true</code></td>
-                    <td>ページを開いたとき保存済み設定を自動で読み込む（<code>false</code> にすると手動のみ）</td>
+                    <td>ページを開いたとき、前回の画面（自動保存）から始める。<code>false</code> にすると毎回初期状態から始まります。</td>
                 </tr>
                 <tr>
                     <td><code>features.saveConfigEnabled</code></td>
                     <td><code>true</code></td>
-                    <td>設定の保存・読み込み機能を有効にする（<code>false</code> で「設定を保存」ボタン非表示）</td>
+                    <td>今の画面を自動で保存する。<code>false</code> にすると自動保存しません（プリセット・ファイル書き出しは使えます）。</td>
+                </tr>
+                <tr>
+                    <td><code>features.presetSave</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面に「プリセットに保存」（名前を付けて保存・上書き）を出す。</td>
+                </tr>
+                <tr>
+                    <td><code>features.presetLoad</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面にプリセットの一覧（読み込む・削除）を出す。</td>
+                </tr>
+                <tr>
+                    <td><code>features.obsSettings</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面に「OBS接続」の欄を出す。<code>false</code> にすると、ブラウザに保存された値ではなく、いつも下の <code>obs</code> の値で接続します。</td>
+                </tr>
+                <tr>
+                    <td><code>features.fileExport</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面に「ファイルに書き出す」を出す。</td>
+                </tr>
+                <tr>
+                    <td><code>features.fileImport</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面に「ファイルから読み込む」を出す。</td>
+                </tr>
+                <tr>
+                    <td><code>features.resetButton</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面に「画面リセット」を出す。</td>
+                </tr>
+                <tr>
+                    <td><code>features.editLock</code></td>
+                    <td><code>false</code></td>
+                    <td>表示専用にする。<code>true</code> にすると、パーツメニュー・ドラッグ・入力など画面の編集が一切できなくなります（OBS接続で送られてきた変更は反映されます）。</td>
+                </tr>
+                <tr>
+                    <td><code>obs.port</code></td>
+                    <td><code>4455</code></td>
+                    <td>OBSのWebSocketサーバーのポート番号。</td>
+                </tr>
+                <tr>
+                    <td><code>obs.password</code></td>
+                    <td><code>''</code></td>
+                    <td>OBSのWebSocketサーバーのパスワード。このファイルを人に渡すとパスワードも渡るので注意してください。</td>
+                </tr>
+                <tr>
+                    <td><code>obs.mode</code></td>
+                    <td><code>'auto'</code></td>
+                    <td>反映のしかた。<code>'auto'</code> = リアルタイム、<code>'manual'</code> = 確定したときだけ。</td>
+                </tr>
+                <tr>
+                    <td><code>obs.autoConnect</code></td>
+                    <td><code>false</code></td>
+                    <td>ページを開いたら自動で接続する。</td>
                 </tr>
             </table>
+            <div class="card">
+                <div class="card-title">ゲームセンターなど、画面を触られたくない場所では</div>
+                <p><code>features.editLock</code> を <code>true</code> にすると、画面の編集が一切できなくなります。<code>obs</code> にパスワードを入れて <code>autoConnect: true</code> にしておけば、開くだけでOBSにつながり、別のPC（<code>editLock</code> をかけていないファイル）から編集を送れます。</p>
+                <p><code>features: {<br>&nbsp;&nbsp;&nbsp;&nbsp;// …<br>&nbsp;&nbsp;&nbsp;&nbsp;editLock: true,<br>},<br>obs: {<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 4455,<br>&nbsp;&nbsp;&nbsp;&nbsp;password: 'OBSのパスワード',<br>&nbsp;&nbsp;&nbsp;&nbsp;mode: 'auto',<br>&nbsp;&nbsp;&nbsp;&nbsp;autoConnect: true,<br>},</code></p>
+            </div>
         </div>
 
         <!-- カラーパレット -->

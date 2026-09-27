@@ -110,12 +110,42 @@
             // 【機能制御】
             // -----------------------------------------------
             features: {
-                /** 設定の保存をコード上で無効化する */
-                /** falseに設定すると保存機能が無効になります */
+                /** 今の画面の自動保存 */
+                /** false にすると自動保存しません（プリセット・ファイル書き出しは使えます） */
                 saveConfigEnabled: true,
-                /** ページを開いたとき保存済み設定を自動で読み込む */
-                /** false にすると「保存を読み込む」を手動で押す必要があります */
+                /** ページを開いたとき、前回の画面（自動保存）から始める */
+                /** false にすると毎回初期状態から始まります（残したい画面はプリセットに保存してください） */
                 autoLoad: true,
+                /** 設定画面に「プリセットに保存」（名前を付けて保存・上書き）を出す */
+                presetSave: true,
+                /** 設定画面にプリセットの一覧（読み込む・削除）を出す */
+                presetLoad: true,
+                /** 設定画面に「OBS接続」の欄を出す（false でも下の obs の値で接続できる） */
+                obsSettings: true,
+                /** 設定画面に「ファイルに書き出す」を出す */
+                fileExport: true,
+                /** 設定画面に「ファイルから読み込む」を出す */
+                fileImport: true,
+                /** 設定画面に「画面リセット」を出す */
+                resetButton: true,
+                /** 表示専用にする（true にすると、パーツメニュー・ドラッグ・入力など画面の編集が一切できなくなる。OBS接続で送られてきた変更は反映する） */
+                editLock: false,
+            },
+            // -----------------------------------------------
+            // 【OBS接続の初期値】
+            // OBSの「ツール → WebSocketサーバー設定」の値を入れておくと、接続画面に最初から入ります。
+            // features.obsSettings を false にすると、ブラウザに保存された値ではなく、いつもこの値を使います
+            // （ゲームセンターなど、設定を変えられたくない場所向け）。
+            // -----------------------------------------------
+            obs: {
+                /** ポート番号 */
+                port: 4455,
+                /** パスワード（このファイルを人に渡すとパスワードも渡るので注意） */
+                password: '',
+                /** 反映のしかた：'auto' = リアルタイム / 'manual' = 確定したときだけ */
+                mode: 'auto',
+                /** ページを開いたら自動で接続する */
+                autoConnect: false,
             },
         };
         /**
@@ -1564,6 +1594,250 @@
             opacity: 0.7;
             margin-top: 2px;
         }
+    
+        /* shared-css:start */
+        /* =====================================================
+         *  共通機能の見た目（overlay/_shared/overlay-shared.css から build.py で流し込み。ここは直接編集しない）
+         *  色はテーマの --color-accent から作るので、明るいテーマ・暗いテーマのどちらにもなじむ。
+         *  文字色・フォントは、要素にテーマの .help-desc を付けて合わせている（HTML・JS 側）
+         * ===================================================== */
+
+        /* ---- 表示専用（CONFIG.features.editLock）：画面を触っても何も起きないようにする ---- */
+        body.edit-locked #capture-area {
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* ---- 設定画面・背景の選択画面 ---- */
+        #obs-modal,
+        #bg-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 4000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #obs-modal.open,
+        #bg-modal.open {
+            display: flex;
+        }
+
+        /* ポップアップ共通：画面より長いときは、ポップアップの中だけスクロールする */
+        .help-popup {
+            max-width: 92vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: color-mix(in srgb, var(--color-accent) 45%, transparent) transparent;
+        }
+
+        /* 使い方は説明文が長いので横長にして、折り返しを減らす */
+        #help-modal .help-popup {
+            width: 760px;
+        }
+
+        /* 設定画面：左に保存・読み込み、右にOBS接続。使い方・リセットは下の段 */
+        #obs-modal .help-popup {
+            width: 900px;
+        }
+
+        .help-body.settings-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 0 32px;
+        }
+
+        /* CONFIG.features.obsSettings が false のときは OBS接続の列を隠して1列にする */
+        .help-body.settings-grid.single {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        #obs-modal .help-popup.narrow {
+            width: 560px;
+        }
+
+        @media (max-width: 760px) {
+            .help-body.settings-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .settings-col {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .settings-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+        }
+
+        .settings-credit {
+            flex: 1;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0.65;
+            white-space: nowrap;
+        }
+
+        .settings-credit a {
+            color: var(--color-accent);
+        }
+
+        .settings-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 6px 0 2px;
+        }
+
+        .settings-btn {
+            height: 32px;
+            padding: 0 14px;
+            background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+            border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+            border-radius: 4px;
+            color: var(--color-accent);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .settings-btn:hover {
+            background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+        }
+
+        .settings-btn.small {
+            height: 26px;
+            padding: 0 10px;
+            font-size: 13px;
+        }
+
+        /* 入力欄 */
+        .obs-field {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 0;
+        }
+
+        .obs-field input[type=text],
+        .obs-field input[type=password],
+        .preset-add input {
+            flex: 1;
+            min-width: 0;
+            background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+            border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+            border-radius: 4px;
+            color: inherit;
+            font-family: inherit;
+            font-size: 14px;
+            padding: 6px 8px;
+            outline: none;
+        }
+
+        .obs-field input:focus,
+        .preset-add input:focus {
+            border-color: var(--color-accent);
+        }
+
+        .obs-mode {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .obs-mode input {
+            accent-color: var(--color-accent);
+        }
+
+        .obs-status {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.85;
+            min-height: 1.5em;
+            margin-top: 8px;
+        }
+
+        .obs-conn-state {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-top: 8px;
+        }
+
+        .obs-conn-state.off {
+            filter: grayscale(1);
+            opacity: 0.6;
+        }
+
+        .obs-conn-state.dirty {
+            color: #e8930c;
+        }
+
+        .obs-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 14px;
+        }
+
+        /* プリセット */
+        .preset-add {
+            display: flex;
+            gap: 8px;
+            padding: 6px 0 2px;
+        }
+
+        .preset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .preset-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
+            border-radius: 4px;
+            background: color-mix(in srgb, var(--color-accent) 5%, transparent);
+        }
+
+        .preset-name {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .preset-date {
+            font-size: 12px;
+            opacity: 0.6;
+            white-space: nowrap;
+        }
+        /* shared-css:end */
     </style>
 </head>
 
@@ -1659,21 +1933,11 @@
         <div class="part-menu-item" data-part="title"><span class="part-menu-icon">🏷</span> 演目ボックス</div>
         <div class="part-menu-item" data-part="image"><span class="part-menu-icon">🖼</span> 画像ボックス</div>
         <div class="part-menu-section">─ 背景パーツ</div>
-        <div class="part-menu-item" data-part="bg-koshi"><span class="part-menu-icon">▦</span> 格子</div>
-        <div class="part-menu-item" data-part="bg-take"><span class="part-menu-icon">▸</span> 竹林</div>
-        <div class="part-menu-item" data-part="bg-sakura"><span class="part-menu-icon">🌸</span> 桜霞</div>
-        <div class="part-menu-item" data-part="bg-upload"><span class="part-menu-icon">📁</span> 背景画像アップロード</div>
-        <div class="part-menu-item" data-part="bg-color"><span class="part-menu-icon">🎨</span> 背景カラー選択</div>
-        <div class="part-menu-item" data-part="bg-clear"><span class="part-menu-icon">🧼</span> 背景削除</div>
+        <div class="part-menu-item" data-part="bg-menu"><span class="part-menu-icon">🖼️</span> 背景を変える</div>
         <div class="part-menu-section">─ その他</div>
-        <div class="part-menu-item" data-part="save-config"><span class="part-menu-icon">💾</span> 設定を保存</div>
-        <div class="part-menu-item" data-part="load-config"><span class="part-menu-icon">📂</span> 保存を読み込む</div>
-        <div class="part-menu-item" data-part="push-live"><span class="part-menu-icon">📡</span> 表示更新（別タブに反映）</div>
-
-        <div class="part-menu-item" data-part="export-config"><span class="part-menu-icon">⬇️</span> 設定をエクスポート</div>
-        <div class="part-menu-item" data-part="import-config"><span class="part-menu-icon">⬆️</span> 設定をインポート</div>
-        <div class="part-menu-item" data-part="reset"><span class="part-menu-icon">🔄</span> 画面リセット</div>
-        <div class="part-menu-item" data-part="help"><span class="part-menu-icon">❓</span> 使い方</div>
+        <div class="part-menu-item" data-part="settings"><span class="part-menu-icon">⚙️</span> 設定（保存・OBS接続）</div>
+        <div class="part-menu-item" data-part="push-live"><span class="part-menu-icon">📡</span> 表示更新（別タブ）</div>
+        <div class="part-menu-item" data-part="obs-commit" id="obs-commit-item" style="display:none"><span class="part-menu-icon">📤</span> <span id="obs-commit-label">OBSに反映</span></div>
     </div>
 
     <!-- 使い方モーダル -->
@@ -1693,29 +1957,108 @@
                         class="help-desc">ホバーで表示、ドラッグでリサイズ</span></div>
                 <div class="help-row"><span class="help-key">≡ ボタン</span><span class="help-desc">ボックスにホバーで右上に出現 →
                         複製・文字サイズ・削除</span></div>
-                <div class="help-section">設定の保存・読込</div>
-                <div class="help-row"><span class="help-key">設定を保存</span><span
-                        class="help-desc">現在の配置をブラウザに保存（次回自動読込）</span></div>
-                <div class="help-row"><span class="help-key">エクスポート</span><span
-                        class="help-desc">設定をJSONファイルとしてダウンロード</span></div>
-                <div class="help-row"><span class="help-key">インポート</span><span class="help-desc">保存したJSONを読み込んで復元</span>
-                </div>
+                <div class="help-section">設定の保存・読込（メニュー「⚙️ 設定」）</div>
+                <div class="help-row"><span class="help-key">自動保存</span><span
+                        class="help-desc">今の画面は自動で保存され、次に開いたときは続きから始まります</span></div>
+                <div class="help-row"><span class="help-key">プリセット</span><span
+                        class="help-desc">今の画面に名前を付けて、いくつでも保存・読み込み</span></div>
+                <div class="help-row"><span class="help-key">ファイルに書き出す</span><span
+                        class="help-desc">今の画面とプリセットをJSONファイルとしてダウンロード</span></div>
+                <div class="help-row"><span class="help-key">ファイルから読み込む</span><span
+                        class="help-desc">書き出したJSONを読み込んで、今の画面とプリセットを復元</span></div>
                 <div class="help-row"><span class="help-key">表示更新</span><span
-                        class="help-desc">同じURLを別タブで開いている場合、その画面へ即座に反映（同一オリジンで開く必要あり）</span>
-                </div>
+                        class="help-desc">同じURLを別タブで開いている場合、その画面へ即座に反映（同一オリジンで開く必要あり）</span></div>
+                <div class="help-row"><span class="help-key">OBSに接続</span><span
+                        class="help-desc">「⚙️ 設定」からOBSに接続すると、Chromeで編集した内容がOBSのブラウザソースに反映されます（OBSのWebSocketサーバーを有効にする必要あり）。確定モードではメニューの「📤 OBSに反映」か Ctrl+Enter で送ります</span></div>
                 <div class="help-section">推奨設定</div>
                 <div class="help-row"><span class="help-key">推奨サイズ</span><span class="help-desc">1920 × 1080 px</span>
                 </div>
-                <div class="help-section">制作 / Created by</div>
-                <div class="help-row" style="justify-content:center;padding:6px 0 2px">
-                    <span class="help-desc" style="opacity:1;text-align:center"><strong>donnma(どんま)</strong>
-                        &nbsp;—&nbsp; <a href="https://donnma.com/" target="_blank"
-                            style="color:inherit">donnma.com</a></span>
+                <div class="help-row" style="justify-content:center;padding:14px 0 2px">
+                    <span class="settings-credit help-desc">Created by どんま / donnma　web : <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
                 </div>
             </div>
             <div class="help-close-row"><button class="help-close-btn" id="help-close">閉じる</button></div>
         </div>
     </div>
+
+    <!-- 背景の選択画面（パーツメニュー「背景を変える」）。ボタンの data-bg はパーツメニューの種類と同じ -->
+    <div id="bg-modal">
+        <div class="help-popup">
+            <div class="help-title">// 背景</div>
+            <div class="help-body">
+                <div class="help-section" style="margin-top:0">飾りを追加</div>
+                <div class="settings-row">
+                    <button class="settings-btn" type="button" data-bg="bg-koshi">▦ 格子</button>
+                    <button class="settings-btn" type="button" data-bg="bg-take">▸ 竹林</button>
+                    <button class="settings-btn" type="button" data-bg="bg-sakura">🌸 桜霞</button>
+                </div>
+                <div class="help-section">色・画像</div>
+                <div class="settings-row">
+                    <button class="settings-btn" type="button" data-bg="bg-color">🎨 背景の色を選ぶ</button>
+                    <button class="settings-btn" type="button" data-bg="bg-upload">📁 背景画像を選ぶ</button>
+                </div>
+                <div class="help-section">消す</div>
+                <div class="settings-row">
+                    <button class="settings-btn" type="button" data-bg="bg-clear">🧼 背景をすべて消す</button>
+                </div>
+                <div class="help-desc" style="opacity:0.7">飾り・色・画像をまとめて消して、透明（OBSでは下の映像が見える状態）にします。</div>
+            </div>
+            <div class="obs-buttons">
+                <button class="help-close-btn" id="bg-close-btn">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- shared-html:start title="// 設定" -->
+    <!-- 設定画面：保存・読み込み／OBS接続（obs-websocket）／使い方・リセット。
+         overlay/_shared/overlay-shared.html から build.py で流し込み。ここは直接編集しない -->
+    <div id="obs-modal">
+        <div class="help-popup">
+            <div class="help-title">// 設定</div>
+            <div class="help-body settings-grid" id="settings-grid">
+                <div class="settings-col">
+                    <div class="help-section" style="margin-top:0">保存・読み込み</div>
+                    <div class="help-desc" style="opacity:0.85" id="autosave-note">今の画面は自動で保存され、次に開いたときは続きから始まります。取っておきたい画面は、名前を付けてプリセットにできます。</div>
+                    <div class="preset-add help-desc">
+                        <input type="text" id="preset-name" maxlength="40" placeholder="プリセット名（例: 雑談用）" spellcheck="false">
+                        <button class="settings-btn" id="preset-save-btn" type="button">＋ プリセットに保存</button>
+                    </div>
+                    <div class="preset-list" id="preset-list"></div>
+                    <div class="obs-status help-desc" id="settings-status" role="status"></div>
+                    <div class="settings-row" id="file-row">
+                        <button class="settings-btn" id="set-export-btn" type="button">⬇️ ファイルに書き出す</button>
+                        <button class="settings-btn" id="set-import-btn" type="button">⬆️ ファイルから読み込む</button>
+                    </div>
+                    <div class="help-desc" style="opacity:0.7" id="file-note">今の画面とプリセットを、まとめて1つのファイルに書き出します（画像も含む）。別のPCやブラウザへ持っていったり、バックアップにしたりできます。</div>
+                </div>
+
+                <div class="settings-col" id="obs-settings-col">
+                    <div class="help-section" style="margin-top:0">OBS接続</div>
+                    <div class="help-desc" style="opacity:0.85">OBSの「ツール → WebSocketサーバー設定」で「WebSocketサーバーを有効にする」をオンにし、「接続情報を表示」のポートとパスワードを入れてください。接続すると、ここでの編集をOBSのこのオーバーレイに送ります。</div>
+                    <div class="obs-field help-desc"><span class="help-key">ポート</span><input type="text" id="obs-port" inputmode="numeric" placeholder="4455"></div>
+                    <div class="obs-field help-desc"><span class="help-key">パスワード</span><input type="password" id="obs-password" autocomplete="off" placeholder="認証なしなら空欄"></div>
+                    <div class="obs-field help-desc"><span class="help-key">反映のしかた</span>
+                        <label class="obs-mode"><input type="radio" name="obs-mode" value="auto"> リアルタイム</label>
+                        <label class="obs-mode"><input type="radio" name="obs-mode" value="manual"> 確定したときだけ</label>
+                    </div>
+                    <div class="help-desc" style="opacity:0.7">「確定したときだけ」は、メニューの「📤 OBSに反映」か Ctrl+Enter を押したときにOBSへ送ります。配信中にこっそり直したいとき向けです。</div>
+                    <div class="obs-conn-state off" id="obs-conn-state">● 未接続</div>
+                    <div class="obs-status help-desc" id="obs-status" role="status"></div>
+                    <div class="settings-row">
+                        <button class="settings-btn" id="obs-connect-btn" type="button">🔌 接続</button>
+                        <button class="settings-btn" id="obs-disconnect-btn" type="button" style="display:none">切断</button>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-footer">
+                <button class="settings-btn" id="set-help-btn" type="button">❓ 使い方を見る</button>
+                <button class="settings-btn" id="set-reset-btn" type="button" title="画面を初期状態に戻します（今の画面は消えます。プリセットは残ります）">🔄 画面リセット</button>
+                <span class="settings-credit help-desc">Created by どんま / donnma　web : <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+                <button class="help-close-btn" id="obs-close-btn">CLOSE</button>
+            </div>
+        </div>
+    </div>
+    <!-- shared-html:end -->
 
     <div id="profile-editor">
         <div class="editor-popup">
@@ -1884,30 +2227,7 @@
         document.getElementById('help-close').addEventListener('click', () => helpModal.classList.remove('open'));
         helpModal.addEventListener('click', (e) => { if (e.target === helpModal) helpModal.classList.remove('open'); });
 
-        // 表示更新：現在の編集内容を保存し、同一オリジンで開いている別タブへ即時反映させる
-        // （別タブ側は下の 'storage' イベントリスナーで検知して再描画する）
-        function pushLiveUpdate() {
-            normalizeCaptureInputs();
-            const state = {
-                profileItems,
-                captureHtml: captureArea.innerHTML,
-                captureBgColor: captureArea.style.backgroundColor || document.body.style.backgroundColor || ''
-            };
-            try {
-                localStorage.setItem('waOverlayConfig', JSON.stringify(state));
-                // 内容が同一でも必ず storage イベントを発火させるためのタイムスタンプ
-                localStorage.setItem('waOverlayLivePing', String(Date.now()));
-            } catch (err) {
-                console.error(err);
-            }
-        }
 
-        // 別タブで「表示更新」が押されたら自動的に反映する
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'waOverlayLivePing' && e.newValue) {
-                loadSavedConfig();
-            }
-        });
 
         function normalizeCaptureInputs() {
             captureArea.querySelectorAll('input').forEach(input => {
@@ -1919,39 +2239,8 @@
             captureArea.querySelectorAll('textarea').forEach(ta => { ta.textContent = ta.value; });
         }
 
-        function exportConfig() {
-            normalizeCaptureInputs();
-            const state = { profileItems, captureHtml: captureArea.innerHTML, captureBgColor: captureArea.style.backgroundColor || document.body.style.backgroundColor || '' };
-            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            const now = new Date();
-            const ts = now.getFullYear() + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2) + '_' + ('0' + now.getHours()).slice(-2) + ('0' + now.getMinutes()).slice(-2);
-            a.href = url; a.download = 'wa-overlay-config_' + ts + '.json'; a.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-        }
 
-        function importConfig() {
-            const input = document.createElement('input');
-            input.type = 'file'; input.accept = '.json,application/json';
-            input.onchange = () => {
-                const file = input.files[0]; if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    try { applyLoadedConfig(JSON.parse(ev.target.result)); saveCurrentConfig(); }
-                    catch (err) { alert('インポートに失敗しました。'); }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
 
-        function saveCurrentConfig() {
-            if (!isSaveConfigEnabled()) return;
-            normalizeCaptureInputs();
-            const state = { profileItems, captureHtml: captureArea.innerHTML, captureBgColor: captureArea.style.backgroundColor || document.body.style.backgroundColor || '' };
-            try { localStorage.setItem('waOverlayConfig', JSON.stringify(state)); } catch (err) { }
-        }
 
         function setupImageDropArea(area) {
             if (!area || area._imageDropSetup) return;
@@ -2013,11 +2302,6 @@
             startProfileCycle();
         }
 
-        function loadSavedConfig() {
-            const raw = localStorage.getItem('waOverlayConfig');
-            if (!raw) return;
-            try { applyLoadedConfig(JSON.parse(raw)); } catch (err) { }
-        }
 
 
         startProfileCycle();
@@ -2202,6 +2486,10 @@
                         break;
                     case 'save-config': saveCurrentConfig(); break;
                     case 'load-config': loadSavedConfig(); break;
+                    case 'bg-menu': document.getElementById('bg-modal').classList.add('open'); break;
+                    case 'settings':
+                    case 'obs-connect': openObsModal(); break;
+                    case 'obs-commit': pushToObs(true); break;
                     case 'push-live': pushLiveUpdate(); break;
 
                     case 'export-config': exportConfig(); break;
@@ -3059,9 +3347,675 @@
         setInterval(updateClock, 1000);
         updateClock();
 
+        // shared-js:start theme=wa key=waOverlay
+        /* =====================================================
+         *  共通機能（overlay/_shared/overlay-shared.js から build.py で流し込み。ここは直接編集しない）
+         *  - 今の画面の自動保存・プリセット（IndexedDB）
+         *  - ファイルに書き出す／読み込む（今の画面＋全プリセット）
+         *  - 表示更新（別タブ）
+         *  - OBS接続（obs-websocket v5 → obs-browser の emit_event）
+         *  - 設定画面・背景の選択画面
+         * ===================================================== */
+        const OVERLAY_THEME = 'wa';
+        const OVERLAY_KEY = 'waOverlay';   // localStorage のキーの頭（例: gamingOverlay → gamingOverlayConfig）
+        const OBS_EVENT = 'donnmaOverlayUpdate';
+        const OBS_LINK_KEY = OVERLAY_KEY + 'ObsLink';
+        const LIVE_PING_KEY = OVERLAY_KEY + 'LivePing';
+        const OLD_CONFIG_KEY = OVERLAY_KEY + 'Config';   // 以前のバージョンの保存先（localStorage）
+
+        // 自動保存するかどうか（CONFIG.features.saveConfigEnabled。isSaveConfigEnabled がないテーマもある）
+        const overlaySaveEnabled = () => CONFIG.features?.saveConfigEnabled !== false;
+        // 設定画面に出す機能（CONFIG.features の presetSave / presetLoad / obsSettings / fileExport / fileImport / resetButton。
+        // 項目がない古い CONFIG では全部出す）
+        const featureOn = (name) => CONFIG.features?.[name] !== false;
+        // 表示専用（CONFIG.features.editLock: true）：画面の編集を一切できないようにする。
+        // 編集用の部品はすべて #capture-area の中にあるので、inert でクリック・ドラッグ・入力・フォーカスをまとめて止める
+        // （inert がない古い OBS 向けに、CSS の pointer-events: none も付ける）。OBS接続で届いた変更は applyLoadedConfig で反映される
+        const EDIT_LOCK = CONFIG.features?.editLock === true;
+        if (EDIT_LOCK) {
+            document.body.classList.add('edit-locked');
+            captureArea.inert = true;
+            document.getElementById('part-menu').classList.remove('open');
+            ['dblclick', 'contextmenu'].forEach(type => window.addEventListener(type, (e) => {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }, true));
+        }
+        // OBS接続の初期値（CONFIG.obs）
+        const OBS_DEFAULTS = { port: 4455, password: '', mode: 'auto', autoConnect: false, ...(CONFIG.obs || {}) };
+
+        /* ---- ブラウザ内のデータベース（IndexedDB）
+         *  今の画面（kv ストアの 'current'）とプリセット（presets ストア）を保存する。
+         *  背景画像を入れると1件で数MBになるので、localStorage（約5MB）ではなく IndexedDB を使う */
+        const OVERLAY_DB = OVERLAY_KEY + 'Data';
+        function overlayDb() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(OVERLAY_DB, 1);
+                req.onupgradeneeded = () => {
+                    const db = req.result;
+                    if (!db.objectStoreNames.contains('presets')) db.createObjectStore('presets', { keyPath: 'name' });
+                    if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+        async function dbTx(store, mode, fn) {
+            const db = await overlayDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(store, mode);
+                const req = fn(tx.objectStore(store));
+                tx.oncomplete = () => { db.close(); resolve(req && req.result); };
+                tx.onerror = tx.onabort = () => { db.close(); reject(tx.error); };
+            });
+        }
+        const presetAll = () => dbTx('presets', 'readonly', st => st.getAll());
+        const presetPut = (preset) => dbTx('presets', 'readwrite', st => st.put(preset));
+        const presetDelete = (name) => dbTx('presets', 'readwrite', st => st.delete(name));
+        const stateGet = () => dbTx('kv', 'readonly', st => st.get('current'));
+        const statePut = (state) => dbTx('kv', 'readwrite', st => st.put(state, 'current'));
+
+        // 保存に失敗したとき（ディスクの空き不足など）は、設定画面に出して気づけるようにする
+        function notifySaveFailed(err) {
+            console.error(err);
+            const el = document.getElementById('settings-status');
+            if (el) el.textContent = '⚠️ 今の画面を保存できませんでした（ディスクの空きが足りない可能性があります）。「ファイルに書き出す」で残してください';
+        }
+
+        // 保存・送信する内容と、変わったかどうかの比較用キーを作る
+        function buildObsState() {
+            normalizeCaptureInputs();
+            // 開いているメニューやドラッグ中の見た目は保存・送信しない
+            const clone = captureArea.cloneNode(true);
+            clone.querySelectorAll('.hover-menu.open, .hover-menu .open').forEach(n => n.classList.remove('open'));
+            clone.querySelectorAll('.dragover, .resizing, .box-long-pressing, .box-long-dragging').forEach(n => {
+                n.classList.remove('dragover', 'resizing', 'box-long-pressing', 'box-long-dragging');
+            });
+            const bg = captureArea.style.backgroundColor || document.body.style.backgroundColor || '';
+            const state = { profileItems, captureHtml: clone.innerHTML, captureBgColor: bg };
+            // 時計・日付・プロフィールの切り替え・ストップウォッチは勝手に変わるので、比較のときだけ空にする
+            clone.querySelectorAll('#clock, #date, .hdr-float-time, .hdr-float-date, .clock-time, .clock-date, .sw-time').forEach(n => { n.textContent = ''; });
+            clone.querySelectorAll('.profile-display-area').forEach(n => { n.textContent = ''; n.removeAttribute('style'); });
+            const key = JSON.stringify([profileItems, clone.innerHTML, bg]);
+            return { state, key };
+        }
+
+        /* ---- 今の画面の保存・読み込み */
+        let autoSaveTimer = 0, lastAutoSaveKey = '';
+
+        function saveCurrentConfig() {
+            if (!overlaySaveEnabled()) {
+                return Promise.resolve();
+            }
+            const { state, key } = buildObsState();
+            lastAutoSaveKey = key;
+            return statePut(state).catch(notifySaveFailed);
+        }
+
+        async function loadSavedConfig() {
+            let state = null;
+            try {
+                state = await stateGet();
+            } catch (err) {
+                console.error(err);
+            }
+            if (!state) {
+                // 以前のバージョンは localStorage に保存していたので、IndexedDB へ引っ越す
+                try {
+                    const raw = localStorage.getItem(OLD_CONFIG_KEY);
+                    if (raw) {
+                        state = JSON.parse(raw);
+                        await statePut(state);
+                        localStorage.removeItem(OLD_CONFIG_KEY);
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+            if (state) applyLoadedConfig(state);
+        }
+
+        // 自動保存（操作のあと少し待って保存。中身が変わっていなければ保存しない）
+        function autoSave() {
+            if (!overlaySaveEnabled()) return;
+            const { state, key } = buildObsState();
+            if (key === lastAutoSaveKey) return;
+            lastAutoSaveKey = key;
+            statePut(state).catch((err) => {
+                lastAutoSaveKey = '';
+                notifySaveFailed(err);
+            });
+        }
+        ['input', 'change', 'mouseup', 'click', 'drop', 'keyup'].forEach(type => {
+            document.addEventListener(type, () => {
+                clearTimeout(autoSaveTimer);
+                autoSaveTimer = setTimeout(autoSave, 800);
+            }, true);
+        });
+
+        /* ---- 以前の「設定を保存」の取り置き
+         *  「設定を保存」ボタンをやめて自動保存（IndexedDB）にしたので、引っ越しで消える前に
+         *  最初の1回だけ、今までの保存内容を別のキーに移しておく（プリセット欄に表示する） */
+        const LEGACY_KEY = OVERLAY_KEY + 'ConfigLegacy';
+        try {
+            if (!localStorage.getItem(OVERLAY_KEY + 'LegacyChecked')) {
+                const old = localStorage.getItem(OLD_CONFIG_KEY);
+                if (old) localStorage.setItem(LEGACY_KEY, old);
+                localStorage.setItem(OVERLAY_KEY + 'LegacyChecked', '1');
+            }
+        } catch (err) { /* ignore */ }
+
+        /* ---- 表示更新：現在の編集内容を保存し、同一オリジンで開いている別タブへ即時反映させる
+         *  （中身は IndexedDB に置き、localStorage には合図のタイムスタンプだけ書く。
+         *    別タブ側は 'storage' イベントで合図を受け取り、IndexedDB から読み直す） */
+        async function pushLiveUpdate() {
+            try {
+                await statePut(buildObsState().state);
+                localStorage.setItem(LIVE_PING_KEY, String(Date.now()));
+            } catch (err) {
+                notifySaveFailed(err);
+            }
+        }
+        window.addEventListener('storage', (e) => {
+            if (e.key === LIVE_PING_KEY && e.newValue) {
+                loadSavedConfig();
+            }
+        });
+
+        /* ---- ファイルに書き出す／読み込む
+         *  形式：{ format, theme, version, exportedAt, current: 今の画面, presets: [{ name, savedAt, state }] }
+         *  画像は captureHtml の中に data URL で入っているので、そのまま書き出せる */
+        const EXPORT_FORMAT = 'donnma-overlay';
+
+        async function exportConfig(onDone) {
+            let presets = [];
+            try { presets = await presetAll(); } catch (err) { console.error(err); }
+            const data = {
+                format: EXPORT_FORMAT,
+                theme: OVERLAY_THEME,
+                version: 2,
+                exportedAt: new Date().toISOString(),
+                current: buildObsState().state,
+                presets: presets.map(p => ({ name: p.name, savedAt: p.savedAt, state: p.state })),
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const now = new Date();
+            const ts = now.getFullYear() + ('0' + (now.getMonth() + 1)).slice(-2) + ('0' + now.getDate()).slice(-2)
+                + '_' + ('0' + now.getHours()).slice(-2) + ('0' + now.getMinutes()).slice(-2);
+            a.href = url;
+            a.download = OVERLAY_THEME + '-overlay-config_' + ts + '.json';
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            if (onDone) onDone(`ファイルに書き出しました（今の画面＋プリセット ${presets.length}件、${(blob.size / 1024 / 1024).toFixed(1)}MB）`);
+        }
+
+        // 読み込み：今の画面を復元し、プリセットも追加する。
+        // 以前の形式（今の画面だけ：{ profileItems, captureHtml, captureBgColor }）も読み込める
+        async function applyImportedData(data) {
+            if (data && data.format === EXPORT_FORMAT) {
+                if (data.theme && data.theme !== OVERLAY_THEME
+                    && !confirm(`このファイルは「${data.theme}」テーマのものです。このテーマ（${OVERLAY_THEME}）では正しく表示されないことがあります。読み込みますか？`)) {
+                    return null;
+                }
+                if (data.current) {
+                    applyLoadedConfig(data.current);
+                    saveCurrentConfig();
+                }
+                const incoming = Array.isArray(data.presets) ? data.presets.filter(p => p && p.name && p.state) : [];
+                let existing = [];
+                try { existing = (await presetAll()).map(p => p.name); } catch (err) { /* ignore */ }
+                const dup = incoming.filter(p => existing.includes(p.name));
+                let overwrite = true;
+                if (dup.length) {
+                    overwrite = confirm(`同じ名前のプリセットが ${dup.length}件あります（${dup.map(p => p.name).join('、')}）。\nOK：上書きする　キャンセル：同じ名前のものは読み込まない`);
+                }
+                let added = 0;
+                for (const p of incoming) {
+                    if (!overwrite && existing.includes(p.name)) continue;
+                    await presetPut({ name: p.name, savedAt: p.savedAt || Date.now(), state: p.state });
+                    added++;
+                }
+                return `ファイルから読み込みました（プリセット ${added}件）`;
+            }
+            // 以前の形式
+            applyLoadedConfig(data);
+            saveCurrentConfig();
+            return 'ファイルから読み込みました';
+        }
+
+        function importConfig(onDone) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,application/json';
+            input.onchange = () => {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async (ev) => {
+                    try {
+                        const message = await applyImportedData(JSON.parse(ev.target.result));
+                        if (message && onDone) onDone(message);
+                    } catch (err) {
+                        alert('インポートに失敗しました。正しいJSONファイルか確認してください。');
+                        console.error('import failed', err);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        /* =====================================================
+         *  OBS接続（obs-websocket v5）
+         *  Chrome で開いたこのページから OBS に接続し、編集内容を
+         *  obs-browser の emit_event で OBS 内のブラウザソースへ送る。
+         *  OBS 側のこのページは 'donnmaOverlayUpdate' イベントで受け取って反映・保存する。
+         * ===================================================== */
+
+        // ---- OBS 側：届いた内容を反映して、このブラウザソースにも保存しておく
+        window.addEventListener(OBS_EVENT, (e) => {
+            const d = e.detail;
+            if (!d || d.theme !== OVERLAY_THEME || !d.state) return;
+            applyLoadedConfig(d.state);
+            statePut(d.state).catch(notifySaveFailed);
+        });
+
+        // ---- Chrome 側：接続と送信
+        // mode: 'auto' = 編集するたびに送る / 'manual' = 「OBSに反映」を押したときだけ送る
+        // lastKey: 最後に送った内容の比較用キー（時計など勝手に変わる部分を除いたもの）
+        const obsLink = { ws: null, ready: false, nextId: 1, pending: new Map(), lastKey: '', timer: 0, mode: 'auto', dirty: false };
+        const obsModal = document.getElementById('obs-modal');
+        const obsStatus = document.getElementById('obs-status');
+
+        function setObsStatus(text) { obsStatus.textContent = text; }
+        function refreshObsUi() {
+            document.getElementById('obs-connect-btn').style.display = obsLink.ready ? 'none' : '';
+            document.getElementById('obs-disconnect-btn').style.display = obsLink.ready ? '' : 'none';
+            const manual = obsLink.mode === 'manual';
+            const dirty = obsLink.ready && manual && obsLink.dirty;
+            // 接続画面の状態の行
+            const state = document.getElementById('obs-conn-state');
+            state.classList.toggle('off', !obsLink.ready);
+            state.classList.toggle('dirty', dirty);
+            state.textContent = !obsLink.ready ? '● 未接続'
+                : !manual ? '● 接続中（リアルタイム）'
+                : dirty ? '● 接続中（確定モード）・未反映の変更あり' : '● 接続中（確定モード）';
+            // メニュー：確定モードで接続中のときだけ「OBSに反映」を出す（リアルタイムは自動で送るので不要）
+            document.getElementById('obs-commit-item').style.display = obsLink.ready && manual ? '' : 'none';
+            const commitLabel = document.getElementById('obs-commit-label');
+            commitLabel.textContent = dirty ? 'OBSに反映 ●' : 'OBSに反映';
+            commitLabel.style.color = dirty ? '#ffb020' : '';
+            document.querySelectorAll('input[name="obs-mode"]').forEach(r => { r.checked = r.value === obsLink.mode; });
+        }
+
+        async function obsAuthString(password, salt, challenge) {
+            const enc = new TextEncoder();
+            const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+            const secret = b64(await crypto.subtle.digest('SHA-256', enc.encode(password + salt)));
+            return b64(await crypto.subtle.digest('SHA-256', enc.encode(secret + challenge)));
+        }
+
+        function obsConnect(port, password) {
+            obsDisconnect();
+            return new Promise((resolve, reject) => {
+                let ws;
+                try {
+                    ws = new WebSocket(`ws://127.0.0.1:${port}`, 'obswebsocket.json');
+                } catch (err) {
+                    reject(new Error('接続先が正しくありません'));
+                    return;
+                }
+                obsLink.ws = ws;
+                ws.onmessage = async (ev) => {
+                    const msg = JSON.parse(ev.data);
+                    if (msg.op === 0) { // Hello
+                        const identify = { rpcVersion: 1, eventSubscriptions: 0 };
+                        const auth = msg.d.authentication;
+                        if (auth) {
+                            if (!password) { reject(new Error('パスワードが必要です')); ws.close(); return; }
+                            identify.authentication = await obsAuthString(password, auth.salt, auth.challenge);
+                        }
+                        ws.send(JSON.stringify({ op: 1, d: identify }));
+                    } else if (msg.op === 2) { // Identified
+                        obsLink.ready = true;
+                        refreshObsUi();
+                        resolve();
+                    } else if (msg.op === 7) { // RequestResponse
+                        const p = obsLink.pending.get(msg.d.requestId);
+                        if (!p) return;
+                        obsLink.pending.delete(msg.d.requestId);
+                        if (msg.d.requestStatus.result) p.resolve(msg.d.responseData);
+                        else p.reject(new Error(msg.d.requestStatus.comment || `エラー ${msg.d.requestStatus.code}`));
+                    }
+                };
+                ws.onclose = (ev) => {
+                    const wasReady = obsLink.ready;
+                    if (obsLink.ws === ws) { obsLink.ws = null; obsLink.ready = false; }
+                    obsLink.pending.forEach(p => p.reject(new Error('切断されました')));
+                    obsLink.pending.clear();
+                    refreshObsUi();
+                    if (ev.code === 4009) reject(new Error('パスワードが違います'));
+                    else if (!wasReady) reject(new Error('OBSに接続できません（OBSが起動しているか、WebSocketサーバーが有効か確認してください）'));
+                    else setObsStatus('OBSとの接続が切れました');
+                };
+            });
+        }
+
+        function obsDisconnect() {
+            if (obsLink.ws) {
+                const ws = obsLink.ws;
+                obsLink.ws = null;
+                obsLink.ready = false;
+                ws.close();
+            }
+            obsLink.lastKey = '';
+            obsLink.dirty = false;
+            refreshObsUi();
+        }
+
+        function obsRequest(requestType, requestData) {
+            return new Promise((resolve, reject) => {
+                if (!obsLink.ready) { reject(new Error('OBSに接続していません')); return; }
+                const requestId = String(obsLink.nextId++);
+                obsLink.pending.set(requestId, { resolve, reject });
+                obsLink.ws.send(JSON.stringify({ op: 6, d: { requestType, requestId, requestData } }));
+            });
+        }
+
+        // いまの編集内容を OBS へ送る（force でなければ、前回と同じ内容のときは送らない）
+        async function pushToObs(force) {
+            if (!obsLink.ready) return;
+            const { state, key } = buildObsState();
+            if (!force && key === obsLink.lastKey) return;
+            obsLink.lastKey = key;
+            obsLink.dirty = false;
+            refreshObsUi();
+            try {
+                await obsRequest('CallVendorRequest', {
+                    vendorName: 'obs-browser',
+                    requestType: 'emit_event',
+                    requestData: { event_name: OBS_EVENT, event_data: { theme: OVERLAY_THEME, state } }
+                });
+                setObsStatus('✅ OBSに反映しました（' + new Date().toLocaleTimeString() + '）');
+            } catch (err) {
+                obsLink.lastKey = '';
+                obsLink.dirty = true;
+                refreshObsUi();
+                setObsStatus('⚠️ 送れませんでした：' + err.message);
+            }
+        }
+
+        // 確定モード：OBS に送った内容から変わっているかだけを調べる
+        function checkObsDirty() {
+            obsLink.dirty = buildObsState().key !== obsLink.lastKey;
+            refreshObsUi();
+        }
+
+        // 操作したら少し待ってから送る（連続した操作はまとめる）。
+        // 時計やプロフィールの切り替えは毎秒 DOM が変わるので、DOM の変化ではなく操作をきっかけにする
+        function schedulePushToObs() {
+            if (!obsLink.ready) return;
+            clearTimeout(obsLink.timer);
+            obsLink.timer = setTimeout(() => {
+                if (obsLink.mode === 'auto') pushToObs(false);
+                else checkObsDirty();
+            }, 600);
+        }
+        ['input', 'change', 'mouseup', 'click', 'drop', 'keyup'].forEach(type => {
+            document.addEventListener(type, schedulePushToObs, true);
+        });
+
+        // 接続の設定：CONFIG.obs の初期値に、このブラウザで変えた値を重ねる。
+        // OBS接続の欄を出さない（obsSettings: false）ときは、設定を変えられないように、いつも CONFIG の値を使う
+        function loadObsLinkSettings() {
+            const defaults = {
+                port: OBS_DEFAULTS.port,
+                password: OBS_DEFAULTS.password,
+                mode: OBS_DEFAULTS.mode === 'manual' ? 'manual' : 'auto',
+                auto: !!OBS_DEFAULTS.autoConnect,
+            };
+            if (!featureOn('obsSettings')) return defaults;
+            let saved = {};
+            try { saved = JSON.parse(localStorage.getItem(OBS_LINK_KEY) || 'null') || {}; } catch (err) { /* ignore */ }
+            return { ...defaults, ...saved };
+        }
+
+        async function connectFromModal(silent) {
+            const port = parseInt(document.getElementById('obs-port').value, 10) || 4455;
+            const password = document.getElementById('obs-password').value;
+            setObsStatus('接続中…');
+            try {
+                await obsConnect(port, password);
+                try { localStorage.setItem(OBS_LINK_KEY, JSON.stringify({ port, password, auto: true, mode: obsLink.mode })); } catch (err) { /* ignore */ }
+                if (obsLink.mode === 'auto') {
+                    setObsStatus('✅ 接続しました。編集するとOBSに自動で反映されます');
+                    pushToObs(true);
+                } else {
+                    setObsStatus('✅ 接続しました。「OBSに反映」か Ctrl+Enter でOBSに送ります');
+                    obsLink.dirty = true;
+                    refreshObsUi();
+                }
+            } catch (err) {
+                setObsStatus('⚠️ ' + err.message);
+                if (!silent) obsModal.classList.add('open');
+            }
+        }
+
+        /* =====================================================
+         *  設定画面（保存・読み込み／OBS接続／使い方・リセット）
+         * ===================================================== */
+        function openObsModal() {
+            renderPresets();
+            const saved = loadObsLinkSettings();
+            document.getElementById('obs-port').value = saved.port || 4455;
+            document.getElementById('obs-password').value = saved.password || '';
+            refreshObsUi();
+            obsModal.classList.add('open');
+        }
+
+        const settingsStatus = document.getElementById('settings-status');
+        const settingsDone = (text) => { settingsStatus.textContent = '✅ ' + text + '（' + new Date().toLocaleTimeString() + '）'; };
+
+        // CONFIG.features で、設定画面に出す機能を切り替える
+        document.getElementById('autosave-note').textContent =
+            (overlaySaveEnabled()
+                ? '今の画面は自動で保存され、次に開いたときは続きから始まります。'
+                : '自動保存はオフになっています（CONFIG.features.saveConfigEnabled）。')
+            + (!featureOn('presetSave') ? ''
+                : overlaySaveEnabled() ? '取っておきたい画面は、名前を付けてプリセットにできます。' : '残したい画面はプリセットに保存してください。');
+        if (!featureOn('presetSave')) document.querySelector('#obs-modal .preset-add').style.display = 'none';
+        if (!featureOn('presetLoad')) document.getElementById('preset-list').style.display = 'none';
+        const hide = (id) => { document.getElementById(id).style.display = 'none'; };
+        if (!featureOn('fileExport')) hide('set-export-btn');
+        if (!featureOn('fileImport')) hide('set-import-btn');
+        if (!featureOn('fileExport') && !featureOn('fileImport')) { hide('file-row'); hide('file-note'); }
+        if (!featureOn('resetButton')) hide('set-reset-btn');
+        if (!featureOn('obsSettings')) {
+            document.getElementById('obs-settings-col').style.display = 'none';
+            document.getElementById('settings-grid').classList.add('single');
+            obsModal.querySelector('.help-popup').classList.add('narrow');
+        }
+
+        /* ---- プリセット（名前を付けて保存） */
+        const presetListEl = document.getElementById('preset-list');
+        const presetNameEl = document.getElementById('preset-name');
+        const fmtDate = (t) => {
+            const d = new Date(t);
+            return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        };
+
+        function presetRow(nameText, dateText, buttons) {
+            const row = document.createElement('div');
+            row.className = 'preset-item';
+            const name = document.createElement('span');
+            name.className = 'preset-name help-desc';
+            name.textContent = nameText;
+            name.title = nameText;
+            const date = document.createElement('span');
+            date.className = 'preset-date help-desc';
+            date.textContent = dateText;
+            row.append(name, date);
+            for (const [label, onClick] of buttons) {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'settings-btn small';
+                b.textContent = label;
+                b.addEventListener('click', onClick);
+                row.appendChild(b);
+            }
+            return row;
+        }
+
+        async function renderPresets() {
+            let presets = [];
+            try { presets = await presetAll(); } catch (err) { console.error(err); }
+            presets.sort((a, b) => b.savedAt - a.savedAt);
+            presetListEl.textContent = '';
+            let legacy = null;
+            try { legacy = localStorage.getItem(LEGACY_KEY); } catch (err) { /* ignore */ }
+            if (legacy) {
+                // 以前の「設定を保存」の行（読み込む・削除だけ）
+                presetListEl.appendChild(presetRow('以前の「設定を保存」', '更新前', [
+                    ['読み込む', () => {
+                        try { applyLoadedConfig(JSON.parse(legacy)); } catch (err) { console.error(err); return; }
+                        saveCurrentConfig();
+                        settingsDone('以前の「設定を保存」を読み込みました');
+                    }],
+                    ['削除', () => {
+                        if (!confirm('以前の「設定を保存」を削除しますか？')) return;
+                        try { localStorage.removeItem(LEGACY_KEY); } catch (err) { /* ignore */ }
+                        settingsDone('以前の「設定を保存」を削除しました');
+                        renderPresets();
+                    }],
+                ]));
+            }
+            if (!presets.length && !legacy) {
+                const empty = document.createElement('div');
+                empty.className = 'help-desc';
+                empty.style.opacity = '0.5';
+                empty.textContent = 'まだプリセットはありません';
+                presetListEl.appendChild(empty);
+                return;
+            }
+            for (const preset of presets) {
+                presetListEl.appendChild(presetRow(preset.name, fmtDate(preset.savedAt), [
+                    ['読み込む', () => {
+                        applyLoadedConfig(preset.state);
+                        saveCurrentConfig();
+                        settingsDone(`「${preset.name}」を読み込みました`);
+                    }],
+                    // 「上書き」はプリセットに保存できるときだけ
+                    ...(featureOn('presetSave') ? [['上書き', () => {
+                        if (!confirm(`「${preset.name}」を今の画面で上書きしますか？`)) return;
+                        savePreset(preset.name);
+                    }]] : []),
+                    ['削除', async () => {
+                        if (!confirm(`「${preset.name}」を削除しますか？`)) return;
+                        await presetDelete(preset.name);
+                        settingsDone(`「${preset.name}」を削除しました`);
+                        renderPresets();
+                    }],
+                ]));
+            }
+        }
+
+        async function savePreset(name) {
+            try {
+                await presetPut({ name, savedAt: Date.now(), state: buildObsState().state });
+                settingsDone(`「${name}」を保存しました`);
+            } catch (err) {
+                console.error(err);
+                settingsStatus.textContent = '⚠️ 保存できませんでした（ブラウザの空き容量が足りない可能性があります。「ファイルに書き出す」も使えます）';
+            }
+            renderPresets();
+        }
+
+        document.getElementById('preset-save-btn').addEventListener('click', async () => {
+            const name = presetNameEl.value.trim();
+            if (!name) { settingsStatus.textContent = '⚠️ プリセット名を入れてください'; presetNameEl.focus(); return; }
+            let exists = false;
+            try { exists = (await presetAll()).some(p => p.name === name); } catch (err) { /* ignore */ }
+            if (exists && !confirm(`「${name}」はすでにあります。上書きしますか？`)) return;
+            await savePreset(name);
+            presetNameEl.value = '';
+        });
+        presetNameEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) document.getElementById('preset-save-btn').click();
+        });
+
+        /* ---- 設定画面のボタン */
+        document.getElementById('set-export-btn').addEventListener('click', () => exportConfig(settingsDone));
+        document.getElementById('set-import-btn').addEventListener('click', () => {
+            settingsStatus.textContent = '';
+            importConfig((message) => { settingsDone(message); renderPresets(); });
+        });
+        document.getElementById('set-reset-btn').addEventListener('click', () => {
+            if (!confirm('画面を初期状態に戻しますか？（今の画面は消えます。プリセットは残ります）')) return;
+            handlePartMenuItem('reset');
+        });
+        document.getElementById('set-help-btn').addEventListener('click', () => {
+            obsModal.classList.remove('open');
+            document.getElementById('help-modal').classList.add('open');
+        });
+
+        document.getElementById('obs-connect-btn').addEventListener('click', () => connectFromModal(false));
+        document.getElementById('obs-disconnect-btn').addEventListener('click', () => {
+            obsDisconnect();
+            try {
+                const saved = loadObsLinkSettings();
+                localStorage.setItem(OBS_LINK_KEY, JSON.stringify({ ...saved, auto: false }));
+            } catch (err) { /* ignore */ }
+            setObsStatus('切断しました');
+        });
+        document.getElementById('obs-close-btn').addEventListener('click', () => obsModal.classList.remove('open'));
+        obsModal.addEventListener('click', (e) => { if (e.target === obsModal) obsModal.classList.remove('open'); });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && obsLink.ready) {
+                e.preventDefault();
+                pushToObs(true);
+            }
+        });
+        // 反映のしかたの切り替え（リアルタイムに戻したら、たまっている変更をすぐ送る）
+        document.querySelectorAll('input[name="obs-mode"]').forEach(r => r.addEventListener('change', () => {
+            if (!r.checked) return;
+            obsLink.mode = r.value;
+            try { localStorage.setItem(OBS_LINK_KEY, JSON.stringify({ ...loadObsLinkSettings(), mode: obsLink.mode })); } catch (err) { /* ignore */ }
+            if (obsLink.mode === 'auto') pushToObs(false);
+            else checkObsDirty();
+            refreshObsUi();
+        }));
+        obsLink.mode = loadObsLinkSettings().mode === 'manual' ? 'manual' : 'auto';
+        refreshObsUi();
+
+        /* ---- 背景の選択画面（ボタンの data-bg はパーツメニューの種類と同じ） */
+        const bgModal = document.getElementById('bg-modal');
+        bgModal.querySelectorAll('[data-bg]').forEach(btn => btn.addEventListener('click', () => {
+            bgModal.classList.remove('open');
+            handlePartMenuItem(btn.dataset.bg);
+        }));
+        document.getElementById('bg-close-btn').addEventListener('click', () => bgModal.classList.remove('open'));
+        bgModal.addEventListener('click', (e) => { if (e.target === bgModal) bgModal.classList.remove('open'); });
+
+        // 前回つないでいたら、ページを開いたときに自動で再接続する（OBS の中で開いているときはつながない）
+        if (!window.obsstudio) {
+            const saved = loadObsLinkSettings();
+            if (saved.auto) {
+                document.getElementById('obs-port').value = saved.port || 4455;
+                document.getElementById('obs-password').value = saved.password || '';
+                connectFromModal(true);
+            }
+        }
+        // shared-js:end
+
         const _skipLoad = localStorage.getItem('_skip_waOverlayConfig') === '1';
         localStorage.removeItem('_skip_waOverlayConfig');
-        if (CONFIG.features.autoLoad && !_skipLoad) loadSavedConfig();
+        if (CONFIG.features.autoLoad && !_skipLoad) {
+            captureArea.style.visibility = 'hidden';
+            loadSavedConfig().finally(() => { captureArea.style.visibility = ''; });
+        }
     </script>
 </body>
 

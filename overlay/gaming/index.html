@@ -316,6 +316,8 @@
         <a href="#basic">基本操作</a>
         <a href="#menu">メニュー機能</a>
         <a href="#live">リアルタイムプレビュー</a>
+        <a href="#save">保存・プリセット</a>
+        <a href="#obs-link">OBS接続</a>
         <a href="#config">カスタマイズ</a>
         <a href="#trouble">トラブル対処</a>
     </nav>
@@ -323,24 +325,23 @@
     <main>
 
         <section id="obs">
-            gaming Streaming Overlay &nbsp;♡&nbsp; Created by <strong>donnma</strong>
-            <p style="margin-top:8px;color:var(--text-sub);font-size:13px;">注意：二次配布および改変しての配布を禁じます。</p>
-            </footer>
-            <span class="en">HOW TO ADD TO OBS</span>
+            <div class="section-header">
+                <h2>OBS設定</h2>
+                <span class="en">HOW TO ADD TO OBS</span>
             </div>
             <h3>ブラウザソースとして追加 / ADD AS BROWSER SOURCE</h3>
             <ol class="steps">
-                <li>OBSを起動し、使用したいシーンを選択する。<br><span class="en-sub">Launch OBS Studio and select the target scene.</span>
-                </li>
-                <li>「ソース」パネルの <strong>＋</strong> をクリックし、<strong>「ブラウザ」</strong> を選択する。<br><span class="en-sub">Click
-                        <strong>+</strong> in Sources and choose <strong>Browser</strong>.</span></li>
-                <li><strong>「ローカルファイル」</strong> にチェックを入れ、<code>gaming.html</code> を選択する。<br><span class="en-sub">Check
-                        <strong>"Local File"</strong> and browse to <code>gaming.html</code>.</span></li>
-                <li>幅: <strong>1920</strong>、高さ: <strong>1080</strong> に設定する。<br><span class="en-sub">Set Width:
-                        <strong>1920</strong>, Height: <strong>1080</strong>.</span></li>
-                <li>「カスタムCSS」欄は <strong>空欄</strong> のままにする。<br><span class="en-sub">Leave Custom CSS
-                        <strong>empty</strong>.</span></li>
-                <li>「OK」をクリックして完了。<br><span class="en-sub">Click "OK" to finish.</span></li>
+                <li><div>OBSを起動し、使用したいシーンを選択する。<br><span class="en-sub">Launch OBS Studio and select the target scene.</span>
+                </div></li>
+                <li><div>「ソース」パネルの <strong>＋</strong> をクリックし、<strong>「ブラウザ」</strong> を選択する。<br><span class="en-sub">Click
+                        <strong>+</strong> in Sources and choose <strong>Browser</strong>.</span></div></li>
+                <li><div><strong>「ローカルファイル」</strong> にチェックを入れ、<code>gaming.html</code> を選択する。<br><span class="en-sub">Check
+                        <strong>"Local File"</strong> and browse to <code>gaming.html</code>.</span></div></li>
+                <li><div>幅: <strong>1920</strong>、高さ: <strong>1080</strong> に設定する。<br><span class="en-sub">Set Width:
+                        <strong>1920</strong>, Height: <strong>1080</strong>.</span></div></li>
+                <li><div>「カスタムCSS」欄は <strong>空欄</strong> のままにする。<br><span class="en-sub">Leave Custom CSS
+                        <strong>empty</strong>.</span></div></li>
+                <li><div>「OK」をクリックして完了。<br><span class="en-sub">Click "OK" to finish.</span></div></li>
             </ol>
             <div class="note">
                 <strong>操作するには「対話」を有効化:</strong> ソースを右クリック → 「対話」を選択。対話ウィンドウ内でクリック・ドラッグ操作ができます。<br>
@@ -409,28 +410,28 @@
                     <th>説明 / Description</th>
                 </tr>
                 <tr>
-                    <td>ボックス追加<br><code>Add Box</code></td>
-                    <td>テキストボックスを追加します。タイトル・メモ・コメント欄として自由に使えます。<br><span class="en-sub">Adds a movable text box for
-                            titles, memos, comments, etc.</span></td>
+                    <td>ヘッダーパーツ<br><code>Header Parts</code></td>
+                    <td>LIVEバッジ・プロフィール・メッセージ入力欄・時計・テロップを上部に追加します。<br><span class="en-sub">Adds LIVE badge, profile, message, clock and ticker to the top bar.</span></td>
                 </tr>
                 <tr>
-                    <td>図形追加<br><code>Add Shape</code></td>
-                    <td>サブメニューから形を選んで図形を追加します。<br><span class="en-sub">Adds a shape — select the type from the
-                            submenu.</span>
-                        <ul style="margin-top:8px;padding-left:18px;font-size:13px;line-height:2">
-                            <li><strong>□ 四角形 / Rectangle</strong></li>
-                            <li><strong>○ 円 / Circle</strong></li>
-                        </ul>
-                    </td>
+                    <td>ボックスパーツ<br><code>Box Parts</code></td>
+                    <td>時計・ストップウォッチ・カウンター・メモ・テキスト・図形・タイトル・画像のボックスを追加します。<br><span class="en-sub">Adds clock, stopwatch, counter, memo, text, shape, title and image boxes.</span></td>
                 </tr>
                 <tr>
-                    <td>背景色<br><code>Background Color</code></td>
-                    <td>画面全体の背景色を変更します。カラーピッカーが開きます。<br><span class="en-sub">Changes the screen background. Opens a
-                            color picker.</span></td>
+                    <td>🖼️ 背景を変える<br><code>Background</code></td>
+                    <td>背景の選択画面を開き、飾り（テーマごとの背景パーツ）・背景の色・背景画像を選びます。「背景をすべて消す」で透明に戻します。<br><span class="en-sub">Opens the background picker: decorations, color and image. "Clear all" makes it transparent.</span></td>
                 </tr>
                 <tr>
-                    <td>背景クリア<br><code>Clear Background</code></td>
-                    <td>背景を透明に戻します。<br><span class="en-sub">Resets background to transparent.</span></td>
+                    <td>⚙️ 設定（保存・OBS接続）<br><code>Settings</code></td>
+                    <td>プリセット・ファイルの書き出し／読み込み・OBS接続・使い方・画面リセットをまとめた設定画面を開きます。<br><span class="en-sub">Presets, export/import, OBS connection, help and reset.</span></td>
+                </tr>
+                <tr>
+                    <td>📡 表示更新（別タブ）<br><code>Update Other Tabs</code></td>
+                    <td>同じURLで開いている別タブに、今の画面を反映します。<br><span class="en-sub">Pushes the current screen to other tabs on the same URL.</span></td>
+                </tr>
+                <tr>
+                    <td>📤 OBSに反映<br><code>Send to OBS</code></td>
+                    <td>OBSに「確定したときだけ」で接続しているときだけ出ます。今の画面をOBSに送ります（Ctrl+Enter でも送れます）。<br><span class="en-sub">Shown only in confirm mode while connected. Sends the screen to OBS (or Ctrl+Enter).</span></td>
                 </tr>
             </table>
 
@@ -470,7 +471,7 @@
                 <h2>リアルタイムプレビュー</h2>
                 <span class="en">REAL-TIME PREVIEW</span>
             </div>
-            <p>パーツメニューの <strong>📡 表示更新（別タブに反映）</strong>
+            <p>パーツメニューの <strong>📡 表示更新（別タブ）</strong>
                 を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。<br>
                 <span class="en-sub">Click <strong>"📡 Update Display"</strong> in the parts menu to instantly push
                     your current edits to another tab open on the same URL — handy for keeping an editing tab and a
@@ -489,15 +490,15 @@
 
             <h3>手元での確認方法（ローカルサーバー） / LOCAL PREVIEW</h3>
             <ol class="steps">
-                <li>同梱の <code>サーバー起動.bat</code> をダブルクリックする（要 Python）。<br><span class="en-sub">Double-click the
-                        included <code>サーバー起動.bat</code> (requires Python).</span></li>
-                <li>自動でブラウザタブが2つ開く（編集用・確認用、どちらも同じURL）。<br><span class="en-sub">Two browser tabs open
-                        automatically — both point to the same local URL.</span></li>
-                <li>片方のタブで編集し、メニューから <strong>📡 表示更新</strong> を押す。<br><span class="en-sub">Edit in one tab, then click
-                        <strong>📡 Update Display</strong> in the menu.</span></li>
-                <li>もう一方のタブに変更が即座に反映される。<br><span class="en-sub">The other tab updates instantly.</span></li>
-                <li>終わったら、開いたウィンドウで何かキーを押すとローカルサーバーが停止する。<br><span class="en-sub">Press any key in the
-                        console window to stop the local server when done.</span></li>
+                <li><div>同梱の <code>サーバー起動.bat</code> をダブルクリックする（要 Python）。<br><span class="en-sub">Double-click the
+                        included <code>サーバー起動.bat</code> (requires Python).</span></div></li>
+                <li><div>自動でブラウザタブが2つ開く（編集用・確認用、どちらも同じURL）。<br><span class="en-sub">Two browser tabs open
+                        automatically — both point to the same local URL.</span></div></li>
+                <li><div>片方のタブで編集し、メニューから <strong>📡 表示更新</strong> を押す。<br><span class="en-sub">Edit in one tab, then click
+                        <strong>📡 Update Display</strong> in the menu.</span></div></li>
+                <li><div>もう一方のタブに変更が即座に反映される。<br><span class="en-sub">The other tab updates instantly.</span></div></li>
+                <li><div>終わったら、開いたウィンドウで何かキーを押すとローカルサーバーが停止する。<br><span class="en-sub">Press any key in the
+                        console window to stop the local server when done.</span></div></li>
             </ol>
 
             <div class="note">
@@ -517,6 +518,84 @@
                 <code>https://donnma.com/live-tool/overlay/gaming/gaming.html</code>）を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。<br>
                 <strong>On stream:</strong> If both the OBS "Custom Browser Dock" and the Browser Source point to the
                 <strong>same hosted URL</strong>, this feature works without any local server.
+            </div>
+
+            <div class="note">
+                <strong>OBSに反映するには：</strong> この機能は同じブラウザのタブどうしで使うものです。OBSのブラウザソースはChromeとは保存場所が別なので、OBSに反映したいときは「OBS接続」を使ってください。
+            </div>
+        </section>
+
+        <section id="save">
+            <div class="section-header">
+                <h2>保存・プリセット</h2>
+                <span class="en">SAVE &amp; PRESETS</span>
+            </div>
+            <p>今の画面は自動で保存されます。名前を付けて取っておきたい画面はプリセットに、別のPCへ持っていくときはファイルに書き出します。いずれもメニューの <strong>「⚙️ 設定」</strong> から使えます。<br><span class="en-sub">The screen is auto-saved. Use presets for named layouts and export for other PCs — all from <strong>Settings</strong>.</span></p>
+            <table>
+                <tr>
+                    <th>項目 / Item</th>
+                    <th>説明 / Description</th>
+                </tr>
+                <tr>
+                    <td>自動保存<br><code>AUTO SAVE</code></td>
+                    <td>今の画面は、操作するたびに自動でこのブラウザに保存されます。次に開いたときは続きから始まります。<br><span class="en-sub">The screen is saved automatically and restored next time.</span></td>
+                </tr>
+                <tr>
+                    <td>プリセット<br><code>PRESET</code></td>
+                    <td>「⚙️ 設定」で今の画面に名前を付けて、いくつでも保存できます（例：雑談用・ゲーム実況用）。一覧から読み込む・上書き・削除ができます。<br><span class="en-sub">Save named presets and load, overwrite or delete them from the list.</span></td>
+                </tr>
+                <tr>
+                    <td>ファイルに書き出す<br><code>EXPORT</code></td>
+                    <td>今の画面とすべてのプリセットを、画像も含めて1つのJSONファイルにまとめてダウンロードします。別のPCへの持ち運びやバックアップに使えます。<br><span class="en-sub">Downloads the current screen and all presets (with images) as one JSON file.</span></td>
+                </tr>
+                <tr>
+                    <td>ファイルから読み込む<br><code>IMPORT</code></td>
+                    <td>書き出したJSONファイルから、今の画面とプリセットを復元します。同じ名前のプリセットがあるときは上書きするか確認します。以前の形式のファイルも読み込めます。<br><span class="en-sub">Restores the screen and presets from an exported file.</span></td>
+                </tr>
+                <tr>
+                    <td>画面リセット<br><code>RESET</code></td>
+                    <td>「⚙️ 設定」から、画面を初期状態に戻します（今の画面は消えます。プリセットは残ります）。<br><span class="en-sub">Resets the screen (presets are kept).</span></td>
+                </tr>
+                <tr>
+                    <td>以前の「設定を保存」<br><code>OLD SAVE</code></td>
+                    <td>前のバージョンで「設定を保存」していた内容は、プリセット一覧の先頭に「以前の『設定を保存』」として残っています。<br><span class="en-sub">Data saved with the old "Save config" appears at the top of the preset list.</span></td>
+                </tr>
+            </table>
+            <div class="note">
+                保存先はこのブラウザの中（IndexedDB）です。<code>file://</code> で開いたときと <code>http://localhost</code> で開いたとき、またブラウザが違うときは、それぞれ別の保存になります。別のPCやブラウザへは「ファイルに書き出す」で持っていってください。
+            </div>
+        </section>
+
+        <section id="obs-link">
+            <div class="section-header">
+                <h2>OBS接続</h2>
+                <span class="en">OBS CONNECT</span>
+            </div>
+            <p>Chromeで開いたこの画面から、OBSのWebSocketサーバーに接続すると、編集内容をOBSのブラウザソースにそのまま反映できます。「対話」ウィンドウで操作する必要がなくなります。<br><span class="en-sub">Connect from Chrome to the OBS WebSocket server and your edits appear in the OBS Browser Source.</span></p>
+            <h3>準備と使い方 / SETUP</h3>
+            <ol class="steps">
+                <li><div>OBSのメニュー <strong>「ツール → WebSocketサーバー設定」</strong> で「WebSocketサーバーを有効にする」をオンにし、「接続情報を表示」でポートとパスワードを確認する（最初の1回だけ）。<br><span class="en-sub">In OBS, open <strong>Tools → WebSocket Server Settings</strong>, enable the server and note the port and password.</span></div></li>
+                <li><div>OBSのブラウザソースには、今までどおりこのHTMLファイルを入れておく。<br><span class="en-sub">Keep this HTML file in your OBS Browser Source as usual.</span></div></li>
+                <li><div>同じPCのChromeで同じHTMLファイルを開き、空いている場所をダブルクリック → <strong>「⚙️ 設定」</strong> → 「OBS接続」にポートとパスワードを入れて <strong>「接続」</strong>。<br><span class="en-sub">Open the same file in Chrome on the same PC, double-click → <strong>Settings</strong> → enter port/password → <strong>Connect</strong>.</span></div></li>
+                <li><div>Chromeで編集すると、OBSのブラウザソースにそのまま反映されます。OBS側にも保存されるので、OBSを再起動しても消えません。<br><span class="en-sub">Edits in Chrome appear in OBS and are saved there too.</span></div></li>
+            </ol>
+            <h3>反映のしかた / MODES</h3>
+            <table>
+                <tr>
+                    <th>モード / Mode</th>
+                    <th>説明 / Description</th>
+                </tr>
+                <tr>
+                    <td>リアルタイム<br><code>Real-time</code></td>
+                    <td>編集すると、少しあとに自動でOBSへ送ります。<br><span class="en-sub">Sends edits to OBS automatically.</span></td>
+                </tr>
+                <tr>
+                    <td>確定したときだけ<br><code>On confirm</code></td>
+                    <td>メニューの「📤 OBSに反映」か Ctrl+Enter を押したときだけ送ります。配信中にこっそり直したいとき向けです。<br><span class="en-sub">Sends only when you press "Send to OBS" or Ctrl+Enter.</span></td>
+                </tr>
+            </table>
+            <div class="note">
+                ChromeとOBSは同じPCで動かしてください（スマホなど別の機器からは接続できません）。Chromeが「ローカルネットワークへのアクセス」を確認してきたら許可してください。ポート・パスワードはこのブラウザに保存され、次に開いたときは自動で再接続します。OBS 28 以降が必要です。
             </div>
         </section>
 
@@ -607,19 +686,92 @@
                 </tr>
                 <tr>
                     <td><code>features.autoLoad</code></td>
-                    <td>ページを開いたとき保存済み設定を自動で読み込む。<br><code>false</code> にすると「保存を読み込む」を手動で押す必要があります。<br><span
-                            class="en-sub">Auto-load saved config on page open. Set <code>false</code> for manual load
-                            only.</span></td>
+                    <td>ページを開いたとき、前回の画面（自動保存）から始める。<code>false</code> にすると毎回初期状態から始まります。<br><span class="en-sub">Start from the last auto-saved screen. <code>false</code> = always start fresh.</span></td>
                     <td><code>true</code></td>
                 </tr>
                 <tr>
                     <td><code>features.saveConfigEnabled</code></td>
-                    <td>設定の保存・読み込み機能を有効にする。<br><code>false</code> にすると「設定を保存」ボタンが非表示になります。<br><span
-                            class="en-sub">Enable save/load config. Set <code>false</code> to hide the save
-                            button.</span></td>
+                    <td>今の画面を自動で保存する。<code>false</code> にすると自動保存しません（プリセット・ファイル書き出しは使えます）。<br><span class="en-sub">Auto-save the current screen.</span></td>
                     <td><code>true</code></td>
                 </tr>
+                <tr>
+                    <td><code>features.presetSave</code></td>
+                    <td>設定画面に「プリセットに保存」（名前を付けて保存・上書き）を出す。<br><span class="en-sub">Show "Save as preset" in Settings.</span></td>
+                    <td><code>true</code></td>
+                </tr>
+                <tr>
+                    <td><code>features.presetLoad</code></td>
+                    <td>設定画面にプリセットの一覧（読み込む・削除）を出す。<br><span class="en-sub">Show the preset list in Settings.</span></td>
+                    <td><code>true</code></td>
+                </tr>
+                <tr>
+                    <td><code>features.obsSettings</code></td>
+                    <td>設定画面に「OBS接続」の欄を出す。<code>false</code> にすると、ブラウザに保存された値ではなく、いつも下の <code>obs</code> の値で接続します。<br><span class="en-sub">Show the OBS connection panel. <code>false</code> = always use the <code>obs</code> values below.</span></td>
+                    <td><code>true</code></td>
+                </tr>
+                <tr>
+                    <td><code>features.fileExport</code></td>
+                    <td>設定画面に「ファイルに書き出す」を出す。<br><span class="en-sub">Show "Export to file".</span></td>
+                    <td><code>true</code></td>
+                </tr>
+                <tr>
+                    <td><code>features.fileImport</code></td>
+                    <td>設定画面に「ファイルから読み込む」を出す。<br><span class="en-sub">Show "Import from file".</span></td>
+                    <td><code>true</code></td>
+                </tr>
+                <tr>
+                    <td><code>features.resetButton</code></td>
+                    <td>設定画面に「画面リセット」を出す。<br><span class="en-sub">Show "Reset screen".</span></td>
+                    <td><code>true</code></td>
+                </tr>
+                <tr>
+                    <td><code>features.editLock</code></td>
+                    <td>表示専用にする。<code>true</code> にすると、パーツメニュー・ドラッグ・入力など画面の編集が一切できなくなります（OBS接続で送られてきた変更は反映されます）。<br><span class="en-sub">Display-only mode: disables all editing (changes sent via OBS connection still apply).</span></td>
+                    <td><code>false</code></td>
+                </tr>
             </table>
+
+            <h3>OBS接続の初期値 / OBS DEFAULTS</h3>
+            <table>
+                <tr>
+                    <th>キー / Key</th>
+                    <th>説明 / Description</th>
+                    <th>初期値 / Default</th>
+                </tr>
+                <tr>
+                    <td><code>obs.port</code></td>
+                    <td>OBSのWebSocketサーバーのポート番号。<br><span class="en-sub">WebSocket server port.</span></td>
+                    <td><code>4455</code></td>
+                </tr>
+                <tr>
+                    <td><code>obs.password</code></td>
+                    <td>OBSのWebSocketサーバーのパスワード。このファイルを人に渡すとパスワードも渡るので注意してください。<br><span class="en-sub">WebSocket server password (shared if you share this file).</span></td>
+                    <td><code>''</code></td>
+                </tr>
+                <tr>
+                    <td><code>obs.mode</code></td>
+                    <td>反映のしかた。<code>'auto'</code> = リアルタイム、<code>'manual'</code> = 確定したときだけ。<br><span class="en-sub"><code>'auto'</code> = real-time, <code>'manual'</code> = on confirm.</span></td>
+                    <td><code>'auto'</code></td>
+                </tr>
+                <tr>
+                    <td><code>obs.autoConnect</code></td>
+                    <td>ページを開いたら自動で接続する。<br><span class="en-sub">Connect automatically when the page opens.</span></td>
+                    <td><code>false</code></td>
+                </tr>
+            </table>
+            <div class="note">
+                <strong>ゲームセンターなど、画面を触られたくない場所では：</strong> <code>features.editLock</code> を <code>true</code> にすると、画面の編集が一切できなくなります。<code>obs</code> にパスワードを入れて <code>autoConnect: true</code> にしておけば、開くだけでOBSにつながり、別のPC（<code>editLock</code> をかけていないファイル）から編集を送れます。
+            </div>
+            <div class="code-block">features: {
+    // …
+    editLock: true,
+},
+obs: {
+    port: 4455,
+    password: 'OBSのパスワード',
+    mode: 'auto',
+    autoConnect: true,
+},</div>
         </section>
 
         <section id="trouble">
@@ -647,9 +799,16 @@
                             height=1080.</span></td>
                 </tr>
                 <tr>
-                    <td>配置が保存されない<br><span class="en-sub">Layout lost on reload</span></td>
-                    <td>リロードでリセットされます。<code>CONFIG</code> の直接編集で永続化できます。<br><span class="en-sub">Reloads reset state.
-                            Edit <code>CONFIG</code> for permanent changes.</span></td>
+                    <td>配置が保存されない<br><span class="en-sub">Layout not saved</span></td>
+                    <td>今の画面は自動で保存されます。<code>file://</code> と <code>http://localhost</code> では保存場所が別なので、いつも同じ開き方で開いてください。<code>features.saveConfigEnabled</code> が <code>false</code> だと保存されません。<br><span class="en-sub">Auto-saved per browser and URL. Open the file the same way each time.</span></td>
+                </tr>
+                <tr>
+                    <td>OBSに接続できない<br><span class="en-sub">Cannot connect to OBS</span></td>
+                    <td>OBSが起動しているか、「ツール → WebSocketサーバー設定」でサーバーが有効か、ポートとパスワードが合っているかを確認してください。<br><span class="en-sub">Check that OBS is running, the WebSocket server is enabled, and the port/password are correct.</span></td>
+                </tr>
+                <tr>
+                    <td>OBSに反映されない<br><span class="en-sub">Changes not shown in OBS</span></td>
+                    <td>「確定したときだけ」のときは、メニューの「📤 OBSに反映」か Ctrl+Enter で送ってください。OBSのブラウザソースに同じテーマのHTMLが入っているかも確認してください。<br><span class="en-sub">In confirm mode, press "Send to OBS" or Ctrl+Enter. Make sure OBS uses the same theme file.</span></td>
                 </tr>
             </table>
         </section>
@@ -660,6 +819,7 @@
         GAMING Streaming Overlay &nbsp;|&nbsp; Created by <strong style="color:#00fff7">donnma(どんま)</strong>
         &nbsp;|&nbsp; <a href="https://donnma.com/" target="_blank"
             style="color:rgba(0,255,247,0.8);text-decoration:underline">donnma.com</a>
+        <p style="margin-top:8px;color:var(--text-sub);font-size:13px;">注意：二次配布および改変しての配布を禁じます。</p>
     </footer>
 
 </body>
