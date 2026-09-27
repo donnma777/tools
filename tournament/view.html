@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>トーナメント表</title>
+  <!-- OBSのブラウザソースで表示するページ（幅1920・高さ1080。ほかの縦横比のウィンドウでは、表示もそれに合わせて広がる）。
+       URL の # 以降で表示の種類を選ぶ：#show=bracket（トーナメント表）/ #show=match（今の試合）/ #show=champion（優勝者）
+       大会データと見た目は、編集ページがこのブラウザに保存したものを読む（OBS接続なら OBS へ送られてくる） -->
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
+    #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+    body.preview .tn-match, body.preview .tn-cell[data-id] { cursor: pointer; }
+    body.preview .tn-match:hover, body.preview .tn-cell[data-id]:hover { outline: 3px solid rgba(255, 255, 255, 0.6); outline-offset: 2px; }
+    body.preview .tn-match.selected, body.preview .tn-cell.selected { outline: 3px solid #ffd54a; outline-offset: 3px; }
+  </style>
+  <style id="gen"></style>
+</head>
+
+<body>
+  <div id="stage"></div>
+
+  <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
+  <script src="tournament-core.js?v=20260928n"></script>
+  <script>
+    (() => {
+      'use strict';
+      const K = window.TournamentCore;
+      const stage = document.getElementById('stage');
+      const params = new URLSearchParams(location.hash.replace(/^#/, ''));
+      const show = params.get('show') || 'bracket';
+      const preview = params.get('preview') === '1';
+      if (preview) document.body.classList.add('preview');
+      // # の後ろ（表示の種類）だけが変わったときは、開き直して切り替える
+      addEventListener('hashchange', () => location.reload());
+
+      let { T, S } = K.loadStored();
+      let selected = null;
+      let lastWinners = null;   // 勝敗が決まった試合を光らせるために、前回の勝者を覚えておく
+      // 抽選の演出：開いたときの drawAt は流さない（開き直すたびに流れないように）。演出中の更新は、終わってから反映する
+      let lastDrawAt = T.drawAt;
+      let animating = false, pendingDraw = false;
+
+      // 1920×1080 を基準に、ウィンドウに合わせて拡大・縮小する（OBS では等倍）。
+      // ウィンドウが横長（縦長）なら、そのぶん表示の幅（高さ）を広げて、背景も画面全体に塗る
+      let size = { w: K.W, h: K.H };
+      function fit() {
+        // 高さ 1080 が基準。縦長のウィンドウでは、幅を 1600 に保って高さを伸ばす（文字が小さくなりすぎないように）
+        const k = Math.min(innerWidth / 1600, innerHeight / K.H) || 1;
+        size = { w: Math.round(innerWidth / k), h: Math.round(innerHeight / k) };
+        stage.style.width = size.w + 'px';
+        stage.style.height = size.h + 'px';
+        stage.style.transform = `scale(${k})`;
+      }
+      let resizeTimer;
+      addEventListener('resize', () => {
+        fit();
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => draw(), 60);
+      });
+      fit();
+
+      let cssKey = '';
+      function draw() {
+        if (animating) { pendingDraw = true; return; }
+        const css = K.generateCSS(S);
+        if (css !== cssKey) { document.getElementById('gen').textContent = css; cssKey = css; }
+        stage.innerHTML = K.render(T, S, show, size);
+        // 新しく勝敗が決まった試合の勝者の行を光らせる
+        const B = K.build(T);
+        const winners = Object.fromEntries(K.allMatches(B).filter(m => m.status === 'done' || m.status === 'forfeit').map(m => [m.id, m.winner]));
+        if (lastWinners) {
+          for (const [id, w] of Object.entries(winners)) {
+            if (lastWinners[id] === w) continue;
+            const el = stage.querySelector(`.tn-match[data-id="${id}"] .tn-row.win`);
+            if (el) el.classList.add('just');
+          }
+        }
+        lastWinners = winners;
+        if (selected) stage.querySelectorAll(`[data-id="${selected}"]`).forEach(el => el.classList.add('selected'));
+      }
+
+      function apply(nextT, nextS) {
+        T = K.sanitizeT(nextT);
+        S = K.sanitizeS(nextS);
+        if (T.drawAt && T.drawAt !== lastDrawAt && show === 'bracket') {
+          lastDrawAt = T.drawAt;
+          playDraw();
+          return;
+        }
+        lastDrawAt = T.drawAt;
+        draw();
+      }
+
+      // 抽選の演出：名前をいったん隠し、中央のボックスで名前をシャッフルしながら、シード順に1人ずつ枠に入れていく
+      const sleep = ms => new Promise(r => setTimeout(r, ms));
+      async function playDraw() {
+        draw();
+        animating = true;
+        const B = K.build(T);
+        const order = B.entrants;
+        if (B.error || order.length < 2) { animating = false; draw(); return; }
+        stage.querySelectorAll('[data-e]').forEach(r => r.classList.add('tn-hide'));
+        const box = document.createElement('div');
+        box.className = 'tn-draw';
+        box.innerHTML = '<div class="tn-draw-label">抽選</div><div class="tn-draw-name"></div><div class="tn-draw-seed"></div>';
+        stage.appendChild(box);
+        const nameEl = box.querySelector('.tn-draw-name'), seedEl = box.querySelector('.tn-draw-seed');
+        // 1人あたりの時間（人数が多いときは、全体が30秒くらいに収まるように速くする）
+        const per = Math.max(0.3, Math.min(S.drawSpeed, 30 / order.length)) * 1000;
+        const left = order.slice();
+        for (const e of order) {
+          seedEl.textContent = '';
+          const spinEnd = performance.now() + per * 0.65;
+          while (performance.now() < spinEnd) {
+            nameEl.textContent = left[Math.floor(Math.random() * left.length)].name;
+            await sleep(55);
+          }
+          left.splice(left.indexOf(e), 1);
+          nameEl.textContent = e.name;
+          seedEl.textContent = `シード ${e.seed}`;
+          box.classList.remove('hit'); void box.offsetWidth; box.classList.add('hit');
+          stage.querySelectorAll(`[data-e="${e.id}"]`).forEach(r => { r.classList.remove('tn-hide'); r.classList.add('tn-reveal'); });
+          await sleep(per * 0.35);
+        }
+        box.querySelector('.tn-draw-label').textContent = '抽選完了！';
+        nameEl.textContent = '🏆';
+        seedEl.textContent = '';
+        await sleep(1600);
+        box.classList.add('done');
+        await sleep(600);
+        box.remove();
+        animating = false;
+        if (pendingDraw) { pendingDraw = false; draw(); }
+      }
+
+      // 同じ場所で開いている編集ページ（OBSのカスタムブラウザドックなど）が保存したら、読み直す
+      addEventListener('storage', (e) => {
+        if (e.key !== K.STORE_KEY) return;
+        const d = K.loadStored();
+        apply(d.T, d.S);
+      });
+
+      // OBS接続：Chrome の編集ページから obs-websocket 経由で届く（届いた内容はこのブラウザにも保存しておく）
+      addEventListener('donnmaTournamentUpdate', (e) => {
+        const d = e.detail;
+        if (!d || !d.T) return;
+        apply(d.T, d.S);
+        K.saveStored(T, S);
+      });
+
+      // 編集ページのプレビュー：内容は親から受け取り、試合のクリックを親に伝える
+      if (preview) {
+        addEventListener('message', (e) => {
+          if (e.source !== window.parent || !e.data) return;
+          if (e.data.type === 'tn-state') apply(e.data.T, e.data.S);
+          if (e.data.type === 'tn-select') { selected = e.data.id; draw(); }
+        });
+        stage.addEventListener('click', (e) => {
+          const m = e.target.closest('.tn-match, .tn-cell[data-id]');
+          if (m) window.parent.postMessage({ type: 'tn-pick', id: m.dataset.id }, '*');
+        });
+        window.parent.postMessage({ type: 'tn-ready' }, '*');
+      }
+
+      draw();
+    })();
+  </script>
+</body>
+
+</html>
