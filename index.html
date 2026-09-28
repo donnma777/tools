@@ -351,6 +351,21 @@
       vertical-align: 1px;
     }
 
+    /* カード右上の種類バッジ */
+    .kind-badge {
+      margin-left: auto;
+      align-self: flex-start;
+      flex-shrink: 0;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      padding: 3px 10px;
+      white-space: nowrap;
+    }
+
     .tool-name {
       font-size: 1.05rem;
       font-weight: 900;
@@ -558,7 +573,7 @@
     </div>
 
     <!-- Tools list -->
-    <h2 class="section-title">ツール一覧<small>Tools</small></h2>
+    <h2 class="section-title">ブラウザで使うツール<small>Web Tools</small></h2>
 
     <div class="tool-list">
 
@@ -576,6 +591,7 @@
             <div class="tool-tag">OBS Studio オーバーレイ<span class="pc-tag">PC向け</span></div>
             <div class="tool-name">配信オーバーレイテーマ</div>
           </div>
+          <span class="kind-badge">配信向け</span>
         </div>
         <div class="tool-desc">サイバーパンク、ゲーミング、和風などOBS用オーバーレイテーマを無料公開中。テーマ一覧・使い方は専用ページで確認できます。</div>
         <div class="card-actions">
@@ -599,6 +615,7 @@
             <div class="tool-tag">YouTube / Twitch チャット × OBS<span class="pc-tag">PC向け</span></div>
             <div class="tool-name">チャットCSSジェネレーター</div>
           </div>
+          <span class="kind-badge">配信向け</span>
         </div>
         <div class="tool-desc">YouTubeライブ・Twitchのチャット欄をOBSでおしゃれに表示。プレビューを見ながらフォント・縁取り・吹き出し・スパチャ/Bits・アニメーションを設定できます。
         </div>
@@ -622,6 +639,7 @@
             <div class="tool-tag">YouTube 登録者数 × OBS<span class="pc-tag">PC向け</span></div>
             <div class="tool-name">登録者数カウンター・目標ゲージ</div>
           </div>
+          <span class="kind-badge">配信向け</span>
         </div>
         <div class="tool-desc">
           YouTubeの登録者数を自動で取得して、OBSでおしゃれに表示。「目標まであと○人」の目標ゲージも出せます。グラデーション・縁取り・見出しや単位・背景の箱を、プレビューを見ながら設定できます。</div>
@@ -645,6 +663,7 @@
             <div class="tool-tag">大会・配信・会場<span class="pc-tag">PC向け</span></div>
             <div class="tool-name">トーナメント表メーカー</div>
           </div>
+          <span class="kind-badge">配信・大会</span>
         </div>
         <div class="tool-desc">
           参加者を入れるだけで、トーナメント・ダブルエリミネーション・総当たり・スイスドローの表を自動で作成。点数（音ゲーのスコア）や団体戦、敗者復活、課題曲のピック・BAN・ルーレットにも対応。配信（OBS）・会場のモニター・画像保存で使えます。</div>
@@ -652,6 +671,12 @@
           <span class="btn btn-primary">ツールを開く →</span>
         </div>
       </a>
+
+    </div>
+
+    <h2 class="section-title">インストールして使うもの<small>Plugins &amp; Extensions</small></h2>
+
+    <div class="tool-list">
 
       <!-- smart-access-control -->
       <div class="tool-card">
@@ -667,6 +692,7 @@
             <div class="tool-tag">WordPress プラグイン</div>
             <div class="tool-name">Smart Access Control</div>
           </div>
+          <span class="kind-badge">WordPress</span>
         </div>
         <div class="tool-desc">
           クローラー・User-Agent・IPアドレスを組み合わせてアクセスを精密に制御するWPプラグイン。AIクローラーやスクレイピングツールの許可/拒否、AIへの画像非表示やテキスト最適化表示に対応。</div>
@@ -692,6 +718,7 @@
             <div class="tool-tag">Chrome 拡張機能</div>
             <div class="tool-name">便利ツール拡張機能まとめ</div>
           </div>
+          <span class="kind-badge">Chrome拡張</span>
         </div>
         <div class="tool-desc">広告ブロック・強制ダークモード・スクリーンショットなどを単体または統合版でまとめたChrome拡張機能リポジトリ。</div>
         <div class="card-actions">
