@@ -76,6 +76,7 @@ OBS Studio のブラウザソースで使える配信オーバーレイのテー
 `tournament/` — 大会で使うトーナメント表を作って、配信（OBS）・会場のモニター・画像で使うツールです。
 参加者（プレイヤーまたはチーム）を1行ずつ入れると、シード・不戦勝つきの組み合わせを自動で作ります。試合をクリックしてスコアや勝者を入れると、OBSの画面もその場で更新されます。
 
+- 選曲リスト（課題曲・ピック＆BAN・ルーレット）も同じ編集ページで操作する。データは `songs-core.js`（`window.TournamentSongs`）で、保存場所はトーナメントとは別（`donnma-tournament-songs-v1`）。表示は `view.html#show=songs`。ピックした曲は今の試合の「○曲目の曲名」に入る。obs-websocket では `donnmaTournamentUpdate` に選曲データ `D` も一緒に送る。選曲は試合ごと（`D.per[matchId]`。`D.cur` は編集ページの「試合の結果」で選んでいる試合で、`switchMatch()` で切り替える）で、`view.html#show=bracket-songs`（トーナメント表＋課題曲）で試合の箱の下に出す（`S.songLines` を渡すと箱に曲名の行が付く）。`D.noReuse` なら、ほかの試合でピックされた曲を使用済み（`stateOf()`）にする。
 - `index.html` は編集ページ、`view.html` はOBSに入れる表示ページ（幅1920・高さ1080）です。`view.html#show=bracket`（トーナメント表）／`#show=match`（今の試合のテロップ）／`#show=champion`（優勝者の発表）で表示を選びます。
 - 大会データと見た目はブラウザの localStorage（`donnma-tournament-v1`）に保存します。編集ページをOBSの「カスタムブラウザドック」、表示ページを「ブラウザソース」に入れると、同じOBSの中なので `storage` イベントで表示が自動更新されます。
 - Chromeから操作するときは、OBSのWebSocketサーバー（obs-websocket v5）に接続し、obs-browser の `emit_event`（`donnmaTournamentUpdate`）で表示ページへ送ります。

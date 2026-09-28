@@ -962,6 +962,61 @@
       font-size: 12px;
     }
 
+    /* ヒント：項目名だけ並べて、押すと開く */
+    .hints {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .hint-group {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 10px 0 2px;
+    }
+
+    .hint-group:first-child {
+      margin-top: 0;
+    }
+
+    .hint {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-deep);
+    }
+
+    .hint > summary {
+      cursor: pointer;
+      padding: 7px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      list-style: none;
+    }
+
+    .hint > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .hint > summary::before {
+      content: '▸';
+      display: inline-block;
+      width: 1.1em;
+      color: var(--muted);
+      transition: transform 0.15s;
+    }
+
+    .hint[open] > summary::before {
+      transform: rotate(90deg);
+    }
+
+    .hint-body {
+      padding: 0 14px 10px 30px;
+      font-size: 12.5px;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
     .notes {
       font-size: 12.5px;
       color: var(--muted);
@@ -1647,6 +1702,30 @@
         padding: 32px 16px 0;
       }
     }
+
+    /* ---- 選曲リスト ---- */
+    .song-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+    .song-row { display: grid; grid-template-columns: 26px 40px minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.6fr) auto auto auto; gap: 6px; align-items: center; }
+    .song-row input { min-width: 0; }
+    .song-thumb { width: 40px; height: 40px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--bg-deep) center / cover no-repeat; color: var(--muted); cursor: pointer; font-size: 16px; }
+    .op-match { font-size: 14px; margin-bottom: 8px; }
+    .op-warn { font-size: 12px; color: #ffb74a; margin-bottom: 8px; }
+    .op-sel { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg-deep); min-height: 44px; }
+    .op-sel b { font-size: 16px; }
+    .op-sel span { font-size: 12px; color: var(--muted); }
+    .op-sel em { font-style: normal; font-size: 12px; font-weight: 700; color: var(--accent); }
+    .op-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+    .op-grid .btn { width: 100%; justify-content: center; }
+    .op-order { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--muted); margin: 8px 0; }
+    .op-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; max-height: 320px; overflow: auto; }
+    .op-chip { font: inherit; font-size: 12px; font-weight: 700; color: var(--text); padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; cursor: pointer; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .op-chip.sel { outline: 2px solid #ffd54a; outline-offset: 1px; }
+    .op-chip.st-pick.by0 { background: rgba(255, 133, 161, 0.3); border-color: #ff85a1; }
+    .op-chip.st-pick.by1 { background: rgba(79, 179, 255, 0.3); border-color: #4fb3ff; }
+    .op-chip.st-pick.byr { background: rgba(255, 213, 74, 0.25); border-color: #ffd54a; }
+    .op-chip.st-ban { opacity: 0.45; text-decoration: line-through; }
+    .op-chip.st-played { opacity: 0.5; }
+    .op-used { margin-left: 4px; font-size: 10px; color: var(--muted); }
   </style>
 </head>
 
@@ -1686,6 +1765,8 @@
             <option value="bracket">表示: トーナメント表</option>
             <option value="match">表示: 今の試合（テロップ）</option>
             <option value="champion">表示: 優勝者</option>
+            <option value="songs">表示: 選曲リスト</option>
+            <option value="bracket-songs">表示: トーナメント表＋課題曲</option>
           </select>
           <select id="stage-bg" aria-label="プレビュー背景">
             <option value="checker">背景: 透過</option>
@@ -1723,12 +1804,21 @@
       </div>
 
       <div class="panel">
+        <div class="panel-head"><span>選曲（ピック・BAN・ルーレット）</span>
+          <button class="btn btn-sm" id="sg-preview" type="button" title="上のプレビューを選曲リストの表示にします">プレビューで見る</button>
+        </div>
+        <div class="panel-body" id="sg-ops"></div>
+      </div>
+
+      <div class="panel">
         <div class="panel-head"><span>OBSに入れる</span></div>
         <div class="panel-body">
           <div class="url-list">
             <div class="url-item"><span>🏆 トーナメント表</span><button class="btn btn-sm btn-primary" type="button" data-copy="bracket">URLをコピー</button></div>
             <div class="url-item"><span>💬 今の試合（テロップ）</span><button class="btn btn-sm btn-primary" type="button" data-copy="match">URLをコピー</button></div>
             <div class="url-item"><span>👑 優勝者の発表</span><button class="btn btn-sm btn-primary" type="button" data-copy="champion">URLをコピー</button></div>
+            <div class="url-item"><span>🎵 選曲リスト（課題曲・ピック＆BAN）</span><button class="btn btn-sm btn-primary" type="button" data-copy="songs">URLをコピー</button></div>
+            <div class="url-item"><span>🏆🎵 トーナメント表＋課題曲</span><button class="btn btn-sm btn-primary" type="button" data-copy="bracket-songs">URLをコピー</button></div>
             <div class="url-item"><span>🛠 操作パネル（OBSのカスタムブラウザドック用）</span><button class="btn btn-sm" type="button" data-copy="editor">URLをコピー</button></div>
           </div>
           <input type="text" id="copy-fallback" readonly hidden aria-label="コピーするURL">
@@ -1745,6 +1835,7 @@
               <button class="btn btn-sm" type="button" data-png="bracket">🏆 トーナメント表</button>
               <button class="btn btn-sm" type="button" data-png="match">💬 今の試合</button>
               <button class="btn btn-sm" type="button" data-png="champion">👑 優勝者</button>
+              <button class="btn btn-sm" type="button" data-png="bracket-songs">🏆🎵 表＋課題曲</button>
             </div>
             <label class="toggle" for="png-fill"><span>背景を塗る（X などに投稿するとき向け）</span><input type="checkbox" id="png-fill" checked><span class="sw"></span></label>
             <div class="url-item" style="margin-top:6px"><span>🖥 会場のモニター・プロジェクター</span>
@@ -1791,6 +1882,53 @@
     </div>
   </div>
 
+
+  <!-- 選曲リスト：課題曲の入力と表示の設定（buildUI のあとで設定の列のいちばん下に移す） -->
+  <div hidden>
+    <details class="sec" id="sg-sec">
+      <summary><span class="sec-icon">🎵</span>課題曲・選曲リスト<span class="preset-count" id="sg-count"></span></summary>
+      <div class="fields">
+        <div class="field field-full">
+          <div class="field-note" style="margin:0 0 8px">課題曲を入れると、右の「選曲」でピック・BAN・ルーレットができます。配信・会場には「OBSに入れる」の <b>🎵 選曲リスト</b> のURLで出します。</div>
+          <div class="song-list" id="sg-list"></div>
+          <div class="ent-add">
+            <button class="btn btn-sm" type="button" id="sg-add">＋ 曲を追加</button>
+            <button class="btn btn-sm btn-danger" type="button" id="sg-clear">全部消す</button>
+          </div>
+          <input type="file" id="sg-img" accept="image/*" hidden>
+          <div class="field-note">🖼 を押すとジャケット画像を入れられます（小さく縮めてこのブラウザに保存します）。</div>
+        </div>
+        <div class="field field-full">
+          <label class="field-label" for="sg-bulk"><span>テキストでまとめて追加（1行に1曲。「曲名 / アーティスト / 難易度」。タブ区切り・「,」区切りも可）</span></label>
+          <textarea class="entrants" id="sg-bulk" spellcheck="false" style="min-height:100px" placeholder="曲名A / アーティストA / EXPERT 12&#10;曲名B / アーティストB / MASTER 13"></textarea>
+          <div class="data-row" style="margin-top:6px">
+            <button class="btn btn-sm btn-primary" type="button" id="sg-bulk-add">下に追加</button>
+            <button class="btn btn-sm" type="button" id="sg-bulk-replace">入れ替える（今のリストを消す）</button>
+            <button class="btn btn-sm" type="button" id="sg-from-tn">「課題曲の候補」から読み込む</button>
+          </div>
+        </div>
+        <div class="field field-full"><label class="field-label" for="sg-title"><span>選曲リストのタイトル</span></label><input type="text" id="sg-title" maxlength="60" placeholder="例: 課題曲 / 決勝 課題曲"></div>
+        <div class="field"><label class="toggle" for="sg-showVs"><span>今の試合（A vs B）を上に出す</span><input type="checkbox" id="sg-showVs"><span class="sw"></span></label></div>
+        <div class="field"><label class="toggle" for="sg-showArtist"><span>アーティストを出す</span><input type="checkbox" id="sg-showArtist"><span class="sw"></span></label></div>
+        <div class="field"><label class="toggle" for="sg-showLevel"><span>難易度を出す</span><input type="checkbox" id="sg-showLevel"><span class="sw"></span></label></div>
+        <div class="field"><label class="toggle" for="sg-hideBanned"><span>BANした曲を表示から消す</span><input type="checkbox" id="sg-hideBanned"><span class="sw"></span></label></div>
+        <div class="field field-full"><label class="toggle" for="sg-noReuse"><span>一度使った曲は、次の試合から使えないようにする</span><input type="checkbox" id="sg-noReuse"><span class="sw"></span></label>
+          <div class="field-note">オフ（最初の設定）なら、同じ曲をほかの試合でも何回でも使えます。オンにすると、ほかの試合でピックされた曲は「使用済み」になって選べなくなります。</div></div>
+        <div class="field"><label class="field-label" for="sg-colorA"><span>左側（1人目）のピックの色</span></label><div class="color-row"><input type="color" id="sg-colorA"></div></div>
+        <div class="field"><label class="field-label" for="sg-colorB"><span>右側（2人目）のピックの色</span></label><div class="color-row"><input type="color" id="sg-colorB"></div></div>
+        <div class="field"><label class="field-label" for="sg-spinSec"><span>ルーレットの長さ</span><span class="field-val" id="sg-v-spinSec"></span></label><input type="range" id="sg-spinSec" min="1" max="10" step="0.5"></div>
+        <div class="field field-full">
+          <div class="data-row" style="margin-top:0">
+            <button class="btn btn-sm" id="sg-export" type="button">⬇️ 曲リストを書き出す</button>
+            <button class="btn btn-sm" id="sg-import" type="button">⬆️ 曲リストを読み込む</button>
+            <button class="btn btn-sm btn-danger" id="sg-clear-history" type="button">選曲の記録を消す</button>
+            <input type="file" id="sg-file" accept=".json,application/json" hidden>
+          </div>
+        </div>
+      </div>
+    </details>
+  </div>
+
   <!-- Guide -->
   <section class="guide">
     <div class="panel">
@@ -1820,30 +1958,37 @@
 
     <div class="panel">
       <div class="panel-body">
-        <h2>💡 ヒント・注意点</h2>
-        <ul class="notes">
-          <li><b>チーム戦</b>は「チーム名: メンバー1, メンバー2」のように書くと、テロップや優勝者の発表にメンバーも出ます。</li>
-          <li>人数が 4・8・16・32… ぴったりでないときは、上位シードから順に<b>不戦勝（BYE）</b>が入ります。</li>
-          <li>「何本勝負」を 3 や 5 にすると、スコアが先取数に届いた時点で自動で勝者が決まります（オフにもできます）。</li>
-          <li><b>音ゲーなど点数で競う大会</b>は、「大会の設定」の「スコアの種類」を「点数」にします。点数を直接入力して「点数で勝敗を決める」（または Enter）で、高いほうが勝ちになります。「1試合の曲数」を2曲以上にすると、曲ごとに曲名と点数を入れて、<b>合計点</b>か<b>曲ごとの勝ち数</b>（同数なら合計点）で勝敗を決められます（「勝敗の決め方」で選びます）。テロップにも曲ごとの点数が出ます。「課題曲の候補」に曲名を入れておくと、曲名の入力欄で選べます。</li>
-          <li><b>ハンデキャップ</b>は、左の「⚖️ ハンデキャップ」で参加者ごとに数字を入れます。点数の大会では合計点に加算（マイナスも可）、本数の大会では最初から持っている本数になります。表とテロップに「HC +50,000」のように出ます（「レイアウト」で消せます）。</li>
-          <li><b>参加者</b>は「📋 一覧で編集」なら1人（1チーム）ずつの欄で、名前・メンバーを書いて ↑↓ で並べ替え、✕ で削除できます。「＋ 参加者を追加」「＋ チームを追加」で1つずつ、「8 人 分まとめて追加」で一度にたくさん作れます。「📝 テキストでまとめて入力」なら1行に1人（「チーム名: メンバー1, メンバー2」）でまとめて貼り付けられます。どちらで直しても同じです。</li>
-          <li><b>対戦相手を入れ替えたい</b>ときは、「👥 参加者」の順番を入れ替えます（一覧なら ↑↓）。組み合わせを「上から順に2人ずつ」にすると、1・2行目、3・4行目…がそのまま1回戦の対戦になるので、思いどおりに組めます（シード順のときは 1位 vs 最下位…の決まった並び）。行を動かしても、入っている結果・ハンデ・棄権はその人についていきます（対戦相手が変わった試合の結果は使われなくなります）。</li>
-          <li><b>敗者復活</b>（シングルエリミネーション）は「🏆 大会の設定」の「敗者復活」で選びます。<b>敗者復活トーナメント</b>は1回戦の敗者どうしでトーナメントをして、勝ち残った人が本戦に戻ります（表の下に出ます）。<b>ラッキールーザー</b>は1回戦の敗者からスコアが高い人が戻ります（候補の一覧で選び直したり、🎲 で抽選したりもできます）。戻る場所は「1回戦の空き枠」か「○回戦から」を選べます。どちらも1回戦が全部終わってから決まります。</li>
-          <li><b>代理出場</b>は、結果を入れる欄の「代理出場」にその試合だけの代理の名前を入れます。表では代理の名前に「代理」の印が付き、テロップには「○○の代理」と出ます。参加者欄は変えないので、元の人の記録はそのままです。団体戦では、先鋒・中堅…ごとの選手を、登録メンバーから選ぶ／「✏️ 自由に入力」／「いない（不戦敗）」から選べます。「出場メンバー（この試合）」のチェックを外すとその試合に出ない人に、「＋ 追加で出る人」に書くと助っ人が加わります（人数が「自動」なら、その試合の人数も変わります）。4人登録して毎試合3人出る、のようなときは「1チームの人数」を3人にして、試合ごとに出る人を選んでください。表とテロップには「交代」の印が付きます。印は、その試合の欄の「代理の印」「交代の印」のチェックで試合ごとに外せます（全部まとめて消すときは「レイアウト」の「代理・交代の印を表示」）。</li>
-          <li><b>形式</b>は「🏆 大会の設定」で選べます。<b>ダブルエリミネーション</b>は、上が勝者側・下が敗者側・右がグランドファイナルの表になります（左右対称のレイアウトは使えません）。グランドファイナルで敗者側から来た人が勝つと、もう1試合（リセット）が自動で出ます。<b>総当たり</b>は星取表（○●）と、勝ち・負け・得失点（点数なら合計点）・順位の表になります。順位は勝ち数 → 得失点差（点数なら合計点）の順で決めます。表のマスをクリックすると、その試合の結果を入れられます。</li>
-          <li><b>スイスドロー</b>は、毎ラウンド同じくらいの成績の人どうしで当たります（同じ相手とは当たりません）。次のラウンドの組み合わせは、前のラウンドの試合が全部終わると自動で決まります。順位は勝ち数 → Bh（ブッフホルツ：当たった相手の勝ち数の合計。強い相手と当たった人ほど上）→ 得失点差の順です。人数が奇数なら、毎ラウンド1人が不戦勝（1勝）になります。</li>
-          <li><b>曲ごとに弾く人が変わる</b>（団体戦にしない点数・複数曲の大会）ときは、結果の欄の「○曲目の選手」で、登録メンバーから選ぶか自由に入力できます。メンバーを書いたチームがあれば自動で出ます（「大会の設定」の「曲ごとに出た選手を入れる」でも出せます）。テロップには曲ごとの点数の横に名前が出ます。</li>
-          <li><b>勝ち抜き戦</b>は、団体戦をオンにして「団体戦の方式」で選びます。勝った人が残り、負けた側は次の人に交代して、相手チームを全員倒したら勝ちです（引き分けは両方とも交代）。表の数字は残り人数です。本数なら対戦ごとに「勝ち」「引き分け」を押し、点数なら点数を入れて Enter で次の対戦へ進みます。</li>
-          <li><b>団体戦</b>は「🏆 大会の設定」で「団体戦」をオンにします。参加者は「チーム名: 先鋒, 中堅, 大将」のように1行に1チーム書くと、対戦の選手名に順番どおり入ります（試合ごとに書き換えもできます）。トーナメント表や順位表でも、チーム名の下にメンバーが小さく出ます（「レイアウト」の「チームのメンバーを表示」で消せます）。本数なら対戦ごとに「勝ち」を押し、過半数を取ったチームが自動で勝ちます（同数なら「チームの勝ち」で決めます）。点数なら対戦ごとに点数を入れ、合計点か勝った人数で決めます。</li>
-          <li><b>🎲 抽選</b>（「👥 参加者」）を押すと、参加者をシャッフルして、配信画面のトーナメント表で「名前がシャッフルされて、シード順に1人ずつ枠に入る」演出が流れます。入っている試合の結果は消えます。1人あたりの時間は「レイアウト」で変えられます。演出を流したくないときは「🔀 シャッフル」を使ってください。</li>
-          <li><b>失格・棄権</b>は、試合の結果の欄の「失格」「棄権」で相手の勝ちにできます（もう一度押すと取り消し）。大会の途中で抜けた人は、左の「🚫 棄権・失格した参加者」で選ぶと、まだ結果のない試合がまとめて相手の不戦勝になります。</li>
-          <li>試合を「🔴 配信中にする」と、トーナメント表でその試合が光り、テロップにも LIVE と出ます。</li>
-          <li>名前の書き間違いは、途中で直しても結果は消えません。行を並べ替えたり、人数を変えたりすると、組み合わせが変わった試合の結果は使われなくなります。</li>
-          <li><b>画像で保存</b>：右の「画像・会場で使う」で、トーナメント表・今の試合・優勝者を 1920×1080 の PNG で保存できます。X などに投稿するときは「背景を塗る」をオンに。</li>
-          <li><b>会場のモニター・プロジェクター</b>：「別ウィンドウで表示」で開いたウィンドウを会場の画面に移し、F11 で全画面にします。ここで結果を入れると、そのまま更新されます。</li>
-          <li>保存はこのブラウザの中です。別のPCへは「ファイルに書き出す」で持っていけます。</li>
-        </ul>
+        <h2>💡 ヒント・注意点 <span class="tn-hint">（項目を押すと開きます）</span></h2>
+        <div class="hints">
+          <div class="hint-group">👥 参加者・組み合わせ</div>
+          <details class="hint"><summary>参加者</summary><div class="hint-body"><b>参加者</b>は「📋 一覧で編集」なら1人（1チーム）ずつの欄で、名前・メンバーを書いて ↑↓ で並べ替え、✕ で削除できます。「＋ 参加者を追加」「＋ チームを追加」で1つずつ、「8 人 分まとめて追加」で一度にたくさん作れます。「📝 テキストでまとめて入力」なら1行に1人（「チーム名: メンバー1, メンバー2」）でまとめて貼り付けられます。どちらで直しても同じです。</div></details>
+          <details class="hint"><summary>チーム戦</summary><div class="hint-body"><b>チーム戦</b>は「チーム名: メンバー1, メンバー2」のように書くと、テロップや優勝者の発表にメンバーも出ます。</div></details>
+          <details class="hint"><summary>対戦相手を入れ替えたい</summary><div class="hint-body"><b>対戦相手を入れ替えたい</b>ときは、「👥 参加者」の順番を入れ替えます（一覧なら ↑↓）。組み合わせを「上から順に2人ずつ」にすると、1・2行目、3・4行目…がそのまま1回戦の対戦になるので、思いどおりに組めます（シード順のときは 1位 vs 最下位…の決まった並び）。行を動かしても、入っている結果・ハンデ・棄権はその人についていきます（対戦相手が変わった試合の結果は使われなくなります）。</div></details>
+          <details class="hint"><summary>🎲 抽選</summary><div class="hint-body"><b>🎲 抽選</b>（「👥 参加者」）を押すと、参加者をシャッフルして、配信画面のトーナメント表で「名前がシャッフルされて、シード順に1人ずつ枠に入る」演出が流れます。入っている試合の結果は消えます。1人あたりの時間は「レイアウト」で変えられます。演出を流したくないときは「🔀 シャッフル」を使ってください。</div></details>
+          <details class="hint"><summary>不戦勝（BYE）が入るとき</summary><div class="hint-body">人数が 4・8・16・32… ぴったりでないときは、上位シードから順に<b>不戦勝（BYE）</b>が入ります。</div></details>
+          <details class="hint"><summary>名前の書き間違い</summary><div class="hint-body">名前の書き間違いは、途中で直しても結果は消えません。行を並べ替えたり、人数を変えたりすると、組み合わせが変わった試合の結果は使われなくなります。</div></details>
+          <div class="hint-group">🏆 形式</div>
+          <details class="hint"><summary>形式</summary><div class="hint-body"><b>形式</b>は「🏆 大会の設定」で選べます。<b>ダブルエリミネーション</b>は、上が勝者側・下が敗者側・右がグランドファイナルの表になります（左右対称のレイアウトは使えません）。グランドファイナルで敗者側から来た人が勝つと、もう1試合（リセット）が自動で出ます。<b>総当たり</b>は星取表（○●）と、勝ち・負け・得失点（点数なら合計点）・順位の表になります。順位は勝ち数 → 得失点差（点数なら合計点）の順で決めます。表のマスをクリックすると、その試合の結果を入れられます。</div></details>
+          <details class="hint"><summary>何本勝負・自動で勝者にする</summary><div class="hint-body">「何本勝負」を 3 や 5 にすると、スコアが先取数に届いた時点で自動で勝者が決まります（オフにもできます）。</div></details>
+          <details class="hint"><summary>スイスドロー</summary><div class="hint-body"><b>スイスドロー</b>は、毎ラウンド同じくらいの成績の人どうしで当たります（同じ相手とは当たりません）。次のラウンドの組み合わせは、前のラウンドの試合が全部終わると自動で決まります。順位は勝ち数 → Bh（ブッフホルツ：当たった相手の勝ち数の合計。強い相手と当たった人ほど上）→ 得失点差の順です。人数が奇数なら、毎ラウンド1人が不戦勝（1勝）になります。</div></details>
+          <details class="hint"><summary>敗者復活</summary><div class="hint-body"><b>敗者復活</b>（シングルエリミネーション）は「🏆 大会の設定」の「敗者復活」で選びます。<b>敗者復活トーナメント</b>は1回戦の敗者どうしでトーナメントをして、勝ち残った人が本戦に戻ります（表の下に出ます）。<b>ラッキールーザー</b>は1回戦の敗者からスコアが高い人が戻ります（候補の一覧で選び直したり、🎲 で抽選したりもできます）。戻る場所は「1回戦の空き枠」か「○回戦から」を選べます。どちらも1回戦が全部終わってから決まります。</div></details>
+          <div class="hint-group">🔢 スコア・試合の結果</div>
+          <details class="hint"><summary>音ゲーなど点数で競う大会</summary><div class="hint-body"><b>音ゲーなど点数で競う大会</b>は、「大会の設定」の「スコアの種類」を「点数」にします。点数を直接入力して「点数で勝敗を決める」（または Enter）で、高いほうが勝ちになります。「1試合の曲数」を2曲以上にすると、曲ごとに曲名と点数を入れて、<b>合計点</b>か<b>曲ごとの勝ち数</b>（同数なら合計点）で勝敗を決められます（「勝敗の決め方」で選びます）。テロップにも曲ごとの点数が出ます。「課題曲の候補」に曲名を入れておくと、曲名の入力欄で選べます。</div></details>
+          <details class="hint"><summary>ハンデキャップ</summary><div class="hint-body"><b>ハンデキャップ</b>は、左の「⚖️ ハンデキャップ」で参加者ごとに数字を入れます。点数の大会では合計点に加算（マイナスも可）、本数の大会では最初から持っている本数になります。表とテロップに「HC +50,000」のように出ます（「レイアウト」で消せます）。</div></details>
+          <details class="hint"><summary>失格・棄権</summary><div class="hint-body"><b>失格・棄権</b>は、試合の結果の欄の「失格」「棄権」で相手の勝ちにできます（もう一度押すと取り消し）。大会の途中で抜けた人は、左の「🚫 棄権・失格した参加者」で選ぶと、まだ結果のない試合がまとめて相手の不戦勝になります。</div></details>
+          <details class="hint"><summary>代理出場</summary><div class="hint-body"><b>代理出場</b>は、結果を入れる欄の「代理出場」にその試合だけの代理の名前を入れます。表では代理の名前に「代理」の印が付き、テロップには「○○の代理」と出ます。参加者欄は変えないので、元の人の記録はそのままです。団体戦では、先鋒・中堅…ごとの選手を、登録メンバーから選ぶ／「✏️ 自由に入力」／「いない（不戦敗）」から選べます。「出場メンバー（この試合）」のチェックを外すとその試合に出ない人に、「＋ 追加で出る人」に書くと助っ人が加わります（人数が「自動」なら、その試合の人数も変わります）。4人登録して毎試合3人出る、のようなときは「1チームの人数」を3人にして、試合ごとに出る人を選んでください。表とテロップには「交代」の印が付きます。印は、その試合の欄の「代理の印」「交代の印」のチェックで試合ごとに外せます（全部まとめて消すときは「レイアウト」の「代理・交代の印を表示」）。</div></details>
+          <details class="hint"><summary>配信中の試合</summary><div class="hint-body">試合を「🔴 配信中にする」と、トーナメント表でその試合が光り、テロップにも LIVE と出ます。</div></details>
+          <div class="hint-group">🤝 団体戦</div>
+          <details class="hint"><summary>団体戦</summary><div class="hint-body"><b>団体戦</b>は「🏆 大会の設定」で「団体戦」をオンにします。参加者は「チーム名: 先鋒, 中堅, 大将」のように1行に1チーム書くと、対戦の選手名に順番どおり入ります（試合ごとに書き換えもできます）。トーナメント表や順位表でも、チーム名の下にメンバーが小さく出ます（「レイアウト」の「チームのメンバーを表示」で消せます）。本数なら対戦ごとに「勝ち」を押し、過半数を取ったチームが自動で勝ちます（同数なら「チームの勝ち」で決めます）。点数なら対戦ごとに点数を入れ、合計点か勝った人数で決めます。</div></details>
+          <details class="hint"><summary>勝ち抜き戦</summary><div class="hint-body"><b>勝ち抜き戦</b>は、団体戦をオンにして「団体戦の方式」で選びます。勝った人が残り、負けた側は次の人に交代して、相手チームを全員倒したら勝ちです（引き分けは両方とも交代）。表の数字は残り人数です。本数なら対戦ごとに「勝ち」「引き分け」を押し、点数なら点数を入れて Enter で次の対戦へ進みます。</div></details>
+          <details class="hint"><summary>曲ごとに弾く人が変わる</summary><div class="hint-body"><b>曲ごとに弾く人が変わる</b>（団体戦にしない点数・複数曲の大会）ときは、結果の欄の「○曲目の選手」で、登録メンバーから選ぶか自由に入力できます。メンバーを書いたチームがあれば自動で出ます（「大会の設定」の「曲ごとに出た選手を入れる」でも出せます）。テロップには曲ごとの点数の横に名前が出ます。</div></details>
+          <div class="hint-group">🎵 選曲リスト</div>
+          <details class="hint"><summary>選曲リスト（課題曲・ピック＆BAN）</summary><div class="hint-body"><b>選曲リスト（課題曲・ピック＆BAN）</b>は、左の「🎵 課題曲・選曲リスト」に曲を入れ、右の「選曲」で曲を選んで「ピック」「BAN」を押します。選曲は<b>「試合の結果」で選んでいる試合</b>ごとに記録され、「次の試合 ▶」で試合を変えると選曲パネルと配信の選曲リストもその試合に切り替わります（前の試合に戻れば、その試合の選曲が出ます）。🎲 ルーレットで残りの曲から演出つきで1曲選べます。配信・会場には「OBSに入れる」の <b>🎵 選曲リスト</b> のURLで出します（上に今の試合が出ます）。<b>🏆🎵 トーナメント表＋課題曲</b> なら、トーナメント表の試合ごとに、選ばれた曲が箱の下に出ます。同じ曲は何回でも使えます（使った回数は曲の横に「×2」のように出ます）。「一度使った曲は、次の試合から使えないようにする」をオンにすると、ほかの試合でピックされた曲は「使用済み」になって選べなくなります。ピックした曲は、その試合の「1曲目・2曲目…」の曲名に順に入ります（スコアが「点数」か団体戦のとき）。</div></details>
+          <div class="hint-group">🖥 画像・会場・保存</div>
+          <details class="hint"><summary>画像で保存</summary><div class="hint-body"><b>画像で保存</b>：右の「画像・会場で使う」で、トーナメント表・今の試合・優勝者を 1920×1080 の PNG で保存できます。X などに投稿するときは「背景を塗る」をオンに。</div></details>
+          <details class="hint"><summary>会場のモニター・プロジェクター</summary><div class="hint-body"><b>会場のモニター・プロジェクター</b>：「別ウィンドウで表示」で開いたウィンドウを会場の画面に移し、F11 で全画面にします。ここで結果を入れると、そのまま更新されます。</div></details>
+          <details class="hint"><summary>保存・別のPCへ持っていく</summary><div class="hint-body">保存はこのブラウザの中です。別のPCへは「ファイルに書き出す」で持っていけます。</div></details>
+        </div>
       </div>
     </div>
   </section>
@@ -1877,7 +2022,8 @@
 
   <!-- フォント一覧・文字効果はチャットCSSジェネレーターと共通。chat-core.js / tournament-core.js を変えたら v を上げる（view.html も） -->
   <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
-  <script src="tournament-core.js?v=20260928n"></script>
+  <script src="tournament-core.js?v=20260928p"></script>
+  <script src="songs-core.js?v=20260928d"></script>
   <script>
     (() => {
       'use strict';
@@ -2390,6 +2536,7 @@
         renderHandicap(B);
         renderLucky(B);
         renderEntList();
+        if (D) { sgSyncMatch(); sgRenderOps(); }
         // 点数を入力している最中は、欄を作り直すとカーソルが外れるので作り直さない
         if (!opts.keepPanel) renderMatchPanel(B);
         scheduleObsPush();
@@ -2466,7 +2613,7 @@
       let frameShow = 'bracket';
       function loadFrame() {
         frameReady = false;
-        frame.src = `view.html?v=20260928n#show=${frameShow}&preview=1`;
+        frame.src = `view.html?v=20260928q#show=${frameShow}&preview=1`;
       }
       addEventListener('message', (e) => {
         if (e.source !== frame.contentWindow || !e.data) return;
@@ -2474,8 +2621,11 @@
           frameReady = true;
           send({ type: 'tn-state', T, S });
           send({ type: 'tn-select', id: selected });
+          send({ type: 'sg-state', D });
+          send({ type: 'sg-select', id: sgSel });
         }
         if (e.data.type === 'tn-pick') select(e.data.id);
+        if (e.data.type === 'sg-pick') sgSelect(e.data.id);
       });
       $('pv-show').addEventListener('change', (e) => { frameShow = e.target.value; loadFrame(); });
       $('stage-bg').addEventListener('change', (e) => { $('stage').className = 'tn-stage bg-' + e.target.value; });
@@ -2485,6 +2635,7 @@
       // =====================================================
       function select(id) {
         selected = id;
+        sgSyncMatch();
         send({ type: 'tn-select', id });
         renderMatchPanel(K.build(T));
       }
@@ -2863,7 +3014,7 @@
           const stage = document.createElement('div');
           stage.id = 'tn-export';
           stage.style.cssText = 'position:relative;width:1920px;height:1080px;overflow:hidden;';
-          stage.innerHTML = K.render(T, S2, show);
+          stage.innerHTML = show === 'bracket-songs' ? K.render(T, { ...S2, songLines: SG.songLines(D, T) }, 'bracket') : K.render(T, S2, show);
           host.append(style, stage);
           document.body.appendChild(host);
           await document.fonts.ready;
@@ -2873,7 +3024,7 @@
           canvas.toBlob((blob) => {
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            const kind = { bracket: 'bracket', match: 'match', champion: 'champion' }[show];
+            const kind = { bracket: 'bracket', match: 'match', champion: 'champion', 'bracket-songs': 'bracket_songs' }[show];
             a.download = `tournament_${kind}_${(T.title || 'image').replace(/[\\/:*?"<>|\s]+/g, '_')}.png`;
             a.click();
             setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -3078,7 +3229,7 @@
         obs.pending.set(requestId, { resolve() {}, reject(err) { obsUi('⚠️ 送れませんでした：' + err.message); } });
         obs.ws.send(JSON.stringify({ op: 6, d: { requestType: 'CallVendorRequest', requestId, requestData: {
           vendorName: 'obs-browser', requestType: 'emit_event',
-          requestData: { event_name: 'donnmaTournamentUpdate', event_data: { T, S } },
+          requestData: { event_name: 'donnmaTournamentUpdate', event_data: { T, S, D } },
         } } }));
       }
       function scheduleObsPush() {
@@ -3120,9 +3271,295 @@
         syncUI();
         send({ type: 'tn-state', T, S });
         renderMatchPanel(K.build(T));
+        // 選曲リストのページが曲名を入れたときなど、ここがOBSにつないでいれば送る
+        scheduleObsPush();
+      });
+
+
+      // =====================================================
+      //  選曲リスト（課題曲・ピック＆BAN・ルーレット）。データは songs-core.js、表示は view.html#show=songs
+      //  var にしているのは、render() がこの部分より先に呼ばれても大丈夫なように
+      // =====================================================
+      var SG = window.TournamentSongs;
+      var D = SG.load();
+      var sgSel = null;
+      let sgWarned = false;
+      function sgCommit(opts = {}) {
+        SG.recordHistory(D);
+        D = SG.sanitize(D);
+        if (!SG.save(D) && !sgWarned) { sgWarned = true; toast('⚠️ ブラウザに保存できませんでした。ジャケット画像を減らしてください'); }
+        send({ type: 'sg-state', D });
+        if (!opts.keepList) sgRenderList();
+        sgRenderOps();
+        $('sg-count').textContent = D.list.length ? `（${D.list.length}曲）` : '';
+        scheduleObsPush();
+      }
+
+      // 課題曲の一覧
+      function sgRenderList(force) {
+        const box = $('sg-list');
+        if (!box || (!force && box.contains(document.activeElement))) return;
+        if (!D.list.length) { box.innerHTML = '<p class="field-note">まだ曲がありません。「＋ 曲を追加」か、下の「テキストでまとめて追加」で入れてください。</p>'; return; }
+        box.innerHTML = D.list.map((x, i) => `<div class="song-row" data-id="${esc(x.id)}"><span class="ent-seed">${i + 1}</span>`
+          + `<button class="song-thumb" type="button" data-sg-act="img" title="ジャケット画像" style="${x.img ? `background-image:url('${x.img}')` : ''}">${x.img ? '' : '🖼'}</button>`
+          + `<input data-k="t" type="text" value="${esc(x.t)}" placeholder="曲名" maxlength="80" aria-label="${i + 1}曲目の曲名">`
+          + `<input data-k="a" type="text" value="${esc(x.a)}" placeholder="アーティスト" maxlength="80" aria-label="${i + 1}曲目のアーティスト">`
+          + `<input data-k="lv" type="text" value="${esc(x.lv)}" placeholder="難易度" maxlength="30" aria-label="${i + 1}曲目の難易度">`
+          + `<button class="btn btn-sm" type="button" data-sg-act="up" aria-label="上へ"${i === 0 ? ' disabled' : ''}>↑</button>`
+          + `<button class="btn btn-sm" type="button" data-sg-act="down" aria-label="下へ"${i === D.list.length - 1 ? ' disabled' : ''}>↓</button>`
+          + `<button class="btn btn-sm" type="button" data-sg-act="del" aria-label="削除">✕</button></div>`).join('');
+      }
+      let sgImgTarget = null;
+      $('sg-list').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-sg-act]');
+        if (!b) return;
+        const id = b.closest('.song-row').dataset.id;
+        const i = D.list.findIndex(x => x.id === id);
+        const act = b.dataset.sgAct;
+        if (act === 'img') {
+          if (D.list[i].img && confirm('ジャケット画像を外しますか？（「キャンセル」で別の画像を選びます）')) { D.list[i].img = ''; sgCommit(); sgRenderList(true); return; }
+          sgImgTarget = id; $('sg-img').click(); return;
+        }
+        if (act === 'up' && i > 0) [D.list[i - 1], D.list[i]] = [D.list[i], D.list[i - 1]];
+        if (act === 'down' && i < D.list.length - 1) [D.list[i + 1], D.list[i]] = [D.list[i], D.list[i + 1]];
+        if (act === 'del') {
+          if (!confirm(`「${D.list[i].t || '（曲名なし）'}」を消しますか？`)) return;
+          D.list.splice(i, 1);
+          if (sgSel === id) sgSel = null;
+        }
+        sgCommit();
+        sgRenderList(true);
+      });
+      $('sg-list').addEventListener('input', (e) => {
+        const inp = e.target.closest('input[data-k]');
+        if (!inp) return;
+        const x = D.list.find(s => s.id === inp.closest('.song-row').dataset.id);
+        if (!x) return;
+        x[inp.dataset.k] = inp.value;
+        sgCommit({ keepList: true });
+      });
+      // ジャケット画像：長い辺を 300px に縮めた JPEG にして持つ
+      function sgShrink(file) {
+        return new Promise((resolve, reject) => {
+          const url = URL.createObjectURL(file);
+          const img = new Image();
+          img.onload = () => {
+            const k = Math.min(1, 300 / Math.max(img.naturalWidth, img.naturalHeight));
+            const c = document.createElement('canvas');
+            c.width = Math.round(img.naturalWidth * k);
+            c.height = Math.round(img.naturalHeight * k);
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            URL.revokeObjectURL(url);
+            resolve(c.toDataURL('image/jpeg', 0.85));
+          };
+          img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('load')); };
+          img.src = url;
+        });
+      }
+      $('sg-img').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        e.target.value = '';
+        const x = D.list.find(s => s.id === sgImgTarget);
+        if (!file || !x) return;
+        try { x.img = await sgShrink(file); sgCommit(); sgRenderList(true); } catch (err) { toast('⚠️ この画像は読み込めませんでした'); }
+      });
+      $('sg-add').addEventListener('click', () => {
+        D.list.push({ id: 's' + Date.now().toString(36), t: '', a: '', lv: '', img: '' });
+        sgCommit();
+        sgRenderList(true);
+        [...$('sg-list').querySelectorAll('input[data-k="t"]')].pop()?.focus();
+      });
+      $('sg-clear').addEventListener('click', () => {
+        if (!D.list.length || !confirm('課題曲を全部消しますか？')) return;
+        D.list = [];
+        sgSel = null;
+        SG.resetState(D);
+        sgCommit();
+      });
+      function sgBulk(replace) {
+        const add = SG.parseText($('sg-bulk').value).filter(x => x.t);
+        if (!add.length) { toast('曲を1行に1曲ずつ入れてください'); return; }
+        if (replace) {
+          if (D.list.length && !confirm('今の曲リストを消して、入れ替えますか？')) return;
+          D.list = [];
+          SG.resetState(D);
+          sgSel = null;
+        }
+        D.list.push(...add);
+        $('sg-bulk').value = '';
+        sgCommit();
+        toast(`${add.length}曲を入れました`);
+      }
+      $('sg-bulk-add').addEventListener('click', () => sgBulk(false));
+      $('sg-bulk-replace').addEventListener('click', () => sgBulk(true));
+      $('sg-from-tn').addEventListener('click', () => {
+        const lines = String(T.songList || '').split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+        if (!lines.length) { toast('「大会の設定」の「課題曲の候補」が空です（スコアが「点数」のときに出ます）'); return; }
+        $('sg-bulk').value = lines.join('\n');
+        toast('上の欄に読み込みました。「下に追加」か「入れ替える」を押してください');
+      });
+
+      // 表示の設定
+      function sgSyncSettings() {
+        $('sg-title').value = D.title;
+        for (const k of ['showVs', 'showArtist', 'showLevel', 'hideBanned', 'noReuse']) $('sg-' + k).checked = D[k];
+        $('sg-colorA').value = D.colorA;
+        $('sg-colorB').value = D.colorB;
+        $('sg-spinSec').value = D.spinSec;
+        $('sg-v-spinSec').textContent = D.spinSec + '秒';
+      }
+      $('sg-title').addEventListener('input', (e) => { D.title = e.target.value; sgCommit({ keepList: true }); });
+      for (const k of ['showVs', 'showArtist', 'showLevel', 'hideBanned', 'noReuse']) $('sg-' + k).addEventListener('change', (e) => { D[k] = e.target.checked; sgCommit({ keepList: true }); });
+      for (const k of ['colorA', 'colorB']) $('sg-' + k).addEventListener('input', (e) => { D[k] = e.target.value; sgCommit({ keepList: true }); });
+      $('sg-spinSec').addEventListener('input', (e) => { D.spinSec = Number(e.target.value); $('sg-v-spinSec').textContent = D.spinSec + '秒'; sgCommit({ keepList: true }); });
+
+      // 選曲（ピック・BAN・ルーレット）
+      function sgSelect(id) {
+        sgSel = id;
+        send({ type: 'sg-select', id });
+        sgRenderOps();
+      }
+      const sgStateLabel = (s, names) => (!s ? '' : s.st === 'ban' ? `BAN${s.by >= 0 ? `（${names[s.by]}）` : ''}` : s.st === 'pick' ? `${s.by === -1 ? 'ランダム' : names[s.by]}のピック` : '演奏済み');
+      function sgRenderOps() {
+        const box = $('sg-ops');
+        if (!box || !D) return;
+        if (!D.list.length) { box.innerHTML = '<p class="mp-empty">左の「🎵 課題曲・選曲リスト」に曲を入れると、ここでピック・BAN・ルーレットができます。</p>'; return; }
+        const info = SG.matchInfo(T, D.cur);
+        const names = info ? info.names : ['左', '右'];
+        const states = SG.stateOf(D);
+        const x = D.list.find(s => s.id === sgSel);
+        const s = x && states[x.id];
+        const used = SG.usage(D);
+        const usedX = x ? used[x.id] || 0 : 0;
+        // 対戦者が決まっていない試合では選べない
+        const open = info && info.m.a && info.m.b && info.m.a !== K.BYE && info.m.b !== K.BYE;
+        const btn = (act, by, label) => {
+          const on = s && s.st === act && s.by === by;
+          return `<button class="btn btn-sm${on ? ' btn-primary' : ''}" type="button" data-op="${act}" data-by="${by}"${x && open && !s?.other ? '' : ' disabled'} aria-pressed="${!!on}">${label}</button>`;
+        };
+        const left = SG.available(D).length;
+        box.innerHTML = `<div class="op-match">${info ? `この試合：<b style="color:${D.colorA}">${esc(names[0] || '（未定）')}</b> vs <b style="color:${D.colorB}">${esc(names[1] || '（未定）')}</b>（${esc(info.round)}）` : 'この試合：なし'}</div>`
+          + '<p class="field-note" style="margin:-4px 0 8px">上の「試合の結果」で選んでいる試合の選曲です。「次の試合 ▶」やトーナメント表のクリックで試合を変えると、選曲も切り替わります。</p>'
+          + (info && !open ? '<p class="op-warn">この試合は対戦者が決まっていないので、まだ選曲できません。</p>' : '')
+          + `<div class="op-sel">${x ? `<b>${esc(x.t || '（曲名なし）')}</b>${x.a ? `<span>${esc(x.a)}</span>` : ''}${s ? `<em>${esc(sgStateLabel(s, names))}</em>` : ''}${usedX ? `<span>ほかの試合で${usedX}回使用</span>` : ''}` : '<span>下の曲か、プレビューのカードをクリックして選んでください</span>'}</div>`
+          + '<div class="op-grid">'
+          + btn('pick', 0, `🎯 ${esc(names[0])}がピック`) + btn('pick', 1, `🎯 ${esc(names[1])}がピック`)
+          + btn('ban', 0, `🚫 ${esc(names[0])}がBAN`) + btn('ban', 1, `🚫 ${esc(names[1])}がBAN`)
+          + btn('ban', -1, '🚫 BAN（運営）') + btn('played', -1, '✅ 演奏済み')
+          + '</div><div class="op-grid">'
+          + `<button class="btn btn-sm btn-primary" type="button" id="sg-roulette"${left && open ? '' : ' disabled'}>🎲 ルーレット（残り${left}曲から）</button>`
+          + '<button class="btn btn-sm btn-danger" type="button" id="sg-reset">↺ この試合の選曲を外す</button>'
+          + '</div>'
+          + `<label class="toggle" for="sg-autoFill"><span>ピックした曲を、この試合の曲名に入れる</span><input type="checkbox" id="sg-autoFill"${D.autoFill ? ' checked' : ''}><span class="sw"></span></label>`
+          + (D.order.length ? `<div class="op-order">選ばれた順：${D.order.map((id, i) => `<span>${i + 1}. ${esc(D.list.find(s2 => s2.id === id)?.t || '')}</span>`).join('')}</div>` : '')
+          + '<div class="op-chips">' + D.list.map((y, i) => {
+            const st = states[y.id];
+            return `<button type="button" class="op-chip${y.id === sgSel ? ' sel' : ''}${st ? ' st-' + st.st + (st.by >= 0 ? ' by' + st.by : ' byr') : ''}" data-chip="${esc(y.id)}" title="${esc(sgStateLabel(st, names))}${used[y.id] ? `（ほかの試合で${used[y.id]}回使用）` : ''}">${i + 1}. ${esc(y.t || '（曲名なし）')}${used[y.id] ? `<small class="op-used">×${used[y.id]}</small>` : ''}</button>`;
+          }).join('') + '</div>';
+      }
+      $('sg-ops').addEventListener('click', (e) => {
+        const chip = e.target.closest('[data-chip]');
+        if (chip) { sgSelect(chip.dataset.chip); return; }
+        const b = e.target.closest('[data-op]');
+        if (b && sgSel) {
+          const on = SG.setState(D, sgSel, b.dataset.op, Number(b.dataset.by));
+          sgCommit({ keepList: true });
+          if (on && b.dataset.op === 'pick') sgFill(sgSel);
+          return;
+        }
+        if (e.target.id === 'sg-roulette') {
+          const x = SG.roulette(D);
+          if (!x) { toast('残っている曲がありません'); return; }
+          sgSel = x.id;
+          send({ type: 'sg-select', id: null });
+          sgCommit({ keepList: true });
+          // 演出が終わってから、テロップの曲名に入れる（先にネタバレしないように）
+          setTimeout(() => sgFill(x.id), D.spinSec * 1000 + 900);
+          return;
+        }
+        if (e.target.id === 'sg-reset') {
+          if (Object.keys(D.state).length && !confirm('この試合のピック・BAN・演奏済みを全部外しますか？（ほかの試合の選曲はそのままです）')) return;
+          SG.resetState(D);
+          sgCommit({ keepList: true });
+        }
+      });
+      $('sg-ops').addEventListener('change', (e) => {
+        if (e.target.id === 'sg-autoFill') { D.autoFill = e.target.checked; sgCommit({ keepList: true }); }
+      });
+      $('sg-preview').addEventListener('click', () => {
+        $('pv-show').value = 'songs';
+        frameShow = 'songs';
+        loadFrame();
+      });
+      // 選曲する試合を、「試合の結果」で選んでいる試合（選んでいなければ配信中・次の試合）に合わせる
+      function sgSyncMatch() {
+        if (!D) return;
+        let id = selected;
+        if (!id) { const info = SG.matchInfo(T); id = info ? info.m.id : null; }
+        if (SG.switchMatch(D, id)) sgCommit({ keepList: true });
+      }
+      // ピックした曲を、この試合の「○曲目の曲名」に入れる（ピックした順番。点数か団体戦のとき）
+      function sgFill(id) {
+        if (!D.autoFill) return;
+        const info = SG.matchInfo(T, D.cur);
+        const x = D.list.find(s => s.id === id);
+        const k = D.order.indexOf(id);
+        if (!info || !x || k < 0) return;
+        if (T.scoreMode !== 'points' && !T.teamMode) return;
+        const n = K.subCountOf(T, info.m);
+        if (k >= n) { toast(`この試合は${n}曲までなので、曲名には入れていません`); return; }
+        K.setSongTitle(T, info.B, info.m.id, k, x.t);
+        render();
+        toast(`今の試合の「${K.subLabel(T, k, n)}」に「${x.t}」を入れました`);
+      }
+
+      // 曲リストの書き出し・読み込み
+      $('sg-export').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify({ format: 'donnma-songs', version: 1, D }, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `songs_${(D.title || 'list').replace(/[\\/:*?"<>|\s]+/g, '_')}.json`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      });
+      $('sg-import').addEventListener('click', () => $('sg-file').click());
+      $('sg-clear-history').addEventListener('click', () => {
+        if (!confirm('試合ごとの選曲の記録（トーナメント表＋課題曲の表示・使った回数）と、今のピック・BANを全部消しますか？')) return;
+        SG.resetState(D, true);
+        sgCommit({ keepList: true });
+      });
+      $('sg-file').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        try {
+          const data = JSON.parse(await file.text());
+          if (data.format !== 'donnma-songs' || !data.D) throw new Error('format');
+          if (D.list.length && !confirm('今の曲リストを、読み込んだものに入れ替えますか？')) return;
+          D = SG.sanitize(data.D);
+          sgSel = null;
+          sgSyncSettings();
+          sgCommit();
+          toast('読み込みました');
+        } catch (err) {
+          toast('⚠️ 曲リストのファイルではありません');
+        }
+      });
+      // 別の場所（ドックなど）で選曲が変わったら読み直す
+      addEventListener('storage', (e) => {
+        if (e.key !== SG.STORE_KEY) return;
+        D = SG.load();
+        sgSyncSettings();
+        send({ type: 'sg-state', D });
+        sgRenderList();
+        sgRenderOps();
+        scheduleObsPush();
       });
 
       buildUI();
+      $('settings').appendChild($('sg-sec'));
+      sgSyncSettings();
+      sgCommit();
       syncUI();
       renderSaves();
       obsUi();

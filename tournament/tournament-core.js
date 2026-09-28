@@ -992,11 +992,19 @@
       + '</div>';
   }
 
+  // S.songLines = { matchId: [{ t: 曲名 }] }：トーナメント表＋課題曲の表示で、試合の箱の下にその試合の曲を出す
+  const songFactor = S => (S.songLines ? 0.8 : 0);
+  function songLineHtml(S, m, box) {
+    if (!S.songLines) return '';
+    const list = (S.songLines[m.id] || []).filter(x => x && x.t);
+    return `<div class="tn-songline" style="height:${px(box.ex || 0)}">${list.length ? '♪ ' + list.map(x => esc(x.t)).join('<span class="tn-songsep">/</span>') : ''}</div>`;
+  }
   function matchHtml(B, S, T, m, box) {
     const cls = ['tn-match', 'st-' + m.status];
     if (T.live === m.id && (m.status === 'ready' || m.status === 'done')) cls.push('live');
     return `<div class="${cls.join(' ')}" data-id="${m.id}" style="left:${px(box.x)};top:${px(box.y)};width:${px(box.w)};height:${px(box.h)}${box.fr ? `;--row:${px(box.fr)}` : ''}">`
       + rowHtml(B, S, m, 0, T) + rowHtml(B, S, m, 1, T)
+      + songLineHtml(S, m, box)
       + '</div>';
   }
 
@@ -1016,10 +1024,11 @@
     const r1 = B.rounds[0].matches.length;
     const perSide = mirror ? r1 / 2 : r1;
     const unit = height / perSide;
-    const mf = memberFactor(B, S);
-    const rowH = Math.max(14, Math.min(S.rowHeight, unit * 0.46 / mf));
+    const mf = memberFactor(B, S), sf = songFactor(S);
+    const rowH = Math.max(14, Math.min(S.rowHeight, unit * 0.92 / (2 * mf + sf)));
     const pitch = rowH * mf;   // 1行の高さ（メンバーを出すときは2段になるので高くする）
-    const boxH = pitch * 2 + 2;
+    const ex = rowH * sf;      // 曲名の行の高さ
+    const boxH = pitch * 2 + 2 + ex;
     const boxes = {}, labels = [], lines = [];
     B.rounds.forEach((R, ri) => {
       const r = ri + 1;
@@ -1052,6 +1061,7 @@
         ? { x: fb.x, y: Math.max(top, fb.y - boxH - rowH * 2.6), w: boxW, h: rowH * 1.9 }
         : { x: colX(rounds), y: fb.y + boxH / 2 - rowH * 0.95, w: boxW, h: rowH * 1.9 };
     }
+    for (const b of Object.values(boxes)) b.ex = ex;
     // 線：試合の出口 → 次の試合の入口（上の試合は a の行へ、下の試合は b の行へ）
     B.rounds.slice(0, -1).forEach((R, ri) => {
       const next = B.rounds[ri + 1];
@@ -1059,7 +1069,7 @@
         const from = boxes[m.id], nm = next.matches[Math.floor(i / 2)], to = boxes[nm.id];
         const toRight = from.side === 'r';
         const x1 = toRight ? from.x : from.x + from.w;
-        const y1 = from.y + from.h / 2;
+        const y1 = from.y + (from.h - from.ex) / 2;
         const x2 = toRight ? to.x + to.w : to.x;
         const y2 = to.y + (i % 2 === 0 ? to.rowH / 2 : to.rowH * 1.5 + 2);
         const advanced = isDecided(m) && m.winner && m.winner !== BYE;
@@ -1069,7 +1079,7 @@
     if (champ) {
       const toRight = S.layout !== 'mirror';
       lines.push(toRight
-        ? { x1: fb.x + fb.w, y1: fb.y + fb.h / 2, x2: champ.x, y2: champ.y + champ.h / 2, on: !!B.champion, from: B.final }
+        ? { x1: fb.x + fb.w, y1: fb.y + (fb.h - ex) / 2, x2: champ.x, y2: champ.y + champ.h / 2, on: !!B.champion, from: B.final }
         : { x1: fb.x + fb.w / 2, y1: fb.y, x2: champ.x + champ.w / 2, y2: champ.y + champ.h, on: !!B.champion, from: B.final, vertical: true });
     }
     return { boxes, labels, lines, champ, rowH };
@@ -1091,10 +1101,11 @@
     const wTop = area.y + labelH;
     const unit = usable / (B.size / 2 + B.size / 4);
     const lTop = wTop + unit * (B.size / 2) + sectionGap + labelH;
-    const mf = memberFactor(B, S);
-    const rowH = Math.max(14, Math.min(S.rowHeight, unit * 0.46 / mf));
+    const mf = memberFactor(B, S), sf = songFactor(S);
+    const rowH = Math.max(14, Math.min(S.rowHeight, unit * 0.92 / (2 * mf + sf)));
     const pitch = rowH * mf;   // 1行の高さ（メンバーを出すときは2段になるので高くする）
-    const boxH = pitch * 2 + 2;
+    const ex = rowH * sf;      // 曲名の行の高さ
+    const boxH = pitch * 2 + 2 + ex;
     const boxes = {}, labels = [], lines = [];
     const wCol = r => (r === 1 ? 0 : 2 * r - 3);
     B.wRounds.forEach((Rd, ri) => {
@@ -1121,10 +1132,11 @@
     });
     const fb = boxes[B.final.id];
     const champ = S.showChampion ? { x: colX(L + gfCols), y: fb.y + boxH / 2 - rowH * 0.95, w: boxW, h: rowH * 1.9 } : null;
+    for (const b of Object.values(boxes)) b.ex = ex;
     const on = m => isDecided(m) && m.winner && m.winner !== BYE;
     const link = (m, to, i) => {
       const from = boxes[m.id], t = boxes[to.id];
-      lines.push({ x1: from.x + from.w, y1: from.y + from.h / 2, x2: t.x, y2: t.y + (i === 0 ? t.rowH / 2 : t.rowH * 1.5 + 2), on: on(m), from: m });
+      lines.push({ x1: from.x + from.w, y1: from.y + (from.h - ex) / 2, x2: t.x, y2: t.y + (i === 0 ? t.rowH / 2 : t.rowH * 1.5 + 2), on: on(m), from: m });
     };
     B.wRounds.slice(0, -1).forEach((Rd, ri) => Rd.matches.forEach((m, i) => link(m, B.wRounds[ri + 1].matches[Math.floor(i / 2)], i % 2)));
     B.lRounds.slice(0, -1).forEach((Rd, ji) => {
@@ -1133,8 +1145,8 @@
     });
     link(B.wRounds[R - 1].matches[0], B.gf[0], 0);
     link(B.lRounds[L - 1].matches[0], B.gf[0], 1);
-    if (B.gf[1]) lines.push({ x1: boxes.gf.x + boxW, y1: gy + boxH / 2, x2: boxes.gf2.x, y2: gy + boxH / 2, on: true, from: B.gf[0] });
-    if (champ) lines.push({ x1: fb.x + fb.w, y1: fb.y + fb.h / 2, x2: champ.x, y2: champ.y + champ.h / 2, on: !!B.champion, from: B.final });
+    if (B.gf[1]) lines.push({ x1: boxes.gf.x + boxW, y1: gy + (boxH - ex) / 2, x2: boxes.gf2.x, y2: gy + (boxH - ex) / 2, on: true, from: B.gf[0] });
+    if (champ) lines.push({ x1: fb.x + fb.w, y1: fb.y + (fb.h - ex) / 2, x2: champ.x, y2: champ.y + champ.h / 2, on: !!B.champion, from: B.final });
     return { boxes, labels, lines, champ, rowH };
   }
 
@@ -1203,9 +1215,10 @@
     const top = area.y + labelH;
     const M = Math.ceil(n / 2);
     const unit = (area.h - labelH) / M;
-    const mf = memberFactor(B, S);
-    const rowH = Math.max(14, Math.min(S.rowHeight, unit * 0.44 / mf));
-    const boxH = rowH * mf * 2 + 2;
+    const mf = memberFactor(B, S), sf = songFactor(S);
+    const rowH = Math.max(14, Math.min(S.rowHeight, unit * 0.88 / (2 * mf + sf)));
+    const ex = rowH * sf;
+    const boxH = rowH * mf * 2 + 2 + ex;
     const step = Math.min(unit, boxH + rowH * 0.7);
     let html = `<div class="tn-bracket" style="--row:${px(rowH)}">`;
     for (let r = 1; r <= total; r++) {
@@ -1217,7 +1230,7 @@
         continue;
       }
       const shown = R.matches.filter(m => !(S.hideByes && m.status === 'bye'));
-      shown.forEach((m, i) => { html += matchHtml(B, S, T, m, { x, y: top + i * step, w: boxW, h: boxH }); });
+      shown.forEach((m, i) => { html += matchHtml(B, S, T, m, { x, y: top + i * step, w: boxW, h: boxH, ex }); });
     }
     html += '</div>';
     // 順位表
@@ -1464,6 +1477,8 @@
     out.push(`.tn-tag { flex: none; font-size: 0.62em; font-weight: 700; line-height: 1; padding: 0.25em 0.5em; border-radius: 999px; color: #fff; text-shadow: none; background: #8a8a96; letter-spacing: 0.04em; }`);
     out.push(`.tn-tag-dq { background: #d33b3b; }`);
     out.push(`.tn-tag-sub { background: #5b6bd6; }`);
+    out.push(`.tn-songline { flex: none; box-sizing: border-box; display: flex; align-items: center; padding: 0 0.7em; font-size: calc(var(--row, ${px(S.rowHeight)}) * 0.4); font-weight: 700; color: ${S.subText}; border-top: 1px dashed ${rgba(S.boxBorder, 0.9)}; background: ${rgba(S.boxBg, Math.min(1, S.boxAlpha + 0.05))}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }`);
+    out.push(`.tn-songsep { margin: 0 0.4em; opacity: 0.6; }`);
     out.push(`.tn-members .tn-tag { font-size: 0.85em; margin-left: 0.5em; vertical-align: middle; }`);
     out.push(`.tn-tag-rev { background: #2f9e6e; }`);
     out.push(`.tn-rep-note { font-size: calc(var(--row, ${px(S.rowHeight)}) * 0.5); color: ${S.text}; }`);

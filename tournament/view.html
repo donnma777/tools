@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex">
   <title>トーナメント表</title>
   <!-- OBSのブラウザソースで表示するページ（幅1920・高さ1080。ほかの縦横比のウィンドウでは、表示もそれに合わせて広がる）。
-       URL の # 以降で表示の種類を選ぶ：#show=bracket（トーナメント表）/ #show=match（今の試合）/ #show=champion（優勝者）
+       URL の # 以降で表示の種類を選ぶ：#show=bracket（トーナメント表）/ #show=match（今の試合）/ #show=champion（優勝者）/ #show=songs（選曲リスト）/ #show=bracket-songs（トーナメント表＋課題曲）
        大会データと見た目は、編集ページがこのブラウザに保存したものを読む（OBS接続なら OBS へ送られてくる） -->
   <style>
     html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
@@ -15,6 +15,9 @@
     body.preview .tn-match, body.preview .tn-cell[data-id] { cursor: pointer; }
     body.preview .tn-match:hover, body.preview .tn-cell[data-id]:hover { outline: 3px solid rgba(255, 255, 255, 0.6); outline-offset: 2px; }
     body.preview .tn-match.selected, body.preview .tn-cell.selected { outline: 3px solid #ffd54a; outline-offset: 3px; }
+    body.preview .sg-card { cursor: pointer; }
+    body.preview .sg-card:hover { outline: 3px solid rgba(255, 255, 255, 0.6); outline-offset: 2px; }
+    body.preview .sg-card.selected { outline: 4px solid #ffd54a; outline-offset: 3px; }
   </style>
   <style id="gen"></style>
 </head>
@@ -23,7 +26,8 @@
   <div id="stage"></div>
 
   <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
-  <script src="tournament-core.js?v=20260928n"></script>
+  <script src="tournament-core.js?v=20260928p"></script>
+  <script src="songs-core.js?v=20260928d"></script>
   <script>
     (() => {
       'use strict';
@@ -42,6 +46,11 @@
       // 抽選の演出：開いたときの drawAt は流さない（開き直すたびに流れないように）。演出中の更新は、終わってから反映する
       let lastDrawAt = T.drawAt;
       let animating = false, pendingDraw = false;
+      // 選曲リスト（#show=songs）：ルーレットも開いたときの分は流さない
+      const SG = window.TournamentSongs;
+      let D = SG.load();
+      let lastRouletteAt = D.roulette.at;
+      let spinHide = null, selectedSong = null;
 
       // 1920×1080 を基準に、ウィンドウに合わせて拡大・縮小する（OBS では等倍）。
       // ウィンドウが横長（縦長）なら、そのぶん表示の幅（高さ）を広げて、背景も画面全体に塗る
@@ -65,9 +74,20 @@
       let cssKey = '';
       function draw() {
         if (animating) { pendingDraw = true; return; }
+        drawNow();
+      }
+      function drawNow() {
+        if (show === 'songs') {
+          const css = K.generateCSS(S) + SG.generateCSS(S, D);
+          if (css !== cssKey) { document.getElementById('gen').textContent = css; cssKey = css; }
+          stage.innerHTML = SG.render(D, T, S, size, { hide: spinHide });
+          if (selectedSong) stage.querySelector(`.sg-card[data-song="${selectedSong}"]`)?.classList.add('selected');
+          return;
+        }
         const css = K.generateCSS(S);
         if (css !== cssKey) { document.getElementById('gen').textContent = css; cssKey = css; }
-        stage.innerHTML = K.render(T, S, show, size);
+        // トーナメント表＋課題曲：試合の箱の下に、その試合で選ばれた曲を出す
+        stage.innerHTML = show === 'bracket-songs' ? K.render(T, { ...S, songLines: SG.songLines(D, T) }, 'bracket', size) : K.render(T, S, show, size);
         // 新しく勝敗が決まった試合の勝者の行を光らせる
         const B = K.build(T);
         const winners = Object.fromEntries(K.allMatches(B).filter(m => m.status === 'done' || m.status === 'forfeit').map(m => [m.id, m.winner]));
@@ -85,7 +105,7 @@
       function apply(nextT, nextS) {
         T = K.sanitizeT(nextT);
         S = K.sanitizeS(nextS);
-        if (T.drawAt && T.drawAt !== lastDrawAt && show === 'bracket') {
+        if (T.drawAt && T.drawAt !== lastDrawAt && (show === 'bracket' || show === 'bracket-songs')) {
           lastDrawAt = T.drawAt;
           playDraw();
           return;
@@ -136,8 +156,68 @@
         if (pendingDraw) { pendingDraw = false; draw(); }
       }
 
+      // 選曲リスト：データが変わったら表示し直す。ルーレットのボタンが押されていたら演出を流す
+      function applySongs(nextD) {
+        D = SG.sanitize(nextD);
+        if (D.roulette.at && D.roulette.at !== lastRouletteAt && D.roulette.id && show === 'songs') {
+          lastRouletteAt = D.roulette.at;
+          playRoulette();
+          return;
+        }
+        lastRouletteAt = D.roulette.at;
+        draw();
+      }
+      // ルーレット：残っている曲のカードを順に光らせて、だんだん遅くして、選ばれた曲で止める
+      async function playRoulette() {
+        if (animating) return;
+        const target = D.roulette.id;
+        spinHide = target;
+        animating = true;
+        drawNow();
+        const cards = [...stage.querySelectorAll('.sg-card.st-none')];
+        const goal = stage.querySelector(`.sg-card[data-song="${target}"]`);
+        if (goal && cards.length > 1) {
+          const total = D.spinSec * 1000;
+          let t = 0, delay = 60, prev = null;
+          while (t < total * 0.85) {
+            let c;
+            do { c = cards[Math.floor(Math.random() * cards.length)]; } while (c === prev && cards.length > 1);
+            prev?.classList.remove('spin');
+            c.classList.add('spin');
+            prev = c;
+            await sleep(delay);
+            t += delay;
+            delay = Math.min(380, delay * 1.09 + 4);
+          }
+          prev?.classList.remove('spin');
+          goal.classList.add('spin');
+          await sleep(700);
+        }
+        spinHide = null;
+        drawNow();
+        const card = stage.querySelector(`.sg-card[data-song="${target}"]`);
+        card?.classList.add('hit');
+        const song = D.list.find(x => x.id === target);
+        if (song) {
+          const pop = document.createElement('div');
+          pop.className = 'sg-pop';
+          pop.innerHTML = '<div class="sg-pop-label">🎲 ルーレット</div><div class="sg-pop-t"></div><div class="sg-pop-a"></div>';
+          pop.querySelector('.sg-pop-t').textContent = song.t || '（曲名なし）';
+          pop.querySelector('.sg-pop-a').textContent = [song.a, song.lv].filter(Boolean).join('　');
+          stage.appendChild(pop);
+          await sleep(2200);
+          pop.classList.add('done');
+          await sleep(600);
+          pop.remove();
+        }
+        // 演出が終わるまで、届いた更新は待たせておく（途中で描き直すと、ポップアップが消えるので）
+        animating = false;
+        if (pendingDraw) { pendingDraw = false; draw(); }
+      }
+
       // 同じ場所で開いている編集ページ（OBSのカスタムブラウザドックなど）が保存したら、読み直す
       addEventListener('storage', (e) => {
+        if (e.key === SG.STORE_KEY) { applySongs(SG.load()); return; }
         if (e.key !== K.STORE_KEY) return;
         const d = K.loadStored();
         apply(d.T, d.S);
@@ -149,6 +229,8 @@
         if (!d || !d.T) return;
         apply(d.T, d.S);
         K.saveStored(T, S);
+        // 選曲リストも一緒に届く
+        if (d.D) { SG.save(SG.sanitize(d.D)); applySongs(d.D); }
       });
 
       // 編集ページのプレビュー：内容は親から受け取り、試合のクリックを親に伝える
@@ -157,10 +239,14 @@
           if (e.source !== window.parent || !e.data) return;
           if (e.data.type === 'tn-state') apply(e.data.T, e.data.S);
           if (e.data.type === 'tn-select') { selected = e.data.id; draw(); }
+          if (e.data.type === 'sg-state') applySongs(e.data.D);
+          if (e.data.type === 'sg-select') { selectedSong = e.data.id; draw(); }
         });
         stage.addEventListener('click', (e) => {
           const m = e.target.closest('.tn-match, .tn-cell[data-id]');
           if (m) window.parent.postMessage({ type: 'tn-pick', id: m.dataset.id }, '*');
+          const c = e.target.closest('.sg-card');
+          if (c) window.parent.postMessage({ type: 'sg-pick', id: c.dataset.song }, '*');
         });
         window.parent.postMessage({ type: 'tn-ready' }, '*');
       }
