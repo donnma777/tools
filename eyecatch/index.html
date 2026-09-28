@@ -4,19 +4,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>登録者数カウンター・目標ゲージ | どんまうんど-Tools</title>
+  <title>アイキャッチメーカー | どんまうんど-Tools</title>
   <link rel="icon" href="../favicon.ico">
   <meta name="description"
-    content="YouTubeチャンネルの登録者数を自動で取得して、OBSのブラウザソースでおしゃれに表示できる無料ツール。「目標まであと○人」の登録者目標ゲージも出せます。グラデーション・縁取り・見出し・単位・背景の箱を、プレビューを見ながら設定できます。">
-  <meta property="og:title" content="登録者数カウンター・目標ゲージ | どんまうんど-Tools">
-  <meta property="og:description" content="YouTubeの登録者数と目標ゲージを、OBSでおしゃれに表示できる無料ツール。">
+    content="ブログのアイキャッチ、YouTubeのサムネイル、SNSの共有画像をブラウザだけで作れる無料ツール。文字を入れて、背景の柄と画像を選ぶだけ。長い文字は自動で収まります。画像はどこにも送信しません。">
+  <meta property="og:title" content="アイキャッチメーカー | どんまうんど-Tools">
+  <meta property="og:description" content="ブログのアイキャッチ・サムネイル・SNSの共有画像を、ブラウザだけで作れる無料ツール。">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://donnma.com/tool/youtube-subscribers/">
+  <meta property="og:url" content="https://donnma.com/tool/eyecatch/">
   <meta property="og:site_name" content="どんまうんど-Tools">
-  <meta property="og:image" content="https://donnma.com/tool/image/ogp-youtube-subscribers.jpg">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-eyecatch.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="登録者数カウンター">
+  <meta property="og:image:alt" content="アイキャッチメーカー">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@donnma777">
   <!-- Google tag (gtag.js) -->
@@ -1087,6 +1087,101 @@
         text-align: center;
       }
     }
+
+    /* ── アイキャッチメーカー用 ── */
+    .side {
+      height: auto;
+      min-height: 0;
+    }
+
+    .preview-panel {
+      flex: none;
+    }
+
+    .ec-stage {
+      padding: 14px;
+      display: grid;
+      place-items: center;
+    }
+
+    #cv {
+      display: block;
+      max-width: 100%;
+      max-height: calc(100vh - 330px);
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .mini-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      padding: 0 14px 14px;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    #mini {
+      border-radius: 4px;
+    }
+
+    .save-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .save-row input {
+      flex: 1 1 180px;
+    }
+
+    .img-pick {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .img-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2) center / contain no-repeat;
+      flex: none;
+    }
+
+    textarea.title-in {
+      width: 100%;
+      min-height: 76px;
+      resize: vertical;
+      font: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    textarea.title-in:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .field-full {
+      grid-column: 1 / -1;
+    }
+
+    @media (min-width: 1001px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr) 620px;
+      }
+    }
   </style>
 </head>
 
@@ -1107,13 +1202,11 @@
     </div>
   </nav>
 
-  <p class="pc-notice" role="note">このツールはPCのOBSで使う前提です。スマホでは正しく表示されません。</p>
-
   <!-- Hero -->
   <header class="hero">
     <div class="hero-inner">
-      <h1>登録者数カウンター・目標ゲージ</h1>
-      <p>YouTubeの登録者数を自動で取得して、OBSにおしゃれに表示できます。「目標まであと○人」のゲージも出せます。見た目はプレビューを見ながら決められます。</p>
+      <h1>アイキャッチメーカー</h1>
+      <p>ブログのアイキャッチ、YouTubeのサムネイル、SNSの共有画像をブラウザだけで作れます。文字を入れて、背景と画像を選ぶだけ。画像はどこにも送信しません。</p>
     </div>
   </header>
 
@@ -1124,71 +1217,62 @@
       <div class="panel">
         <div class="panel-body">
           <div class="data-row" style="margin-top: 0;">
-            <button class="btn btn-sm" id="btn-save" type="button">💾 設定をファイルに保存</button>
-            <button class="btn btn-sm" id="btn-load" type="button">📂 ファイルから復元</button>
             <button class="btn btn-sm btn-danger" id="btn-reset" type="button">すべてリセット</button>
-            <input type="file" id="file-load" accept=".json,application/json" hidden>
           </div>
+          <p class="field-note" style="margin-top:8px">設定はこのブラウザに自動で保存されます（選んだ画像も、保存できる大きさなら残ります）。</p>
         </div>
       </div>
-      <details class="sec preset-sec" data-key="counter-presets">
-        <summary><span class="sec-icon">🎭</span>テンプレート<span class="preset-count"></span></summary>
-        <div class="preset-row preset-body" id="presets"></div>
+
+      <details class="sec" open>
+        <summary><span class="sec-icon">✏️</span>文字</summary>
+        <div class="fields">
+          <div class="field field-full">
+            <label class="field-label" for="f-title"><span>タイトル（Enter で改行）</span></label>
+            <textarea class="title-in" id="f-title" spellcheck="false"></textarea>
+            <div class="field-note">長い文字は、枠に収まるように自動で小さくなります。</div>
+          </div>
+          <div class="field field-full">
+            <label class="field-label" for="f-sub"><span>サブタイトル（小さい文字。空欄でなし）</span></label>
+            <input type="text" id="f-sub" spellcheck="false" placeholder="例: 初心者向けにやさしく解説">
+          </div>
+        </div>
+      </details>
+
+      <details class="sec" open>
+        <summary><span class="sec-icon">🖼️</span>画像</summary>
+        <div class="fields">
+          <div class="field field-full">
+            <span class="field-label"><span>横に置く画像（キャラ・写真・アイコンなど）</span></span>
+            <div class="img-pick">
+              <span class="img-thumb" id="img-thumb"></span>
+              <button class="btn btn-sm" type="button" id="img-pick">📁 画像を選ぶ</button>
+              <button class="btn btn-sm" type="button" id="img-clear">サンプルに戻す</button>
+              <input type="file" id="img-file" accept="image/*" hidden>
+            </div>
+            <div class="field-note">背景が透明な PNG・WebP だと、柄の上にきれいに乗ります。選ばないときは、サンプルのうさぎが入ります。</div>
+          </div>
+        </div>
       </details>
       <!-- sections are generated from SECTIONS below -->
     </div>
 
-    <!-- Preview + output column -->
+    <!-- Preview column -->
     <div class="side">
       <div class="panel preview-panel">
         <div class="panel-head">
-          <span>プレビュー</span>
-          <div class="preview-tools">
-            <select id="stage-bg" aria-label="プレビュー背景">
-              <option value="checker">背景: 透過</option>
-              <option value="game">背景: ゲーム画面風</option>
-              <option value="dark">背景: 黒</option>
-              <option value="light">背景: 白</option>
-              <option value="green">背景: グリーンバック</option>
-            </select>
-            <button class="btn btn-sm" id="btn-up" type="button" title="登録者が増えたときの動きを試します">＋1 増やす</button>
-            <button class="btn btn-sm" id="btn-up100" type="button">＋100</button>
-            <button class="btn btn-sm" id="btn-goal-test" type="button" title="目標を超えたときの動きを試します"
-              style="display: none;">🎉 達成を試す</button>
-          </div>
+          <span>プレビュー <span class="out-meta" id="size-meta"></span></span>
         </div>
-        <div class="stage bg-checker" id="stage">
-          <iframe id="preview" title="登録者数のプレビュー"></iframe>
+        <div class="ec-stage bg-checker">
+          <canvas id="cv" width="1280" height="720" aria-label="アイキャッチのプレビュー"></canvas>
         </div>
-      </div>
-
-      <div class="panel output-panel">
-        <div class="panel-head">
-          <span>接続設定・OBSに貼るURL</span>
-          <div class="preview-tools">
-            <button class="btn btn-sm" id="btn-test" type="button">接続テスト</button>
-            <button class="btn btn-sm btn-primary" id="btn-copy-url" type="button">📋 URLをコピー</button>
-          </div>
+        <div class="mini-row">
+          <span>一覧などで小さく出たとき：</span>
+          <canvas id="mini" width="160" height="90"></canvas>
         </div>
-        <div class="panel-body tw-out">
-          <label class="field-label" for="api-key"><span>APIキー（YouTube Data API v3）</span></label>
-          <div class="color-row">
-            <input type="password" id="api-key" placeholder="AIza から始まる文字列" spellcheck="false" autocomplete="off">
-            <button class="btn btn-sm" id="btn-key-show" type="button" aria-pressed="false">表示</button>
-          </div>
-          <label class="field-label" for="channel"><span>チャンネル（@ハンドル か、UC から始まるチャンネルID）</span></label>
-          <input type="text" id="channel" placeholder="@donnma" spellcheck="false" autocomplete="off">
-          <label class="field-label" for="interval"><span>数を取りに行く間隔</span></label>
-          <select id="interval">
-            <option value="10">10秒ごと</option>
-            <option value="30">30秒ごと（おすすめ）</option>
-            <option value="60">1分ごと</option>
-            <option value="300">5分ごと</option>
-          </select>
-          <p class="field-note" id="test-result" role="status"></p>
-          <input type="text" id="obs-url" readonly hidden spellcheck="false" aria-label="OBSに貼るURL">
-          <p class="field-note">APIキーは、このブラウザとコピーしたURLの中にだけ保存されます。URLにキーが入るので、配信画面やSNSに映さないでください。APIキーの作り方は下の「使い方」にあります。
-          </p>
+        <div class="save-row">
+          <input type="text" id="file-name" spellcheck="false" aria-label="ファイル名">
+          <button class="btn btn-primary" id="save-jpg" type="button">⬇ JPG で保存</button>
+          <button class="btn" id="save-png" type="button">PNG で保存</button>
         </div>
       </div>
     </div>
@@ -1198,34 +1282,12 @@
   <section class="guide">
     <div class="panel">
       <div class="panel-body">
-        <h2>🎥 OBSでの使い方</h2>
+        <h2>🖌 使い方</h2>
         <ol class="steps">
-          <li>下の「APIキーの作り方」で <b>APIキー</b> を用意します（無料・最初の1回だけ）。</li>
-          <li>右の「接続設定」に <b>APIキー</b> と <b>チャンネル</b>（<code>@ハンドル</code> か <code>UC…</code>
-            のチャンネルID）を入れて、<b>「接続テスト」</b>。チャンネル名と登録者数が出ればOKです。</li>
-          <li>このページで見た目を決めて <b>「URLをコピー」</b>。</li>
-          <li>OBSで <b>ソース ＋ → ブラウザ</b> を追加し、URLに貼り付けます。幅 <code>800</code>・高さ <code>300</code> くらい（目標ゲージを出すなら高さ
-            <code>400</code> くらい）が目安です。カスタムCSSは空のままでOKです。
-          </li>
-          <li>同じ画面で <b>「表示されていないときにソースをシャットダウン」</b>
-            にチェックを入れます。ソースを目のアイコンで非表示にしたり、ソースが入っていないシーンに切り替えたりすると、数を取りに行くのが止まります（表示に戻すと再開）。</li>
-          <li>あとで見た目を変えたときは、もう一度「URLをコピー」して、ブラウザソースのURLを貼り替えてください。</li>
-        </ol>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-body">
-        <h2>🔑 APIキーの作り方</h2>
-        <ol class="steps">
-          <li><a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud コンソール</a>
-            にGoogleアカウントでログインし、<b>新しいプロジェクト</b>を作ります（名前は何でもOK）。</li>
-          <li>「APIとサービス」→「ライブラリ」で <b>YouTube Data API v3</b> を検索して、<b>「有効にする」</b>。</li>
-          <li>「APIとサービス」→「認証情報」→「認証情報を作成」→ <b>「APIキー」</b>。</li>
-          <li>できたキーの編集画面で制限をかけます。<b>「APIの制限」</b>は「YouTube Data API v3」だけを選び、<b>「アプリケーションの制限」</b>は「ウェブサイト」にして
-            <code>https://donnma.com/*</code> を追加して保存。
-          </li>
-          <li>キーをコピーして、右の「APIキー」に貼り付けます。クレジットカードの登録はいりません。</li>
+          <li>左の「文字」に <b>タイトル</b> を入れます。Enter で改行できます。</li>
+          <li>「大きさ」で使う場所に合わせたサイズを選びます（ブログのアイキャッチ・YouTubeのサムネイルは <b>1280×720</b>、SNSの共有画像は <b>1200×630</b> がおすすめ）。</li>
+          <li>「画像」で自分のキャラや写真を選び、「背景」で柄や色を選びます。</li>
+          <li>右の <b>「JPG で保存」</b> を押すと、画像がダウンロードされます。</li>
         </ol>
       </div>
     </div>
@@ -1234,18 +1296,11 @@
       <div class="panel-body">
         <h2>💡 ヒント・注意点</h2>
         <ul class="notes">
-          <li>YouTubeの仕様で、APIで取れる登録者数は <b>1,000人を超えると上から3桁に丸められます</b>（例: 12,345人 → 12,300人）。表示もその数になります。</li>
-          <li>登録者が増えてから、APIの数が変わるまで少し時間がかかることがあります。</li>
-          <li>1回数を取りに行くと、APIの使用量を1使います。無料で使えるのは1日10,000までなので、10秒ごとでも足ります。同じキーをほかのツールでも使うなら、30秒以上がおすすめです。</li>
-          <li>
-            <b>APIを止めたいとき</b>は、ソースを非表示にする（上の「シャットダウン」にチェックを入れた場合）、ソースを削除する、OBSを終了する、のどれかでOKです。ブラウザのタブで表示用のURLを開いている場合は、そのタブも閉じてください。この設定ページは「接続テスト」を押したときしか数を取りに行きません。
-          </li>
-          <li>キーそのものを使えなくしたいとき（URLをうっかり見せてしまったときなど）は、Google Cloud コンソールの「認証情報」でAPIキーを削除してください。</li>
-          <li><b>目標ゲージ</b>は「🎯 目標ゲージ」でオンにします。目標を超えたら、次のキリのいい数（1,000 → 2,000 → 3,000 →
-            5,000…）に自動で切り替えることも、「達成」を出したままにすることもできます。プレビューの「🎉 達成を試す」で、超えたときの動きを確認できます。</li>
-          <li>1,000人を超えると登録者数が上から3桁に丸められるため、ゲージも少しずつではなく、まとまって進みます。</li>
-          <li>うまく取れないときは、カウンターの左上に理由が出ます。</li>
-          <li>設定はこのブラウザに自動で保存されます。「設定をファイルに保存」にはAPIキーは入りません。</li>
+          <li>選んだ画像は、このブラウザの中だけで使います。サーバーには送信しません。</li>
+          <li>ブログやSNSの一覧では、画像がかなり小さく表示されます。プレビューの下の「小さく出たとき」で、文字が読めるか確かめてください。</li>
+          <li>JPG のほうがファイルが軽くなります。背景を透明にしたいときだけ PNG を使ってください（背景の「なし（透明）」）。</li>
+          <li>縦長や正方形では、上に文字・下に画像の縦並びになります。</li>
+          <li>作った画像は、ブログ・動画・配信の告知など、自由に使ってかまいません（サンプルのうさぎや背景の柄も含む）。</li>
         </ul>
       </div>
     </div>
@@ -1278,145 +1333,106 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <!-- フォント一覧・文字効果はチャットCSSジェネレーターと共通。chat-core.js / counter-core.js を変えたら v を上げる（view.html も） -->
-  <!-- 確認はページの中に出す（OBSのドックでは confirm() が出ないことがあるので） -->
+  <!-- フォント一覧はチャットCSSジェネレーターと共通。確認はページの中に出す（common/ask.js） -->
   <script src="../common/ask.js?v=20260929a"></script>
   <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
-  <script src="counter-core.js?v=20260927b"></script>
   <script>
     (() => {
       'use strict';
       const C = window.ChatCore;
-      const K = window.CounterCore;
       const $ = id => document.getElementById(id);
-      const ask = (msg, opts) => window.DonnmaAsk.ask(msg, opts).then(r => r === true);
-      const { DEFAULTS, sanitize, IDLE } = K;
+      const ask = (msg, yes) => window.DonnmaAsk.ask(msg, { yes }).then(r => r === true);
 
       // =====================================================
-      //  設定項目
+      //  設定
       // =====================================================
-      const WEIGHTS = C.WEIGHTS;
-      const BORDER_STYLES = [['solid', '実線'], ['dashed', '破線'], ['dotted', '点線'], ['double', '二重線']];
-      const effOn = s => s.textEffect !== 'none';
-      const gOn = s => s.gaugeOn;
-      const barOn = s => s.gaugeOn && s.gaugeBar;
+      const SIZES = {
+        yt: [1280, 720, 'アイキャッチ・YouTubeサムネ（1280×720）'],
+        ogp: [1200, 630, 'SNS共有・OGP（1200×630）'],
+        x: [1600, 900, 'X（旧Twitter）の投稿画像（1600×900）'],
+        sq: [1080, 1080, '正方形（1080×1080）'],
+        tall: [1080, 1920, '縦長・ストーリー（1080×1920）'],
+        custom: [0, 0, '自由に入力'],
+      };
+      const DEFAULTS = {
+        title: 'タイトルを\n入力してね', sub: '',
+        size: 'yt', customW: 1280, customH: 720,
+        font: 'Zen Maru Gothic', fontCustom: '', weight: '900',
+        titleColor: '#ff7fa0', subColor: '#6e3551', strokeWidth: 14, strokeColor: '#ffffff', shadow: true,
+        textScale: 1,
+        imgPos: 'left', imgAnchor: 'auto', imgScale: 1,
+        bg: 'usagi', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
+      };
+      const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
+      function sanitize(o) {
+        const out = { ...DEFAULTS };
+        if (!o || typeof o !== 'object') return out;
+        for (const k of Object.keys(DEFAULTS)) {
+          const d = DEFAULTS[k], v = o[k];
+          if (v === undefined) continue;
+          if (typeof d === 'number' && typeof v === 'number' && isFinite(v)) out[k] = v;
+          else if (typeof d === 'boolean' && typeof v === 'boolean') out[k] = v;
+          else if (typeof d === 'string' && typeof v === 'string' && (!COLOR_KEYS.includes(k) || /^#[0-9a-f]{6}$/i.test(v))) out[k] = v;
+        }
+        if (!SIZES[out.size]) out.size = 'yt';
+        out.customW = Math.round(Math.min(4000, Math.max(200, out.customW)));
+        out.customH = Math.round(Math.min(4000, Math.max(200, out.customH)));
+        return out;
+      }
+
+      const bgPat = s => ['usagi', 'dots', 'stripe', 'check'].includes(s.bg);
       const SECTIONS = [
         {
-          title: '目標ゲージ', icon: '🎯', fields: [
-            { k: 'gaugeOn', l: '目標ゲージを表示', t: 'check' },
-            { k: 'goal', l: '目標の人数', t: 'number', min: 1, max: 100000000, when: gOn },
-            {
-              k: 'goalAfter', l: '目標を超えたら', t: 'select', when: gOn, o: [
-                ['next', '次のキリのいい数を目標にする'], ['stay', '「達成」を表示したままにする']],
-              note: '「次のキリのいい数」は 1,000 → 2,000 → 3,000 → 5,000 → 10,000… のように自動で決まります',
-            },
-            { k: 'showCount', l: '大きな数字も表示する（オフでゲージだけ）', t: 'check', when: gOn },
-            { k: 'gaugeBar', l: 'バーを表示する（オフで目標の文字だけ）', t: 'check', when: gOn },
-            { k: 'gaugeTitle', l: 'ゲージの見出し', t: 'text', ph: '例: 収益化まで', when: gOn, note: '{goal} と書くと目標の人数に置き換わります' },
-            { k: 'gaugeInfo', l: 'ゲージの右側', t: 'select', o: [['left', 'あと○人'], ['pct', '○%'], ['frac', 'いまの数 / 目標'], ['none', '表示しない']], when: gOn },
-            { k: 'gaugeDoneText', l: '達成したときの文字', t: 'text', ph: '🎉 目標達成！', when: gOn },
-            { k: 'gaugeTextSize', l: 'ゲージの文字サイズ', t: 'range', min: 10, max: 80, step: 1, u: 'px', when: gOn },
-            { k: 'gaugeTextColor', l: 'ゲージの文字色', t: 'color', when: gOn },
-            { k: 'gaugeWidth', l: 'ゲージの長さ', t: 'range', min: 160, max: 1600, step: 10, u: 'px', when: barOn },
-            { k: 'gaugeHeight', l: 'ゲージの太さ', t: 'range', min: 4, max: 80, step: 1, u: 'px', when: barOn },
-            { k: 'gaugeRadius', l: 'ゲージの角の丸み', t: 'range', min: 0, max: 40, step: 1, u: 'px', when: barOn },
-            { k: 'gaugeFillMode', l: 'バーの色', t: 'select', o: [['same', '数字と同じ色'], ['solid', '単色'], ['gradient', 'グラデーション']], when: barOn },
-            { k: 'gaugeFill1', l: s => s.gaugeFillMode === 'solid' ? 'バーの色' : 'バーの色（左）', t: 'color', when: s => barOn(s) && s.gaugeFillMode !== 'same' },
-            { k: 'gaugeFill2', l: 'バーの色（右）', t: 'color', when: s => barOn(s) && s.gaugeFillMode === 'gradient' },
-            { k: 'gaugeTrack', l: 'バーの下地の色', t: 'color', when: barOn },
-            { k: 'gaugeTrackAlpha', l: '下地の不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: barOn },
-            { k: 'gaugeBorder', l: 'ゲージに枠線を付ける', t: 'check', when: barOn },
-            { k: 'gaugeBorderWidth', l: '枠線の太さ', t: 'range', min: 1, max: 8, step: 0.5, u: 'px', when: s => barOn(s) && s.gaugeBorder },
-            { k: 'gaugeBorderColor', l: '枠線の色', t: 'color', when: s => barOn(s) && s.gaugeBorder },
-            { k: 'gaugeShine', l: 'バーに光を流す', t: 'check', when: barOn },
+          title: '大きさ', icon: '📐', open: true, fields: [
+            { k: 'size', l: '使う場所', t: 'select', o: Object.entries(SIZES).map(([v, a]) => [v, a[2]]) },
+            { k: 'customW', l: '幅（px）', t: 'number', min: 200, max: 4000, when: s => s.size === 'custom' },
+            { k: 'customH', l: '高さ（px）', t: 'number', min: 200, max: 4000, when: s => s.size === 'custom' },
           ]
         },
         {
-          title: '数字', icon: '🔢', fields: [
+          title: '文字の見た目', icon: '🔤', fields: [
             { k: 'font', l: 'フォント', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]) },
             { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
-            { k: 'weight', l: '文字の太さ', t: 'select', o: WEIGHTS },
-            { k: 'scale', l: '大きさ', t: 'range', min: 0.5, max: 6, step: 0.1, u: '倍' },
-            { k: 'spacing', l: '文字の間隔', t: 'range', min: -4, max: 20, step: 1, u: 'px' },
-            { k: 'tabular', l: '数字の幅をそろえる（増えるときにガタつかない）', t: 'check' },
+            { k: 'weight', l: '文字の太さ', t: 'select', o: C.WEIGHTS },
+            { k: 'textScale', l: '文字の大きさ', t: 'range', min: 0.5, max: 1.3, step: 0.05, u: '倍', note: '枠に収まらないときは、これより小さくなります' },
+            { k: 'titleColor', l: 'タイトルの色', t: 'color' },
+            { k: 'subColor', l: 'サブタイトルの色', t: 'color' },
+            { k: 'strokeWidth', l: '縁取りの太さ（0でなし）', t: 'range', min: 0, max: 30, step: 1, u: 'px' },
+            { k: 'strokeColor', l: '縁取りの色', t: 'color', when: s => s.strokeWidth > 0 },
+            { k: 'shadow', l: '文字にほんのり影を付ける', t: 'check' },
           ]
         },
         {
-          title: '数字の色・文字効果', icon: '🎨', fields: [
-            { k: 'colorMode', l: '色', t: 'select', o: [['solid', '単色'], ['gradient', 'グラデーション'], ['rainbow', 'レインボー（流れる）']] },
-            { k: 'color', l: '文字色', t: 'color', when: s => s.colorMode === 'solid' },
-            { k: 'grad1', l: 'グラデーションの色 1', t: 'color', when: s => s.colorMode === 'gradient' },
-            { k: 'grad2', l: 'グラデーションの色 2', t: 'color', when: s => s.colorMode === 'gradient' },
-            { k: 'grad3On', l: '3色目を使う', t: 'check', when: s => s.colorMode === 'gradient' },
-            { k: 'grad3', l: 'グラデーションの色 3', t: 'color', when: s => s.colorMode === 'gradient' && s.grad3On },
-            { k: 'gradAngle', l: 'グラデーションの向き', t: 'range', min: 0, max: 360, step: 5, u: '°', when: s => s.colorMode === 'gradient' },
-            { k: 'textEffect', l: '文字効果', t: 'select', o: [['none', 'なし'], ['outline', '縁取り'], ['shadow', '影'], ['glow', '発光（ネオン）']] },
-            { k: 'effectWidth', l: '縁取り・影の太さ', t: 'range', min: 0.5, max: 12, step: 0.5, u: 'px', when: effOn },
-            { k: 'effectColor', l: '縁取り・影の色', t: 'color', when: effOn },
+          title: '画像の置き方', icon: '🧸', fields: [
+            { k: 'imgPos', l: '画像の位置', t: 'select', o: [['left', '左'], ['right', '右'], ['none', '画像なし（文字だけ）']], note: '縦長・正方形では、上に文字・下に画像になります' },
+            { k: 'imgAnchor', l: '縦の位置', t: 'select', o: [['auto', 'おまかせ'], ['bottom', '下にそろえる（キャラの全身など）'], ['center', '真ん中']], when: s => s.imgPos !== 'none' },
+            { k: 'imgScale', l: '画像の大きさ', t: 'range', min: 0.4, max: 1.2, step: 0.05, u: '倍', when: s => s.imgPos !== 'none' },
           ]
         },
         {
-          title: '見出し・単位', icon: '🏷️', fields: [
-            { k: 'labelPos', l: '見出しの位置', t: 'select', o: [['above', '数字の上'], ['left', '数字の左'], ['none', '表示しない']] },
-            { k: 'labelText', l: '見出しの文字', t: 'text', ph: 'チャンネル登録者数', when: s => s.labelPos !== 'none' },
-            { k: 'labelSize', l: '見出しの文字サイズ', t: 'range', min: 10, max: 120, step: 1, u: 'px', when: s => s.labelPos !== 'none' },
-            { k: 'labelColor', l: '見出しの色', t: 'color', when: s => s.labelPos !== 'none' },
-            { k: 'labelWeight', l: '見出し・単位の太さ', t: 'select', o: WEIGHTS },
-            { k: 'suffixText', l: '単位（数字のあと。空欄でなし）', t: 'text', ph: '人' },
-            { k: 'suffixSize', l: '単位の文字サイズ', t: 'range', min: 10, max: 160, step: 1, u: 'px', when: s => !!s.suffixText.trim() },
-            { k: 'suffixColor', l: '単位の色', t: 'color', when: s => !!s.suffixText.trim() },
-          ]
-        },
-        {
-          title: '背景の箱・枠', icon: '🖼️', fields: [
-            { k: 'boxOn', l: '背景の箱を付ける', t: 'check' },
-            { k: 'boxBg', l: '箱の色', t: 'color', when: s => s.boxOn },
-            { k: 'boxAlpha', l: '箱の不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.boxOn },
-            { k: 'boxRadius', l: '角の丸み', t: 'range', min: 0, max: 80, step: 1, u: 'px', when: s => s.boxOn },
-            { k: 'boxPadX', l: '左右の余白', t: 'range', min: 0, max: 120, step: 1, u: 'px', when: s => s.boxOn },
-            { k: 'boxPadY', l: '上下の余白', t: 'range', min: 0, max: 80, step: 1, u: 'px', when: s => s.boxOn },
-            { k: 'boxBorder', l: '枠線を付ける', t: 'check', when: s => s.boxOn },
-            { k: 'boxBorderWidth', l: '枠線の太さ', t: 'range', min: 1, max: 12, step: 0.5, u: 'px', when: s => s.boxOn && s.boxBorder },
-            { k: 'boxBorderStyle', l: '枠線の種類', t: 'select', o: BORDER_STYLES, when: s => s.boxOn && s.boxBorder },
-            { k: 'boxBorderColor', l: '枠線の色', t: 'color', when: s => s.boxOn && s.boxBorder },
-          ]
-        },
-        {
-          title: '置く場所・動き', icon: '✨', fields: [
-            { k: 'hAlign', l: '横の位置', t: 'select', o: [['left', '左'], ['center', '中央'], ['right', '右']] },
-            { k: 'vAlign', l: '縦の位置', t: 'select', o: [['top', '上'], ['center', '中央'], ['bottom', '下']] },
-            { k: 'edge', l: '端からの余白', t: 'range', min: 0, max: 200, step: 2, u: 'px' },
-            { k: 'countUp', l: '増えたときにカウントアップする', t: 'check' },
-            { k: 'pop', l: '増えたときに弾む', t: 'check' },
-            { k: 'idle', l: 'ずっと続く動き', t: 'select', o: [['none', 'なし'], ...Object.entries(IDLE).map(([v, a]) => [v, a.l])] },
-            { k: 'idleDur', l: '動きの速さ（1回の長さ）', t: 'range', min: 0.5, max: 6, step: 0.1, u: '秒', when: s => s.idle !== 'none' },
+          title: '背景', icon: '🎨', fields: [
+            {
+              k: 'bg', l: '背景', t: 'select', o: [['usagi', 'うさぎと桜の柄'], ['dots', '水玉'], ['stripe', 'ストライプ'], ['check', 'チェック'],
+              ['gradient', 'グラデーション'], ['plain', '無地'], ['image', '自分の画像'], ['none', 'なし（透明。PNGで保存）']]
+            },
+            { k: 'bgColor', l: s => s.bg === 'gradient' ? '色 1' : '背景の色', t: 'color', when: s => !['none', 'image'].includes(s.bg) },
+            { k: 'bgColor2', l: '色 2', t: 'color', when: s => s.bg === 'gradient' },
+            { k: 'patColor', l: '柄の色', t: 'color', when: s => ['dots', 'stripe', 'check'].includes(s.bg) },
+            { k: 'patScale', l: '柄の大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', when: bgPat },
+            { k: 'glow', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'check', when: s => s.bg !== 'none' },
           ]
         },
       ];
 
-      const PRESETS = [
-        ['シンプル白', {}],
-        ['グラデーション', { colorMode: 'gradient', grad1: '#ffec61', grad2: '#f321d7', textEffect: 'shadow', effectWidth: 3, effectColor: '#000000' }],
-        ['レインボー', { colorMode: 'rainbow', textEffect: 'outline', effectWidth: 3, effectColor: '#ffffff', font: 'Dela Gothic One', weight: '400', labelWeight: '400', labelColor: '#ff5f9e', suffixColor: '#ff5f9e' }],
-        ['ネオン', { color: '#ffffff', textEffect: 'glow', effectWidth: 4, effectColor: '#ff3fd2', labelColor: '#7ff9ff', suffixColor: '#7ff9ff', idle: 'glow', font: 'Zen Kaku Gothic New' }],
-        ['箱入り', { textEffect: 'none', boxOn: true, boxBg: '#2e1224', boxAlpha: 0.85, boxBorder: true, boxBorderColor: '#ff85a1', labelColor: '#ffb3c6', suffixColor: '#ffb3c6' }],
-        ['ポップ', { font: 'Mochiy Pop One', weight: '400', labelWeight: '400', color: '#3a8bb5', textEffect: 'outline', effectWidth: 4, effectColor: '#ffffff', labelColor: '#ff9ecb', suffixColor: '#ff9ecb', idle: 'float' }],
-        ['和風', { font: 'Shippori Mincho', weight: '800', color: '#f5f0e1', textEffect: 'shadow', effectWidth: 2, effectColor: '#1b1410', labelColor: '#d9b777', suffixColor: '#d9b777', labelText: '登録者', boxOn: true, boxBg: '#1b1410', boxAlpha: 0.75, boxRadius: 4 }],
-        ['ゲージ（あと○人）', { gaugeOn: true, colorMode: 'gradient', grad1: '#ffec61', grad2: '#f321d7', gaugeFillMode: 'same', textEffect: 'shadow', effectWidth: 3, effectColor: '#000000', scale: 1.6 }],
-        ['ゲージだけ', { gaugeOn: true, showCount: false, gaugeInfo: 'frac', gaugeTitle: '登録者 目標 {goal}人', gaugeFillMode: 'gradient', gaugeFill1: '#7ff9ff', gaugeFill2: '#ff3fd2', gaugeHeight: 28, gaugeRadius: 14, gaugeBorder: true, gaugeBorderColor: '#7ff9ff', boxOn: true, boxBg: '#140a24', boxAlpha: 0.8, boxRadius: 20, textEffect: 'glow', effectWidth: 3, effectColor: '#ff3fd2' }],
-        ['収益化チャレンジ', { gaugeOn: true, goal: 1000, goalAfter: 'stay', gaugeTitle: '収益化まで', gaugeInfo: 'left', font: 'Mochiy Pop One', weight: '400', labelWeight: '400', color: '#ffffff', textEffect: 'outline', effectWidth: 4, effectColor: '#ff6f91', labelColor: '#ffe066', suffixColor: '#ffe066', gaugeTextColor: '#ffffff', gaugeFillMode: 'solid', gaugeFill1: '#ffe066', gaugeTrack: '#ff6f91', gaugeTrackAlpha: 0.45, gaugeBorder: true, gaugeBorderWidth: 3, gaugeBorderColor: '#ffffff', scale: 1.6 }],
-      ];
-
       // =====================================================
-      //  状態・UI
+      //  状態・保存
       // =====================================================
-      const STORE_KEY = 'donnma-youtube-subscribers-v1';
-      const CONN_KEY = 'donnma-youtube-subscribers-conn-v1';
+      const STORE_KEY = 'donnma-eyecatch-v1';
+      const IMG_KEY = 'donnma-eyecatch-img-v1';
+      const BG_KEY = 'donnma-eyecatch-bg-v1';
       let S = { ...DEFAULTS };
       try { S = sanitize(JSON.parse(localStorage.getItem(STORE_KEY) || 'null')); } catch (e) { /* storage unavailable */ }
-      // 接続設定（APIキー・チャンネル・間隔）は見た目の設定とは別に保存する（設定ファイルやテンプレートに混ぜない）
-      let conn = { key: '', channel: '', interval: 30 };
-      try { conn = { ...conn, ...JSON.parse(localStorage.getItem(CONN_KEY) || '{}') }; } catch (e) { /* storage unavailable */ }
+      const img = { side: null, sample: null, pattern: null, bg: null };
 
       const inputs = {};
       function buildField(f) {
@@ -1494,20 +1510,22 @@
           grid.className = 'fields';
           for (const f of sec.fields) grid.appendChild(buildField(f));
           det.appendChild(grid);
-          $('settings').appendChild(det);
+          // 「大きさ」は文字の前に出す
+          if (sec.title === '大きさ') $('settings').insertBefore(det, $('settings').children[1]);
+          else $('settings').appendChild(det);
         }
       }
-
-      const refreshVisibility = () => {
+      function refreshVisibility() {
         for (const k in inputs) {
           const { f, wrap, labelEl } = inputs[k];
           wrap.hidden = f.when ? !f.when(S) : false;
           if (typeof f.l === 'function') labelEl.textContent = f.l(S);
         }
-        $('btn-goal-test').style.display = S.gaugeOn ? '' : 'none';
-      };
+      }
       function syncUI() {
         for (const k in inputs) inputs[k].set(S[k]);
+        $('f-title').value = S.title;
+        $('f-sub').value = S.sub;
         refreshVisibility();
       }
 
@@ -1515,152 +1533,359 @@
       function update(k, v) {
         S[k] = v;
         refreshVisibility();
+        if (k === 'bg' && v === 'image' && !img.bg) $('bg-file').click();
+        redraw();
+      }
+      function redraw() {
         if (queued) return;
         queued = true;
-        requestAnimationFrame(() => { queued = false; render(); });
+        requestAnimationFrame(() => {
+          queued = false;
+          try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* ignore */ }
+          loadFont().then(render, render);
+        });
       }
 
-      const obsURL = () => new URL('view.html', location.href).href + '#' + K.encodeHash(conn, S);
+      // =====================================================
+      //  フォント（Google フォントは読み込み終わってから描く）
+      // =====================================================
+      let fontKey = '';
+      function family() {
+        const f = C.fontInfo(S);
+        return f ? f.family : '"Zen Maru Gothic", sans-serif';
+      }
+      function loadFont() {
+        const f = C.fontInfo(S);
+        const key = `${S.font}|${S.fontCustom}`;
+        if (f && f.url && key !== fontKey) {
+          fontKey = key;
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = f.url;
+          document.head.appendChild(link);
+          return new Promise(res => { link.onload = res; link.onerror = res; })
+            .then(() => document.fonts.load(`${S.weight} 80px ${family()}`, S.title + S.sub + 'あ'));
+        }
+        return document.fonts.load(`${S.weight} 80px ${family()}`, S.title + S.sub + 'あ');
+      }
 
+      // =====================================================
+      //  サンプルのうさぎ（背景の柄と同じ形を大きく描く）
+      // =====================================================
+      const SAMPLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="-30 -34 60 60">
+        <g fill="#ffc4d2">
+          <ellipse cx="-6.5" cy="-11" rx="4.4" ry="8.5" transform="rotate(-8 -6.5 -11)"/>
+          <ellipse cx="6.5" cy="-11" rx="4.4" ry="8.5" transform="rotate(8 6.5 -11)"/>
+          <ellipse cx="0" cy="2" rx="16" ry="12"/>
+        </g>
+        <ellipse cx="-6.5" cy="-11" rx="2" ry="5.6" fill="#ffe3ea" transform="rotate(-8 -6.5 -11)"/>
+        <ellipse cx="6.5" cy="-11" rx="2" ry="5.6" fill="#ffe3ea" transform="rotate(8 6.5 -11)"/>
+        <ellipse cx="-5.2" cy="2.6" rx="1.5" ry="1.9" fill="#6b4a48"/>
+        <ellipse cx="5.2" cy="2.6" rx="1.5" ry="1.9" fill="#6b4a48"/>
+        <circle cx="-4.6" cy="2" r="0.5" fill="#fff"/><circle cx="5.8" cy="2" r="0.5" fill="#fff"/>
+        <ellipse cx="-9.6" cy="6" rx="2.4" ry="1.4" fill="#ff9fb6" opacity="0.8"/>
+        <ellipse cx="9.6" cy="6" rx="2.4" ry="1.4" fill="#ff9fb6" opacity="0.8"/>
+        <path d="M-2.2 5.8 Q-1.1 7.3 0 6 Q1.1 7.3 2.2 5.8" fill="none" stroke="#6b4a48" stroke-width="0.9" stroke-linecap="round"/>
+      </svg>`;
+      const loadImg = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
+
+      // =====================================================
+      //  描く（数字は 1200×630 のときの大きさ。ほかの大きさでは合わせて拡大・縮小する）
+      // =====================================================
+      const dims = () => S.size === 'custom' ? [S.customW, S.customH] : SIZES[S.size].slice(0, 2);
+
+      function draw(cv) {
+        const [W, H] = dims();
+        cv.width = W; cv.height = H;
+        const c = cv.getContext('2d');
+        const k = Math.min(W / 1200, H / 630);
+        const stacked = W / H < 1.4;
+        const side = S.imgPos === 'none' ? null : (img.side || img.sample);
+
+        // ---- 背景
+        drawBackground(c, W, H, k);
+
+        // ---- 画像と文字の場所を決める
+        let area = { l: W * 0.06, r: W * 0.94 }, band = { t: H * 0.08, b: H * 0.92 };
+        let pic = null;
+        if (side) {
+          const bottom = S.imgAnchor === 'bottom' || (S.imgAnchor === 'auto' && !!img.side);
+          if (stacked) {
+            const ph = H * 0.56 * S.imgScale;
+            let pw = side.width * ph / side.height;
+            let h2 = ph;
+            if (pw > W * 0.9) { pw = W * 0.9; h2 = side.height * pw / side.width; }
+            pic = { x: W / 2 - pw / 2, y: bottom ? H - H * 0.03 - h2 : H * 0.62 - h2 / 2 + H * 0.05, w: pw, h: h2 };
+            band = { t: H * 0.05, b: Math.min(pic.y - H * 0.01, H * 0.42) };
+          } else {
+            let ph = (bottom ? H - 52 * k : H * 0.72) * S.imgScale;
+            let pw = side.width * ph / side.height;
+            if (pw > W * 0.46) { pw = W * 0.46; ph = side.height * pw / side.width; }
+            const x = S.imgPos === 'left' ? 36 * k : W - 36 * k - pw;
+            const y = bottom ? H - 26 * k - ph : H / 2 - ph / 2;
+            pic = { x, y, w: pw, h: ph };
+            area = S.imgPos === 'left' ? { l: x + pw + 24 * k, r: W - 40 * k } : { l: 40 * k, r: x - 24 * k };
+          }
+        }
+        if (S.glow && S.bg !== 'none') {
+          const all = pic ? { l: Math.min(area.l, pic.x), r: Math.max(area.r, pic.x + pic.w) } : area;
+          glow(c, (all.l + all.r) / 2, H / 2, (all.r - all.l) * 0.62, H * 0.62);
+        }
+        if (pic) c.drawImage(side, pic.x, pic.y, pic.w, pic.h);
+
+        // ---- 文字
+        const lines = S.title.replace(/\s+$/, '').split('\n');
+        const aw = area.r - area.l, bh = band.b - band.t, mid = (area.l + area.r) / 2;
+        const lh = 1.14;
+        const sub = S.sub.trim();
+        let subFs = sub ? fit(c, [sub], 60 * k * S.textScale, aw) : 0;
+        let fs = fit(c, lines, (stacked || !side ? 150 : 124) * k * S.textScale, aw);
+        const subH = () => sub ? subFs * 1.35 : 0;
+        while (lines.length * fs * lh + subH() > bh && fs > 12) { fs -= 2; subFs = Math.min(subFs, fs * 0.55); }
+        let y = (band.t + band.b) / 2 - (lines.length * fs * lh + subH()) / 2 + fs * lh / 2;
+        for (const line of lines) {
+          text(c, line, mid, y, fs, S.titleColor, S.strokeWidth * k);
+          y += fs * lh;
+        }
+        if (sub) text(c, sub, mid, y - fs * lh / 2 + subH() / 2 + 2 * k, subFs, S.subColor, S.strokeWidth * k * 0.8);
+      }
+
+      function drawBackground(c, W, H, k) {
+        if (S.bg === 'none') return;
+        if (S.bg === 'image' && img.bg) {
+          const r = Math.max(W / img.bg.width, H / img.bg.height);
+          const w = img.bg.width * r, h = img.bg.height * r;
+          c.drawImage(img.bg, (W - w) / 2, (H - h) / 2, w, h);
+          return;
+        }
+        if (S.bg === 'gradient') {
+          const g = c.createLinearGradient(0, 0, W, H);
+          g.addColorStop(0, S.bgColor);
+          g.addColorStop(1, S.bgColor2);
+          c.fillStyle = g;
+          c.fillRect(0, 0, W, H);
+          return;
+        }
+        c.fillStyle = S.bgColor;
+        c.fillRect(0, 0, W, H);
+        const sc = k * S.patScale;
+        if (S.bg === 'usagi' && img.pattern) {
+          const t = 300 * sc;
+          for (let y = 0; y < H; y += t) for (let x = 0; x < W; x += t) c.drawImage(img.pattern, x, y, t, t);
+        } else if (S.bg === 'dots') {
+          const g = 64 * sc, r = 9 * sc;
+          c.fillStyle = S.patColor;
+          for (let y = 0, row = 0; y < H + g; y += g / 2, row++) {
+            for (let x = row % 2 ? g / 2 : 0; x < W + g; x += g) { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); }
+          }
+        } else if (S.bg === 'stripe') {
+          const g = 56 * sc;
+          c.save();
+          c.fillStyle = S.patColor;
+          c.translate(W / 2, H / 2);
+          c.rotate(-Math.PI / 4);
+          const d = Math.hypot(W, H);
+          for (let x = -d; x < d; x += g) c.fillRect(x, -d, g / 2, d * 2);
+          c.restore();
+        } else if (S.bg === 'check') {
+          const g = 60 * sc;
+          c.save();
+          c.fillStyle = S.patColor;
+          c.globalAlpha = 0.55;
+          for (let x = 0; x < W; x += g * 2) c.fillRect(x, 0, g, H);
+          for (let y = 0; y < H; y += g * 2) c.fillRect(0, y, W, g);
+          c.restore();
+        }
+      }
+
+      // 文字と画像のまわりを背景色でふんわり明るくして、柄を薄くする
+      function glow(c, x, y, rx, ry) {
+        const base = S.bg === 'gradient' ? S.bgColor : S.bg === 'image' ? '#ffffff' : S.bgColor;
+        const [r, g, b] = [1, 3, 5].map(i => parseInt(base.slice(i, i + 2), 16));
+        c.save();
+        c.translate(x, y);
+        c.scale(rx / ry, 1);
+        const gr = c.createRadialGradient(0, 0, 0, 0, 0, ry);
+        const a = S.bg === 'image' ? 0.55 : 0.95;
+        gr.addColorStop(0, `rgba(${r},${g},${b},${a})`);
+        gr.addColorStop(0.5, `rgba(${r},${g},${b},${a})`);
+        gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        c.fillStyle = gr;
+        c.fillRect(-ry * 4, -ry, ry * 8, ry * 2);
+        c.restore();
+      }
+
+      function fit(c, lines, start, width) {
+        let fs = start;
+        for (;;) {
+          c.font = `${S.weight} ${fs}px ${family()}`;
+          const w = Math.max(...lines.map(l => c.measureText(l).width)) + S.strokeWidth * 2;
+          if (w <= width || fs <= 12) return fs;
+          fs -= 2;
+        }
+      }
+
+      function text(c, str, x, y, fs, color, stroke) {
+        c.save();
+        c.font = `${S.weight} ${fs}px ${family()}`;
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.lineJoin = 'round';
+        if (S.shadow) {
+          c.shadowColor = 'rgba(120, 40, 70, 0.28)';
+          c.shadowBlur = Math.max(4, fs * 0.08);
+          c.shadowOffsetY = Math.max(2, fs * 0.05);
+        }
+        if (stroke > 0) {
+          c.lineWidth = stroke;
+          c.strokeStyle = S.strokeColor;
+          c.strokeText(str, x, y);
+          c.shadowColor = 'transparent';
+        }
+        c.fillStyle = color;
+        c.fillText(str, x, y);
+        c.restore();
+      }
+
+      // =====================================================
+      //  プレビュー・保存
+      // =====================================================
+      const cv = $('cv'), mini = $('mini');
+      let nameTouched = false;
+      const defaultName = () => {
+        const t = S.title.split('\n').join('').trim().slice(0, 30) || 'image';
+        const [W, H] = dims();
+        return `eyecatch_${t}_${W}x${H}`.replace(/[\\/:*?"<>|\s]+/g, '_');
+      };
       function render() {
-        sendPreview({ type: 'cc-settings', s: S });
-        try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* ignore */ }
+        draw(cv);
+        const [W, H] = dims();
+        $('size-meta').textContent = `${W}×${H}`;
+        mini.width = 160;
+        mini.height = Math.round(160 * H / W);
+        const m = mini.getContext('2d');
+        m.imageSmoothingQuality = 'high';
+        m.drawImage(cv, 0, 0, mini.width, mini.height);
+        if (!nameTouched) $('file-name').value = defaultName();
       }
+      $('file-name').addEventListener('input', () => { nameTouched = !!$('file-name').value.trim(); });
 
-      function applyAll(next) {
-        S = sanitize(next);
-        syncUI();
-        render();
+      function save(type) {
+        const out = document.createElement('canvas');
+        draw(out);
+        out.toBlob(b => {
+          if (!b) { toast('保存できませんでした'); return; }
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(b);
+          a.download = ($('file-name').value.trim() || defaultName()) + (type === 'image/jpeg' ? '.jpg' : '.png');
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+          toast('保存しました');
+        }, type, 0.9);
       }
-
-      // =====================================================
-      //  プレビュー（OBSに入れる view.html をそのまま使い、設定と数は postMessage で渡す）
-      // =====================================================
-      const frame = $('preview');
-      let count = 12345, frameReady = false;
-      function sendPreview(msg) { if (frameReady) frame.contentWindow.postMessage(msg, '*'); }
-      frame.addEventListener('load', () => {
-        frameReady = true;
-        sendPreview({ type: 'cc-settings', s: S });
-        sendPreview({ type: 'cc-count', n: count });
+      $('save-jpg').addEventListener('click', () => {
+        if (S.bg === 'none') toast('背景が透明なので、JPG では黒くなります。PNG での保存がおすすめです');
+        save('image/jpeg');
       });
-      frame.src = 'view.html?v=20260927b#demo=1';
-      const bump = n => { count += n; sendPreview({ type: 'cc-count', n: count }); };
-      $('btn-up').addEventListener('click', () => bump(1));
-      $('btn-up100').addEventListener('click', () => bump(100));
-      // 目標の少し手前に戻してから、目標ちょうどまで増やす
-      let goalTestTimer;
-      $('btn-goal-test').addEventListener('click', () => {
-        const goal = K.goalFor(S, count);
-        clearTimeout(goalTestTimer);
-        count = Math.max(0, goal - 3);
-        sendPreview({ type: 'cc-count', n: count });
-        goalTestTimer = setTimeout(() => bump(goal - count), 1500);
-      });
-      $('stage-bg').addEventListener('change', e => { $('stage').className = 'stage bg-' + e.target.value; });
-      // 見本の登録者数も、ときどき少しずつ増やす
-      setInterval(() => { if (Math.random() < 0.3) bump(1); }, 4000);
+      $('save-png').addEventListener('click', () => save('image/png'));
 
-      // =====================================================
-      //  ボタン類
-      // =====================================================
+      // ---- 画像を選ぶ（このブラウザの中だけで使う。保存できる大きさなら縮めて残す）
+      function readImage(file, maxSide) {
+        return new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = async () => {
+            const i = await loadImg(r.result);
+            if (!i) { reject(new Error('画像を読み込めませんでした')); return; }
+            const s = Math.min(1, maxSide / Math.max(i.width, i.height));
+            const t = document.createElement('canvas');
+            t.width = Math.round(i.width * s); t.height = Math.round(i.height * s);
+            t.getContext('2d').drawImage(i, 0, 0, t.width, t.height);
+            const url = t.toDataURL(file.type === 'image/jpeg' ? 'image/jpeg' : 'image/webp', 0.9);
+            resolve({ url, im: await loadImg(url) });
+          };
+          r.onerror = () => reject(new Error('画像を読み込めませんでした'));
+          r.readAsDataURL(file);
+        });
+      }
+      function keep(key, url) {
+        try { localStorage.setItem(key, url); } catch (e) { toast('画像が大きいので、このブラウザには残せません（このページを開いている間は使えます）'); }
+      }
+      function setThumb() {
+        $('img-thumb').style.backgroundImage = `url("${(img.side || img.sample).src}")`;
+      }
+      $('img-pick').addEventListener('click', () => $('img-file').click());
+      $('img-file').addEventListener('change', async e => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (!f) return;
+        try {
+          const { url, im } = await readImage(f, 1600);
+          img.side = im;
+          keep(IMG_KEY, url);
+          if (S.imgPos === 'none') { S.imgPos = 'left'; syncUI(); }
+          setThumb();
+          redraw();
+        } catch (err) { toast(err.message); }
+      });
+      $('img-clear').addEventListener('click', () => {
+        img.side = null;
+        try { localStorage.removeItem(IMG_KEY); } catch (e) { /* ignore */ }
+        setThumb();
+        redraw();
+      });
+      const bgFile = document.createElement('input');
+      bgFile.type = 'file'; bgFile.accept = 'image/*'; bgFile.id = 'bg-file'; bgFile.hidden = true;
+      document.body.appendChild(bgFile);
+      bgFile.addEventListener('change', async e => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (!f) return;
+        try {
+          const { url, im } = await readImage(f, 2400);
+          img.bg = im;
+          keep(BG_KEY, url);
+          redraw();
+        } catch (err) { toast(err.message); }
+      });
+
+      $('f-title').addEventListener('input', e => { S.title = e.target.value; redraw(); });
+      $('f-sub').addEventListener('input', e => { S.sub = e.target.value; redraw(); });
+
+      $('btn-reset').addEventListener('click', async () => {
+        if (!await ask('文字・設定・選んだ画像をすべて初期値に戻しますか？', 'リセットする')) return;
+        S = { ...DEFAULTS };
+        img.side = null; img.bg = null;
+        try { [IMG_KEY, BG_KEY].forEach(k => localStorage.removeItem(k)); } catch (e) { /* ignore */ }
+        nameTouched = false;
+        syncUI(); setThumb(); redraw();
+      });
+
       const toastEl = $('toast');
       let toastTimer;
       function toast(msg) {
         toastEl.textContent = msg;
         toastEl.classList.add('show');
         clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
-      }
-      async function copyText(text, input) {
-        try { await navigator.clipboard.writeText(text); } catch (e) { input.value = text; input.hidden = false; input.select(); document.execCommand('copy'); }
-      }
-      function download(name, text, type) {
-        const url = URL.createObjectURL(new Blob([text], { type }));
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = name;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
       }
 
-      // ---- 接続設定
-      const saveConn = () => { try { localStorage.setItem(CONN_KEY, JSON.stringify(conn)); } catch (e) { /* ignore */ } };
-      $('api-key').value = conn.key;
-      $('channel').value = conn.channel;
-      $('interval').value = String(conn.interval);
-      $('api-key').addEventListener('input', e => { conn.key = e.target.value.trim(); saveConn(); });
-      $('channel').addEventListener('input', e => { conn.channel = e.target.value.trim(); saveConn(); });
-      $('interval').addEventListener('change', e => { conn.interval = +e.target.value; saveConn(); });
-      $('btn-key-show').addEventListener('click', e => {
-        const show = $('api-key').type === 'password';
-        $('api-key').type = show ? 'text' : 'password';
-        e.target.textContent = show ? '隠す' : '表示';
-        e.target.setAttribute('aria-pressed', String(show));
-      });
-
-      const connProblem = () => !conn.key ? 'APIキーを入れてください'
-        : !K.channelQuery(conn.channel) ? 'チャンネル（@ハンドル か UC から始まるID）を入れてください' : '';
-      $('btn-test').addEventListener('click', async () => {
-        const out = $('test-result');
-        const problem = connProblem();
-        if (problem) { out.textContent = '⚠️ ' + problem; return; }
-        out.textContent = '確認中…';
-        try {
-          const r = await K.fetchChannel(conn.key, conn.channel);
-          out.textContent = `✅ ${r.title}：${r.count.toLocaleString('en-US')}人（プレビューにも反映しました）`;
-          count = r.count;
-          sendPreview({ type: 'cc-count', n: count });
-        } catch (err) {
-          out.textContent = '⚠️ ' + (err.message || err);
-        }
-      });
-      $('btn-copy-url').addEventListener('click', async () => {
-        const problem = connProblem();
-        if (problem) { toast(problem); return; }
-        await copyText(obsURL(), $('obs-url'));
-        toast('URLをコピーしました！OBSのブラウザソースのURLに貼り付けてください');
-      });
-
-      for (const [name, p] of PRESETS) {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'chip-btn';
-        b.textContent = name;
-        b.addEventListener('click', () => { applyAll({ ...DEFAULTS, ...p }); toast(`テンプレート「${name}」を適用しました`); });
-        $('presets').appendChild(b);
-      }
-      document.querySelectorAll('.preset-sec').forEach(group => {
-        const key = 'donnma-youtube-subscribers-open-' + group.dataset.key;
-        group.querySelector('.preset-count').textContent = `${group.querySelectorAll('.chip-btn').length}種類`;
-        try { group.open = localStorage.getItem(key) !== '0'; } catch (e) { group.open = true; }
-        group.addEventListener('toggle', () => { try { localStorage.setItem(key, group.open ? '1' : '0'); } catch (e) { /* ignore */ } });
-      });
-
-      $('btn-save').addEventListener('click', () => {
-        download('youtube-subscribers-settings.json', JSON.stringify({ tool: 'donnma-youtube-subscribers', version: 1, settings: S }, null, 2), 'application/json');
-      });
-      $('btn-load').addEventListener('click', () => $('file-load').click());
-      $('file-load').addEventListener('change', async e => {
-        const file = e.target.files[0];
-        e.target.value = '';
-        if (!file) return;
-        try {
-          const data = JSON.parse(await file.text());
-          applyAll(data.settings || data);
-          toast('設定を復元しました');
-        } catch (err) {
-          toast('読み込めませんでした（ファイル形式を確認してください）');
-        }
-      });
-      $('btn-reset').addEventListener('click', async () => {
-        if (!await ask('すべての設定を初期値に戻しますか？', { yes: 'リセットする' })) return;
-        applyAll({ ...DEFAULTS });
-      });
-
+      // =====================================================
+      //  はじめ
+      // =====================================================
       buildUI();
       syncUI();
-      render();
+      (async () => {
+        img.sample = await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SAMPLE_SVG));
+        img.pattern = await loadImg('../image/pattern.svg?v=20260929');
+        let saved = null;
+        try { saved = localStorage.getItem(IMG_KEY); } catch (e) { /* ignore */ }
+        if (saved) img.side = await loadImg(saved);
+        try { saved = localStorage.getItem(BG_KEY); } catch (e) { saved = null; }
+        if (saved) img.bg = await loadImg(saved);
+        setThumb();
+        redraw();
+      })();
+      document.fonts.addEventListener('loadingdone', () => redraw());
     })();
   </script>
 
