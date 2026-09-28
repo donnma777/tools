@@ -1249,7 +1249,7 @@
               <button class="btn btn-sm" type="button" id="img-clear">サンプルに戻す</button>
               <input type="file" id="img-file" accept="image/*" hidden>
             </div>
-            <div class="field-note">背景が透明な PNG・WebP だと、柄の上にきれいに乗ります。選ばないときは、サンプルのうさぎが入ります。</div>
+            <div class="field-note">背景が透明な PNG・WebP だと、柄の上にきれいに乗ります。選ばないときは、下の「画像の置き方」で選んだサンプル（ハート・星など）が入ります。</div>
           </div>
         </div>
       </details>
@@ -1300,7 +1300,7 @@
           <li>ブログやSNSの一覧では、画像がかなり小さく表示されます。プレビューの下の「小さく出たとき」で、文字が読めるか確かめてください。</li>
           <li>JPG のほうがファイルが軽くなります。背景を透明にしたいときだけ PNG を使ってください（背景の「なし（透明）」）。</li>
           <li>縦長や正方形では、上に文字・下に画像の縦並びになります。</li>
-          <li>作った画像は、ブログ・動画・配信の告知など、自由に使ってかまいません（サンプルのうさぎや背景の柄も含む）。</li>
+          <li>作った画像は、ブログ・動画・配信の告知など、自由に使ってかまいません。ただし、<b>うさぎのキャラクターと「うさぎと桜の柄」</b>は どんまうんど のデザインです。作った画像の中で使うのはかまいませんが、切り出して素材として使ったり、再配布したりしないでください。</li>
         </ul>
       </div>
     </div>
@@ -1360,8 +1360,8 @@
         font: 'Zen Maru Gothic', fontCustom: '', weight: '900',
         titleColor: '#ff7fa0', subColor: '#6e3551', strokeWidth: 14, strokeColor: '#ffffff', shadow: true,
         textScale: 1,
-        imgPos: 'left', imgAnchor: 'auto', imgScale: 1,
-        bg: 'usagi', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
+        imgPos: 'left', imgAnchor: 'auto', imgScale: 1, sample: 'heart',
+        bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
       };
       const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
       function sanitize(o) {
@@ -1407,13 +1407,15 @@
             { k: 'imgPos', l: '画像の位置', t: 'select', o: [['left', '左'], ['right', '右'], ['none', '画像なし（文字だけ）']], note: '縦長・正方形では、上に文字・下に画像になります' },
             { k: 'imgAnchor', l: '縦の位置', t: 'select', o: [['auto', 'おまかせ'], ['bottom', '下にそろえる（キャラの全身など）'], ['center', '真ん中']], when: s => s.imgPos !== 'none' },
             { k: 'imgScale', l: '画像の大きさ', t: 'range', min: 0.4, max: 1.2, step: 0.05, u: '倍', when: s => s.imgPos !== 'none' },
+            { k: 'sample', l: '画像を選ばないときのサンプル', t: 'select', o: [['heart', 'ハート'], ['star', '星'], ['bunny', 'うさぎ（どんまうんど）']], when: s => s.imgPos !== 'none' },
           ]
         },
         {
           title: '背景', icon: '🎨', fields: [
             {
-              k: 'bg', l: '背景', t: 'select', o: [['usagi', 'うさぎと桜の柄'], ['dots', '水玉'], ['stripe', 'ストライプ'], ['check', 'チェック'],
-              ['gradient', 'グラデーション'], ['plain', '無地'], ['image', '自分の画像'], ['none', 'なし（透明。PNGで保存）']]
+              k: 'bg', l: '背景', t: 'select', o: [['dots', '水玉'], ['stripe', 'ストライプ'], ['check', 'チェック'],
+              ['gradient', 'グラデーション'], ['plain', '無地'], ['image', '自分の画像'], ['none', 'なし（透明。PNGで保存）'],
+              ['usagi', 'うさぎと桜の柄（どんまうんど）']]
             },
             { k: 'bgColor', l: s => s.bg === 'gradient' ? '色 1' : '背景の色', t: 'color', when: s => !['none', 'image'].includes(s.bg) },
             { k: 'bgColor2', l: '色 2', t: 'color', when: s => s.bg === 'gradient' },
@@ -1432,7 +1434,7 @@
       const BG_KEY = 'donnma-eyecatch-bg-v1';
       let S = { ...DEFAULTS };
       try { S = sanitize(JSON.parse(localStorage.getItem(STORE_KEY) || 'null')); } catch (e) { /* storage unavailable */ }
-      const img = { side: null, sample: null, pattern: null, bg: null };
+      const img = { side: null, samples: {}, pattern: null, bg: null };
 
       const inputs = {};
       function buildField(f) {
@@ -1534,6 +1536,7 @@
         S[k] = v;
         refreshVisibility();
         if (k === 'bg' && v === 'image' && !img.bg) $('bg-file').click();
+        if (k === 'sample') setThumb();
         redraw();
       }
       function redraw() {
@@ -1570,23 +1573,34 @@
       }
 
       // =====================================================
-      //  サンプルのうさぎ（背景の柄と同じ形を大きく描く）
+      //  サンプル画像（画像を選ばないとき）。うさぎは どんまうんど のデザインなので、選択肢のいちばん下に置く
       // =====================================================
-      const SAMPLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="-30 -34 60 60">
-        <g fill="#ffc4d2">
-          <ellipse cx="-6.5" cy="-11" rx="4.4" ry="8.5" transform="rotate(-8 -6.5 -11)"/>
-          <ellipse cx="6.5" cy="-11" rx="4.4" ry="8.5" transform="rotate(8 6.5 -11)"/>
-          <ellipse cx="0" cy="2" rx="16" ry="12"/>
-        </g>
-        <ellipse cx="-6.5" cy="-11" rx="2" ry="5.6" fill="#ffe3ea" transform="rotate(-8 -6.5 -11)"/>
-        <ellipse cx="6.5" cy="-11" rx="2" ry="5.6" fill="#ffe3ea" transform="rotate(8 6.5 -11)"/>
-        <ellipse cx="-5.2" cy="2.6" rx="1.5" ry="1.9" fill="#6b4a48"/>
-        <ellipse cx="5.2" cy="2.6" rx="1.5" ry="1.9" fill="#6b4a48"/>
-        <circle cx="-4.6" cy="2" r="0.5" fill="#fff"/><circle cx="5.8" cy="2" r="0.5" fill="#fff"/>
-        <ellipse cx="-9.6" cy="6" rx="2.4" ry="1.4" fill="#ff9fb6" opacity="0.8"/>
-        <ellipse cx="9.6" cy="6" rx="2.4" ry="1.4" fill="#ff9fb6" opacity="0.8"/>
-        <path d="M-2.2 5.8 Q-1.1 7.3 0 6 Q1.1 7.3 2.2 5.8" fill="none" stroke="#6b4a48" stroke-width="0.9" stroke-linecap="round"/>
-      </svg>`;
+      const SAMPLES = {
+        heart: `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="-30 -30 60 60">
+          <path d="M0 22 C-26 6 -24 -16 -11 -18 C-5 -19 -1 -15 0 -11 C1 -15 5 -19 11 -18 C24 -16 26 6 0 22 Z" fill="#ff9fb6" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+          <ellipse cx="-11" cy="-8" rx="4.5" ry="2.8" fill="#fff" opacity="0.6" transform="rotate(-30 -11 -8)"/>
+        </svg>`,
+        star: `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="-30 -30 60 60">
+          <path d="M0 -24 L6.5 -8.5 L23 -7.5 L10.5 3.5 L14.5 20 L0 11 L-14.5 20 L-10.5 3.5 L-23 -7.5 L-6.5 -8.5 Z" fill="#ffd66b" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+          <ellipse cx="-3" cy="-8" rx="2.4" ry="4" fill="#fff" opacity="0.6" transform="rotate(20 -3 -8)"/>
+        </svg>`,
+        bunny: `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="-30 -34 60 60">
+          <g fill="#ffc4d2">
+            <ellipse cx="-6.5" cy="-11" rx="4.4" ry="8.5" transform="rotate(-8 -6.5 -11)"/>
+            <ellipse cx="6.5" cy="-11" rx="4.4" ry="8.5" transform="rotate(8 6.5 -11)"/>
+            <ellipse cx="0" cy="2" rx="16" ry="12"/>
+          </g>
+          <ellipse cx="-6.5" cy="-11" rx="2" ry="5.6" fill="#ffe3ea" transform="rotate(-8 -6.5 -11)"/>
+          <ellipse cx="6.5" cy="-11" rx="2" ry="5.6" fill="#ffe3ea" transform="rotate(8 6.5 -11)"/>
+          <ellipse cx="-5.2" cy="2.6" rx="1.5" ry="1.9" fill="#6b4a48"/>
+          <ellipse cx="5.2" cy="2.6" rx="1.5" ry="1.9" fill="#6b4a48"/>
+          <circle cx="-4.6" cy="2" r="0.5" fill="#fff"/><circle cx="5.8" cy="2" r="0.5" fill="#fff"/>
+          <ellipse cx="-9.6" cy="6" rx="2.4" ry="1.4" fill="#ff9fb6" opacity="0.8"/>
+          <ellipse cx="9.6" cy="6" rx="2.4" ry="1.4" fill="#ff9fb6" opacity="0.8"/>
+          <path d="M-2.2 5.8 Q-1.1 7.3 0 6 Q1.1 7.3 2.2 5.8" fill="none" stroke="#6b4a48" stroke-width="0.9" stroke-linecap="round"/>
+        </svg>`,
+      };
+      const sampleImg = () => img.samples[S.sample] || img.samples.heart;
       const loadImg = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
 
       // =====================================================
@@ -1600,7 +1614,7 @@
         const c = cv.getContext('2d');
         const k = Math.min(W / 1200, H / 630);
         const stacked = W / H < 1.4;
-        const side = S.imgPos === 'none' ? null : (img.side || img.sample);
+        const side = S.imgPos === 'none' ? null : (img.side || sampleImg());
 
         // ---- 背景
         drawBackground(c, W, H, k);
@@ -1811,7 +1825,7 @@
         try { localStorage.setItem(key, url); } catch (e) { toast('画像が大きいので、このブラウザには残せません（このページを開いている間は使えます）'); }
       }
       function setThumb() {
-        $('img-thumb').style.backgroundImage = `url("${(img.side || img.sample).src}")`;
+        $('img-thumb').style.backgroundImage = `url("${(img.side || sampleImg()).src}")`;
       }
       $('img-pick').addEventListener('click', () => $('img-file').click());
       $('img-file').addEventListener('change', async e => {
@@ -1875,7 +1889,7 @@
       buildUI();
       syncUI();
       (async () => {
-        img.sample = await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SAMPLE_SVG));
+        for (const [k, svg] of Object.entries(SAMPLES)) img.samples[k] = await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
         img.pattern = await loadImg('../image/pattern.svg?v=20260929');
         let saved = null;
         try { saved = localStorage.getItem(IMG_KEY); } catch (e) { /* ignore */ }
