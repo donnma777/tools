@@ -1,0 +1,2380 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>配信用ルーレット | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="OBSの配信画面に出せる無料のルーレット。項目・当たりやすさ・色を自由に決めて、OBSのドックやChromeから回せます。罰ゲーム・企画の順番決め・抽選など何にでも使えます。当たった項目を外していく機能や効果音つき。">
+  <meta property="og:title" content="配信用ルーレット | どんまうんど-Tools">
+  <meta property="og:description" content="OBSの配信画面に出せる無料のルーレット。項目・当たりやすさ・見た目を自由に決められます。">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@donnma777">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --code-bg: #1a0a14;
+      --code-text: #f3dbe5;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* ── Topnav ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    .topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* スマホで開いたときだけ出すお知らせ */
+    .pc-notice {
+      display: none;
+      background: var(--accent-soft);
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.6;
+      padding: 10px 16px;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .pc-notice {
+        display: block;
+      }
+    }
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.webp") center top / 256px 256px repeat;
+    }
+
+    /* 下端をスカラップ（波）にして本文へつなぐ */
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 460px;
+      grid-template-areas: "settings side";
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings {
+      grid-area: settings;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .side {
+      grid-area: side;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: calc(100vh - 88px);
+      min-height: 560px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .kicker {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    /* platform switch */
+    .seg {
+      display: inline-flex;
+      padding: 3px;
+      gap: 3px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+
+    .seg button {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+      padding: 7px 18px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
+    .sc-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 0;
+    }
+
+    .sc-tabs button[aria-selected="true"] {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .seg button:hover {
+      color: var(--text);
+    }
+
+    .seg button[aria-checked="true"][data-platform="youtube"] {
+      background: #ff3b3b;
+      color: #fff;
+    }
+
+    .seg button[aria-checked="true"][data-platform="twitch"] {
+      background: #9147ff;
+      color: #fff;
+    }
+
+    [data-for][hidden],
+    details.sec[hidden] {
+      display: none;
+    }
+
+    .tw-out {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tw-out textarea {
+      width: 100%;
+      height: 52px;
+      resize: vertical;
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 11.5px;
+      color: var(--code-text);
+      background: var(--code-bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+      word-break: break-all;
+    }
+
+    /* presets */
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* テンプレートのブロック */
+    .preset-body {
+      padding: 14px 16px 16px;
+    }
+
+    .preset-count {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .chip-btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .chip-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: filter 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      border-color: var(--accent);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .btn-danger:hover {
+      border-color: #ff5a5a;
+      color: #ff8a8a;
+    }
+
+    .data-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    /* settings sections */
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 4px 20px;
+      padding: 12px 16px 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 0;
+      min-width: 0;
+    }
+
+    .field[hidden] {
+      display: none;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .field-val {
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 12px;
+      color: var(--accent-2);
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select,
+    input[type=text],
+    input[type=number],
+    input[type=password] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    select:focus,
+    input[type=text]:focus,
+    input[type=number]:focus,
+    input[type=password]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .color-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .color-row input[type=color] {
+      width: 40px;
+      height: 34px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .color-row input[type=text] {
+      font-family: ui-monospace, Consolas, monospace;
+      text-transform: lowercase;
+    }
+
+    /* toggle */
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle .sw {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--border-strong);
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .toggle .sw::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.15s;
+    }
+
+    .toggle input:checked+.sw {
+      background: var(--accent);
+    }
+
+    .toggle input:checked+.sw::after {
+      transform: translateX(18px);
+    }
+
+    .toggle input:focus-visible+.sw {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    /* preview */
+    .preview-panel {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .preview-tools {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .preview-tools select {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    /* テスト送信（プレビューの下。YouTube のチャット入力欄の位置） */
+    .test-bar {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 12px 10px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .test-tabs {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .test-label {
+      margin-right: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .test-tab {
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .test-tab:hover {
+      color: var(--text);
+    }
+
+    .test-tab[aria-selected="true"] {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .test-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-height: 26px;
+    }
+
+    .chip {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      line-height: 1.5;
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+    }
+
+    .test-free {
+      display: flex;
+      gap: 6px;
+    }
+
+    .test-free input {
+      flex: 1;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .test-free select {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    /* プレビューを大きく表示 */
+    body.preview-expanded {
+      overflow: hidden;
+    }
+
+    /* sticky の .side は重なり順が閉じるので、ヘッダー（z-index: 100）より手前に出す */
+    body.preview-expanded .side {
+      z-index: 400;
+    }
+
+    body.preview-expanded .preview-panel {
+      position: fixed;
+      inset: 24px;
+      z-index: 300;
+      box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.65);
+    }
+
+    .stage {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 240px;
+      overflow: hidden;
+    }
+
+    .stage iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: transparent;
+      color-scheme: normal;
+    }
+
+    .bg-checker {
+      background-color: #2a2a36;
+      background-image:
+        linear-gradient(45deg, #353544 25%, transparent 25%),
+        linear-gradient(-45deg, #353544 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #353544 75%),
+        linear-gradient(-45deg, transparent 75%, #353544 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    }
+
+    .bg-dark {
+      background: #111;
+    }
+
+    .bg-light {
+      background: #f2f2f2;
+    }
+
+    .bg-green {
+      background: #00b140;
+    }
+
+    .bg-game {
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255, 190, 90, 0.55), transparent 45%),
+        radial-gradient(circle at 70% 70%, rgba(80, 160, 255, 0.55), transparent 50%),
+        linear-gradient(160deg, #3b6d3a 0%, #7aa6c8 55%, #d9c7a0 100%);
+    }
+
+    /* output */
+    .output-panel {
+      flex: 0 0 auto;
+    }
+
+    .output-panel textarea {
+      display: block;
+      width: 100%;
+      height: 150px;
+      resize: vertical;
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: var(--code-text);
+      background: var(--code-bg);
+      border: 0;
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .output-panel textarea[hidden] {
+      display: none;
+    }
+
+    .output-panel textarea.react-out {
+      height: 90px;
+    }
+
+    .output-panel textarea:focus {
+      outline: none;
+    }
+
+    .out-meta {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .guide h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    code {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      word-break: break-all;
+    }
+
+    .url-tool {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .url-out {
+      display: flex;
+      gap: 8px;
+    }
+
+    .url-out input {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid #a03060;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      border-bottom: none;
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    @media (max-width: 1000px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "side" "settings";
+        padding: 40px 16px 40px;
+      }
+
+      .side {
+        position: static;
+        height: auto;
+        min-height: 0;
+      }
+
+      .stage {
+        height: 420px;
+        flex: none;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+      }
+
+      .guide {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      .topnav-back {
+        display: none;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .fields {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* ── ルーレット用 ── */
+    /* トーナメント表メーカーと同じく、プレビューは設定の上に全幅で置く */
+    .rl-top {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 24px 0;
+    }
+
+    .rl-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: calc(100vh - 220px);
+      min-height: 320px;
+      overflow: hidden;
+    }
+
+    .rl-stage iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: transparent;
+      color-scheme: normal;
+    }
+
+    .workspace {
+      padding-top: 24px;
+    }
+
+    .side {
+      position: static;
+      height: auto;
+      min-height: 0;
+    }
+
+    /* 大きく表示：プレビューを画面いっぱいにする（Esc で閉じる） */
+    body.preview-expanded .rl-top .preview-panel {
+      position: fixed;
+      inset: 24px;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.65);
+    }
+
+    body.preview-expanded .rl-stage {
+      flex: 1 1 auto;
+      aspect-ratio: auto;
+      max-height: none;
+      min-height: 0;
+    }
+
+    body.preview-expanded .spin-btn {
+      font-size: 20px;
+      padding: 14px 34px;
+    }
+
+    body.preview-expanded .spin-result {
+      font-size: 20px;
+    }
+
+    .spin-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .spin-btn {
+      font-size: 17px;
+      padding: 12px 26px;
+      border-radius: 999px;
+    }
+
+    .spin-btn:disabled {
+      opacity: 0.55;
+      cursor: default;
+      filter: none;
+    }
+
+    .spin-result {
+      flex: 1;
+      min-width: 0;
+      font-size: 15px;
+      font-weight: 900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .spin-result small {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .history {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 180px;
+      overflow-y: auto;
+      font-size: 13px;
+    }
+
+    .history li {
+      display: flex;
+      gap: 10px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--surface-2);
+    }
+
+    .history .tm {
+      color: var(--muted);
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .history .nm {
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .history-empty {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .url-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .url-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .obs-line {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .obs-state {
+      font-size: 13px;
+      font-weight: 700;
+      margin: 6px 0;
+    }
+
+    .obs-state.on {
+      color: #7ee0a1;
+    }
+
+    /* 項目の一覧 */
+    .items-body {
+      padding: 12px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .it-head,
+    .it-row {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) 72px 52px 40px 26px 26px 26px;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .it-head {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .it-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .it-row input[type=color] {
+      width: 34px;
+      height: 32px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      cursor: pointer;
+    }
+
+    .it-row input[type=number] {
+      padding: 6px 6px;
+      text-align: right;
+    }
+
+    .it-pct {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 11.5px;
+      color: var(--accent-2);
+      text-align: right;
+    }
+
+    .it-row.off input[type=text],
+    .it-row.hit input[type=text] {
+      opacity: 0.45;
+      text-decoration: line-through;
+    }
+
+    .it-row .toggle .sw {
+      width: 36px;
+    }
+
+    .it-row .toggle input:checked+.sw::after {
+      transform: translateX(14px);
+    }
+
+    .icon-btn {
+      font: inherit;
+      font-size: 12px;
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .icon-btn:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .icon-btn:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    .it-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .it-sum {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    textarea.bulk {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    textarea.bulk:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .sub-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--label);
+      margin-bottom: 6px;
+    }
+
+    /* OBSのカスタムブラウザドック（?dock=1）：操作に要るものだけを出す */
+    body.dock .topnav,
+    body.dock .pc-notice,
+    body.dock .hero,
+    body.dock .guide,
+    body.dock .ad-wrap,
+    body.dock footer,
+    body.dock .no-dock {
+      display: none !important;
+    }
+
+    body.dock .workspace {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "side" "settings";
+      padding: 10px;
+      gap: 10px;
+    }
+
+    body.dock .rl-top {
+      padding: 10px 10px 0;
+    }
+
+    body.dock .rl-stage {
+      aspect-ratio: 1 / 1;
+      max-height: 60vh;
+      min-height: 0;
+    }
+
+    @media (max-width: 600px) {
+      .rl-top {
+        padding: 32px 16px 0;
+      }
+
+      .rl-stage {
+        aspect-ratio: 1 / 1;
+      }
+    }
+
+    @media (max-width: 600px) {
+
+      .it-head,
+      .it-row {
+        grid-template-columns: 34px minmax(0, 1fr) 56px 40px 26px 26px;
+      }
+
+      .it-head .pct,
+      .it-pct,
+      .it-head .mv,
+      .it-row .mv-up {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.png" alt="どんまうんど" width="720"
+          height="151"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">← トップに戻る</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <p class="pc-notice" role="note">PCでの利用がおすすめです（スマホでも回せますが、画面が狭く設定しにくいです）。</p>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>配信用ルーレット</h1>
+      <p>OBSの配信画面に出せるルーレットです。項目・当たりやすさ・見た目を自由に決めて、OBSのドックやChromeから回せます。罰ゲーム・企画の順番決め・抽選など、何にでも使えます。OBSを使わなくても、大きく表示して画面共有や会場のモニターに映せます。</p>
+    </div>
+  </header>
+
+  <div class="rl-top">
+    <div class="panel preview-panel">
+      <div class="panel-head">
+        <span>プレビュー</span>
+        <div class="preview-tools">
+          <select id="stage-bg" aria-label="プレビュー背景">
+            <option value="checker">背景: 透過</option>
+            <option value="game">背景: ゲーム画面風</option>
+            <option value="dark">背景: 黒</option>
+            <option value="light">背景: 白</option>
+            <option value="green">背景: グリーンバック</option>
+          </select>
+          <button class="btn btn-sm" id="btn-mute" type="button" aria-pressed="false">🔊 プレビューの音</button>
+          <button class="btn btn-sm" id="btn-expand" type="button" aria-pressed="false" title="プレビューを画面いっぱいに広げます（Esc で閉じる）">⛶ 大きく表示</button>
+          <button class="btn btn-sm no-dock" id="btn-tab" type="button" title="ルーレットだけを別のタブで開きます（画面共有など）">↗ 別タブで開く</button>
+        </div>
+      </div>
+      <div class="rl-stage bg-checker" id="stage">
+        <iframe id="preview" title="ルーレットのプレビュー" allow="autoplay"></iframe>
+      </div>
+      <div class="spin-bar">
+        <button class="btn btn-primary spin-btn" id="btn-spin" type="button">🎲 回す</button>
+        <div class="spin-result" id="spin-result" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="workspace">
+
+    <!-- Settings column -->
+    <div class="settings" id="settings">
+      <div class="panel no-dock">
+        <div class="panel-body">
+          <div class="data-row" style="margin-top: 0;">
+            <button class="btn btn-sm" id="btn-save" type="button">💾 項目と見た目をファイルに保存</button>
+            <button class="btn btn-sm" id="btn-load" type="button">📂 ファイルから復元</button>
+            <button class="btn btn-sm btn-danger" id="btn-reset" type="button">すべてリセット</button>
+            <input type="file" id="file-load" accept=".json,application/json" hidden>
+          </div>
+        </div>
+      </div>
+
+      <details class="sec" id="items-sec" open>
+        <summary><span class="sec-icon">📝</span>項目<span class="preset-count" id="items-count"></span></summary>
+        <div class="items-body">
+          <div class="field" style="padding:0">
+            <label class="field-label" for="r-title"><span>見出し（円盤の上に出す文字。空欄でなし）</span></label>
+            <input type="text" id="r-title" maxlength="60" placeholder="例: 罰ゲームルーレット">
+          </div>
+          <div>
+            <div class="it-head" aria-hidden="true"><span>色</span><span>項目</span><span>当たりやすさ</span><span class="pct">確率</span><span>使う</span><span class="mv"></span><span></span><span></span></div>
+            <div class="it-list" id="it-list"></div>
+          </div>
+          <div class="it-tools">
+            <button class="btn btn-sm" id="it-add" type="button">＋ 項目を追加</button>
+            <button class="btn btn-sm" id="it-autocolor" type="button">🎨 色を配色に戻す</button>
+            <button class="btn btn-sm btn-danger" id="it-clear" type="button">全部消す</button>
+            <span class="it-sum" id="it-sum"></span>
+          </div>
+          <label class="toggle" for="r-removeHit"><span>当たった項目を外していく（罰ゲーム・順番決め向け）</span><input type="checkbox" id="r-removeHit"><span class="sw"></span></label>
+          <p class="field-note" style="margin-top:-6px">当たった項目は、結果を出し終わったあと円盤から消えます。右の「外した項目を戻す」で全部戻せます。</p>
+          <div>
+            <div class="sub-title">サンプルから入れる</div>
+            <div class="preset-row" id="samples"></div>
+          </div>
+          <div>
+            <label class="sub-title" for="bulk" style="display:block">テキストでまとめて入れる（1行に1つ。「項目 *3」で当たりやすさ3倍）</label>
+            <textarea class="bulk" id="bulk" spellcheck="false" placeholder="歌う&#10;雑談 *2&#10;ホラーゲーム&#10;おやすみ"></textarea>
+            <div class="data-row" style="margin-top:6px">
+              <button class="btn btn-sm btn-primary" id="bulk-add" type="button">下に追加</button>
+              <button class="btn btn-sm" id="bulk-replace" type="button">入れ替える（今の項目を消す）</button>
+              <button class="btn btn-sm" id="bulk-from" type="button">今の項目をテキストにする</button>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec preset-sec" data-key="roulette-presets">
+        <summary><span class="sec-icon">🎭</span>見た目のテンプレート<span class="preset-count"></span></summary>
+        <div class="preset-row preset-body" id="presets"></div>
+      </details>
+      <!-- sections are generated from SECTIONS below -->
+    </div>
+
+    <!-- Results + OBS column -->
+    <div class="side">
+
+      <div class="panel">
+        <div class="panel-head">
+          <span>結果の記録</span>
+          <div class="preview-tools">
+            <button class="btn btn-sm" id="btn-restore" type="button" style="display:none">↩ 外した項目を戻す</button>
+            <button class="btn btn-sm no-dock" id="btn-hist-tab" type="button" title="結果の記録だけを別のタブで開きます">↗ 別タブで開く</button>
+            <button class="btn btn-sm btn-danger" id="btn-clear-history" type="button">記録を消す</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <ol class="history" id="history"></ol>
+        </div>
+      </div>
+
+      <div class="panel no-dock">
+        <div class="panel-head"><span>OBSに入れる</span></div>
+        <div class="panel-body">
+          <div class="url-list">
+            <div class="url-item"><span>🎡 ルーレット（ブラウザソース用）</span><button class="btn btn-sm btn-primary" type="button" data-copy="view">URLをコピー</button></div>
+            <div class="url-item"><span>📜 結果の記録だけ（ブラウザソース用）</span><button class="btn btn-sm" type="button" data-copy="history">URLをコピー</button></div>
+            <div class="url-item"><span>🛠 操作パネル（カスタムブラウザドック用）</span><button class="btn btn-sm" type="button" data-copy="dock">URLをコピー</button></div>
+          </div>
+          <input type="text" id="copy-fallback" readonly hidden aria-label="コピーするURL">
+          <p class="field-note" style="margin-top:10px">「ルーレット」はOBSの「ソース ＋ → ブラウザ」に貼り付けます（幅1080・高さ1080がおすすめ）。「操作パネル」はOBSのメニュー「ドック → カスタムブラウザドック」に貼り付けると、OBSの中で項目を直したり回したりできます。くわしくは下の「使い方」へ。</p>
+        </div>
+      </div>
+
+      <div class="panel no-dock">
+        <div class="panel-head"><span>OBS接続（Chromeから回すとき）</span></div>
+        <div class="panel-body">
+          <p class="field-note" style="margin:0 0 10px">OBSの「ツール → WebSocketサーバー設定」で「WebSocketサーバーを有効にする」をオンにし、「接続情報を表示」のポートとパスワードを入れてください。同じPCのChromeで回すと、OBSのブラウザソースも同じ結果で回ります。ドックで操作するときは不要です。</p>
+          <div class="obs-line"><label for="obs-port">ポート</label><input type="text" id="obs-port" inputmode="numeric" placeholder="4455"></div>
+          <div class="obs-line"><label for="obs-password">パスワード</label><input type="password" id="obs-password" autocomplete="off" placeholder="認証なしなら空欄"></div>
+          <div class="obs-state" id="obs-state">● 未接続</div>
+          <div class="data-row" style="margin-top:0">
+            <button class="btn btn-sm btn-primary" id="obs-connect" type="button">🔌 接続</button>
+            <button class="btn btn-sm" id="obs-disconnect" type="button" style="display:none">切断</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <div class="panel">
+      <div class="panel-body">
+        <h2>🎥 OBSでの使い方（おすすめ：OBSだけで完結）</h2>
+        <ol class="steps">
+          <li>左の「項目」に、ルーレットに入れたいものを書きます。「当たりやすさ」を 2 にすると、ほかの2倍当たりやすくなります。</li>
+          <li>右の「OBSに入れる」で <b>ルーレット</b> の「URLをコピー」を押し、OBSで <b>ソース ＋ → ブラウザ</b> を追加してURLに貼り付けます（幅 <code>1080</code>・高さ <code>1080</code> がおすすめ）。</li>
+          <li>同じく <b>操作パネル</b> の「URLをコピー」を押し、OBSのメニュー <b>ドック → カスタムブラウザドック</b> を開いて、ドック名（例: ルーレット）とURLを入れて「適用」します。OBSの中に操作パネルが出ます。</li>
+          <li>ドックの <b>「🎲 回す」</b> を押すと、配信画面のルーレットが回ります。項目や見た目もドックで直せます。</li>
+          <li>効果音を配信に乗せるときは、ブラウザソースのプロパティで <b>「オーディオをOBSで制御する」</b> にチェックを入れると、音量ミキサーで音量を調整できます。</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body">
+        <h2>🖥 Chromeで操作するとき</h2>
+        <ol class="steps">
+          <li>OBSの「ツール → WebSocketサーバー設定」で「WebSocketサーバーを有効にする」をオンにします。</li>
+          <li>OBSのブラウザソースには、上と同じように「ルーレット」のURLを入れておきます。</li>
+          <li>同じPCのChromeでこのページを開き、右の「OBS接続」にポートとパスワードを入れて「接続」を押します。</li>
+          <li>このページで「🎲 回す」を押すと、OBSの画面でも同じ結果で回ります。項目や見た目の変更も、そのまま送られます。</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body">
+        <h2>💡 ヒント・注意点</h2>
+        <ul class="notes">
+          <li>当たる項目は、回したときに「当たりやすさ」の割合で公平に決まります（各項目の「確率」がその割合です）。</li>
+          <li>「🎵 回り方・音」の <b>当たりやすさに合わせて扇の大きさを変える</b> をオフにすると、扇はすべて同じ大きさになります（当たりやすさはそのまま）。見た目と確率が違うことになるので、視聴者参加の抽選などではオンのままがおすすめです。</li>
+          <li><b>当たった項目を外していく</b> をオンにすると、当たった項目が円盤から消えていきます。順番決めや、罰ゲームを全部やりきる企画に便利です。</li>
+          <li><b>止め方</b>は「🎵 回り方・音」で選べます。「ストップボタンで止める」にすると、「✋ ストップ」を押すまで回り続けます。「自動で止めるまでの時間」を 0 にすると、押すまでずっと回る無限モードです（秒数を入れると、押さなくてもその時間で止まります）。</li>
+          <li>操作パネルでは <b>スペースキー</b> でも回す・止めるができます。</li>
+          <li><b>OBSを使わないとき</b>は、プレビューの <b>「⛶ 大きく表示」</b> で画面いっぱいに広げて、画面共有や会場のモニターに映せます。<b>「↗ 別タブで開く」</b> ならルーレットだけのタブを開けます（このページで回すと一緒に回ります。タブの円盤をクリックしても回せます。音は、そのタブを一度クリックすると鳴るようになります）。</li>
+          <li><b>結果の記録だけ</b>を見たいときは、「結果の記録」の <b>「↗ 別タブで開く」</b> を押します。回すたびに自動で更新されます（止まってから足されます）。OBSに記録だけを出すときは、「OBSに入れる」の <b>「📜 結果の記録だけ」</b> のURLをブラウザソースに入れます（文字の大きさ・色は「📜 履歴の表示」の設定を使います）。</li>
+          <li><b>「📜 履歴の表示」</b> で、これまでの結果を円盤の横や下に出せます。結果は止まってから足されます。「結果の記録」の「記録を消す」で履歴も消えます。</li>
+          <li>OBSでルーレットのソースを選んで <b>「対話」</b> を開き、円盤をクリックしても回す・止めるができます。</li>
+          <li>項目・見た目・結果の記録は、このブラウザに自動で保存されます（OBSのドックとブラウザソースは同じ保存場所を使います）。別のPCに移すときは「ファイルに保存」を使ってください。</li>
+          <li>ルーレットのソースを開き直しても、前の結果の演出はもう一度流れません。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- AdSense -->
+  <div class="ad-wrap" style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      if (new URLSearchParams(location.search).get('dock') !== '1') (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.png"
+            alt="どんまうんど" width="720" height="151"></a>
+        <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a
+            href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+      </div>
+      <span>
+        <a href="https://github.com/donnma777/tools" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- フォント一覧はチャットCSSジェネレーターと共通。chat-core.js / roulette-core.js を変えたら v を上げる（view.html も） -->
+  <script src="../common/ask.js?v=20260929a"></script>
+  <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
+  <script src="roulette-core.js?v=20260929c"></script>
+  <script>
+    (() => {
+      'use strict';
+      const C = window.ChatCore;
+      const K = window.RouletteCore;
+      const $ = id => document.getElementById(id);
+      const { DEFAULTS, sanitize, PALETTES } = K;
+      const dock = new URLSearchParams(location.search).get('dock') === '1';
+      if (dock) document.body.classList.add('dock');
+
+      // =====================================================
+      //  見た目の設定項目
+      // =====================================================
+      const fixedText = s => s.textMode === 'fixed';
+      const SECTIONS = [
+        {
+          title: '円盤の色', icon: '🎨', fields: [
+            { k: 'palette', l: '配色（項目の色を指定していないとき）', t: 'select', o: Object.entries(PALETTES).map(([v, p]) => [v, p.l]) },
+            { k: 'textMode', l: '項目の文字色', t: 'select', o: [['auto', '自動（扇の色に合わせて白か黒）'], ['fixed', '指定する']] },
+            { k: 'textColor', l: '文字色', t: 'color', when: fixedText },
+            { k: 'textStroke', l: '文字を縁取る', t: 'check' },
+            { k: 'strokeColor', l: '縁取りの色', t: 'color', when: s => s.textStroke },
+            { k: 'strokeWidth', l: '縁取りの太さ', t: 'range', min: 1, max: 12, step: 0.5, u: 'px', when: s => s.textStroke },
+            { k: 'lineOn', l: '扇の境目に線を引く', t: 'check' },
+            { k: 'lineColor', l: '境目の線の色', t: 'color', when: s => s.lineOn },
+            { k: 'lineWidth', l: '境目の線の太さ', t: 'range', min: 1, max: 12, step: 0.5, u: 'px', when: s => s.lineOn },
+            { k: 'rimOn', l: '外枠を付ける', t: 'check' },
+            { k: 'rimColor', l: '外枠の色', t: 'color', when: s => s.rimOn },
+            { k: 'rimWidth', l: '外枠の太さ', t: 'range', min: 4, max: 48, step: 1, u: 'px', when: s => s.rimOn },
+            { k: 'pins', l: '外枠に飾りの点を付ける', t: 'check', when: s => s.rimOn },
+            { k: 'pinColor', l: '飾りの点の色', t: 'color', when: s => s.rimOn && s.pins },
+            { k: 'hubOn', l: '真ん中の丸を付ける', t: 'check' },
+            { k: 'hubColor', l: '真ん中の丸の色', t: 'color', when: s => s.hubOn },
+            { k: 'hubText', l: '真ん中の文字（空欄でなし）', t: 'text', ph: '例: GO!', when: s => s.hubOn },
+            { k: 'hubTextColor', l: '真ん中の文字の色', t: 'color', when: s => s.hubOn && !!s.hubText.trim() },
+            { k: 'shadow', l: '円盤に影を付ける', t: 'check' },
+          ]
+        },
+        {
+          title: '文字・見出し', icon: '🔤', fields: [
+            { k: 'font', l: 'フォント', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]) },
+            { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
+            { k: 'weight', l: '文字の太さ', t: 'select', o: C.WEIGHTS },
+            { k: 'textScale', l: '項目の文字の大きさ', t: 'range', min: 0.5, max: 1.6, step: 0.05, u: '倍', note: '長い項目は、扇に収まるように自動で小さくなります' },
+            { k: 'titleSize', l: '見出しの文字サイズ', t: 'range', min: 24, max: 140, step: 2, u: 'px' },
+            { k: 'titleColor', l: '見出しの色', t: 'color' },
+            { k: 'titleEffect', l: '見出しの文字効果', t: 'select', o: [['none', 'なし'], ['outline', '縁取り'], ['shadow', '影'], ['glow', '発光（ネオン）']] },
+            { k: 'titleEffectColor', l: '縁取り・影の色', t: 'color', when: s => s.titleEffect !== 'none' },
+          ]
+        },
+        {
+          title: '針', icon: '👆', fields: [
+            { k: 'pointerPos', l: '針の位置', t: 'select', o: [['top', '上'], ['right', '右']] },
+            { k: 'pointerColor', l: '針の色', t: 'color' },
+            { k: 'pointerOutline', l: '針の縁の色', t: 'color' },
+          ]
+        },
+        {
+          title: '結果の表示', icon: '🎉', fields: [
+            { k: 'resultOn', l: '止まったら結果を大きく出す', t: 'check' },
+            { k: 'resultLabel', l: '結果の上の文字（空欄でなし）', t: 'text', ph: '🎉 結果', when: s => s.resultOn },
+            { k: 'resultSec', l: '結果を出しておく時間', t: 'range', min: 0, max: 20, step: 0.5, u: '秒', note: '0 にすると、次に回すまで出したままにします' },
+            { k: 'resultSize', l: '結果の文字サイズ', t: 'range', min: 32, max: 180, step: 2, u: 'px', when: s => s.resultOn },
+            { k: 'resultColor', l: '結果の文字色', t: 'color', when: s => s.resultOn },
+            { k: 'resultAccent', l: '枠と上の文字の色', t: 'color', when: s => s.resultOn },
+            { k: 'resultBg', l: '結果の背景色', t: 'color', when: s => s.resultOn },
+            { k: 'resultAlpha', l: '背景の不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.resultOn },
+            { k: 'dimOthers', l: '当たった扇以外を暗くする', t: 'check' },
+          ]
+        },
+        {
+          title: '履歴の表示', icon: '📜', fields: [
+            { k: 'histPos', l: 'これまでの結果を画面に出す', t: 'select', o: [['none', '出さない'], ['right', '円盤の右'], ['left', '円盤の左'], ['bottom', '円盤の下（横に並べる）']] },
+            { k: 'histTitle', l: '履歴の見出し（空欄でなし）', t: 'text', ph: 'これまでの結果', when: s => s.histPos !== 'none' },
+            { k: 'histCount', l: '出す件数（新しい順）', t: 'range', min: 1, max: 30, step: 1, u: '件', when: s => s.histPos !== 'none' },
+            { k: 'histNum', l: '何回目かの番号を付ける', t: 'check', when: s => s.histPos !== 'none' },
+            { k: 'histSize', l: '履歴の文字サイズ', t: 'range', min: 18, max: 72, step: 1, u: 'px', when: s => s.histPos !== 'none' },
+            { k: 'histColor', l: '履歴の文字色', t: 'color', when: s => s.histPos !== 'none' },
+            { k: 'histAccent', l: '見出し・番号の色', t: 'color', when: s => s.histPos !== 'none' },
+            { k: 'histBg', l: '履歴の背景色', t: 'color', when: s => s.histPos !== 'none' },
+            { k: 'histAlpha', l: '背景の不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.histPos !== 'none' },
+          ]
+        },
+        {
+          title: '回り方・音', icon: '🎵', fields: [
+            {
+              k: 'stopMode', l: '止め方', t: 'select', o: [['auto', '自動で止まる（回る時間を決める）'], ['button', 'ストップボタンで止める']],
+              note: 'ストップボタン式は、「✋ ストップ」を押すまで回り続けます（押した瞬間に当たりが決まって、だんだん遅くなって止まります）',
+            },
+            { k: 'spinSec', l: '回る時間', t: 'range', min: 2, max: 20, step: 0.5, u: '秒', when: s => s.stopMode === 'auto' },
+            { k: 'freeSpeed', l: '回る速さ（1秒に何周）', t: 'range', min: 0.3, max: 4, step: 0.1, u: '周', when: s => s.stopMode === 'button' },
+            { k: 'maxSec', l: '自動で止めるまでの時間', t: 'range', min: 0, max: 120, step: 1, u: '秒', when: s => s.stopMode === 'button', note: '0 にすると、ストップを押すまでずっと回ります（無限モード）' },
+            { k: 'stopSec', l: 'ストップしてから止まるまで', t: 'range', min: 1, max: 10, step: 0.5, u: '秒', when: s => s.stopMode === 'button' },
+            { k: 'sizeByWeight', l: '当たりやすさに合わせて扇の大きさを変える', t: 'check', note: 'オフにすると扇は同じ大きさになります（当たりやすさはそのまま）' },
+            { k: 'idleSpin', l: '回していないときも、ゆっくり回しておく', t: 'check' },
+            { k: 'sound', l: '効果音を鳴らす', t: 'check' },
+            { k: 'volume', l: '音量', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.sound },
+          ]
+        },
+      ];
+
+      const PRESETS = [
+        ['ポップ', {}],
+        ['パステル', { palette: 'pastel', font: 'Mochiy Pop One', weight: '400', pinColor: '#ff85a1', pointerColor: '#ff85a1', resultAccent: '#ff85a1', titleColor: '#ff85a1', titleEffectColor: '#ffffff' }],
+        ['どんまうんど', { palette: 'pink', font: 'Zen Maru Gothic', pinColor: '#ff5c8a', pointerColor: '#ff5c8a', resultBg: '#2e1224', resultAccent: '#ff85a1', titleColor: '#ffffff', titleEffectColor: '#ff5c8a' }],
+        ['ネオン', { palette: 'neon', font: 'Zen Kaku Gothic New', lineColor: '#ff2e88', rimColor: '#1b1036', pinColor: '#00e5ff', hubColor: '#1b1036', hubTextColor: '#00e5ff', pointerColor: '#00e5ff', pointerOutline: '#ff2e88', titleEffect: 'glow', titleEffectColor: '#ff2e88', resultBg: '#140a24', resultAccent: '#00e5ff' }],
+        ['カジノ', { palette: 'vivid', font: 'Dela Gothic One', weight: '400', textMode: 'fixed', textColor: '#ffffff', lineColor: '#d4a017', rimColor: '#d4a017', pinColor: '#fff3bf', hubColor: '#d4a017', hubText: '★', hubTextColor: '#7a1010', pointerColor: '#ffd43b', pointerOutline: '#7a5200', resultAccent: '#d4a017', titleColor: '#ffd43b' }],
+        ['和風', { palette: 'wa', font: 'Shippori Mincho', weight: '800', lineColor: '#1b1410', rimColor: '#1b1410', pinColor: '#d9b777', hubColor: '#1b1410', hubTextColor: '#d9b777', pointerColor: '#b7282e', pointerOutline: '#f5f0e1', titleEffect: 'shadow', titleColor: '#f5f0e1', titleEffectColor: '#1b1410', resultBg: '#1b1410', resultAccent: '#d9b777', resultLabel: '結果' }],
+        ['オーシャン', { palette: 'ocean', pinColor: '#0b7285', pointerColor: '#ffd43b', pointerOutline: '#0b7285', resultAccent: '#66d9e8' }],
+        ['モノトーン', { palette: 'mono', lineColor: '#888888', rimColor: '#2b2b2b', pinColor: '#f1f1f1', hubColor: '#2b2b2b', hubTextColor: '#f1f1f1', pointerColor: '#ffffff', pointerOutline: '#2b2b2b', resultAccent: '#ffffff', shadow: false }],
+      ];
+
+      const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => String(a + i));
+      const SAMPLES = [
+        ['サイコロ（1〜6）', range(1, 6)],
+        ['数字（1〜10）', range(1, 10)],
+        ['YES / NO', ['YES', 'NO']],
+        ['じゃんけん', ['グー', 'チョキ', 'パー']],
+        ['当たり・ハズレ', ['大当たり *1', '当たり *3', 'ハズレ *6']],
+        ['罰ゲーム', ['変顔', 'ものまね', '一発ギャグ', '語尾が「にゃん」', '早口言葉', 'セーフ！']],
+        ['配信の企画', ['歌枠', '雑談', 'ホラーゲーム', 'お絵かき', '視聴者参加型', 'おやすみ']],
+      ];
+
+      // =====================================================
+      //  状態
+      // =====================================================
+      let { R, S } = K.loadStored();
+
+      const inputs = {};
+      function buildField(f) {
+        const wrap = document.createElement('div');
+        wrap.className = 'field';
+        const id = 'f-' + f.k;
+        let set;
+        if (f.t === 'check') {
+          wrap.innerHTML = `<label class="toggle" for="${id}"><span></span><input type="checkbox" id="${id}"><span class="sw"></span></label>`;
+          const el = wrap.querySelector('input');
+          el.addEventListener('change', () => update(f.k, el.checked));
+          set = v => { el.checked = v; };
+        } else if (f.t === 'range') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span><span class="field-val"></span></label>
+            <input type="range" id="${id}" min="${f.min}" max="${f.max}" step="${f.step}">`;
+          const el = wrap.querySelector('input'), val = wrap.querySelector('.field-val');
+          const show = v => { val.textContent = f.k === 'maxSec' && +v === 0 ? '∞ 無限' : `${+(+v).toFixed(2)}${f.u}`; };
+          el.addEventListener('input', () => { show(el.value); update(f.k, parseFloat(el.value)); });
+          set = v => { el.value = v; show(v); };
+        } else if (f.t === 'select') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label><select id="${id}"></select>`;
+          const el = wrap.querySelector('select');
+          for (const [v, label] of f.o) el.add(new Option(label, v));
+          el.addEventListener('change', () => update(f.k, el.value));
+          set = v => { el.value = v; };
+        } else if (f.t === 'color') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label>
+            <div class="color-row"><input type="color" id="${id}"><input type="text" maxlength="7" spellcheck="false"></div>`;
+          const [pick, hex] = wrap.querySelectorAll('input');
+          hex.setAttribute('aria-label', 'カラーコード');
+          pick.addEventListener('input', () => { hex.value = pick.value; update(f.k, pick.value); });
+          hex.addEventListener('input', () => {
+            let v = hex.value.trim();
+            if (!v.startsWith('#')) v = '#' + v;
+            if (/^#[0-9a-f]{6}$/i.test(v)) { pick.value = v.toLowerCase(); update(f.k, v.toLowerCase()); }
+          });
+          hex.addEventListener('blur', () => { hex.value = S[f.k]; });
+          set = v => { pick.value = v; hex.value = v; };
+        } else {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label><input type="text" id="${id}">`;
+          const el = wrap.querySelector('input');
+          el.placeholder = f.ph || '';
+          el.addEventListener('input', () => update(f.k, el.value));
+          set = v => { el.value = v; };
+        }
+        wrap.querySelector('label > span').textContent = f.l;
+        if (f.note) {
+          const n = document.createElement('div');
+          n.className = 'field-note';
+          n.textContent = f.note;
+          wrap.appendChild(n);
+        }
+        inputs[f.k] = { f, wrap, set };
+        return wrap;
+      }
+
+      function buildUI() {
+        for (const sec of SECTIONS) {
+          const det = document.createElement('details');
+          det.className = 'sec';
+          det.innerHTML = `<summary><span class="sec-icon">${sec.icon}</span>${sec.title}</summary>`;
+          const grid = document.createElement('div');
+          grid.className = 'fields';
+          for (const f of sec.fields) grid.appendChild(buildField(f));
+          det.appendChild(grid);
+          $('settings').appendChild(det);
+        }
+      }
+
+      const refreshVisibility = () => {
+        for (const k in inputs) {
+          const { f, wrap } = inputs[k];
+          wrap.hidden = f.when ? !f.when(S) : false;
+        }
+      };
+      function syncUI() {
+        for (const k in inputs) inputs[k].set(S[k]);
+        refreshVisibility();
+        $('r-title').value = R.title;
+        $('r-removeHit').checked = R.removeHit;
+        renderItems();
+        spinUi();
+      }
+
+      let queued = false;
+      function update(k, v) {
+        S[k] = v;
+        refreshVisibility();
+        // 配色を変えたら、項目の色の見本も変わる
+        if (k === 'palette' || k === 'sizeByWeight') renderItems();
+        commitSoon();
+      }
+      function commitSoon() {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => { queued = false; commit(); });
+      }
+
+      // 保存して、プレビュー・OBSのドック／ブラウザソース・OBS接続に伝える
+      function commit(now) {
+        K.saveStored(R, S);
+        sendPreview();
+        if (now) obsPush(); else scheduleObsPush();
+      }
+
+      // =====================================================
+      //  確認：OBSのカスタムブラウザドックでは confirm() が出ないことがあるので、ページの中に出す（../common/ask.js）
+      // =====================================================
+      const ask = (msg, yes) => window.DonnmaAsk.ask(msg, { yes }).then(r => r === true);
+
+      // =====================================================
+      //  項目の一覧
+      // =====================================================
+      const esc = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const fmtPct = p => (p >= 10 ? p.toFixed(1) : p >= 1 ? p.toFixed(1) : p.toFixed(2)) + '%';
+
+      function effectiveColors() {
+        // 円盤に載っている項目は円盤と同じ色、載っていない項目は一覧の順で配色から
+        const act = K.active(R);
+        const onWheel = Object.fromEntries(K.colorsFor(act, S).map((c, i) => [act[i].id, c]));
+        const pal = PALETTES[S.palette].c;
+        return R.items.map((x, i) => onWheel[x.id] || x.c || pal[i % pal.length]);
+      }
+
+      function renderItems() {
+        const list = $('it-list');
+        const colors = effectiveColors();
+        list.innerHTML = R.items.map((x, i) => {
+          const hit = R.removeHit && x.hit;
+          return `<div class="it-row${x.off ? ' off' : ''}${hit ? ' hit' : ''}" data-i="${i}">
+            <input type="color" value="${colors[i]}" aria-label="${i + 1}番目の項目の色" title="${x.c ? '色を指定しています' : '配色の色'}">
+            <input type="text" value="${esc(x.t)}" maxlength="60" aria-label="${i + 1}番目の項目" placeholder="項目${i + 1}">
+            <input type="number" value="${x.w}" min="0.1" max="1000" step="1" aria-label="当たりやすさ" title="当たりやすさ（ほかの項目の何倍当たりやすいか）">
+            <span class="it-pct"></span>
+            <label class="toggle" title="${hit ? '当たったので外れています' : '円盤に載せる'}"><input type="checkbox" ${x.off ? '' : 'checked'} aria-label="円盤に載せる"><span class="sw"></span></label>
+            <button class="icon-btn mv-up" type="button" data-act="up" title="上へ" ${i === 0 ? 'disabled' : ''}>↑</button>
+            <button class="icon-btn" type="button" data-act="down" title="下へ" ${i === R.items.length - 1 ? 'disabled' : ''}>↓</button>
+            <button class="icon-btn" type="button" data-act="del" title="削除">✕</button>
+          </div>`;
+        }).join('');
+        renderStats();
+      }
+
+      // 確率・件数だけ書き直す（入力中に一覧を作り直すと、カーソルが外れるので）
+      function renderStats() {
+        const act = K.active(R);
+        const total = act.reduce((a, x) => a + x.w, 0);
+        const ids = new Set(act.map(x => x.id));
+        list().forEach((row, i) => {
+          const x = R.items[i];
+          row.querySelector('.it-pct').textContent = ids.has(x.id) && total ? fmtPct(x.w / total * 100) : '—';
+        });
+        $('items-count').textContent = `${act.length} / ${R.items.length}`;
+        $('it-sum').textContent = act.length ? `円盤に ${act.length} 個` : '円盤に項目がありません';
+        $('btn-restore').style.display = R.removeHit && R.items.some(x => x.hit) ? '' : 'none';
+      }
+      const list = () => [...$('it-list').children];
+
+      $('it-list').addEventListener('input', e => {
+        const row = e.target.closest('.it-row');
+        if (!row) return;
+        const x = R.items[+row.dataset.i];
+        if (e.target.type === 'text') { x.t = e.target.value.slice(0, 60); renderStats(); }
+        else if (e.target.type === 'number') {
+          const v = parseFloat(e.target.value);
+          if (!(v >= 0.1 && v <= 1000)) return;
+          x.w = v; renderStats();
+        } else if (e.target.type === 'color') { x.c = e.target.value; }
+        else return;
+        commitSoon();
+      });
+      $('it-list').addEventListener('change', e => {
+        const row = e.target.closest('.it-row');
+        if (!row) return;
+        const x = R.items[+row.dataset.i];
+        if (e.target.type === 'checkbox') {
+          x.off = !e.target.checked;
+          // 当たって外れた項目をオンにし直したら、また円盤に戻す
+          if (!x.off) x.hit = false;
+          renderItems(); commitSoon();
+        }
+        if (e.target.type === 'number') e.target.value = x.w;
+      });
+      $('it-list').addEventListener('click', e => {
+        const b = e.target.closest('button[data-act]');
+        if (!b) return;
+        const i = +b.closest('.it-row').dataset.i;
+        const it = R.items;
+        if (b.dataset.act === 'del') it.splice(i, 1);
+        if (b.dataset.act === 'up' && i > 0) [it[i - 1], it[i]] = [it[i], it[i - 1]];
+        if (b.dataset.act === 'down' && i < it.length - 1) [it[i + 1], it[i]] = [it[i], it[i + 1]];
+        renderItems(); commitSoon();
+      });
+      $('it-add').addEventListener('click', () => {
+        if (R.items.length >= K.MAX_ITEMS) { toast(`項目は${K.MAX_ITEMS}個までです`); return; }
+        R.items.push({ id: K.uid(), t: '', w: 1, c: '', off: false, hit: false });
+        renderItems(); commitSoon();
+        const rows = list();
+        rows[rows.length - 1].querySelector('input[type=text]').focus();
+      });
+      $('it-autocolor').addEventListener('click', () => {
+        R.items.forEach(x => { x.c = ''; });
+        renderItems(); commitSoon();
+        toast('項目の色を配色に戻しました');
+      });
+      $('it-clear').addEventListener('click', async () => {
+        if (!R.items.length || !await ask('項目をすべて消しますか？', '消す')) return;
+        R.items = [];
+        renderItems(); commitSoon();
+      });
+      $('r-title').addEventListener('input', e => { R.title = e.target.value.slice(0, 60); commitSoon(); });
+      $('r-removeHit').addEventListener('change', e => { R.removeHit = e.target.checked; renderItems(); commitSoon(); });
+
+      function setItems(items, replace) {
+        const next = replace ? items : [...R.items, ...items];
+        if (next.length > K.MAX_ITEMS) toast(`項目は${K.MAX_ITEMS}個までなので、あふれた分は入れませんでした`);
+        R.items = next.slice(0, K.MAX_ITEMS);
+        renderItems(); commitSoon();
+      }
+      for (const [name, lines] of SAMPLES) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip-btn';
+        b.textContent = name;
+        b.addEventListener('click', async () => {
+          if (R.items.some(x => x.t.trim()) && !await ask(`今の項目を「${name}」に入れ替えますか？`, '入れ替える')) return;
+          setItems(K.parseText(lines.join('\n')), true);
+          toast(`「${name}」を入れました`);
+        });
+        $('samples').appendChild(b);
+      }
+      $('bulk-add').addEventListener('click', () => {
+        const items = K.parseText($('bulk').value);
+        if (!items.length) { toast('1行に1つずつ書いてください'); return; }
+        setItems(items, false);
+        $('bulk').value = '';
+        toast(`${items.length}個追加しました`);
+      });
+      $('bulk-replace').addEventListener('click', async () => {
+        const items = K.parseText($('bulk').value);
+        if (!items.length) { toast('1行に1つずつ書いてください'); return; }
+        if (!await ask('今の項目を消して、テキストの項目に入れ替えますか？', '入れ替える')) return;
+        setItems(items, true);
+        $('bulk').value = '';
+      });
+      $('bulk-from').addEventListener('click', () => { $('bulk').value = K.toText(R.items); });
+
+      // =====================================================
+      //  回す・結果の記録
+      // =====================================================
+      //  状態：'idle'（回せる）/ 'free'（ストップ待ちで回っている）/ 'busy'（止まるのを待っている）
+      let spinTimer = 0, autoStopTimer = 0;
+      const spinState = () => K.isFree(R) ? 'free' : R.spin && Date.now() < K.doneAt(R) ? 'busy' : 'idle';
+      function doSpin() {
+        const st = spinState();
+        if (st === 'busy') return;
+        if (st === 'free') { doStop(); return; }
+        const r = K.spin(R, S);
+        if (r.error) { toast(r.error); return; }
+        R = r.R;
+        commit(true);
+        renderItems();
+        spinUi();
+        // 「自動で止めるまでの時間」があれば、その時間で止める（その前に誰かが止めていたら何もしない）
+        const sp = R.spin;
+        clearTimeout(autoStopTimer);
+        if (K.isFree(R) && sp.maxSec > 0) autoStopTimer = setTimeout(() => { if (K.isFree(R) && R.spin.at === sp.at) doStop(); }, sp.maxSec * 1000);
+      }
+      function doStop() {
+        clearTimeout(autoStopTimer);
+        const r = K.stopSpin(R, S);
+        if (r.error) return;
+        R = r.R;
+        commit(true);
+        renderItems();
+        spinUi();
+      }
+      // ボタンと結果の欄を、今の状態に合わせる。結果は止まってから出す（このページだけ先にネタバレしないように）
+      function spinUi() {
+        clearTimeout(spinTimer);
+        const st = spinState(), btn = $('btn-spin'), out = $('spin-result');
+        btn.disabled = st === 'busy';
+        btn.textContent = st === 'free' ? '✋ ストップ' : '🎲 回す';
+        if (st === 'free') {
+          const max = R.spin.maxSec;
+          out.innerHTML = `<small>回っています${max > 0 ? `（${max}秒で自動で止まります）` : ''}</small>ストップで止めます`;
+        } else if (st === 'busy') {
+          out.innerHTML = '<small>回しています…</small>';
+          spinTimer = setTimeout(spinUi, Math.max(0, K.doneAt(R) - Date.now()));
+        } else {
+          const item = R.spin && R.spin.items.find(x => x.id === R.spin.id);
+          out.innerHTML = item ? '<small>結果</small>' : '';
+          if (item) out.append(item.t);
+        }
+        renderHistory();
+      }
+      $('btn-spin').addEventListener('click', doSpin);
+      // スペースキーでも回す・止める（入力欄やボタンを操作しているときは除く）
+      addEventListener('keydown', e => {
+        if (e.code !== 'Space' || e.repeat || e.target.closest('input, textarea, select, button, summary')) return;
+        e.preventDefault();
+        doSpin();
+      });
+
+      const hhmm = at => { const d = new Date(at); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+      function renderHistory() {
+        // 止まる前の結果は、まだ記録に出さない
+        const hist = spinState() === 'busy' ? R.history.slice(1) : R.history;
+        $('history').innerHTML = hist.length
+          ? hist.map((h, i) => `<li><span class="tm">${hist.length - i}. ${hhmm(h.at)}</span><span class="nm">${esc(h.t)}</span></li>`).join('')
+          : '<li class="history-empty" style="background:none">まだ回していません</li>';
+      }
+      $('btn-clear-history').addEventListener('click', async () => {
+        if (!R.history.length || !await ask('結果の記録を消しますか？（画面の履歴も消えます）', '消す')) return;
+        R.history = [];
+        renderHistory(); commitSoon();
+      });
+      // 結果の記録だけを別タブで（このブラウザの保存場所を共有するので、回すと自動で更新される）
+      $('btn-hist-tab').addEventListener('click', () => openTab('show=history&tab=1', 'donnma-roulette-history'));
+      $('btn-restore').addEventListener('click', () => {
+        R.items.forEach(x => { x.hit = false; });
+        renderItems(); commitSoon();
+        toast('外した項目を円盤に戻しました');
+      });
+
+      // =====================================================
+      //  プレビュー（OBSに入れる view.html をそのまま使い、内容は postMessage で渡す）
+      // =====================================================
+      const frame = $('preview');
+      let frameReady = false;
+      // ドックではOBSのソースと音が重なるので、最初はプレビューの音を消しておく
+      let muted = dock;
+      function sendPreview() {
+        if (frameReady) frame.contentWindow.postMessage({ type: 'rl-state', R, S: muted ? { ...S, sound: false } : S }, '*');
+      }
+      addEventListener('message', e => {
+        if (e.source !== frame.contentWindow || !e.data) return;
+        if (e.data.type === 'rl-ready') { frameReady = true; sendPreview(); }
+        if (e.data.type === 'rl-spin') doSpin();
+      });
+      frame.src = 'view.html?v=20260929c#preview=1';
+      $('stage-bg').addEventListener('change', e => { $('stage').className = 'rl-stage bg-' + e.target.value; });
+      const muteUi = () => {
+        $('btn-mute').textContent = muted ? '🔇 プレビューの音' : '🔊 プレビューの音';
+        $('btn-mute').setAttribute('aria-pressed', String(muted));
+      };
+      $('btn-mute').addEventListener('click', () => { muted = !muted; muteUi(); sendPreview(); });
+      muteUi();
+
+      // 大きく表示（OBSを使わず、このページを画面共有したり、会場のモニターに映したりするとき）
+      function setExpanded(on) {
+        document.body.classList.toggle('preview-expanded', on);
+        $('btn-expand').textContent = on ? '✕ 閉じる' : '⛶ 大きく表示';
+        $('btn-expand').setAttribute('aria-pressed', String(on));
+      }
+      $('btn-expand').addEventListener('click', () => setExpanded(!document.body.classList.contains('preview-expanded')));
+      addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('preview-expanded')) setExpanded(false); });
+      // 別タブ：view.html をそのまま開く（このブラウザの保存場所を共有するので、ここで回すと一緒に回る）
+      //  結果の記録だけ（#show=history）も同じ開き方にそろえる。tab=1 は普通のタブ向けに背景を暗くする
+      function openTab(hash, name) {
+        const w = window.open(new URL('view.html#' + hash, location.href).href, name);
+        if (!w) toast('新しいタブを開けませんでした。ブラウザでポップアップを許可してください');
+        return w;
+      }
+      $('btn-tab').addEventListener('click', () => {
+        if (openTab('tab=1', 'donnma-roulette-view')) toast('別タブで開きました。音は、そのタブを一度クリックすると鳴るようになります');
+      });
+
+      // 別の場所（OBSのドックや、ソースの「対話」でのクリック）で回したり直したりしたら、読み直す
+      addEventListener('storage', e => {
+        if (e.key !== K.STORE_KEY) return;
+        const prev = R.spin && `${R.spin.at}|${R.spin.stopAt}`;
+        ({ R, S } = K.loadStored());
+        syncUI();
+        sendPreview();
+        if (R.spin && `${R.spin.at}|${R.spin.stopAt}` !== prev) {
+          // ほかの場所で止められたら、ここの自動停止は取り消す
+          if (!K.isFree(R)) clearTimeout(autoStopTimer);
+          spinUi();
+        }
+        scheduleObsPush();
+      });
+
+      // =====================================================
+      //  ボタン類
+      // =====================================================
+      const toastEl = $('toast');
+      let toastTimer;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+      }
+      async function copyText(text, input) {
+        try { await navigator.clipboard.writeText(text); } catch (e) { input.value = text; input.hidden = false; input.select(); document.execCommand('copy'); }
+      }
+      function download(name, text, type) {
+        const url = URL.createObjectURL(new Blob([text], { type }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+        const kind = b.dataset.copy;
+        const url = new URL({ view: 'view.html', history: 'view.html#show=history', dock: 'index.html?dock=1' }[kind], location.href).href;
+        await copyText(url, $('copy-fallback'));
+        toast({
+          view: 'コピーしました！OBSのブラウザソースに貼り付けてください（幅1080・高さ1080）',
+          history: 'コピーしました！OBSのブラウザソースに貼り付けてください（幅500・高さ800 くらい）',
+          dock: 'コピーしました！OBSのメニュー「ドック → カスタムブラウザドック」のURLに貼り付けてください',
+        }[kind]);
+      }));
+
+      for (const [name, p] of PRESETS) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip-btn';
+        b.textContent = name;
+        // 回り方・音・結果の時間はテンプレートで変えない
+        const keep = ['stopMode', 'spinSec', 'freeSpeed', 'maxSec', 'stopSec', 'sizeByWeight', 'idleSpin', 'sound', 'volume', 'resultSec', 'resultOn',
+          'histPos', 'histTitle', 'histCount', 'histNum', 'histSize'];
+        b.addEventListener('click', () => {
+          const next = { ...DEFAULTS, ...p };
+          for (const k of keep) next[k] = S[k];
+          // 履歴の色は、結果の表示の色に合わせる
+          next.histAccent = next.resultAccent;
+          next.histBg = next.resultBg;
+          S = sanitize(next);
+          syncUI(); commitSoon();
+          toast(`テンプレート「${name}」を適用しました`);
+        });
+        $('presets').appendChild(b);
+      }
+      document.querySelectorAll('.preset-sec').forEach(group => {
+        const key = 'donnma-roulette-open-' + group.dataset.key;
+        group.querySelector('.preset-count').textContent = `${group.querySelectorAll('.chip-btn').length}種類`;
+        try { group.open = localStorage.getItem(key) !== '0'; } catch (e) { group.open = true; }
+        group.addEventListener('toggle', () => { try { localStorage.setItem(key, group.open ? '1' : '0'); } catch (e) { /* ignore */ } });
+      });
+
+      $('btn-save').addEventListener('click', () => {
+        const { spin, history, ...items } = R;
+        download('roulette.json', JSON.stringify({ tool: 'donnma-roulette', version: 1, R: items, S }, null, 2), 'application/json');
+      });
+      $('btn-load').addEventListener('click', () => $('file-load').click());
+      $('file-load').addEventListener('change', async e => {
+        const file = e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        try {
+          const data = JSON.parse(await file.text());
+          if (!data || (!data.R && !data.S)) throw new Error('bad');
+          if (data.R) R = K.sanitizeR({ ...data.R, spin: R.spin, history: R.history });
+          if (data.S) S = sanitize(data.S);
+          syncUI(); commitSoon();
+          toast('項目と見た目を復元しました');
+        } catch (err) {
+          toast('読み込めませんでした（ファイル形式を確認してください）');
+        }
+      });
+      $('btn-reset').addEventListener('click', async () => {
+        if (!await ask('項目・見た目・結果の記録をすべて初期値に戻しますか？', 'リセットする')) return;
+        R = K.sanitizeR(null); S = sanitize(null);
+        syncUI(); commitSoon();
+      });
+
+      // =====================================================
+      //  OBS接続（obs-websocket v5）：Chrome から操作するとき、内容を OBS のブラウザソースへ送る
+      //  obs-browser の emit_event で 'donnmaRouletteUpdate' を送り、view.html が受け取る
+      // =====================================================
+      const OBS_KEY = 'donnma-roulette-obs-v1';
+      const obs = { ws: null, ready: false, nextId: 1, pending: new Map(), timer: 0 };
+      const loadObs = () => { try { return JSON.parse(localStorage.getItem(OBS_KEY) || 'null') || {}; } catch (e) { return {}; } };
+      function obsUi(text) {
+        $('obs-state').textContent = text || (obs.ready ? '● 接続中（回すとOBSでも回ります）' : '● 未接続');
+        $('obs-state').classList.toggle('on', obs.ready);
+        // .btn の display 指定が hidden 属性より強いので、style で切り替える
+        $('obs-connect').style.display = obs.ready ? 'none' : '';
+        $('obs-disconnect').style.display = obs.ready ? '' : 'none';
+      }
+      async function authString(password, salt, challenge) {
+        const enc = new TextEncoder();
+        const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+        const secret = b64(await crypto.subtle.digest('SHA-256', enc.encode(password + salt)));
+        return b64(await crypto.subtle.digest('SHA-256', enc.encode(secret + challenge)));
+      }
+      function obsDisconnect() {
+        if (obs.ws) { const ws = obs.ws; obs.ws = null; obs.ready = false; ws.close(); }
+        obsUi();
+      }
+      function obsConnect(port, password) {
+        obsDisconnect();
+        return new Promise((resolve, reject) => {
+          let ws;
+          try { ws = new WebSocket(`ws://127.0.0.1:${port}`, 'obswebsocket.json'); } catch (e) { reject(new Error('接続先が正しくありません')); return; }
+          obs.ws = ws;
+          ws.onmessage = async (ev) => {
+            const msg = JSON.parse(ev.data);
+            if (msg.op === 0) {
+              const identify = { rpcVersion: 1, eventSubscriptions: 0 };
+              const auth = msg.d.authentication;
+              if (auth) {
+                if (!password) { reject(new Error('パスワードが必要です')); ws.close(); return; }
+                identify.authentication = await authString(password, auth.salt, auth.challenge);
+              }
+              ws.send(JSON.stringify({ op: 1, d: identify }));
+            } else if (msg.op === 2) {
+              obs.ready = true; obsUi(); resolve();
+            } else if (msg.op === 7) {
+              const p = obs.pending.get(msg.d.requestId);
+              if (!p) return;
+              obs.pending.delete(msg.d.requestId);
+              if (msg.d.requestStatus.result) p.resolve(); else p.reject(new Error(msg.d.requestStatus.comment || `エラー ${msg.d.requestStatus.code}`));
+            }
+          };
+          ws.onclose = (ev) => {
+            const was = obs.ready;
+            if (obs.ws === ws) { obs.ws = null; obs.ready = false; }
+            obs.pending.forEach(p => p.reject(new Error('切断されました')));
+            obs.pending.clear();
+            obsUi();
+            if (ev.code === 4009) reject(new Error('パスワードが違います'));
+            else if (!was) reject(new Error('OBSに接続できません（OBSが起動しているか、WebSocketサーバーが有効か確認してください）'));
+            else obsUi('● OBSとの接続が切れました');
+          };
+        });
+      }
+      function obsPush() {
+        if (!obs.ready) return;
+        clearTimeout(obs.timer);
+        const requestId = String(obs.nextId++);
+        obs.pending.set(requestId, { resolve() { }, reject(err) { obsUi('⚠️ 送れませんでした：' + err.message); } });
+        obs.ws.send(JSON.stringify({
+          op: 6, d: {
+            requestType: 'CallVendorRequest', requestId, requestData: {
+              vendorName: 'obs-browser', requestType: 'emit_event',
+              requestData: { event_name: 'donnmaRouletteUpdate', event_data: { R, S } },
+            }
+          }
+        }));
+      }
+      function scheduleObsPush() {
+        if (!obs.ready) return;
+        clearTimeout(obs.timer);
+        obs.timer = setTimeout(obsPush, 250);
+      }
+      async function connectFromUi(silent) {
+        const port = parseInt($('obs-port').value, 10) || 4455;
+        const password = $('obs-password').value;
+        obsUi('● 接続中…');
+        try {
+          await obsConnect(port, password);
+          try { localStorage.setItem(OBS_KEY, JSON.stringify({ port, password, auto: true })); } catch (e) { /* ignore */ }
+          obsPush();
+          if (!silent) toast('OBSに接続しました');
+        } catch (err) {
+          obsUi('⚠️ ' + err.message);
+        }
+      }
+      $('obs-connect').addEventListener('click', () => connectFromUi(false));
+      $('obs-disconnect').addEventListener('click', () => {
+        obsDisconnect();
+        try { localStorage.setItem(OBS_KEY, JSON.stringify({ ...loadObs(), auto: false })); } catch (e) { /* ignore */ }
+      });
+      {
+        const saved = loadObs();
+        $('obs-port').value = saved.port || 4455;
+        $('obs-password').value = saved.password || '';
+        // 前回つないでいたら自動で再接続（OBS のドックの中で開いているときはつながない）
+        if (saved.auto && !window.obsstudio && !dock) connectFromUi(true);
+      }
+
+      buildUI();
+      syncUI();
+    })();
+  </script>
+
+</body>
+
+</html>

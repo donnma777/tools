@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>ルーレット</title>
+  <!-- OBSのブラウザソースで表示するページ。円盤はウィンドウの大きさに合わせて拡大・縮小する（おすすめは幅1080・高さ1080）。
+       項目と見た目は、編集ページがこのブラウザに保存したものを読む（OBS接続なら OBS へ送られてくる）。
+       OBSでソースを「対話」で開いて円盤をクリックしても回せる。
+       #show=history なら結果の記録だけを出す。tab=1 は普通のブラウザのタブ向けに背景を暗くする -->
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
+    #stage {
+      position: absolute; left: 0; top: 0; transform-origin: 0 0;
+      display: grid; grid-template-columns: 1000px; grid-template-areas: "title" "wheel";
+    }
+    /* 履歴の置き場所（右・左は円盤の横、下は円盤の下に横並び） */
+    #stage.h-right { grid-template-columns: 1000px var(--hist-w); grid-template-areas: "title title" "wheel hist"; column-gap: 24px; }
+    #stage.h-left { grid-template-columns: var(--hist-w) 1000px; grid-template-areas: "title title" "hist wheel"; column-gap: 24px; }
+    #stage.h-bottom { grid-template-areas: "title" "wheel" "hist"; row-gap: 16px; }
+    .rl-title { grid-area: title; }
+    #wheel { grid-area: wheel; }
+    .rl-hist {
+      grid-area: hist; display: none; flex-direction: column; gap: 14px; box-sizing: border-box; min-width: 0;
+      align-self: center; max-height: 960px; padding: 28px 30px; border-radius: 28px; overflow: hidden; line-height: 1.25;
+    }
+    .h-right .rl-hist, .h-left .rl-hist, .h-bottom .rl-hist { display: flex; }
+    .rl-hist-title { text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rl-hist-title:empty { display: none; }
+    .rl-hist ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .rl-hist li { display: flex; gap: 14px; align-items: baseline; min-width: 0; }
+    .rl-hist .n { flex: none; font-size: 0.7em; font-variant-numeric: tabular-nums; }
+    .rl-hist .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rl-hist li.empty { opacity: 0.5; justify-content: center; }
+    .rl-hist li.new { animation: rl-hist-in 0.6s cubic-bezier(0.2, 1.4, 0.4, 1); }
+    @keyframes rl-hist-in { from { opacity: 0; transform: translateX(-24px) scale(0.9); } }
+    .h-bottom .rl-hist { flex-direction: row; align-items: center; height: var(--hist-h); max-height: none; padding: 0 30px; }
+    .h-bottom .rl-hist-title { flex: none; }
+    .h-bottom .rl-hist ol { flex-direction: row; gap: 12px; overflow: hidden; }
+    .h-bottom .rl-hist li { flex: none; max-width: 360px; padding: 4px 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.1); }
+    .rl-title {
+      height: var(--title-h, 0px); display: flex; align-items: center; justify-content: center;
+      text-align: center; line-height: 1.15; white-space: nowrap; overflow: hidden;
+    }
+    .rl-title:empty { display: none; }
+    #wheel { position: relative; width: 1000px; height: 1000px; }
+    #cv { position: absolute; inset: 0; width: 1000px; height: 1000px; cursor: pointer; }
+    .rl-result {
+      position: absolute; left: 50%; top: 50%; width: max-content; max-width: 860px; box-sizing: border-box;
+      padding: 26px 56px 32px; border-radius: 36px; text-align: center; pointer-events: none;
+      opacity: 0; transform: translate(-50%, -50%) scale(0.5);
+      transition: opacity 0.2s ease, transform 0.45s cubic-bezier(0.2, 1.6, 0.4, 1);
+    }
+    .rl-result.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .rl-result-label { font-size: 40px; line-height: 1.3; }
+    .rl-result-label:empty { display: none; }
+    .rl-result-text { line-height: 1.2; word-break: break-word; }
+    /* 結果の記録だけ（#show=history）：拡大・縮小せず、ウィンドウいっぱいに一覧を出す */
+    body.only-hist #stage { position: static; transform: none !important; width: auto !important; display: block; }
+    body.only-hist .rl-title, body.only-hist #wheel { display: none; }
+    body.only-hist .rl-hist {
+      display: flex; height: 100vh; max-height: none; border-radius: 0; padding: 32px 36px; gap: 18px;
+    }
+    body.only-hist .rl-hist ol { overflow-y: auto; gap: 12px; }
+    body.only-hist .rl-hist .tm { flex: none; margin-left: auto; font-size: 0.55em; opacity: 0.7; font-variant-numeric: tabular-nums; }
+    body.tab { background: #1a0a14; }
+    #msg {
+      position: fixed; left: 8px; top: 8px; max-width: calc(100% - 16px);
+      padding: 6px 10px; border-radius: 8px; background: rgba(20, 0, 10, 0.8); color: #fff;
+      font: 700 14px/1.5 'Meiryo', sans-serif;
+    }
+    #msg:empty { display: none; }
+  </style>
+  <style id="gen"></style>
+</head>
+
+<body>
+  <div id="stage">
+    <div class="rl-title"></div>
+    <div id="wheel">
+      <canvas id="cv"></canvas>
+      <div class="rl-result" role="status"><div class="rl-result-label"></div><div class="rl-result-text"></div></div>
+    </div>
+    <div class="rl-hist"><div class="rl-hist-title"></div><ol></ol></div>
+  </div>
+  <div id="msg"></div>
+
+  <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
+  <script src="roulette-core.js?v=20260929c"></script>
+  <script>
+    (() => {
+      'use strict';
+      const K = window.RouletteCore;
+      const { TAU, mod } = K;
+      const $ = s => document.querySelector(s);
+      const params = new URLSearchParams(location.hash.replace(/^#/, ''));
+      const preview = params.get('preview') === '1';
+      const onlyHist = params.get('show') === 'history';
+      if (onlyHist) {
+        document.body.classList.add('only-hist');
+        document.title = 'ルーレットの結果';
+      }
+      if (params.get('tab') === '1') document.body.classList.add('tab');
+      // # の後ろ（表示の種類）だけが変わったときは、開き直して切り替える
+      if (!preview) addEventListener('hashchange', () => location.reload());
+
+      let { R, S } = preview ? { R: K.sanitizeR(null), S: K.sanitize(null) } : K.loadStored();
+      // 開いたときの結果は流さない（開き直すたびに回らないように）。ストップ待ちで回っている最中なら回しておく
+      let lastAt = 0, lastStop = 0;
+      let rot = 0;
+      // anim.type 'auto'・'decel'：from から to へ、だんだん遅くして dur ミリ秒で止める
+      //           'free'：ストップを押すまで同じ速さで回る
+      let anim = null;
+      let result = null;        // 結果を出している間の spin（円盤はそのときの項目のまま）
+      let resultTimer = 0;
+      let kick = 0;             // 針が弾かれたときの揺れ
+      let segs = [], lastSeg = null;
+
+      // ---------------------------------------------------------------
+      //  大きさ：1000×(1000＋見出し) を、ウィンドウに収まるように拡大・縮小して真ん中に置く
+      // ---------------------------------------------------------------
+      const stage = $('#stage'), cv = $('#cv'), ctx = cv.getContext('2d');
+      const off = document.createElement('canvas'), octx = off.getContext('2d');
+      let scale = 1, px = 1000;
+      function titleH() { return R.title.trim() ? Math.round(S.titleSize * 1.5 + 16) : 0; }
+      const HIST_W = 440;
+      const histH = () => Math.round(S.histSize * 1.6 + 40);
+      function fit() {
+        const th = titleH(), pos = S.histPos;
+        stage.className = pos === 'none' ? '' : 'h-' + pos;
+        stage.style.setProperty('--title-h', th + 'px');
+        stage.style.setProperty('--hist-w', HIST_W + 'px');
+        stage.style.setProperty('--hist-h', histH() + 'px');
+        const W = 1000 + (pos === 'right' || pos === 'left' ? HIST_W + 24 : 0);
+        const H = 1000 + th + (pos === 'bottom' ? histH() + 16 : 0);
+        stage.style.width = W + 'px';
+        scale = Math.min(innerWidth / W, innerHeight / H) || 1;
+        stage.style.transform = `translate(${(innerWidth - W * scale) / 2}px, ${(innerHeight - H * scale) / 2}px) scale(${scale})`;
+        // canvas は表示される大きさの画素で描く（拡大してもぼやけないように）
+        px = Math.max(200, Math.round(1000 * scale * (devicePixelRatio || 1)));
+        cv.width = cv.height = px;
+        off.width = off.height = px;
+        rebuild();
+      }
+
+      // ---------------------------------------------------------------
+      //  円盤（回る部分は off に描いておき、毎フレーム回して貼るだけにする）
+      // ---------------------------------------------------------------
+      const RW = 430;                         // 円盤の外側の半径（1000 のうち）
+      const HUB = 72;
+      const P = () => (S.pointerPos === 'right' ? 0 : -Math.PI / 2);   // 針の向き
+      const inner = () => RW - (S.rimOn ? S.rimWidth : 0);
+      const shownItems = () => (anim || result ? (anim || result).items : K.active(R));
+      const family = () => K.fontFamily(S);
+      function luminance(hex) {
+        const n = parseInt(hex.slice(1), 16);
+        const f = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+        return 0.2126 * f(n >> 16) + 0.7152 * f((n >> 8) & 255) + 0.0722 * f(n & 255);
+      }
+
+      function rebuild() {
+        const items = shownItems();
+        segs = K.layout(items, S);
+        const k = px / 1000, c = octx, r = inner();
+        c.setTransform(1, 0, 0, 1, 0, 0);
+        c.clearRect(0, 0, px, px);
+        c.setTransform(k, 0, 0, k, 500 * k, 500 * k);
+        const hi = result && S.dimOthers ? result.id : null;
+
+        if (!segs.length) {
+          c.beginPath(); c.arc(0, 0, r, 0, TAU); c.fillStyle = 'rgba(0,0,0,0.35)'; c.fill();
+        }
+        for (const s of segs) {
+          c.beginPath();
+          c.moveTo(0, 0);
+          c.arc(0, 0, r, P() + s.a0, P() + s.a1);
+          c.closePath();
+          c.fillStyle = s.color;
+          c.fill();
+          if (hi && s.id !== hi) { c.fillStyle = 'rgba(0,0,0,0.5)'; c.fill(); }
+        }
+        if (S.lineOn && segs.length > 1) {
+          c.strokeStyle = S.lineColor;
+          c.lineWidth = S.lineWidth;
+          for (const s of segs) {
+            c.beginPath(); c.moveTo(0, 0);
+            c.lineTo(Math.cos(P() + s.a0) * r, Math.sin(P() + s.a0) * r);
+            c.stroke();
+          }
+        }
+        // 項目の文字：真ん中から外に向かって、扇の中心線に沿って書く
+        const hubR = S.hubOn ? HUB : 20;
+        for (const s of segs) {
+          const span = s.a1 - s.a0, mid = P() + (s.a0 + s.a1) / 2;
+          const end = r - 26, avail = end - hubR - 18;
+          const h = span >= Math.PI ? 160 : 2 * (r * 0.62) * Math.sin(span / 2);
+          let fs = Math.min(h * 0.62, 72) * S.textScale;
+          c.save();
+          c.rotate(mid);
+          c.font = `${S.weight} ${fs}px ${family()}`;
+          let text = s.t, w = c.measureText(text).width;
+          if (w > avail) { fs = Math.max(14, fs * avail / w); c.font = `${S.weight} ${fs}px ${family()}`; w = c.measureText(text).width; }
+          while (w > avail && text.length > 1) { text = text.slice(0, -1); w = c.measureText(text + '…').width; }
+          if (text !== s.t) text += '…';
+          c.textAlign = 'right';
+          c.textBaseline = 'middle';
+          const col = S.textMode === 'auto' ? (luminance(s.color) > 0.45 ? '#222222' : '#ffffff') : S.textColor;
+          if (S.textStroke) {
+            c.lineJoin = 'round';
+            c.lineWidth = S.strokeWidth * 2;
+            c.strokeStyle = S.strokeColor;
+            c.strokeText(text, end, 0);
+          }
+          c.fillStyle = col;
+          c.globalAlpha = hi && s.id !== hi ? 0.55 : 1;
+          c.fillText(text, end, 0);
+          c.restore();
+        }
+        if (S.rimOn) {
+          c.beginPath(); c.arc(0, 0, RW, 0, TAU); c.arc(0, 0, r, 0, TAU, true);
+          c.fillStyle = S.rimColor; c.fill();
+          if (S.pins && segs.length > 1) {
+            c.fillStyle = S.pinColor;
+            const pr = (RW + r) / 2, size = Math.max(3, S.rimWidth * 0.28);
+            for (const s of segs) {
+              c.beginPath(); c.arc(Math.cos(P() + s.a0) * pr, Math.sin(P() + s.a0) * pr, size, 0, TAU); c.fill();
+            }
+          }
+        }
+        drawFrame();
+      }
+
+      // 回らない部分（影・真ん中の丸・針）と、回した円盤を重ねて描く
+      function drawFrame() {
+        const k = px / 1000;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, px, px);
+        ctx.setTransform(k, 0, 0, k, 500 * k, 500 * k);
+        if (S.shadow) {
+          ctx.save();
+          ctx.shadowColor = 'rgba(0,0,0,0.45)';
+          ctx.shadowBlur = 40 * k;
+          ctx.shadowOffsetY = 12 * k;
+          ctx.beginPath(); ctx.arc(0, 0, RW - 2, 0, TAU); ctx.fillStyle = '#000'; ctx.fill();
+          ctx.restore();
+        }
+        ctx.save();
+        ctx.rotate(rot);
+        ctx.drawImage(off, -500, -500, 1000, 1000);
+        ctx.restore();
+
+        if (S.hubOn) {
+          ctx.save();
+          ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 14 * k; ctx.shadowOffsetY = 4 * k;
+          ctx.beginPath(); ctx.arc(0, 0, HUB, 0, TAU); ctx.fillStyle = S.hubColor; ctx.fill();
+          ctx.restore();
+          if (S.lineOn) { ctx.lineWidth = S.lineWidth; ctx.strokeStyle = S.lineColor; ctx.stroke(); }
+          const t = S.hubText.trim();
+          if (t) {
+            let fs = 40;
+            ctx.font = `${S.weight} ${fs}px ${family()}`;
+            const w = ctx.measureText(t).width;
+            if (w > HUB * 1.6) { fs *= HUB * 1.6 / w; ctx.font = `${S.weight} ${fs}px ${family()}`; }
+            ctx.fillStyle = S.hubTextColor; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(t, 0, 2);
+          }
+        }
+
+        // 針：円盤の外から内側を指す。扇の境目を越えたときに少し弾かれる
+        ctx.save();
+        ctx.rotate(P());
+        ctx.translate(RW + 36, 0);
+        ctx.rotate(kick * 0.45);
+        ctx.beginPath();
+        ctx.moveTo(-100, 0);
+        ctx.lineTo(8, -40);
+        ctx.quadraticCurveTo(26, 0, 8, 40);
+        ctx.closePath();
+        ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 10 * k; ctx.shadowOffsetY = 4 * k;
+        ctx.fillStyle = S.pointerColor; ctx.fill();
+        ctx.shadowColor = 'transparent';
+        ctx.lineJoin = 'round'; ctx.lineWidth = 6; ctx.strokeStyle = S.pointerOutline; ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, 0, 10, 0, TAU); ctx.fillStyle = S.pointerOutline; ctx.fill();
+        ctx.restore();
+      }
+
+      // ---------------------------------------------------------------
+      //  音（WebAudio で鳴らす。OBSでは「オーディオをOBSで制御する」にすると音量を調整できる）
+      // ---------------------------------------------------------------
+      let ac = null, lastTick = 0;
+      function audio() {
+        if (!S.sound || S.volume <= 0 || onlyHist) return null;
+        try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+        if (ac.state === 'suspended') ac.resume().catch(() => { });
+        return ac;
+      }
+      function tone(freq, start, len, vol, type) {
+        const a = ac, o = a.createOscillator(), g = a.createGain();
+        o.type = type; o.frequency.value = freq;
+        g.gain.setValueAtTime(0.0001, start);
+        g.gain.exponentialRampToValueAtTime(vol, start + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, start + len);
+        o.connect(g).connect(a.destination);
+        o.start(start); o.stop(start + len + 0.02);
+      }
+      function tick() {
+        const now = performance.now();
+        if (now - lastTick < 28 || !audio()) return;
+        lastTick = now;
+        tone(1500, ac.currentTime, 0.05, 0.22 * S.volume, 'triangle');
+      }
+      function fanfare() {
+        if (!audio()) return;
+        const t = ac.currentTime + 0.02;
+        [523.25, 659.25, 783.99].forEach((f, i) => tone(f, t + i * 0.1, 0.18, 0.25 * S.volume, 'triangle'));
+        tone(1046.5, t + 0.3, 0.7, 0.3 * S.volume, 'triangle');
+        tone(1318.5, t + 0.3, 0.7, 0.12 * S.volume, 'sine');
+      }
+
+      // ---------------------------------------------------------------
+      //  回す演出
+      // ---------------------------------------------------------------
+      let raf = 0, prevT = 0;
+      function loop(now) {
+        raf = 0;
+        const dt = prevT ? Math.min(0.1, (now - prevT) / 1000) : 0;
+        prevT = now;
+        if (anim && anim.type === 'free') {
+          const t = (now - anim.t0) / 1000;
+          rot = anim.from + (t < RAMP ? anim.v * t * t / (2 * RAMP) : anim.v * (t - RAMP / 2));
+        } else if (anim) {
+          const p = Math.min(1, (now - anim.t0) / anim.dur);
+          const e = 1 - Math.pow(1 - p, anim.k);
+          rot = anim.from + (anim.to - anim.from) * e;
+          if (p >= 1) finish();
+        } else if (S.idleSpin && !result) {
+          rot = mod(rot + dt * 0.25, TAU);
+        }
+        if (segs.length > 1) {
+          const s = K.segmentAt(segs, rot);
+          if (lastSeg && s && s.id !== lastSeg && anim) { kick = 1; tick(); }
+          lastSeg = s && s.id;
+        }
+        kick *= 0.8;
+        if (kick < 0.01) kick = 0;
+        drawFrame();
+        if (anim || kick || (S.idleSpin && !result)) raf = requestAnimationFrame(loop);
+        else prevT = 0;
+      }
+      const wake = () => { if (!raf) raf = requestAnimationFrame(loop); };
+
+      const RAMP = 0.8;   // ストップ式で、最高速になるまでの秒数
+      function clearResult() {
+        clearTimeout(resultTimer);
+        result = null;
+        $('.rl-result').classList.remove('show');
+        audio();   // 回し始めに音の準備をしておく
+      }
+      function startSpin(sp) {
+        clearResult();
+        const from = mod(rot, TAU);
+        const dur = sp.dur * 1000;
+        const turns = Math.max(2, Math.round(sp.dur * 1.1));
+        anim = { type: 'auto', k: 4, from, to: from + turns * TAU + mod(sp.angle - from, TAU), t0: performance.now(), dur, id: sp.id, items: sp.items };
+        rebuild();
+        lastSeg = null;
+        wake();
+      }
+      // ストップ式：ストップが押されるまで同じ速さで回す
+      function startFree(sp) {
+        clearResult();
+        anim = { type: 'free', from: mod(rot, TAU), v: S.freeSpeed * TAU, t0: performance.now(), items: sp.items };
+        rebuild();
+        lastSeg = null;
+        wake();
+      }
+      // ストップが押されたら、今の速さのまま減速を始めて、決まった角度に止める。
+      // 減速の長さが stopSec 前後になるように、止まるまでに回る量 D を選び、長さは D から決める（速さが途中で跳ねないように）
+      function startDecel(sp) {
+        const now = performance.now();
+        let v = S.freeSpeed * TAU;
+        if (anim && anim.type === 'free') {
+          const t = (now - anim.t0) / 1000;
+          v = t < RAMP ? Math.max(0.5, anim.v * t / RAMP) : anim.v;
+        } else clearResult();
+        const k = 3;
+        const from = mod(rot, TAU);
+        const d0 = v * sp.stopSec / k;
+        let D = d0 + mod(sp.angle - (from + d0) + Math.PI, TAU) - Math.PI;
+        if (D < Math.PI) D += TAU;
+        anim = { type: 'decel', k, from, to: from + D, t0: now, dur: D * k / v * 1000, id: sp.id, items: sp.items };
+        rot = from;
+        rebuild();
+        wake();
+      }
+      // 開いたとき・プレビューが最初に受け取ったとき：前の結果は流さない
+      function initFrom(r) {
+        const sp = r.spin;
+        lastAt = sp ? sp.at : 0;
+        lastStop = sp ? sp.stopAt : 0;
+        if (sp && sp.id) rot = sp.angle;
+        if (K.isFree(r)) startFree(sp);
+      }
+      function finish() {
+        const done = anim;
+        anim = null;
+        rot = mod(done.to, TAU);
+        result = done;
+        rebuild();
+        const item = done.items.find(x => x.id === done.id);
+        if (S.resultOn && item) {
+          $('.rl-result-label').textContent = S.resultLabel;
+          $('.rl-result-text').textContent = item.t;
+          $('.rl-result').classList.add('show');
+        }
+        fanfare();
+        renderHist();
+        // 「0秒」なら次に回すまで出したまま
+        if (S.resultSec > 0) resultTimer = setTimeout(endResult, S.resultSec * 1000);
+      }
+      function endResult() {
+        result = null;
+        $('.rl-result').classList.remove('show');
+        rebuild();
+        wake();
+      }
+
+      // ---------------------------------------------------------------
+      //  履歴：新しい順に出す。回っている最中（当たりが決まってから止まるまで）の結果は、止まってから足す
+      // ---------------------------------------------------------------
+      let histTop = null;
+      function renderHist() {
+        if (S.histPos === 'none' && !onlyHist) return;
+        const hist = anim && anim.type !== 'free' ? R.history.slice(1) : R.history;
+        const shown = onlyHist ? hist : hist.slice(0, S.histCount);
+        $('.rl-hist-title').textContent = S.histTitle;
+        const ol = $('.rl-hist ol');
+        ol.innerHTML = '';
+        if (!shown.length) ol.innerHTML = '<li class="empty">—</li>';
+        shown.forEach((h, i) => {
+          const li = document.createElement('li');
+          if (S.histNum) {
+            const n = document.createElement('span');
+            n.className = 'n';
+            n.textContent = `${hist.length - i}.`;
+            li.append(n);
+          }
+          const t = document.createElement('span');
+          t.className = 't';
+          t.textContent = h.t;
+          li.append(t);
+          if (onlyHist) {
+            const d = new Date(h.at), tm = document.createElement('span');
+            tm.className = 'tm';
+            tm.textContent = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            li.append(tm);
+          }
+          if (i === 0 && histTop !== null && h.at !== histTop) li.classList.add('new');
+          ol.append(li);
+        });
+        histTop = shown.length ? shown[0].at : 0;
+      }
+
+      // ---------------------------------------------------------------
+      //  状態の受け取り
+      // ---------------------------------------------------------------
+      let cssKey = '', fontKey = '';
+      function apply(nextR, nextS) {
+        const layoutKey = () => `${R.title}|${S.titleSize}|${S.histPos}|${S.histSize}`;
+        const prevLayout = layoutKey();
+        R = K.sanitizeR(nextR);
+        S = K.sanitize(nextS);
+        const css = K.generateCSS(S);
+        if (css !== cssKey) { $('#gen').textContent = css; cssKey = css; }
+        $('.rl-title').textContent = R.title;
+        loadFont();
+        if (layoutKey() !== prevLayout) fit(); else rebuild();
+        if (!S.resultOn) $('.rl-result').classList.remove('show');
+        const sp = R.spin;
+        if (sp && sp.at !== lastAt) {
+          lastAt = sp.at;
+          lastStop = sp.stopAt;
+          if (sp.mode === 'auto') startSpin(sp);
+          else if (sp.stopAt) startDecel(sp);   // 回し始めと止めるのが一度に届いたとき
+          else startFree(sp);
+        } else if (sp && sp.mode === 'free' && sp.stopAt && sp.stopAt !== lastStop) {
+          lastStop = sp.stopAt;
+          startDecel(sp);
+        }
+        renderHist();
+        wake();
+      }
+
+      // Google フォントは読み込み終わってから描き直す（canvas は読み込み前のフォントで描いてしまうので）
+      function loadFont() {
+        const key = `${S.font}|${S.fontCustom}|${S.weight}`;
+        if (key === fontKey || !document.fonts) return;
+        fontKey = key;
+        const info = window.ChatCore.fontInfo(S);
+        const ready = () => {
+          const text = [...new Set(R.items.map(x => x.t).join('') + S.hubText + '…')].join('');
+          document.fonts.load(`${S.weight} 40px ${K.fontFamily(S)}`, text || 'あ').then(rebuild, rebuild);
+        };
+        if (info && info.url) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = info.url;
+          link.onload = ready;
+          document.head.appendChild(link);
+        } else ready();
+      }
+      document.fonts && document.fonts.addEventListener('loadingdone', () => rebuild());
+
+      // OBSでソースを「対話」で開いたときなど：ここで回す・止めて保存する（ドックの編集ページにも伝わる）
+      let autoStopTimer = 0;
+      function commitHere(r) {
+        if (r.error) return;
+        K.saveStored(r.R, S);
+        apply(r.R, S);
+      }
+      cv.addEventListener('click', () => {
+        const free = anim && anim.type === 'free';
+        if (anim && !free) return;
+        if (preview) { window.parent.postMessage({ type: 'rl-spin' }, '*'); return; }
+        if (free) { clearTimeout(autoStopTimer); commitHere(K.stopSpin(R, S)); return; }
+        commitHere(K.spin(R, S));
+        // 「自動で止めるまでの時間」があれば、その時間で止める（その前に誰かが止めていたら何もしない）
+        const sp = R.spin;
+        if (K.isFree(R) && sp.maxSec > 0) {
+          clearTimeout(autoStopTimer);
+          autoStopTimer = setTimeout(() => {
+            if (K.isFree(R) && R.spin.at === sp.at) commitHere(K.stopSpin(R, S));
+          }, sp.maxSec * 1000);
+        }
+      });
+
+      if (preview) {
+        // 編集ページのプレビュー：内容は親から受け取る
+        let first = true;
+        addEventListener('message', e => {
+          if (e.source !== window.parent || !e.data || e.data.type !== 'rl-state') return;
+          if (first) {
+            first = false;
+            initFrom(K.sanitizeR(e.data.R));
+          }
+          apply(e.data.R, e.data.S);
+        });
+        window.parent.postMessage({ type: 'rl-ready' }, '*');
+      } else {
+        // 同じ場所で開いている編集ページ（OBSのカスタムブラウザドックなど）が保存したら、読み直す
+        addEventListener('storage', e => {
+          if (e.key !== K.STORE_KEY) return;
+          const d = K.loadStored();
+          apply(d.R, d.S);
+        });
+        // OBS接続：Chrome の編集ページから obs-websocket 経由で届く（届いた内容はこのブラウザにも保存しておく）
+        addEventListener('donnmaRouletteUpdate', e => {
+          const d = e.detail;
+          if (!d || !d.R) return;
+          K.saveStored(K.sanitizeR(d.R), K.sanitize(d.S));
+          apply(d.R, d.S);
+        });
+      }
+
+      let resizeTimer;
+      addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fit, 60); });
+      $('#gen').textContent = cssKey = K.generateCSS(S);
+      $('.rl-title').textContent = R.title;
+      if (!preview) initFrom(R);
+      fit();
+      renderHist();
+      loadFont();
+      wake();
+    })();
+  </script>
+</body>
+
+</html>
