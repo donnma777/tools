@@ -27,7 +27,17 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.XSERVER_SSH_KEY }}" > ~/.ssh/xserver_key
           chmod 600 ~/.ssh/xserver_key
-          ssh-keyscan -p ${{ secrets.XSERVER_PORT }} ${{ secrets.XSERVER_HOST }} >> ~/.ssh/known_hosts
+          # ssh-keyscan はときどき一時的に失敗するので、何回かやり直す
+          for i in 1 2 3 4 5 6; do
+            if ssh-keyscan -T 15 -p ${{ secrets.XSERVER_PORT }} ${{ secrets.XSERVER_HOST }} > /tmp/keyscan 2>/dev/null && [ -s /tmp/keyscan ]; then
+              cat /tmp/keyscan >> ~/.ssh/known_hosts
+              exit 0
+            fi
+            echo "ssh-keyscan に失敗（${i}回目）。10秒後にやり直します"
+            sleep 10
+          done
+          echo "ssh-keyscan が6回とも失敗しました" >&2
+          exit 1
 
       - name: Deploy via rsync
         run: |
