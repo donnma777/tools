@@ -1273,6 +1273,8 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- フォント一覧・文字効果はチャットCSSジェネレーターと共通。chat-core.js / counter-core.js を変えたら v を上げる（view.html も） -->
+  <!-- 確認はページの中に出す（OBSのドックでは confirm() が出ないことがあるので） -->
+  <script src="../common/ask.js?v=20260929a"></script>
   <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
   <script src="counter-core.js?v=20260927b"></script>
   <script>
@@ -1281,6 +1283,7 @@
       const C = window.ChatCore;
       const K = window.CounterCore;
       const $ = id => document.getElementById(id);
+      const ask = (msg, opts) => window.DonnmaAsk.ask(msg, opts).then(r => r === true);
       const { DEFAULTS, sanitize, IDLE } = K;
 
       // =====================================================
@@ -1644,8 +1647,8 @@
           toast('読み込めませんでした（ファイル形式を確認してください）');
         }
       });
-      $('btn-reset').addEventListener('click', () => {
-        if (!confirm('すべての設定を初期値に戻しますか？')) return;
+      $('btn-reset').addEventListener('click', async () => {
+        if (!await ask('すべての設定を初期値に戻しますか？', { yes: 'リセットする' })) return;
         applyAll({ ...DEFAULTS });
       });
 

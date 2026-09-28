@@ -1735,6 +1735,45 @@
             display: flex;
         }
 
+        /* 確認（confirm() / alert() の代わり。OBSのドックやソースの「対話」では出ないことがあるので、ページの中に出す）。
+           設定画面より手前に出す */
+        #ask-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 5000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #ask-modal.open {
+            display: flex;
+        }
+
+        #ask-modal .help-popup {
+            width: 460px;
+        }
+
+        #ask-msg {
+            white-space: pre-line;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        #ask-modal .settings-row {
+            justify-content: flex-end;
+        }
+
+        #ask-yes {
+            background: var(--color-accent);
+            color: #fff;
+            border-color: var(--color-accent);
+            font-weight: 700;
+            /* 明るいアクセント色（水色など）でも読めるように */
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+        }
+
         /* ポップアップ共通：画面より長いときは、ポップアップの中だけスクロールする */
         .help-popup {
             max-width: 92vw;
@@ -2166,6 +2205,17 @@
                 <button class="settings-btn" id="set-reset-btn" type="button" title="画面を初期状態に戻します（今の画面は消えます。プリセットは残ります）">🔄 画面リセット</button>
                 <span class="settings-credit help-desc">Created by どんま / donnma　web : <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
                 <button class="help-close-btn" id="obs-close-btn">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 確認（confirm() / alert() の代わり）。OBSのドックやソースの「対話」では confirm() が出ないことがあるので、ページの中に出す -->
+    <div id="ask-modal">
+        <div class="help-popup" role="alertdialog" aria-modal="true" aria-labelledby="ask-msg">
+            <div class="help-desc" id="ask-msg"></div>
+            <div class="settings-row">
+                <button class="settings-btn" id="ask-no" type="button"></button>
+                <button class="settings-btn" id="ask-yes" type="button"></button>
             </div>
         </div>
     </div>
@@ -3265,6 +3315,40 @@
                 e.preventDefault();
             }, true));
         }
+        /* ---- 確認・お知らせ（confirm() / alert() の代わり）
+         *  OBSのドックやソースの「対話」では confirm() / alert() が出ないことがあるので、ページの中に出す。
+         *  overlayAsk は はい → true / いいえ → false / Esc・外側クリック → null */
+        const askModal = document.getElementById('ask-modal');
+        let askDone = null;
+        function askFinish(v) {
+            if (!askDone) return;
+            const d = askDone;
+            askDone = null;
+            askModal.classList.remove('open');
+            d(v);
+        }
+        function overlayAsk(msg, { yes = 'OK', no = 'やめる' } = {}) {
+            askFinish(null);
+            document.getElementById('ask-msg').textContent = msg;
+            const yesEl = document.getElementById('ask-yes'), noEl = document.getElementById('ask-no');
+            yesEl.textContent = yes;
+            noEl.textContent = no || '';
+            noEl.style.display = no ? '' : 'none';
+            askModal.classList.add('open');
+            (no ? noEl : yesEl).focus();
+            return new Promise(resolve => { askDone = resolve; });
+        }
+        const overlayNotice = (msg) => overlayAsk(msg, { yes: 'OK', no: '' });
+        document.getElementById('ask-yes').addEventListener('click', () => askFinish(true));
+        document.getElementById('ask-no').addEventListener('click', () => askFinish(false));
+        askModal.addEventListener('click', (e) => { if (e.target === askModal) askFinish(null); });
+        // 出している間は、Esc はこれだけを閉じ、ほかのキー操作（パーツの操作など）を動かさない
+        window.addEventListener('keydown', (e) => {
+            if (!askDone) return;
+            if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); askFinish(null); return; }
+            if (!(e.target instanceof Element && e.target.closest('#ask-modal button'))) { e.preventDefault(); e.stopImmediatePropagation(); }
+        }, true);
+
         // OBS接続の初期値（CONFIG.obs）
         const OBS_DEFAULTS = { port: 4455, password: '', mode: 'auto', autoConnect: false, ...(CONFIG.obs || {}) };
 
@@ -3441,7 +3525,7 @@
         async function applyImportedData(data) {
             if (data && data.format === EXPORT_FORMAT) {
                 if (data.theme && data.theme !== OVERLAY_THEME
-                    && !confirm(`このファイルは「${data.theme}」テーマのものです。このテーマ（${OVERLAY_THEME}）では正しく表示されないことがあります。読み込みますか？`)) {
+                    && (await overlayAsk(`このファイルは「${data.theme}」テーマのものです。このテーマ（${OVERLAY_THEME}）では正しく表示されないことがあります。読み込みますか？`, { yes: '読み込む' })) !== true) {
                     return null;
                 }
                 if (data.current) {
@@ -3454,7 +3538,9 @@
                 const dup = incoming.filter(p => existing.includes(p.name));
                 let overwrite = true;
                 if (dup.length) {
-                    overwrite = confirm(`同じ名前のプリセットが ${dup.length}件あります（${dup.map(p => p.name).join('、')}）。\nOK：上書きする　キャンセル：同じ名前のものは読み込まない`);
+                    const r = await overlayAsk(`同じ名前のプリセットが ${dup.length}件あります（${dup.map(p => p.name).join('、')}）。`, { yes: '上書きする', no: '同じ名前のものは読み込まない' });
+                    if (r === null) return null;
+                    overwrite = r;
                 }
                 let added = 0;
                 for (const p of incoming) {
@@ -3483,7 +3569,7 @@
                         const message = await applyImportedData(JSON.parse(ev.target.result));
                         if (message && onDone) onDone(message);
                     } catch (err) {
-                        alert('インポートに失敗しました。正しいJSONファイルか確認してください。');
+                        overlayNotice('インポートに失敗しました。正しいJSONファイルか確認してください。');
                         console.error('import failed', err);
                     }
                 };
@@ -3768,8 +3854,8 @@
                         saveCurrentConfig();
                         settingsDone('以前の「設定を保存」を読み込みました');
                     }],
-                    ['削除', () => {
-                        if (!confirm('以前の「設定を保存」を削除しますか？')) return;
+                    ['削除', async () => {
+                        if ((await overlayAsk('以前の「設定を保存」を削除しますか？', { yes: '削除する' })) !== true) return;
                         try { localStorage.removeItem(LEGACY_KEY); } catch (err) { /* ignore */ }
                         settingsDone('以前の「設定を保存」を削除しました');
                         renderPresets();
@@ -3792,12 +3878,12 @@
                         settingsDone(`「${preset.name}」を読み込みました`);
                     }],
                     // 「上書き」はプリセットに保存できるときだけ
-                    ...(featureOn('presetSave') ? [['上書き', () => {
-                        if (!confirm(`「${preset.name}」を今の画面で上書きしますか？`)) return;
+                    ...(featureOn('presetSave') ? [['上書き', async () => {
+                        if ((await overlayAsk(`「${preset.name}」を今の画面で上書きしますか？`, { yes: '上書きする' })) !== true) return;
                         savePreset(preset.name);
                     }]] : []),
                     ['削除', async () => {
-                        if (!confirm(`「${preset.name}」を削除しますか？`)) return;
+                        if ((await overlayAsk(`「${preset.name}」を削除しますか？`, { yes: '削除する' })) !== true) return;
                         await presetDelete(preset.name);
                         settingsDone(`「${preset.name}」を削除しました`);
                         renderPresets();
@@ -3822,7 +3908,7 @@
             if (!name) { settingsStatus.textContent = '⚠️ プリセット名を入れてください'; presetNameEl.focus(); return; }
             let exists = false;
             try { exists = (await presetAll()).some(p => p.name === name); } catch (err) { /* ignore */ }
-            if (exists && !confirm(`「${name}」はすでにあります。上書きしますか？`)) return;
+            if (exists && (await overlayAsk(`「${name}」はすでにあります。上書きしますか？`, { yes: '上書きする' })) !== true) return;
             await savePreset(name);
             presetNameEl.value = '';
         });
@@ -3836,8 +3922,8 @@
             settingsStatus.textContent = '';
             importConfig((message) => { settingsDone(message); renderPresets(); });
         });
-        document.getElementById('set-reset-btn').addEventListener('click', () => {
-            if (!confirm('画面を初期状態に戻しますか？（今の画面は消えます。プリセットは残ります）')) return;
+        document.getElementById('set-reset-btn').addEventListener('click', async () => {
+            if ((await overlayAsk('画面を初期状態に戻しますか？（今の画面は消えます。プリセットは残ります）', { yes: 'リセットする' })) !== true) return;
             handlePartMenuItem('reset');
         });
         document.getElementById('set-help-btn').addEventListener('click', () => {

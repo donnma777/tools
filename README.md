@@ -85,6 +85,26 @@ OBS Studio のブラウザソースで使える配信オーバーレイのテー
 
 ---
 
+## 配信用ルーレット
+
+`roulette/` — OBSの配信画面に出せる汎用のルーレットです。項目・当たりやすさ（重み）・色・見た目を決めて、OBSのドックやChromeから回します。
+
+| ファイル | 内容 |
+|----------|------|
+| `roulette/index.html` | 編集・操作ページ（`?dock=1` でOBSのカスタムブラウザドック向けの表示） |
+| `roulette/view.html` | OBSのブラウザソースに入れる表示ページ（canvas で円盤を描く。ウィンドウの大きさに合わせて拡大・縮小） |
+| `roulette/roulette-core.js` | 項目 `R`・見た目 `S` の初期値と読み込み、抽選、保存、CSS生成（`window.RouletteCore`） |
+
+- 当たる項目と止まる角度は、回したページが `spin()` で決めて `R.spin`（`at`・`id`・`angle`・そのときの円盤の項目 `items`）に書きます。表示ページは `R.spin.at` が変わったら、その角度に止まる演出を流します（開き直したときは流さない）。だから、プレビューとOBSで同じ結果に止まります。止め方は2通り：自動（`spin.mode = 'auto'`。回し始めに当たりを決めて `dur` 秒で止まる）と、ストップボタン式（`'free'`。押すまで同じ速さで回り、`stopSpin()` を呼んだ時刻 `stopAt` に当たりを決めて、表示ページが今の速さから減速して止める。`maxSec` 秒で自動で止める処理は、回し始めたページだけが持つ。0 なら無限）。
+- 項目と見た目はブラウザの localStorage（`donnma-roulette-v1`）に保存します。ドックとブラウザソースは同じOBSの中なので、`storage` イベントで同期します。Chrome から操作するときは obs-websocket の `emit_event`（`donnmaRouletteUpdate`）で送ります。OBSでソースを「対話」で開いて円盤をクリックしても回せます。
+- 効果音は WebAudio で鳴らしています（音声ファイルなし）。
+- 履歴の表示（`S.histPos`：右・左・下）は `view.html` の `#stage` のグリッドに `.rl-hist` を足して、ステージの大きさ（`fit()`）もその分広げます。回っている最中（当たりが決まってから止まるまで）は `R.history[0]` を出さず、止まってから足します。
+- 編集ページの「⛶ 大きく表示」は、プレビュー（`view.html#preview=1`）を画面いっぱいに広げるだけです。「↗ 別タブで開く」は `view.html#tab=1` を新しいタブで開きます（localStorage を共有するので、編集ページで回すと一緒に回る）。確認はOBSのドックで `confirm()` が出ないことがあるので、ページの中の確認（`ask()`）を使っています。
+- `view.html#show=history` は結果の記録だけを出します（全件・時刻つき・効果音なし。`&tab=1` で背景を暗くする。編集ページの「↗ 別タブで開く」はこれを開く）。見た目は「履歴の表示」の設定を使います。
+- `roulette-core.js` を変更したら、`roulette/index.html`（script と iframe の `view.html?v=`）と `roulette/view.html` の `?v=` を上げてください。
+
+---
+
 ## Plugin & Extension
 
 ### Smart Access Control
@@ -99,6 +119,13 @@ WordPressプラグイン。クローラー・User-Agent・IPアドレスを組�
 Chrome拡張機能をまとめたリポジトリ。広告ブロック・強制ダークモード・スクリーンショットを単体または統合版で提供。
 
 - GitHub: https://github.com/donnma777/feature-browser-benri-tools
+
+---
+
+## 共通の部品
+
+- `common/ask.js` — ページの中に出す確認・お知らせ（`DonnmaAsk.ask(msg, { yes, no })` → はい true／いいえ false／Esc・外側クリック null、`DonnmaAsk.notice(msg)`）。OBSのカスタムブラウザドックやソースの「対話」では `confirm()` / `alert()` が出ないことがあるので、ツールのページではこちらを使います（トーナメント表・ルーレット・チャットCSS・登録者数）。
+- 配信オーバーレイは HTML 1ファイルで完結させるため、同じ仕組みを `overlay/_shared/overlay-shared.js` の `overlayAsk()` / `overlayNotice()` として持っています。
 
 ---
 

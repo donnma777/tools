@@ -2021,6 +2021,8 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- フォント一覧・文字効果はチャットCSSジェネレーターと共通。chat-core.js / tournament-core.js を変えたら v を上げる（view.html も） -->
+  <!-- 確認はページの中に出す（OBSのドックでは confirm() が出ないことがあるので） -->
+  <script src="../common/ask.js?v=20260929a"></script>
   <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
   <script src="tournament-core.js?v=20260928p"></script>
   <script src="songs-core.js?v=20260928d"></script>
@@ -2030,6 +2032,8 @@
       const C = window.ChatCore;
       const K = window.TournamentCore;
       const $ = id => document.getElementById(id);
+      // 確認はページの中に出す（../common/ask.js）。OBSのドックでは confirm() が出ないことがある
+      const ask = (msg, opts) => window.DonnmaAsk.ask(msg, opts).then(r => opts && opts.no ? r : r === true);
       const esc = K.esc;
 
       // =====================================================
@@ -2412,7 +2416,7 @@
           + '<select id="ent-bulk-kind" aria-label="まとめて追加する種類"><option value="solo">人</option><option value="team">チーム</option></select>'
           + '<button class="btn btn-sm" type="button" data-ent-act="bulk">分まとめて追加</button></span></div>';
       }
-      document.addEventListener('click', (e) => {
+      document.addEventListener('click', async (e) => {
         const mb = e.target.closest('[data-ent-mode]');
         if (mb) {
           entMode = mb.dataset.entMode;
@@ -2429,7 +2433,7 @@
         if (act === 'up' && i > 0) [rows[i - 1], rows[i]] = [rows[i], rows[i - 1]];
         if (act === 'down' && i < rows.length - 1) [rows[i + 1], rows[i]] = [rows[i], rows[i + 1]];
         if (act === 'del') {
-          if (!confirm(`「${rows[i].name}」を消しますか？（入っている結果も使われなくなります）`)) return;
+          if (!await ask(`「${rows[i].name}」を消しますか？（入っている結果も使われなくなります）`, { yes: '消す' })) return;
           rows.splice(i, 1);
         }
         let focusNew = false;
@@ -3043,12 +3047,12 @@
 
       // シャッフル（参加者の並びを入れ替える）
       // 抽選（🎲）はシャッフルして結果を消し、トーナメント表の表示で演出を流す
-      document.addEventListener('click', (e) => {
+      document.addEventListener('click', async (e) => {
         const isDraw = e.target.id === 'btn-draw';
         if (e.target.id !== 'btn-shuffle' && !isDraw) return;
         if (isDraw) {
-          if (Object.keys(T.results).length && !confirm('抽選すると、入っている試合の結果はすべて消えます。抽選しますか？')) return;
-        } else if (Object.keys(T.results).length && !confirm('並びを入れ替えると、入っている試合の結果はすべて消えます。シャッフルしますか？')) return;
+          if (Object.keys(T.results).length && !await ask('抽選すると、入っている試合の結果はすべて消えます。抽選しますか？', { yes: '抽選する' })) return;
+        } else if (Object.keys(T.results).length && !await ask('並びを入れ替えると、入っている試合の結果はすべて消えます。シャッフルしますか？', { yes: 'シャッフルする' })) return;
         const lines = T.entrantsText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
         const order = lines.map((_, i) => i);
         for (let i = order.length - 1; i > 0; i--) {
@@ -3105,23 +3109,23 @@
           row.innerHTML = `<span class="nm"></span><span class="dt">${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}</span>`
             + '<button class="btn btn-sm" type="button" data-a="load">読み込む</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button>';
           row.querySelector('.nm').textContent = item.name;
-          row.querySelector('[data-a="load"]').addEventListener('click', () => {
-            if (!confirm(`「${item.name}」を読み込みますか？（今の大会は、保存していなければ消えます）`)) return;
+          row.querySelector('[data-a="load"]').addEventListener('click', async () => {
+            if (!await ask(`「${item.name}」を読み込みますか？（今の大会は、保存していなければ消えます）`, { yes: '読み込む' })) return;
             T = K.sanitizeT(item.T); S = K.sanitizeS(item.S); selected = null;
             syncUI(); render(); toast(`「${item.name}」を読み込みました`);
           });
-          row.querySelector('[data-a="del"]').addEventListener('click', () => {
-            if (!confirm(`「${item.name}」を削除しますか？`)) return;
+          row.querySelector('[data-a="del"]').addEventListener('click', async () => {
+            if (!await ask(`「${item.name}」を削除しますか？`, { yes: '削除する' })) return;
             writeSaves(loadSaves().filter(x => x.name !== item.name)); renderSaves();
           });
           box.appendChild(row);
         }
       }
-      $('btn-save').addEventListener('click', () => {
+      $('btn-save').addEventListener('click', async () => {
         const name = $('save-name').value.trim() || T.title.trim();
         if (!name) { toast('名前を入れてください'); return; }
         const list = loadSaves();
-        if (list.some(x => x.name === name) && !confirm(`「${name}」はすでにあります。上書きしますか？`)) return;
+        if (list.some(x => x.name === name) && !await ask(`「${name}」はすでにあります。上書きしますか？`, { yes: '上書きする' })) return;
         if (writeSaves([...list.filter(x => x.name !== name), { name, savedAt: Date.now(), T, S }])) {
           $('save-name').value = '';
           renderSaves();
@@ -3152,12 +3156,12 @@
           toast('読み込めませんでした（このツールで書き出したファイルか確認してください）');
         }
       });
-      $('btn-clear-results').addEventListener('click', () => {
-        if (!confirm('すべての試合の結果を消しますか？（参加者と見た目はそのままです）')) return;
+      $('btn-clear-results').addEventListener('click', async () => {
+        if (!await ask('すべての試合の結果を消しますか？（参加者と見た目はそのままです）', { yes: '消す' })) return;
         T.results = {}; T.live = null; render();
       });
-      $('btn-reset').addEventListener('click', () => {
-        if (!confirm('参加者・結果・見た目をすべて初期値に戻しますか？')) return;
+      $('btn-reset').addEventListener('click', async () => {
+        if (!await ask('参加者・結果・見た目をすべて初期値に戻しますか？', { yes: 'リセットする' })) return;
         T = K.sanitizeT(null); S = K.sanitizeS(null); selected = null;
         syncUI(); render();
       });
@@ -3310,20 +3314,24 @@
           + `<button class="btn btn-sm" type="button" data-sg-act="del" aria-label="削除">✕</button></div>`).join('');
       }
       let sgImgTarget = null;
-      $('sg-list').addEventListener('click', (e) => {
+      $('sg-list').addEventListener('click', async (e) => {
         const b = e.target.closest('[data-sg-act]');
         if (!b) return;
         const id = b.closest('.song-row').dataset.id;
         const i = D.list.findIndex(x => x.id === id);
         const act = b.dataset.sgAct;
         if (act === 'img') {
-          if (D.list[i].img && confirm('ジャケット画像を外しますか？（「キャンセル」で別の画像を選びます）')) { D.list[i].img = ''; sgCommit(); sgRenderList(true); return; }
+          if (D.list[i].img) {
+            const r = await ask('ジャケット画像を外しますか？', { yes: '画像を外す', no: '別の画像を選ぶ' });
+            if (r === null) return;
+            if (r) { D.list[i].img = ''; sgCommit(); sgRenderList(true); return; }
+          }
           sgImgTarget = id; $('sg-img').click(); return;
         }
         if (act === 'up' && i > 0) [D.list[i - 1], D.list[i]] = [D.list[i], D.list[i - 1]];
         if (act === 'down' && i < D.list.length - 1) [D.list[i + 1], D.list[i]] = [D.list[i], D.list[i + 1]];
         if (act === 'del') {
-          if (!confirm(`「${D.list[i].t || '（曲名なし）'}」を消しますか？`)) return;
+          if (!await ask(`「${D.list[i].t || '（曲名なし）'}」を消しますか？`, { yes: '消す' })) return;
           D.list.splice(i, 1);
           if (sgSel === id) sgSel = null;
         }
@@ -3369,18 +3377,18 @@
         sgRenderList(true);
         [...$('sg-list').querySelectorAll('input[data-k="t"]')].pop()?.focus();
       });
-      $('sg-clear').addEventListener('click', () => {
-        if (!D.list.length || !confirm('課題曲を全部消しますか？')) return;
+      $('sg-clear').addEventListener('click', async () => {
+        if (!D.list.length || !await ask('課題曲を全部消しますか？', { yes: '消す' })) return;
         D.list = [];
         sgSel = null;
         SG.resetState(D);
         sgCommit();
       });
-      function sgBulk(replace) {
+      async function sgBulk(replace) {
         const add = SG.parseText($('sg-bulk').value).filter(x => x.t);
         if (!add.length) { toast('曲を1行に1曲ずつ入れてください'); return; }
         if (replace) {
-          if (D.list.length && !confirm('今の曲リストを消して、入れ替えますか？')) return;
+          if (D.list.length && !await ask('今の曲リストを消して、入れ替えますか？', { yes: '入れ替える' })) return;
           D.list = [];
           SG.resetState(D);
           sgSel = null;
@@ -3457,7 +3465,7 @@
             return `<button type="button" class="op-chip${y.id === sgSel ? ' sel' : ''}${st ? ' st-' + st.st + (st.by >= 0 ? ' by' + st.by : ' byr') : ''}" data-chip="${esc(y.id)}" title="${esc(sgStateLabel(st, names))}${used[y.id] ? `（ほかの試合で${used[y.id]}回使用）` : ''}">${i + 1}. ${esc(y.t || '（曲名なし）')}${used[y.id] ? `<small class="op-used">×${used[y.id]}</small>` : ''}</button>`;
           }).join('') + '</div>';
       }
-      $('sg-ops').addEventListener('click', (e) => {
+      $('sg-ops').addEventListener('click', async (e) => {
         const chip = e.target.closest('[data-chip]');
         if (chip) { sgSelect(chip.dataset.chip); return; }
         const b = e.target.closest('[data-op]');
@@ -3478,7 +3486,7 @@
           return;
         }
         if (e.target.id === 'sg-reset') {
-          if (Object.keys(D.state).length && !confirm('この試合のピック・BAN・演奏済みを全部外しますか？（ほかの試合の選曲はそのままです）')) return;
+          if (Object.keys(D.state).length && !await ask('この試合のピック・BAN・演奏済みを全部外しますか？（ほかの試合の選曲はそのままです）', { yes: '外す' })) return;
           SG.resetState(D);
           sgCommit({ keepList: true });
         }
@@ -3523,8 +3531,8 @@
         setTimeout(() => URL.revokeObjectURL(a.href), 1000);
       });
       $('sg-import').addEventListener('click', () => $('sg-file').click());
-      $('sg-clear-history').addEventListener('click', () => {
-        if (!confirm('試合ごとの選曲の記録（トーナメント表＋課題曲の表示・使った回数）と、今のピック・BANを全部消しますか？')) return;
+      $('sg-clear-history').addEventListener('click', async () => {
+        if (!await ask('試合ごとの選曲の記録（トーナメント表＋課題曲の表示・使った回数）と、今のピック・BANを全部消しますか？', { yes: '消す' })) return;
         SG.resetState(D, true);
         sgCommit({ keepList: true });
       });
@@ -3535,7 +3543,7 @@
         try {
           const data = JSON.parse(await file.text());
           if (data.format !== 'donnma-songs' || !data.D) throw new Error('format');
-          if (D.list.length && !confirm('今の曲リストを、読み込んだものに入れ替えますか？')) return;
+          if (D.list.length && !await ask('今の曲リストを、読み込んだものに入れ替えますか？', { yes: '入れ替える' })) return;
           D = SG.sanitize(data.D);
           sgSel = null;
           sgSyncSettings();

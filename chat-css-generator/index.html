@@ -1330,6 +1330,8 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- chat-core.js を変えたら v を上げる（サーバーとブラウザのキャッシュ対策） -->
+  <!-- 確認はページの中に出す（OBSのドックでは confirm() が出ないことがあるので） -->
+  <script src="../common/ask.js?v=20260929a"></script>
   <script src="chat-core.js?v=20260924g"></script>
   <script>
     (() => {
@@ -1644,6 +1646,7 @@
       //  設定UIの生成
       // =====================================================
       const $ = id => document.getElementById(id);
+      const ask = (msg, opts) => window.DonnmaAsk.ask(msg, opts).then(r => r === true);
       const settingsEl = $('settings');
       const inputs = {}; // key -> {f, wrap, set, labelEl}
       const sectionEls = [];
@@ -2307,14 +2310,14 @@
           toast('読み込めませんでした（ファイル形式を確認してください）');
         }
       });
-      $('btn-reset-color').addEventListener('click', () => {
-        if (!confirm('色の設定だけ初期値に戻しますか？')) return;
+      $('btn-reset-color').addEventListener('click', async () => {
+        if (!await ask('色の設定だけ初期値に戻しますか？', { yes: '色を戻す' })) return;
         const next = { ...S };
         for (const k of COLOR_KEYS) next[k] = DEFAULTS[k];
         applyAll(next);
       });
-      $('btn-reset').addEventListener('click', () => {
-        if (!confirm('すべての設定を初期値に戻しますか？')) return;
+      $('btn-reset').addEventListener('click', async () => {
+        if (!await ask('すべての設定を初期値に戻しますか？', { yes: 'リセットする' })) return;
         applyAll({ ...DEFAULTS, ...keepLocal() });
       });
 
