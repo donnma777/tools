@@ -1274,6 +1274,11 @@
       }
     }
 
+    .main-text-slot .fields {
+      display: block;
+      padding: 4px 0 0;
+    }
+
     .add-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1436,9 +1441,8 @@
         </div>
       </details>
 
-      <details class="sec" open>
-        <summary><span class="sec-icon">✏️</span>文字</summary>
-        <div class="fields">
+      <div hidden>
+        <div class="fields" id="main-text-fields">
           <div class="field field-full">
             <label class="field-label" for="f-title"><span>タイトル（Enter で改行）</span></label>
             <textarea class="title-in" id="f-title" spellcheck="false"></textarea>
@@ -1449,7 +1453,7 @@
             <input type="text" id="f-sub" spellcheck="false" placeholder="例: 初心者向けにやさしく解説">
           </div>
         </div>
-      </details>
+      </div>
 
       <div hidden>
         <div class="fields">
@@ -1543,7 +1547,7 @@
       <div class="panel-body">
         <h2>🖌 使い方</h2>
         <ol class="steps">
-          <li>左の「文字」に <b>タイトル</b> を入れます。Enter で改行できます。</li>
+          <li>「🧩 文字と画像を追加」の <b>メインの文字</b> のカードに、タイトルを入れます。Enter で改行できます。</li>
           <li>「大きさ」で使う場所に合わせたサイズを選びます（ブログのアイキャッチ・YouTubeのサムネイルは <b>1280×720</b>、SNSの共有画像は <b>1200×630</b> がおすすめ）。</li>
           <li>「文字と画像を追加」で自分のキャラや写真、好きな文字を足し、「ロゴ」で自分のロゴを選び、「背景」で柄・色・背景画像を選びます。文字や画像はプレビューでドラッグして動かせます。</li>
           <li>よく使う見た目は「🎭 テンプレート」に名前を付けて保存しておくと、次からはタイトルと写真を変えるだけで作れます。同じデザインで何枚も作るときは「📦 まとめて作る」が便利です。</li>
@@ -1880,7 +1884,9 @@
           if (sec.title === '大きさ') $('settings').insertBefore(det, $('settings').children[1]);
           else $('settings').appendChild(det);
         }
-        // 「まとめて作る」はいちばん下に
+        // 欄の並び（よく使う順）：テンプレート → 大きさ → 文字と画像を追加 → 文字の見た目 → ロゴ → 背景 → まとめて作る
+        const secOf = t => [...$('settings').querySelectorAll(':scope > details.sec')].find(d => d.querySelector('summary').textContent.includes(t));
+        for (const t of ['大きさ', '文字と画像を追加', '文字の見た目', 'ロゴ', '背景']) $('settings').appendChild(secOf(t));
         $('settings').appendChild($('batch-sec'));
         // メインの画像の置き方は、メインのカードの中に
         $('main-opts').append(inputs.imgPos.wrap, inputs.imgAnchor.wrap, inputs.sample.wrap);
@@ -2694,6 +2700,8 @@
       ];
       let movedId = null, movedTimer = 0, hoverId = null;
       const mainCard = $('main-card');
+      // メインの文字の入力欄（一覧を作り直しても、同じ入力欄を使い回す）
+      const mainTextFields = $('main-text-fields');
       let mainPos = '';
       function renderMain(pos) {
         if (pos !== undefined) mainPos = pos;
@@ -2771,13 +2779,14 @@
             row.className = 'extra-item main-card';
             const t = S.title.replace(/\*/g, '').split('\n')[0] || '（タイトルなし）';
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb">Aa</span><span class="nm">メインの文字<small>（${esc(t.slice(0, 12))}…）</small>${pos}</span>`
-              + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="edit">文字の欄へ</button></div>`
-              + '<div class="field-note" style="padding:4px 0 6px">タイトル・サブタイトル・ロゴです。上の「✏️ 文字」「🔤 文字の見た目」で編集します。</div>';
-            row.querySelector('[data-a="edit"]').onclick = () => {
-              const d = $('f-title').closest('details');
+              + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="style">見た目を変える</button></div>`
+              + '<div class="main-text-slot"></div>'
+              + '<div class="field-note" style="padding:0 0 6px">フォント・色・位置・ロゴは「🔤 文字の見た目」「🏷️ ロゴ」で変えます。</div>';
+            row.querySelector('.main-text-slot').appendChild(mainTextFields);
+            row.querySelector('[data-a="style"]').onclick = () => {
+              const d = inputs.font.wrap.closest('details');
               d.open = true;
-              $('f-title').focus();
-              $('f-title').scrollIntoView({ block: 'center' });
+              d.scrollIntoView({ block: 'start' });
             };
             hookRow(row, '@text');
             list.appendChild(row);
