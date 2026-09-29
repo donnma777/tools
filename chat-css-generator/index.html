@@ -13,7 +13,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://donnma.com/tool/chat-css-generator/">
   <meta property="og:site_name" content="どんまうんど-Tools">
-  <meta property="og:image" content="https://donnma.com/tool/image/ogp-chat-css.jpg">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-chat-css.jpg?v=20260929b">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="チャットCSSジェネレーター">
@@ -1217,6 +1217,22 @@
         <textarea id="css-out" readonly spellcheck="false" aria-label="生成されたCSS" hidden></textarea>
       </div>
 
+      <!-- YouTube：配信URLから、OBSに貼るチャット欄のURLを作る -->
+      <div class="panel output-panel" data-for="youtube">
+        <div class="panel-head">
+          <span>🔗 チャット欄のURL <span class="out-meta">OBSのブラウザソースに貼る</span></span>
+          <div class="preview-tools">
+            <button class="btn btn-sm btn-primary" id="btn-copy-url" type="button">📋 URLをコピー</button>
+          </div>
+        </div>
+        <div class="panel-body url-tool">
+          <input type="text" id="yt-url" placeholder="配信URL または 動画ID（例: https://www.youtube.com/live/xxxxxxxxxxx）"
+            aria-label="配信URL または 動画ID">
+          <input type="text" id="chat-url" readonly placeholder="ここにチャット欄のURLが表示されます" aria-label="チャット欄のURL">
+          <p class="field-note">枠を立てるたびに動画IDが変わる場合は、配信ごとにURLを差し替えてください。</p>
+        </div>
+      </div>
+
       <div class="panel output-panel" id="react-panel" hidden>
         <div class="panel-head">
           <span>リアクション用CSS <span class="out-meta">2つ目のブラウザソースに貼る</span></span>
@@ -1260,27 +1276,11 @@
       <div class="panel-body">
         <h2>🎥 OBSでの使い方（YouTube）</h2>
         <ol class="steps">
-          <li>右の<b>「URL作成」</b>に配信のURLを入れて、チャット欄のURL（ポップアウト版）を作ります。</li>
+          <li>右の<b>「🔗 チャット欄のURL」</b>に配信のURLを入れて、チャット欄のURL（ポップアウト版）を作ります。</li>
           <li>OBSで <b>ソース ＋ → ブラウザ</b> を追加し、URLに貼り付けます。幅 <code>400</code>・高さ <code>600〜1000</code> くらいが目安です。</li>
           <li>このページで見た目を決めて <b>「CSSをコピー」</b>。</li>
           <li>ブラウザソースのプロパティにある <b>カスタムCSS</b> の中身をすべて消して、コピーしたCSSを貼り付けて「OK」。</li>
         </ol>
-      </div>
-    </div>
-
-    <div class="panel" data-for="youtube">
-      <div class="panel-body">
-        <h2>🔗 チャット欄URL作成</h2>
-        <div class="url-tool">
-          <input type="text" id="yt-url" placeholder="配信URL または 動画ID（例: https://www.youtube.com/live/xxxxxxxxxxx）"
-            aria-label="配信URL または 動画ID">
-          <div class="url-out">
-            <input type="text" id="chat-url" readonly placeholder="ここにチャット欄のURLが表示されます"
-              aria-label="チャット欄のURL">
-            <button class="btn btn-sm" id="btn-copy-url" type="button">コピー</button>
-          </div>
-          <p class="field-note">枠を立てるたびに動画IDが変わる場合は、配信ごとにURLを差し替えてください。</p>
-        </div>
       </div>
     </div>
 
