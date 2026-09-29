@@ -1184,6 +1184,68 @@
       grid-column: 1 / -1;
     }
 
+    /* テンプレート・追加の画像の一覧 */
+    .row-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .row-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .row-item .nm {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .row-item .dt {
+      color: var(--muted);
+      font-size: 11.5px;
+      white-space: nowrap;
+    }
+
+    .row-item input[type=range] {
+      flex: 1;
+      min-width: 80px;
+    }
+
+    .row-item .img-thumb {
+      width: 36px;
+      height: 36px;
+    }
+
+    .inline-add {
+      display: flex;
+      gap: 8px;
+    }
+
+    .inline-add input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .row-empty {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .undo-row {
+      display: flex;
+      gap: 6px;
+    }
+
     @media (min-width: 1001px) {
       .workspace {
         grid-template-columns: 440px minmax(0, 1fr);
@@ -1222,14 +1284,24 @@
 
     <!-- Settings column -->
     <div class="settings" id="settings">
-      <div class="panel">
-        <div class="panel-body">
-          <div class="data-row" style="margin-top: 0;">
-            <button class="btn btn-sm btn-danger" id="btn-reset" type="button">すべてリセット</button>
+      <details class="sec" open>
+        <summary><span class="sec-icon">🎭</span>テンプレート</summary>
+        <div class="fields">
+          <div class="field field-full">
+            <div class="inline-add">
+              <input type="text" id="tpl-name" maxlength="40" placeholder="名前（例: レポ記事用）" spellcheck="false">
+              <button class="btn btn-sm btn-primary" type="button" id="tpl-save">＋ 保存</button>
+            </div>
+            <div class="row-list" id="tpl-list"></div>
+            <div class="field-note">今の見た目（背景・画像・ロゴ・色・フォント・置き方など）を名前を付けて保存します。読み込んでも、タイトルとサブタイトルは今のままです。このブラウザに保存されます。</div>
           </div>
-          <p class="field-note" style="margin-top:8px">設定はこのブラウザに自動で保存されます（選んだ画像も、保存できる大きさなら残ります）。</p>
+          <div class="field field-full">
+            <div class="data-row" style="margin-top:0">
+              <button class="btn btn-sm btn-danger" id="btn-reset" type="button">すべてリセット</button>
+            </div>
+          </div>
         </div>
-      </div>
+      </details>
 
       <details class="sec" open>
         <summary><span class="sec-icon">✏️</span>文字</summary>
@@ -1237,7 +1309,7 @@
           <div class="field field-full">
             <label class="field-label" for="f-title"><span>タイトル（Enter で改行）</span></label>
             <textarea class="title-in" id="f-title" spellcheck="false"></textarea>
-            <div class="field-note">長い文字は、枠に収まるように自動で小さくなります。</div>
+            <div class="field-note">長い文字は、枠に収まるように自動で小さくなります。<b>*〜*</b> で囲んだところは強調（色・大きさは「文字の見た目」）。例: マジカルミライ *2026* レポ</div>
           </div>
           <div class="field field-full">
             <label class="field-label" for="f-sub"><span>サブタイトル（小さい文字。空欄でなし）</span></label>
@@ -1258,6 +1330,15 @@
             </div>
             <div class="field-note">背景が透明な PNG・WebP だと、柄の上にきれいに乗ります。選ばないときは、下の「画像を選ばないときのサンプル」で選んだもの（ハート・星など）が入ります。</div>
           </div>
+          <div class="field field-full" id="extra-upload">
+            <span class="field-label"><span>追加の画像（アイコン・スタンプなど。いくつでも）</span></span>
+            <div class="row-list" id="extra-list"></div>
+            <div class="data-row" style="margin-top:0">
+              <button class="btn btn-sm" type="button" id="extra-add">＋ 画像を追加</button>
+              <input type="file" id="extra-file" accept="image/*" hidden>
+            </div>
+            <div class="field-note">追加した画像は、プレビューでドラッグして好きな場所に置けます。</div>
+          </div>
         </div>
       </div>
       <div hidden>
@@ -1275,6 +1356,20 @@
         </div>
       </div>
       <!-- sections are generated from SECTIONS below -->
+      <details class="sec" id="batch-sec">
+        <summary><span class="sec-icon">📦</span>まとめて作る</summary>
+        <div class="fields">
+          <div class="field field-full">
+            <label class="field-label" for="batch-text"><span>1行に1枚（同じデザインで、タイトルだけ変えて書き出します）</span></label>
+            <textarea class="title-in" id="batch-text" spellcheck="false" style="min-height:120px" placeholder="BLOG&#10;PROFILE&#10;マジカルミライ｜2026レポ / 幕張"></textarea>
+            <div class="field-note">「｜」で改行、「 / 」のあとはサブタイトルです（なければ今のサブタイトル）。ZIP ファイルでまとめてダウンロードします。</div>
+            <div class="data-row" style="margin-top:6px">
+              <button class="btn btn-sm btn-primary" type="button" id="batch-jpg">📦 JPG でまとめて書き出す</button>
+              <button class="btn btn-sm" type="button" id="batch-png">PNG で</button>
+            </div>
+          </div>
+        </div>
+      </details>
     </div>
 
     <!-- Preview column -->
@@ -1282,6 +1377,10 @@
       <div class="panel preview-panel">
         <div class="panel-head">
           <span>プレビュー <span class="out-meta" id="size-meta"></span></span>
+          <div class="undo-row">
+            <button class="btn btn-sm" type="button" id="btn-undo" title="元に戻す（Ctrl+Z）">↶ 戻す</button>
+            <button class="btn btn-sm" type="button" id="btn-redo" title="やり直す（Ctrl+Y）">↷ やり直す</button>
+          </div>
         </div>
         <div class="ec-stage" id="ec-stage">
           <canvas id="cv" width="1280" height="720" aria-label="アイキャッチのプレビュー"></canvas>
@@ -1308,6 +1407,7 @@
           <li>左の「文字」に <b>タイトル</b> を入れます。Enter で改行できます。</li>
           <li>「大きさ」で使う場所に合わせたサイズを選びます（ブログのアイキャッチ・YouTubeのサムネイルは <b>1280×720</b>、SNSの共有画像は <b>1200×630</b> がおすすめ）。</li>
           <li>「画像」で自分のキャラや写真を、「ロゴ」で自分のロゴを選び、「背景」で柄・色・背景画像を選びます。画像はプレビューでドラッグして動かせます。</li>
+          <li>よく使う見た目は「🎭 テンプレート」に名前を付けて保存しておくと、次からはタイトルと写真を変えるだけで作れます。同じデザインで何枚も作るときは「📦 まとめて作る」が便利です。</li>
           <li>右の <b>「JPG で保存」</b> を押すと、画像がダウンロードされます。</li>
         </ol>
       </div>
@@ -1379,10 +1479,12 @@
         title: 'タイトルを\n入力してね', sub: '',
         size: 'yt', customW: 1280, customH: 720,
         font: 'Zen Maru Gothic', fontCustom: '', weight: '900',
-        titleColor: '#ff7fa0', subColor: '#6e3551', strokeWidth: 14, strokeColor: '#ffffff', shadow: true,
-        textScale: 1,
+        titleColor: '#ff7fa0', hlColor: '#f0325a', hlScale: 1.15, subColor: '#6e3551', strokeWidth: 14, strokeColor: '#ffffff', shadow: true,
+        textScale: 1, textAlign: 'center', textX: 0, textY: 0,
+        titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
+        extras: [],
         imgPos: 'left', imgAnchor: 'auto', imgScale: 1, imgX: 0, imgY: 0, sample: 'heart',
-        subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subArc: 0,
+        subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subArc: 0, subGap: 0,
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
         bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
@@ -1401,6 +1503,11 @@
           else if (typeof d === 'string' && typeof v === 'string' && (!COLOR_KEYS.includes(k) || /^#[0-9a-f]{6}$/i.test(v))) out[k] = v;
         }
         if (!SIZES[out.size]) out.size = 'yt';
+        // 追加の画像：[{ id, x, y, scale }]（x・y は中心の位置。幅・高さの %）
+        out.extras = Array.isArray(o.extras) ? o.extras.filter(e => e && typeof e.id === 'string' && /^[a-z0-9]{1,16}$/.test(e.id)).slice(0, 20).map(e => ({
+          id: e.id, x: +e.x >= -20 && +e.x <= 120 ? +e.x : 50, y: +e.y >= -20 && +e.y <= 120 ? +e.y : 50,
+          scale: +e.scale >= 0.05 && +e.scale <= 5 ? +e.scale : 1,
+        })) : [];
         if (out.bg === 'usagi') out.bg = 'dots';
         out.customW = Math.round(Math.min(4000, Math.max(200, out.customW)));
         out.customH = Math.round(Math.min(4000, Math.max(200, out.customH)));
@@ -1423,11 +1530,20 @@
             { k: 'weight', l: '文字の太さ', t: 'select', o: C.WEIGHTS },
             { k: 'textScale', l: '文字の大きさ', t: 'range', min: 0.5, max: 1.3, step: 0.05, u: '倍', note: '枠に収まらないときは、これより小さくなります' },
             { k: 'titleColor', l: 'タイトルの色', t: 'color' },
+            { k: 'hlColor', l: '強調（*〜*）の色', t: 'color' },
+            { k: 'hlScale', l: '強調（*〜*）の大きさ', t: 'range', min: 0.8, max: 1.6, step: 0.05, u: '倍' },
+            { k: 'textAlign', l: '文字のそろえ方', t: 'select', o: [['center', '中央'], ['left', '左寄せ'], ['right', '右寄せ']] },
+            { k: 'textX', l: '文字を左右にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', note: 'プレビューの文字をドラッグしても動かせます' },
+            { k: 'textY', l: '文字を上下にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%' },
+            { k: 'titlePlate', l: '文字の後ろに敷く（座布団）', t: 'select', o: [['none', 'なし'], ['box', '角丸の四角'], ['band', '横いっぱいの帯']], note: '写真の上でも文字が読みやすくなります' },
+            { k: 'tpColor', l: '敷く色', t: 'color', when: s => s.titlePlate !== 'none' },
+            { k: 'tpAlpha', l: '敷く色の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', when: s => s.titlePlate !== 'none' },
             { k: 'subColor', l: 'サブタイトルの色', t: 'color' },
             { k: 'subBox', l: 'サブタイトルの後ろの形', t: 'select', o: [['none', 'なし'], ['pill', '楕円（まるい札）'], ['round', '角丸の四角']], note: '形を敷いたときは、サブタイトルの縁取りを付けません' },
             { k: 'subBoxColor', l: '形の色', t: 'color', when: s => s.subBox !== 'none' },
             { k: 'subArc', l: 'サブタイトルの曲がり', t: 'range', min: -1, max: 1, step: 0.05, u: '', note: '0 でまっすぐ。プラスで上に反る（アーチ）、マイナスで下に反る。曲げたときは後ろの形は付きません' },
             { k: 'subPos', l: 'サブタイトルの位置', t: 'select', o: [['below', 'タイトルの下'], ['above', 'タイトルの上'], ['corner', '隅に小さく']] },
+            { k: 'subGap', l: 'サブタイトルとタイトルの間', t: 'range', min: 0, max: 200, step: 2, u: 'px', when: s => s.subPos !== 'corner' },
             { k: 'subCorner', l: 'サブタイトルの隅', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], when: s => s.subPos === 'corner' },
             { k: 'strokeWidth', l: '縁取りの太さ（0でなし）', t: 'range', min: 0, max: 30, step: 1, u: 'px' },
             { k: 'strokeColor', l: '縁取りの色', t: 'color', when: s => s.strokeWidth > 0 },
@@ -1492,7 +1608,7 @@
       const BG_KEY = 'donnma-eyecatch-bg-v1';
       let S = { ...DEFAULTS };
       try { S = sanitize(JSON.parse(localStorage.getItem(STORE_KEY) || 'null')); } catch (e) { /* storage unavailable */ }
-      const img = { side: null, samples: {}, bg: null, logo: null };
+      const img = { side: null, samples: {}, bg: null, logo: null, extras: {} };
 
       const inputs = {};
       function buildField(f) {
@@ -1593,13 +1709,15 @@
           grid.className = 'fields';
           // ロゴの欄は、先頭にロゴのアップロードを置く
           if (sec.title === 'ロゴ') grid.appendChild($('logo-upload'));
-          if (sec.title === '画像') grid.appendChild($('img-upload'));
+          if (sec.title === '画像') { grid.appendChild($('img-upload')); grid.appendChild($('extra-upload')); }
           for (const f of sec.fields) grid.appendChild(buildField(f));
           det.appendChild(grid);
           // 「大きさ」は文字の前に出す
           if (sec.title === '大きさ') $('settings').insertBefore(det, $('settings').children[1]);
           else $('settings').appendChild(det);
         }
+        // 「まとめて作る」はいちばん下に
+        $('settings').appendChild($('batch-sec'));
       }
       function refreshVisibility() {
         for (const k in inputs) {
@@ -1628,6 +1746,8 @@
         requestAnimationFrame(() => {
           queued = false;
           try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* ignore */ }
+          clearTimeout(histTimer);
+          histTimer = setTimeout(snapshot, 400);
           loadFont().then(render, render);
         });
       }
@@ -1691,19 +1811,20 @@
       // =====================================================
       const dims = () => S.size === 'custom' ? [S.customW, S.customH] : SIZES[S.size].slice(0, 2);
 
-      let lastPic = null;   // プレビューで画像をドラッグするための、画像の場所（canvas の座標）
+      // プレビューでドラッグするための、画像・文字・追加の画像の場所（canvas の座標）
+      let lastHit = { pic: null, text: null, extras: [] };
       function draw(cv) {
         const [W, H] = dims();
         const band = S.logoMode === 'band' ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
         if (!band) {
-          const pic = drawContent(cv, W, H);
-          if (cv === $('cv')) lastPic = pic;
+          const hit = drawContent(cv, W, H);
+          if (cv === $('cv')) lastHit = hit;
           return;
         }
         // 帯のぶんを除いた部分を描いて、帯と一緒に貼る
         const top = S.bandPos === 'top' ? band : 0;
         const body = document.createElement('canvas');
-        const pic = drawContent(body, W, H - band);
+        const hit = drawContent(body, W, H - band);
         cv.width = W; cv.height = H;
         const c = cv.getContext('2d');
         c.drawImage(body, 0, top);
@@ -1714,7 +1835,10 @@
           const w = img.logo.width * r, h = img.logo.height * r;
           c.drawImage(img.logo, W / 2 - w / 2, (top ? 0 : H - band) + band / 2 - h / 2, w, h);
         }
-        if (cv === $('cv')) lastPic = pic && { ...pic, y: pic.y + top };
+        if (cv === $('cv')) {
+          const sh = r => r && { ...r, y: r.y + top };
+          lastHit = { pic: sh(hit.pic), text: sh(hit.text), extras: hit.extras.map(sh) };
+        }
       }
 
       function drawContent(cv, W, H) {
@@ -1769,7 +1893,6 @@
           const all = pic && pos !== 'center' ? { l: Math.min(area.l, pic.x), r: Math.max(area.r, pic.x + pic.w) } : area;
           glow(c, (all.l + all.r) / 2, H / 2, (all.r - all.l) * 0.62, H * 0.62);
         }
-        if (pic) c.drawImage(side, pic.x, pic.y, pic.w, pic.h);
 
         // ---- 文字（とロゴ）：上から ロゴ → タイトル → サブタイトル を、帯の中で上下の真ん中にそろえる
         const logo = S.logoMode !== 'none' ? img.logo : null;
@@ -1779,7 +1902,7 @@
         const lh = 1.14, gap = 14 * k;
         const sub = S.sub.trim();
         let subFs = sub ? fit(c, [sub], (mode === 'replace' ? 84 : 60) * k * S.textScale, aw) : 0;
-        let fs = lines.length ? fit(c, lines, (stacked || !side || pos === 'center' ? 150 : 124) * k * S.textScale, aw) : 0;
+        let fs = lines.length ? fitTitle(c, lines, (stacked || !side || pos === 'center' ? 150 : 124) * k * S.textScale, aw) : 0;
         let lg = null;
         if (mode === 'replace' || mode === 'above' || mode === 'below') {
           const r = Math.min(aw * 0.9 / logo.width, bh * (mode === 'replace' ? 0.62 : 0.3) / logo.height) * S.logoScale;
@@ -1797,16 +1920,44 @@
           const a = Math.abs(S.subArc) * 1.4, R = c.measureText(sub).width / a;
           return R * (1 - Math.cos(a / 2));
         };
-        const subH = () => subIn ? subFs * (boxed ? 1.9 : 1.35) + arcLift(subFs) : 0;
+        // サブタイトルの高さ（すき間 subGap も含む。すき間はタイトル側に空ける）
+        const gapPx = S.subGap * k;
+        const subBody = () => subFs * (boxed ? 1.9 : 1.35) + arcLift(subFs);
+        const subH = () => subIn ? subBody() + gapPx : 0;
         // ロゴの前後のすきま：タイトルの下なら「タイトルとの間」と「サブタイトルとの間」、それ以外は「次との間」
         const logoGaps = () => !lg ? 0 : mode === 'below' ? (lines.length ? 1 : 0) + (subBelow ? 1 : 0) : (lines.length || subBelow ? 1 : 0);
-        const total = () => (lg ? lg.h + logoGaps() * gap : 0) + lines.length * fs * lh + subH();
+        // 行の高さ（強調を大きくした行は、そのぶん高く）
+        const lineH = l => fs * lh * (hasHL(l) ? Math.max(1, S.hlScale) : 1);
+        const total = () => (lg ? lg.h + logoGaps() * gap : 0) + lines.reduce((a, l) => a + lineH(l), 0) + subH();
         while (total() > bh && (fs > 12 || (lg && lg.h > 20))) {
           if (fs > 12) fs -= 2;
           else { lg.w *= 0.95; lg.h *= 0.95; }
           subFs = Math.min(subFs, fs ? fs * 0.55 : subFs * 0.95);
         }
-        let y = (band.t + band.b) / 2 - total() / 2;
+        // 文字のまとまり：そろえ方（中央・左・右）と、ずらし（textX・textY）
+        const tx = S.textX / 100 * W, ty = S.textY / 100 * H;
+        const cxOf = w => (S.textAlign === 'left' ? area.l + w / 2 : S.textAlign === 'right' ? area.r - w / 2 : mid) + tx;
+        const subWidth = f => {
+          c.font = `${S.weight} ${f}px ${family()}`;
+          return c.measureText(sub).width + (S.subBox !== 'none' && !S.subArc ? f * 1.3 : S.strokeWidth * k * 0.8);
+        };
+        const blockW = Math.max(0, ...lines.map(l => lineW(c, l, fs) + S.strokeWidth * k), lg ? lg.w : 0, subIn ? subWidth(subFs) : 0);
+        let y = (band.t + band.b) / 2 - total() / 2 + ty;
+        const textRect = blockW > 0 ? { x: cxOf(blockW) - blockW / 2, y, w: blockW, h: total() } : null;
+        // 文字の後ろに敷く（座布団）
+        if (textRect && S.titlePlate !== 'none') {
+          const pad = Math.max(12 * k, (fs || subFs) * 0.28);
+          c.save();
+          c.globalAlpha = S.tpAlpha;
+          c.fillStyle = S.tpColor;
+          c.beginPath();
+          if (S.titlePlate === 'band') c.rect(0, textRect.y - pad, W, textRect.h + pad * 2);
+          else c.roundRect(textRect.x - pad * 1.4, textRect.y - pad, textRect.w + pad * 2.8, textRect.h + pad * 2, pad * 1.2);
+          c.fill();
+          c.restore();
+        }
+        // 画像（座布団の上、文字の下）
+        if (pic) c.drawImage(side, pic.x, pic.y, pic.w, pic.h);
         const plate = (x, y, w, h) => {
           if (!S.logoPlate) return;
           const pad = Math.max(8 * k, h * 0.2);
@@ -1819,10 +1970,11 @@
           c.restore();
         };
         const drawLogo = last => {
-          plate(mid - lg.w / 2, y, lg.w, lg.h);
+          const lx = cxOf(lg.w) - lg.w / 2;
+          plate(lx, y, lg.w, lg.h);
           c.save();
           if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = 10 * k; c.shadowOffsetY = 5 * k; }
-          c.drawImage(logo, mid - lg.w / 2, y, lg.w, lg.h);
+          c.drawImage(logo, lx, y, lg.w, lg.h);
           c.restore();
           y += lg.h + (last ? 0 : gap);
         };
@@ -1884,14 +2036,14 @@
           }
           c.restore();
         };
-        if (subAbove) { subText(mid, y + subH() / 2, subFs); y += subH(); }
+        if (subAbove) { subText(cxOf(subWidth(subFs)), y + subBody() / 2, subFs); y += subH(); }
         if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow));
         for (const line of lines) {
-          text(c, line, mid, y + fs * lh / 2, fs, S.titleColor, S.strokeWidth * k);
-          y += fs * lh;
+          drawLine(c, line, cxOf(lineW(c, line, fs)), y + lineH(line) / 2, fs, S.strokeWidth * k);
+          y += lineH(line);
         }
         if (lg && mode === 'below') { if (lines.length) y += gap; drawLogo(!subBelow); }
-        if (subBelow) subText(mid, y + subH() / 2, subFs);
+        if (subBelow) subText(cxOf(subWidth(subFs)), y + gapPx + subBody() / 2, subFs);
 
         // ---- 隅に小さくサブタイトル（隅の文字は、枠の端にそろえる）
         if (sub && S.subPos === 'corner') {
@@ -1917,7 +2069,20 @@
           c.drawImage(logo, x, yy, w, h);
           c.restore();
         }
-        return pic;
+
+        // ---- 追加の画像（アイコン・スタンプなど）。位置は中心の %、大きさは短い辺の 30% が 1倍
+        const extras = [];
+        for (const e of S.extras) {
+          const im = img.extras[e.id];
+          if (!im) continue;
+          const base = Math.min(W, H) * 0.3 * e.scale;
+          const r = Math.min(base / im.width, base / im.height);
+          const w = im.width * r, h = im.height * r;
+          const x = e.x / 100 * W - w / 2, yy = e.y / 100 * H - h / 2;
+          c.drawImage(im, x, yy, w, h);
+          extras.push({ id: e.id, x, y: yy, w, h });
+        }
+        return { pic, text: textRect, extras };
       }
 
       function drawBackground(c, W, H, k) {
@@ -1992,6 +2157,65 @@
         gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
         c.fillStyle = gr;
         c.fillRect(-ry * 4, -ry, ry * 8, ry * 2);
+        c.restore();
+      }
+
+      // タイトルの *〜* を強調に分ける
+      const splitHL = line => {
+        const out = [];
+        let last = 0;
+        for (const m of line.matchAll(/\*([^*]+)\*/g)) {
+          if (m.index > last) out.push({ t: line.slice(last, m.index), hl: false });
+          out.push({ t: m[1], hl: true });
+          last = m.index + m[0].length;
+        }
+        if (last < line.length) out.push({ t: line.slice(last), hl: false });
+        return out;
+      };
+      const hasHL = line => /\*[^*]+\*/.test(line);
+      function lineW(c, line, fs) {
+        return splitHL(line).reduce((a, sg) => {
+          c.font = `${S.weight} ${sg.hl ? fs * S.hlScale : fs}px ${family()}`;
+          return a + c.measureText(sg.t).width;
+        }, 0);
+      }
+      function fitTitle(c, lines, start, width) {
+        let fs = start;
+        while (Math.max(...lines.map(l => lineW(c, l, fs))) + S.strokeWidth * 2 > width && fs > 12) fs -= 2;
+        return fs;
+      }
+      // 1行を描く（cx は行の真ん中）。縁取りを全部描いてから文字を描く。文字の下のラインをそろえる
+      function drawLine(c, line, cx, y, fs, stroke) {
+        const segs = splitHL(line);
+        const w = lineW(c, line, fs);
+        c.save();
+        c.textAlign = 'left';
+        c.textBaseline = 'alphabetic';
+        c.lineJoin = 'round';
+        const base = y + fs * 0.36;
+        const each = fn => {
+          let x = cx - w / 2;
+          for (const sg of segs) {
+            const f = sg.hl ? fs * S.hlScale : fs;
+            c.font = `${S.weight} ${f}px ${family()}`;
+            fn(sg, x, f);
+            x += c.measureText(sg.t).width;
+          }
+        };
+        const shadowOn = () => {
+          if (!S.shadow) return;
+          c.shadowColor = 'rgba(120, 40, 70, 0.28)';
+          c.shadowBlur = Math.max(4, fs * 0.08);
+          c.shadowOffsetY = Math.max(2, fs * 0.05);
+        };
+        if (stroke > 0) {
+          shadowOn();
+          c.lineWidth = stroke;
+          c.strokeStyle = S.strokeColor;
+          each((sg, x) => c.strokeText(sg.t, x, base));
+          c.shadowColor = 'transparent';
+        } else shadowOn();
+        each((sg, x) => { c.fillStyle = sg.hl ? S.hlColor : S.titleColor; c.fillText(sg.t, x, base); });
         c.restore();
       }
 
@@ -2158,33 +2382,258 @@
         redraw();
       });
 
-      // ---- プレビューの画像をドラッグして動かす
+      // ---- プレビューでドラッグして動かす（追加の画像 → 文字 → 画像 の順に、上にあるものをつかむ）
       let drag = null;
       const toCanvas = e => {
         const r = cv.getBoundingClientRect();
         return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height };
       };
-      const onPic = p => lastPic && p.x >= lastPic.x && p.x <= lastPic.x + lastPic.w && p.y >= lastPic.y && p.y <= lastPic.y + lastPic.h;
+      const inRect = (p, r) => r && p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
+      function hitAt(p) {
+        for (let i = lastHit.extras.length - 1; i >= 0; i--) if (inRect(p, lastHit.extras[i])) return { kind: 'extra', id: lastHit.extras[i].id };
+        if (inRect(p, lastHit.text)) return { kind: 'text' };
+        if (inRect(p, lastHit.pic)) return { kind: 'pic' };
+        return null;
+      }
       cv.addEventListener('pointerdown', e => {
         const p = toCanvas(e);
-        if (!onPic(p)) return;
-        drag = { p, x: S.imgX, y: S.imgY };
+        const h = hitAt(p);
+        if (!h) return;
+        const ex = h.kind === 'extra' ? S.extras.find(x => x.id === h.id) : null;
+        drag = { p, h, x: h.kind === 'text' ? S.textX : h.kind === 'pic' ? S.imgX : ex.x, y: h.kind === 'text' ? S.textY : h.kind === 'pic' ? S.imgY : ex.y };
         cv.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
       cv.addEventListener('pointermove', e => {
         const p = toCanvas(e);
-        cv.style.cursor = drag || onPic(p) ? 'move' : '';
+        cv.style.cursor = drag || hitAt(p) ? 'move' : '';
         if (!drag) return;
-        const clamp = v => Math.max(-50, Math.min(50, Math.round(v)));
-        S.imgX = clamp(drag.x + (p.x - drag.p.x) / cv.width * 100);
-        S.imgY = clamp(drag.y + (p.y - drag.p.y) / cv.height * 100);
-        inputs.imgX.set(S.imgX); inputs.imgY.set(S.imgY);
+        const dx = (p.x - drag.p.x) / cv.width * 100, dy = (p.y - drag.p.y) / cv.height * 100;
+        const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
+        if (drag.h.kind === 'pic') {
+          S.imgX = clamp(drag.x + dx, -50, 50); S.imgY = clamp(drag.y + dy, -50, 50);
+          inputs.imgX.set(S.imgX); inputs.imgY.set(S.imgY);
+        } else if (drag.h.kind === 'text') {
+          S.textX = clamp(drag.x + dx, -50, 50); S.textY = clamp(drag.y + dy, -50, 50);
+          inputs.textX.set(S.textX); inputs.textY.set(S.textY);
+        } else {
+          const ex = S.extras.find(x => x.id === drag.h.id);
+          if (ex) { ex.x = clamp(drag.x + dx, -20, 120); ex.y = clamp(drag.y + dy, -20, 120); }
+        }
         redraw();
       });
       const endDrag = () => { drag = null; };
       cv.addEventListener('pointerup', endDrag);
       cv.addEventListener('pointercancel', endDrag);
+
+      // =====================================================
+      //  追加の画像
+      // =====================================================
+      const EXTRA_KEY = id => 'donnma-eyecatch-extra-' + id;
+      function renderExtras() {
+        const list = $('extra-list');
+        list.innerHTML = '';
+        if (!S.extras.length) { list.innerHTML = '<div class="row-empty">まだありません</div>'; return; }
+        S.extras.forEach(ex => {
+          const row = document.createElement('div');
+          row.className = 'row-item';
+          row.innerHTML = `<span class="img-thumb"></span><span class="dt">大きさ</span><input type="range" min="0.1" max="3" step="0.05" aria-label="大きさ"><button class="btn btn-sm btn-danger" type="button">削除</button>`;
+          const im = img.extras[ex.id];
+          if (im) row.querySelector('.img-thumb').style.backgroundImage = `url("${im.src}")`;
+          const r = row.querySelector('input');
+          r.value = ex.scale;
+          r.addEventListener('input', () => { ex.scale = parseFloat(r.value); redraw(); });
+          row.querySelector('button').addEventListener('click', () => {
+            S.extras = S.extras.filter(x => x !== ex);
+            delete img.extras[ex.id];
+            try { localStorage.removeItem(EXTRA_KEY(ex.id)); } catch (e) { /* ignore */ }
+            renderExtras(); redraw();
+          });
+          list.appendChild(row);
+        });
+      }
+      $('extra-add').addEventListener('click', () => $('extra-file').click());
+      $('extra-file').addEventListener('change', async e => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (!f) return;
+        try {
+          const { url, im } = await readImage(f, 1000);
+          const id = Math.random().toString(36).slice(2, 10);
+          img.extras[id] = im;
+          keep(EXTRA_KEY(id), url);
+          // 前に足したものと重ならないように、少しずつずらして置く
+          const n = S.extras.length;
+          S.extras.push({ id, x: 80 - (n % 4) * 8, y: 22 + (n % 4) * 8, scale: 0.6 });
+          renderExtras(); redraw();
+        } catch (err) { toast(err.message); }
+      });
+
+      // =====================================================
+      //  テンプレート（IndexedDB。画像ごと保存するので localStorage では入りきらない）
+      // =====================================================
+      const TPL_DB = 'donnma-eyecatch', TPL_STORE = 'templates';
+      const openTpl = () => new Promise((res, rej) => {
+        const r = indexedDB.open(TPL_DB, 1);
+        r.onupgradeneeded = () => r.result.createObjectStore(TPL_STORE, { keyPath: 'name' });
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+      const tplTx = async (mode, fn) => {
+        const db = await openTpl();
+        return new Promise((res, rej) => {
+          const t = db.transaction(TPL_STORE, mode);
+          const out = fn(t.objectStore(TPL_STORE));
+          t.oncomplete = () => res(out && out.result);
+          t.onerror = () => rej(t.error);
+        });
+      };
+      const tplAll = () => tplTx('readonly', st => st.getAll());
+      async function renderTpl() {
+        const list = $('tpl-list');
+        let all = [];
+        try { all = await tplAll(); } catch (e) { list.innerHTML = '<div class="row-empty">このブラウザでは保存できません</div>'; return; }
+        all.sort((a, b) => b.savedAt - a.savedAt);
+        list.innerHTML = all.length ? '' : '<div class="row-empty">まだありません</div>';
+        for (const t of all) {
+          const row = document.createElement('div');
+          row.className = 'row-item';
+          const d = new Date(t.savedAt);
+          row.innerHTML = `<span class="nm"></span><span class="dt">${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}</span>`
+            + '<button class="btn btn-sm" type="button" data-a="load">読み込む</button><button class="btn btn-sm" type="button" data-a="over">上書き</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button>';
+          row.querySelector('.nm').textContent = t.name;
+          row.querySelector('[data-a="load"]').addEventListener('click', () => loadTpl(t));
+          row.querySelector('[data-a="over"]').addEventListener('click', async () => {
+            if (!await ask(`「${t.name}」を今の見た目で上書きしますか？`, '上書きする')) return;
+            saveTpl(t.name);
+          });
+          row.querySelector('[data-a="del"]').addEventListener('click', async () => {
+            if (!await ask(`「${t.name}」を削除しますか？`, '削除する')) return;
+            await tplTx('readwrite', st => st.delete(t.name));
+            renderTpl();
+          });
+          list.appendChild(row);
+        }
+      }
+      async function saveTpl(name) {
+        const data = {
+          name, savedAt: Date.now(), S: JSON.parse(JSON.stringify(S)),
+          images: {
+            side: img.side ? img.side.src : null, bg: img.bg ? img.bg.src : null, logo: img.logo ? img.logo.src : null,
+            extras: Object.fromEntries(S.extras.filter(e => img.extras[e.id]).map(e => [e.id, img.extras[e.id].src])),
+          },
+        };
+        try {
+          await tplTx('readwrite', st => st.put(data));
+          toast(`「${name}」を保存しました`);
+        } catch (e) { toast('保存できませんでした（ブラウザの空き容量を確認してください）'); }
+        renderTpl();
+      }
+      async function loadTpl(t) {
+        const keepText = { title: S.title, sub: S.sub };
+        S = sanitize({ ...t.S, ...keepText });
+        const im = t.images || {};
+        img.side = im.side ? await loadImg(im.side) : null;
+        img.bg = im.bg ? await loadImg(im.bg) : null;
+        img.logo = im.logo ? await loadImg(im.logo) : null;
+        img.extras = {};
+        for (const [id, src] of Object.entries(im.extras || {})) img.extras[id] = await loadImg(src);
+        // 今の状態としても残す（開き直したときに同じになるように）
+        const put = (key, v) => { try { v ? localStorage.setItem(key, v) : localStorage.removeItem(key); } catch (e) { /* 入りきらなければ、開いている間だけ */ } };
+        put(IMG_KEY, im.side); put(BG_KEY, im.bg); put(LOGO_KEY, im.logo);
+        for (const [id, src] of Object.entries(im.extras || {})) put(EXTRA_KEY(id), src);
+        syncUI(); setThumb(); setLogoThumb(); renderExtras(); redraw();
+        toast(`「${t.name}」を読み込みました`);
+      }
+      $('tpl-save').addEventListener('click', async () => {
+        const name = $('tpl-name').value.trim();
+        if (!name) { toast('名前を入れてください'); $('tpl-name').focus(); return; }
+        let exists = false;
+        try { exists = (await tplAll()).some(t => t.name === name); } catch (e) { /* ignore */ }
+        if (exists && !await ask(`「${name}」はすでにあります。上書きしますか？`, '上書きする')) return;
+        await saveTpl(name);
+        $('tpl-name').value = '';
+      });
+      $('tpl-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('tpl-save').click(); });
+
+      // =====================================================
+      //  元に戻す・やり直す（設定だけ。選んだ画像そのものは戻らない）
+      // =====================================================
+      let hist = [], histAt = -1, histTimer = 0;
+      function snapshot() {
+        const j = JSON.stringify(S);
+        if (j === hist[histAt]) return;
+        hist = hist.slice(0, histAt + 1);
+        hist.push(j);
+        if (hist.length > 100) hist.shift();
+        histAt = hist.length - 1;
+        undoUi();
+      }
+      function undoUi() {
+        $('btn-undo').disabled = histAt <= 0;
+        $('btn-redo').disabled = histAt >= hist.length - 1;
+      }
+      function goHist(d) {
+        const i = histAt + d;
+        if (i < 0 || i >= hist.length) return;
+        histAt = i;
+        S = sanitize(JSON.parse(hist[i]));
+        nameTouched = false;
+        syncUI(); renderExtras(); undoUi(); redraw();
+      }
+      $('btn-undo').addEventListener('click', () => goHist(-1));
+      $('btn-redo').addEventListener('click', () => goHist(1));
+      addEventListener('keydown', e => {
+        if (!(e.ctrlKey || e.metaKey) || e.target.closest('input, textarea, select')) return;
+        const key = e.key.toLowerCase();
+        if (key === 'z' && !e.shiftKey) { e.preventDefault(); goHist(-1); }
+        else if (key === 'y' || (key === 'z' && e.shiftKey)) { e.preventDefault(); goHist(1); }
+      });
+
+      // =====================================================
+      //  まとめて作る（ZIP は押したときだけ JSZip を読み込む）
+      // =====================================================
+      const loadScript = src => new Promise((res, rej) => {
+        const sc = document.createElement('script');
+        sc.src = src; sc.onload = res; sc.onerror = () => rej(new Error('読み込めませんでした'));
+        document.head.appendChild(sc);
+      });
+      async function batch(type) {
+        const rows = $('batch-text').value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        if (!rows.length) { toast('1行に1枚ずつ、タイトルを書いてください'); return; }
+        try {
+          if (!window.JSZip) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+        } catch (e) { toast('ZIP を作る部品を読み込めませんでした（ネットにつながっているか確認してください）'); return; }
+        const zip = new JSZip();
+        const keepText = { title: S.title, sub: S.sub };
+        const ext = type === 'image/jpeg' ? 'jpg' : 'png';
+        toast(`${rows.length}枚を作っています…`);
+        try {
+          for (const [i, row] of rows.entries()) {
+            const [t, sb] = row.split(/\s+\/\s+/);
+            S.title = t.replace(/[｜|]/g, '\n');
+            S.sub = sb !== undefined ? sb : keepText.sub;
+            await loadFont();
+            const out = document.createElement('canvas');
+            draw(out);
+            const blob = await new Promise(r => out.toBlob(r, type, 0.9));
+            const nm = `${String(i + 1).padStart(2, '0')}_${t.replace(/[｜|]/g, '')}`.replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 60);
+            zip.file(`${nm}.${ext}`, blob);
+          }
+        } finally {
+          S.title = keepText.title; S.sub = keepText.sub;
+          redraw();
+        }
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'eyecatch.zip';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+        toast(`${rows.length}枚を ZIP で保存しました`);
+      }
+      $('batch-jpg').addEventListener('click', () => batch('image/jpeg'));
+      $('batch-png').addEventListener('click', () => batch('image/png'));
 
       $('f-title').addEventListener('input', e => { S.title = e.target.value; redraw(); });
       $('f-sub').addEventListener('input', e => { S.sub = e.target.value; redraw(); });
@@ -2192,10 +2641,11 @@
       $('btn-reset').addEventListener('click', async () => {
         if (!await ask('文字・設定・選んだ画像をすべて初期値に戻しますか？', 'リセットする')) return;
         S = { ...DEFAULTS };
-        img.side = null; img.bg = null; img.logo = null;
+        for (const ex of S.extras) { try { localStorage.removeItem(EXTRA_KEY(ex.id)); } catch (e) { /* ignore */ } }
+        img.side = null; img.bg = null; img.logo = null; img.extras = {};
         try { [IMG_KEY, BG_KEY, LOGO_KEY].forEach(k => localStorage.removeItem(k)); } catch (e) { /* ignore */ }
         nameTouched = false;
-        syncUI(); setThumb(); setLogoThumb(); redraw();
+        syncUI(); setThumb(); setLogoThumb(); renderExtras(); redraw();
       });
 
       const toastEl = $('toast');
@@ -2222,6 +2672,14 @@
         try { saved = localStorage.getItem(LOGO_KEY); } catch (e) { saved = null; }
         if (saved) img.logo = await loadImg(saved);
         setLogoThumb();
+        for (const ex of S.extras) {
+          try { saved = localStorage.getItem(EXTRA_KEY(ex.id)); } catch (e) { saved = null; }
+          if (saved) img.extras[ex.id] = await loadImg(saved);
+        }
+        S.extras = S.extras.filter(ex => img.extras[ex.id]);
+        renderExtras();
+        renderTpl();
+        snapshot();
         setThumb();
         redraw();
       })();
