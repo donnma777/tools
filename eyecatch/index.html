@@ -1154,12 +1154,24 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 6px 8px;
+      gap: 6px;
+      padding-right: 10px;
+      margin-right: 4px;
+      border-right: 1px solid var(--border-strong);
+    }
+
+    .sel-head[hidden] {
+      display: none;
+    }
+
+    .undo-row {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
     }
 
     .sel-name {
-      flex: 1;
-      min-width: 0;
+      max-width: 200px;
       font-size: 13px;
       font-weight: 700;
       color: var(--accent);
@@ -1186,7 +1198,6 @@
       padding: 4px 0;
     }
 
-    .sel-panel.empty .sel-head,
     .sel-panel.empty .sel-bars,
     .sel-panel:not(.empty) .sel-empty {
       display: none;
@@ -1654,7 +1665,13 @@
         <div class="panel-head">
           <span>プレビュー <span class="out-meta" id="size-meta"></span></span>
           <div class="undo-row">
-            <button class="btn btn-sm" type="button" id="btn-mini" aria-pressed="false" title="一覧などで小さく表示されたときの見え方を確かめます">🔍 小さく見る</button>
+            <div class="sel-head" id="sel-head" hidden>
+              <span class="sel-name" id="sel-name"></span>
+              <button class="btn btn-sm" type="button" id="sel-up" title="1つ前に重ねる">↑ 前へ</button>
+              <button class="btn btn-sm" type="button" id="sel-down" title="1つ後ろに重ねる">↓ 後ろへ</button>
+              <button class="btn btn-sm" type="button" id="sel-reset" title="ずらした位置・回転を元に戻します">位置を戻す</button>
+              <button class="btn btn-sm" type="button" id="sel-clear" title="選ぶのをやめる" aria-label="選ぶのをやめる">✕</button>
+            </div>
             <button class="btn btn-sm" type="button" id="btn-undo" title="元に戻す（Ctrl+Z）">↶ 戻す</button>
             <button class="btn btn-sm" type="button" id="btn-redo" title="やり直す（Ctrl+Y）">↷ やり直す</button>
           </div>
@@ -1664,19 +1681,11 @@
           <div class="mini-pop" id="mini-pop" hidden>一覧などで小さく出たとき<canvas id="mini" width="160" height="90"></canvas></div>
         </div>
         <div class="sel-panel empty" id="sel-panel">
-          <div class="sel-head">
-            <span class="sel-name" id="sel-name"></span>
-            <span class="sel-btns" id="sel-btns">
-              <button class="btn btn-sm" type="button" id="sel-up" title="1つ前に重ねる">↑ 前へ</button>
-              <button class="btn btn-sm" type="button" id="sel-down" title="1つ後ろに重ねる">↓ 後ろへ</button>
-              <button class="btn btn-sm" type="button" id="sel-reset" title="ずらした位置・回転を元に戻します">位置を戻す</button>
-              <button class="btn btn-sm" type="button" id="sel-clear" title="選ぶのをやめる" aria-label="選ぶのをやめる">✕</button>
-            </span>
-          </div>
           <div class="sel-bars" id="sel-bars"></div>
           <div class="sel-empty" id="sel-empty">プレビューの文字や画像をクリックすると、ここで大きさ・位置・回転を変えられます（ドラッグでも動かせます）。</div>
         </div>
         <div class="save-row">
+          <button class="btn" type="button" id="btn-mini" aria-pressed="false" title="一覧などで小さく表示されたときの見え方を確かめます">🔍 小さく見る</button>
           <input type="text" id="file-name" spellcheck="false" aria-label="ファイル名">
           <button class="btn btn-primary" id="save-jpg" type="button">⬇ JPG で保存</button>
           <button class="btn" id="save-png" type="button">PNG で保存</button>
@@ -1774,7 +1783,7 @@
         titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
         extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0, subScale: 1,
         imgPos: 'left', imgAnchor: 'auto', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart',
-        subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subArc: 0, subGap: 0,
+        subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subArc: 0,
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
         bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
@@ -1830,6 +1839,15 @@
           out.order = ['@pic', ...ids(true), '@text', ...ids(false)];
         }
         if (o.subScale === undefined && typeof o.textScale === 'number') out.subScale = out.textScale;
+        // 以前の「タイトルとの間」（subGap・px）は、同じ見た目になるように上下のずらしに置き換える
+        //（間を空けると、まとまりの真ん中がずれていたので、タイトルは半分、サブタイトルは残りを動かす）
+        const og = typeof o.subGap === 'number' ? o.subGap : 0;
+        if (og > 0 && out.subPos !== 'corner') {
+          const g = og / 630 * 100, d = out.subPos === 'above' ? -1 : 1;
+          const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
+          out.textY = clamp(out.textY - d * g / 2, -50, 50);
+          out.subY = clamp(out.subY + d * g, -60, 60);
+        }
         const oldW = typeof o.strokeWidth === 'number' ? o.strokeWidth : null, oldC = hex(o.strokeColor, '#ffffff');
         if (oldW !== null && o.titleStrokeW === undefined) {
           Object.assign(out, {
@@ -1885,7 +1903,6 @@
             { k: 'subScale', l: '大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', home: 'none' },
             { k: 'subColor', l: '色', t: 'color', home: 'sub' },
             { k: 'subPos', l: '置き場所', t: 'select', o: [['below', 'タイトルの下'], ['above', 'タイトルの上'], ['corner', '隅に小さく']], home: 'sub' },
-            { k: 'subGap', l: 'タイトルとの間', t: 'range', min: 0, max: 200, step: 2, u: 'px', home: 'sub', when: s => s.subPos !== 'corner' },
             { k: 'subCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], home: 'sub', when: s => s.subPos === 'corner' },
             { k: 'subStrokeOn', l: '縁取り', t: 'check', home: 'sub', when: s => s.subBox === 'none' || !!s.subArc },
             { k: 'subStrokeColor', l: '縁取りの色', t: 'color', home: 'sub', when: s => s.subStrokeOn && (s.subBox === 'none' || !!s.subArc) },
@@ -2310,8 +2327,8 @@
           const a = Math.abs(S.subArc) * 1.4, R = c.measureText(sub).width / a;
           return R * (1 - Math.cos(a / 2));
         };
-        // サブタイトルの高さ（すき間 subGap も含む。すき間はタイトル側に空ける）
-        const gapPx = S.subGap * k;
+        // サブタイトルの高さ（タイトルとの間は、サブタイトルの「上下」のずらしで空ける）
+        const gapPx = 0;
         const subBody = () => subFs * (boxed ? 1.9 : 1.35) + arcLift(subFs);
         const subH = () => subIn ? subBody() + gapPx : 0;
         // ロゴの前後のすきま：タイトルの下なら「タイトルとの間」と「サブタイトルとの間」、それ以外は「次との間」
@@ -3007,6 +3024,7 @@
         const def = selId && selDef(selId);
         if (!def) selId = null;
         $('sel-panel').classList.toggle('empty', !def);
+        $('sel-head').hidden = !def;
         const box = $('sel-bars');
         box.innerHTML = '';
         selBars = [];
@@ -3040,7 +3058,7 @@
           if (document.activeElement !== b.r) b.r.value = o[b.key] ?? 0;
           b.show(o[b.key] ?? 0);
         }
-        $('sel-name').textContent = '選んでいるもの：' + def.name;
+        $('sel-name').textContent = '選択中：' + def.name;
         const i = S.order.indexOf(selId);
         $('sel-up').disabled = i === S.order.length - 1;
         $('sel-down').disabled = i <= 0;
