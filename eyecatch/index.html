@@ -1382,7 +1382,7 @@
         titleColor: '#ff7fa0', subColor: '#6e3551', strokeWidth: 14, strokeColor: '#ffffff', shadow: true,
         textScale: 1,
         imgPos: 'left', imgAnchor: 'auto', imgScale: 1, imgX: 0, imgY: 0, sample: 'heart',
-        subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0',
+        subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subArc: 0,
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
         bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
@@ -1426,6 +1426,7 @@
             { k: 'subColor', l: 'サブタイトルの色', t: 'color' },
             { k: 'subBox', l: 'サブタイトルの後ろの形', t: 'select', o: [['none', 'なし'], ['pill', '楕円（まるい札）'], ['round', '角丸の四角']], note: '形を敷いたときは、サブタイトルの縁取りを付けません' },
             { k: 'subBoxColor', l: '形の色', t: 'color', when: s => s.subBox !== 'none' },
+            { k: 'subArc', l: 'サブタイトルの曲がり', t: 'range', min: -1, max: 1, step: 0.05, u: '', note: '0 でまっすぐ。プラスで上に反る（アーチ）、マイナスで下に反る。曲げたときは後ろの形は付きません' },
             { k: 'subPos', l: 'サブタイトルの位置', t: 'select', o: [['below', 'タイトルの下'], ['above', 'タイトルの上'], ['corner', '隅に小さく']] },
             { k: 'subCorner', l: 'サブタイトルの隅', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], when: s => s.subPos === 'corner' },
             { k: 'strokeWidth', l: '縁取りの太さ（0でなし）', t: 'range', min: 0, max: 30, step: 1, u: 'px' },
@@ -1788,8 +1789,15 @@
         // サブタイトル：タイトルの上か下（ブロックの中）、または隅（ブロックの外）
         const subIn = !!sub && S.subPos !== 'corner';
         const subAbove = subIn && S.subPos === 'above', subBelow = subIn && S.subPos === 'below';
-        const boxed = S.subBox !== 'none';
-        const subH = () => subIn ? subFs * (boxed ? 1.9 : 1.35) : 0;
+        const boxed = S.subBox !== 'none' && !S.subArc;
+        // 曲げたときに、反りのぶん高くなる量（サブタイトルの文字の大きさに対して）
+        const arcLift = f => {
+          if (!S.subArc) return 0;
+          c.font = `${S.weight} ${f}px ${family()}`;
+          const a = Math.abs(S.subArc) * 1.4, R = c.measureText(sub).width / a;
+          return R * (1 - Math.cos(a / 2));
+        };
+        const subH = () => subIn ? subFs * (boxed ? 1.9 : 1.35) + arcLift(subFs) : 0;
         // ロゴの前後のすきま：タイトルの下なら「タイトルとの間」と「サブタイトルとの間」、それ以外は「次との間」
         const logoGaps = () => !lg ? 0 : mode === 'below' ? (lines.length ? 1 : 0) + (subBelow ? 1 : 0) : (lines.length || subBelow ? 1 : 0);
         const total = () => (lg ? lg.h + logoGaps() * gap : 0) + lines.length * fs * lh + subH();
@@ -1833,10 +1841,48 @@
             c.fill();
             c.restore();
           }
+          if (S.subArc) { arcText(sub, x, yy, f); return; }
           const keep = S.shadow;
           if (boxed) S.shadow = false;   // 札の上の文字には影を付けない
           text(c, sub, x, yy + (boxed ? f * 0.03 : 0), f, S.subColor, subStroke);
           S.shadow = keep;
+        };
+        const arcText = (str, x, yy, f) => {
+          const chars = [...str];
+          c.save();
+          c.font = `${S.weight} ${f}px ${family()}`;
+          c.textAlign = 'center';
+          c.textBaseline = 'middle';
+          c.lineJoin = 'round';
+          const ws = chars.map(ch => c.measureText(ch).width);
+          const total = ws.reduce((a, b) => a + b, 0);
+          const d = Math.sign(S.subArc), a = Math.abs(S.subArc) * 1.4, R = total / a;
+          const sag = R * (1 - Math.cos(a / 2));
+          // 真ん中の文字と両端の文字の高さの中間が yy になるように、円の中心を置く
+          const cy = yy - d * sag / 2 + d * R;
+          const place = (i, acc) => {
+            const th = -a / 2 + (acc + ws[i] / 2) / R;
+            return { x: x + R * Math.sin(th), y: cy - d * R * Math.cos(th), r: d * th };
+          };
+          for (const pass of (subStroke > 0 ? ['stroke', 'fill'] : ['fill'])) {
+            let acc = 0;
+            chars.forEach((ch, i) => {
+              const p = place(i, acc);
+              acc += ws[i];
+              c.save();
+              c.translate(p.x, p.y);
+              c.rotate(p.r);
+              if (pass === 'stroke') {
+                if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = Math.max(4, f * 0.08); c.shadowOffsetY = Math.max(2, f * 0.05); }
+                c.lineWidth = subStroke; c.strokeStyle = S.strokeColor; c.strokeText(ch, 0, 0);
+              } else {
+                if (S.shadow && subStroke <= 0) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = Math.max(4, f * 0.08); c.shadowOffsetY = Math.max(2, f * 0.05); }
+                c.fillStyle = S.subColor; c.fillText(ch, 0, 0);
+              }
+              c.restore();
+            });
+          }
+          c.restore();
         };
         if (subAbove) { subText(mid, y + subH() / 2, subFs); y += subH(); }
         if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow));
@@ -1852,7 +1898,7 @@
           const cfs = fit(c, [sub], 44 * k * S.textScale, W * 0.45);
           c.font = `${S.weight} ${cfs}px ${family()}`;
           const w = c.measureText(sub).width + (boxed ? cfs * 1.3 : subStroke);
-          const hh = boxed ? cfs * 1.55 : cfs * 1.2;
+          const hh = (boxed ? cfs * 1.55 : cfs * 1.2) + arcLift(cfs);
           const m = Math.min(W, H) * 0.045 + subStroke / 2;
           const x = S.subCorner.endsWith('l') ? m + w / 2 : S.subCorner.endsWith('c') ? W / 2 : W - m - w / 2;
           const yy = S.subCorner.startsWith('t') ? m + hh / 2 : H - m - hh / 2;
