@@ -1238,10 +1238,9 @@
         </div>
       </details>
 
-      <details class="sec" open>
-        <summary><span class="sec-icon">🖼️</span>画像</summary>
+      <div hidden>
         <div class="fields">
-          <div class="field field-full">
+          <div class="field field-full" id="img-upload">
             <span class="field-label"><span>横に置く画像（キャラ・写真・アイコンなど）</span></span>
             <div class="img-pick">
               <span class="img-thumb" id="img-thumb"></span>
@@ -1249,14 +1248,13 @@
               <button class="btn btn-sm" type="button" id="img-clear">サンプルに戻す</button>
               <input type="file" id="img-file" accept="image/*" hidden>
             </div>
-            <div class="field-note">背景が透明な PNG・WebP だと、柄の上にきれいに乗ります。選ばないときは、下の「画像の置き方」で選んだサンプル（ハート・星など）が入ります。</div>
+            <div class="field-note">背景が透明な PNG・WebP だと、柄の上にきれいに乗ります。選ばないときは、下の「画像を選ばないときのサンプル」で選んだもの（ハート・星など）が入ります。</div>
           </div>
         </div>
-      </details>
-      <details class="sec" open>
-        <summary><span class="sec-icon">🏷️</span>ロゴ</summary>
+      </div>
+      <div hidden>
         <div class="fields">
-          <div class="field field-full">
+          <div class="field field-full" id="logo-upload">
             <span class="field-label"><span>ロゴ画像（なくてもOK）</span></span>
             <div class="img-pick">
               <span class="img-thumb" id="logo-thumb"></span>
@@ -1264,10 +1262,10 @@
               <button class="btn btn-sm" type="button" id="logo-clear">外す</button>
               <input type="file" id="logo-file" accept="image/*" hidden>
             </div>
-            <div class="field-note">背景が透明な PNG・WebP がおすすめです。置き方は「ロゴの置き方」で選べます（タイトルの代わり・タイトルの上・隅に小さく）。</div>
+            <div class="field-note">背景が透明な PNG・WebP がおすすめです。</div>
           </div>
         </div>
-      </details>
+      </div>
       <!-- sections are generated from SECTIONS below -->
     </div>
 
@@ -1408,7 +1406,7 @@
           ]
         },
         {
-          title: '文字の見た目', icon: '🔤', fields: [
+          title: '文字の見た目', icon: '🔤', open: true, fields: [
             { k: 'font', l: 'フォント', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]) },
             { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
             { k: 'weight', l: '文字の太さ', t: 'select', o: C.WEIGHTS },
@@ -1421,7 +1419,7 @@
           ]
         },
         {
-          title: '画像の置き方', icon: '🧸', fields: [
+          title: '画像', icon: '🖼️', open: true, fields: [
             {
               k: 'imgPos', l: '画像の位置', t: 'select', o: [['left', '左'], ['right', '右'], ['top', '上（文字は下）'], ['bottom', '下（文字は上）'],
               ['center', '真ん中（文字の後ろ）'], ['none', '画像なし（文字だけ）']], note: '縦長・正方形で「左」「右」を選ぶと、下に置きます'
@@ -1434,12 +1432,12 @@
           ]
         },
         {
-          title: 'ロゴの置き方', icon: '📍', fields: [
+          title: 'ロゴ', icon: '🏷️', open: true, fields: [
             {
               k: 'logoMode', l: 'ロゴの置き方', t: 'select', o: [['none', '使わない'], ['replace', 'タイトルの代わりに大きく（下にサブタイトル）'],
-              ['above', 'タイトルの上に'], ['corner', '隅に小さく']], note: 'ロゴ画像は上の「ロゴ」で選びます'
+              ['above', 'タイトルの上に'], ['below', 'タイトルの下に'], ['corner', '隅に小さく']]
             },
-            { k: 'logoCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tr', '右上'], ['bl', '左下'], ['br', '右下']], when: s => s.logoMode === 'corner' },
+            { k: 'logoCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], when: s => s.logoMode === 'corner' },
             { k: 'logoScale', l: 'ロゴの大きさ', t: 'range', min: 0.3, max: 1.6, step: 0.05, u: '倍', when: s => s.logoMode !== 'none' },
           ]
         },
@@ -1549,6 +1547,9 @@
           det.innerHTML = `<summary><span class="sec-icon">${sec.icon}</span>${sec.title}</summary>`;
           const grid = document.createElement('div');
           grid.className = 'fields';
+          // ロゴの欄は、先頭にロゴのアップロードを置く
+          if (sec.title === 'ロゴ') grid.appendChild($('logo-upload'));
+          if (sec.title === '画像') grid.appendChild($('img-upload'));
           for (const f of sec.fields) grid.appendChild(buildField(f));
           det.appendChild(grid);
           // 「大きさ」は文字の前に出す
@@ -1705,37 +1706,42 @@
         let subFs = sub ? fit(c, [sub], (mode === 'replace' ? 84 : 60) * k * S.textScale, aw) : 0;
         let fs = lines.length ? fit(c, lines, (stacked || !side || pos === 'center' ? 150 : 124) * k * S.textScale, aw) : 0;
         let lg = null;
-        if (mode === 'replace' || mode === 'above') {
+        if (mode === 'replace' || mode === 'above' || mode === 'below') {
           const r = Math.min(aw * 0.9 / logo.width, bh * (mode === 'replace' ? 0.62 : 0.3) / logo.height) * S.logoScale;
           lg = { w: logo.width * r, h: logo.height * r };
           if (lg.w > aw) { const t = aw / lg.w; lg.w *= t; lg.h *= t; }
         }
         const subH = () => sub ? subFs * 1.35 : 0;
-        const total = () => (lg ? lg.h + (lines.length || sub ? gap : 0) : 0) + lines.length * fs * lh + subH();
+        // ロゴの前後のすきま：タイトルの下なら「タイトルとの間」と「サブタイトルとの間」、それ以外は「次との間」
+        const logoGaps = () => !lg ? 0 : mode === 'below' ? (lines.length ? 1 : 0) + (sub ? 1 : 0) : (lines.length || sub ? 1 : 0);
+        const total = () => (lg ? lg.h + logoGaps() * gap : 0) + lines.length * fs * lh + subH();
         while (total() > bh && (fs > 12 || (lg && lg.h > 20))) {
           if (fs > 12) fs -= 2;
           else { lg.w *= 0.95; lg.h *= 0.95; }
           subFs = Math.min(subFs, fs ? fs * 0.55 : subFs * 0.95);
         }
         let y = (band.t + band.b) / 2 - total() / 2;
-        if (lg) {
+        const drawLogo = last => {
           c.save();
           if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = 10 * k; c.shadowOffsetY = 5 * k; }
           c.drawImage(logo, mid - lg.w / 2, y, lg.w, lg.h);
           c.restore();
-          y += lg.h + (lines.length || sub ? gap : 0);
-        }
+          y += lg.h + (last ? 0 : gap);
+        };
+        // 上から：ロゴ（タイトルの上・代わり）→ タイトル → ロゴ（タイトルの下）→ サブタイトル
+        if (lg && mode !== 'below') drawLogo(!(lines.length || sub));
         for (const line of lines) {
           text(c, line, mid, y + fs * lh / 2, fs, S.titleColor, S.strokeWidth * k);
           y += fs * lh;
         }
+        if (lg && mode === 'below') { if (lines.length) y += gap; drawLogo(!sub); }
         if (sub) text(c, sub, mid, y + subH() / 2, subFs, S.subColor, S.strokeWidth * k * 0.8);
 
         // ---- 隅に小さくロゴ
         if (mode === 'corner') {
           const r = Math.min(W * 0.2 / logo.width, H * 0.14 / logo.height) * S.logoScale;
           const w = logo.width * r, h = logo.height * r, m = Math.min(W, H) * 0.04;
-          const x = S.logoCorner.endsWith('l') ? m : W - m - w;
+          const x = S.logoCorner.endsWith('l') ? m : S.logoCorner.endsWith('c') ? (W - w) / 2 : W - m - w;
           const yy = S.logoCorner.startsWith('t') ? m : H - m - h;
           c.save();
           if (S.shadow) { c.shadowColor = 'rgba(0, 0, 0, 0.25)'; c.shadowBlur = 8 * k; c.shadowOffsetY = 3 * k; }
