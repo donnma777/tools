@@ -80,7 +80,9 @@ jobs:
           git config user.name "gh-pages-bot"
           git config user.email "actions@users.noreply.github.com"
           git rm -r --cached .github > /dev/null
-          rm -rf .github README.md
+          rm -rf .github
+          # 各フォルダの README.md（開発メモ）も公開しない
+          find . -path ./.git -prune -o -name README.md -type f -exec rm -f {} +
           git add -A
           git commit -m "Publish noindex build from $(git rev-parse --short HEAD~0 2>/dev/null || echo main)"
           git push origin HEAD:gh-pages --force
