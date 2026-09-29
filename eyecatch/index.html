@@ -1145,6 +1145,64 @@
       border-radius: 4px;
     }
 
+    .sel-panel {
+      padding: 10px 14px 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .sel-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 8px;
+    }
+
+    .sel-name {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sel-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .sel-bars {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 4px 16px;
+      padding-top: 6px;
+    }
+
+    .sel-empty {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 4px 0;
+    }
+
+    .sel-panel.empty .sel-head,
+    .sel-panel.empty .sel-bars,
+    .sel-panel:not(.empty) .sel-empty {
+      display: none;
+    }
+
+    .extra-item.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    @media (max-width: 700px) {
+      .sel-bars {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
     .save-row {
       display: flex;
       flex-wrap: wrap;
@@ -1543,7 +1601,6 @@
               <button class="btn btn-sm" type="button" id="img-center" title="ずらした位置を元に戻します">位置を戻す</button>
               <input type="file" id="img-file" accept="image/*" hidden>
             </div>
-            <div class="extra-bars" id="img-bars"></div>
           </div>
           <div class="field field-full main-opts" id="main-opts">
             <span class="field-label"><span>メインの画像の置き方（文字がよける画像）</span></span>
@@ -1605,6 +1662,19 @@
         <div class="ec-stage" id="ec-stage">
           <canvas id="cv" width="1280" height="720" aria-label="アイキャッチのプレビュー"></canvas>
           <div class="mini-pop" id="mini-pop" hidden>一覧などで小さく出たとき<canvas id="mini" width="160" height="90"></canvas></div>
+        </div>
+        <div class="sel-panel empty" id="sel-panel">
+          <div class="sel-head">
+            <span class="sel-name" id="sel-name"></span>
+            <span class="sel-btns" id="sel-btns">
+              <button class="btn btn-sm" type="button" id="sel-up" title="1つ前に重ねる">↑ 前へ</button>
+              <button class="btn btn-sm" type="button" id="sel-down" title="1つ後ろに重ねる">↓ 後ろへ</button>
+              <button class="btn btn-sm" type="button" id="sel-reset" title="ずらした位置・回転を元に戻します">位置を戻す</button>
+              <button class="btn btn-sm" type="button" id="sel-clear" title="選ぶのをやめる" aria-label="選ぶのをやめる">✕</button>
+            </span>
+          </div>
+          <div class="sel-bars" id="sel-bars"></div>
+          <div class="sel-empty" id="sel-empty">プレビューの文字や画像をクリックすると、ここで大きさ・位置・回転を変えられます（ドラッグでも動かせます）。</div>
         </div>
         <div class="save-row">
           <input type="text" id="file-name" spellcheck="false" aria-label="ファイル名">
@@ -1797,11 +1867,11 @@
             // ここから下は、タイトル（home: 'title'）・サブタイトル（home: 'sub'）のカードの中に出す
             { k: 'titleFont', l: 'フォント', t: 'select', o: LAYER_FONTS, home: 'title' },
             { k: 'titleWeight', l: '文字の太さ', t: 'select', o: LAYER_WEIGHTS, home: 'title' },
-            { k: 'textScale', l: '大きさ', t: 'range', min: 0.5, max: 1.3, step: 0.05, u: '倍', home: 'title', note: '枠に収まらないときは、これより小さくなります' },
+            { k: 'textScale', l: '大きさ', t: 'range', min: 0.5, max: 1.3, step: 0.05, u: '倍', home: 'none' },
             { k: 'titleColor', l: '色', t: 'color', home: 'title' },
             { k: 'textAlign', l: 'そろえ方', t: 'select', o: [['center', '中央'], ['left', '左寄せ'], ['right', '右寄せ']], home: 'title' },
-            { k: 'textX', l: '左右にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', home: 'title' },
-            { k: 'textY', l: '上下にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', home: 'title' },
+            { k: 'textX', l: '左右にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', home: 'none' },
+            { k: 'textY', l: '上下にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', home: 'none' },
             { k: 'hlColor', l: '強調（*〜*）の色', t: 'color', home: 'title' },
             { k: 'hlScale', l: '強調（*〜*）の大きさ', t: 'range', min: 0.8, max: 1.6, step: 0.05, u: '倍', home: 'title' },
             { k: 'titleStrokeOn', l: '縁取り', t: 'check', home: 'title' },
@@ -1812,7 +1882,7 @@
             { k: 'tpAlpha', l: '座布団の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', home: 'title', when: s => s.titlePlate !== 'none' },
             { k: 'subFont', l: 'フォント', t: 'select', o: LAYER_FONTS, home: 'sub' },
             { k: 'subWeight', l: '文字の太さ', t: 'select', o: LAYER_WEIGHTS, home: 'sub' },
-            { k: 'subScale', l: '大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', home: 'sub' },
+            { k: 'subScale', l: '大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', home: 'none' },
             { k: 'subColor', l: '色', t: 'color', home: 'sub' },
             { k: 'subPos', l: '置き場所', t: 'select', o: [['below', 'タイトルの下'], ['above', 'タイトルの上'], ['corner', '隅に小さく']], home: 'sub' },
             { k: 'subGap', l: 'タイトルとの間', t: 'range', min: 0, max: 200, step: 2, u: 'px', home: 'sub', when: s => s.subPos !== 'corner' },
@@ -1878,7 +1948,8 @@
       const STORE_KEY = 'donnma-eyecatch-v1';
       const IMG_KEY = 'donnma-eyecatch-img-v1';
       const BG_KEY = 'donnma-eyecatch-bg-v1';
-      let S = { ...DEFAULTS };
+      // DEFAULTS の配列（extras・order）を共有しないように、sanitize で新しく作る
+      let S = sanitize({});
       try { S = sanitize(JSON.parse(localStorage.getItem(STORE_KEY) || 'null')); } catch (e) { /* storage unavailable */ }
       const img = { side: null, samples: {}, bg: null, logo: null, extras: {} };
 
@@ -1971,6 +2042,10 @@
         return wrap;
       }
 
+      // カードから外した項目の置き場所（値の出し入れはそのまま使う）
+      const hiddenBin = document.createElement('div');
+      hiddenBin.hidden = true;
+      document.body.appendChild(hiddenBin);
       function buildUI() {
         for (const sec of SECTIONS) {
           const det = document.createElement('details');
@@ -1996,6 +2071,7 @@
         for (const sec of SECTIONS) for (const f of sec.fields) {
           if (f.home === 'title') titleOpts.appendChild(inputs[f.k].wrap);
           if (f.home === 'sub') subOpts.appendChild(inputs[f.k].wrap);
+          if (f.home === 'none') hiddenBin.appendChild(inputs[f.k].wrap);
         }
         // メインの画像の置き方は、メインのカードの中に
         $('main-opts').append(inputs.imgPos.wrap, inputs.imgAnchor.wrap, inputs.sample.wrap);
@@ -2010,7 +2086,7 @@
           const set = v => { r.value = v; val.textContent = `${+(+v).toFixed(2)}${u}`; };
           r.addEventListener('input', () => { set(r.value); update(k, parseFloat(r.value)); });
           inputs[k] = { f: { k }, wrap: f, set, labelEl: f.querySelector('.field-label > span') };
-          $('img-bars').appendChild(f);
+          hiddenBin.appendChild(f);
         }
       }
       function refreshVisibility() {
@@ -2653,6 +2729,17 @@
       };
       function render() {
         draw(cv);
+        const rectOf = id => id === '@pic' ? lastHit.pic : id === '@text' ? lastHit.text : id === '@sub' ? lastHit.sub : id && lastHit.extras.find(r => r.id === id);
+        const sr = rectOf(selId);
+        if (sr) {
+          const c = cv.getContext('2d'), lw = Math.max(3, cv.width / 320);
+          c.save();
+          c.lineWidth = lw;
+          c.strokeStyle = 'rgba(255, 61, 127, 0.9)';
+          c.strokeRect(sr.x - lw * 2, sr.y - lw * 2, sr.w + lw * 4, sr.h + lw * 4);
+          c.restore();
+        }
+        refreshSel();
         const hv = hoverId === '@pic' ? lastHit.pic : hoverId === '@text' ? lastHit.text : hoverId === '@sub' ? lastHit.sub : hoverId && lastHit.extras.find(r => r.id === hoverId);
         if (hv) {
           const c = cv.getContext('2d'), lw = Math.max(3, cv.width / 300);
@@ -2813,7 +2900,8 @@
       cv.addEventListener('pointerdown', e => {
         const p = toCanvas(e);
         const h = hitAt(p);
-        if (!h) return;
+        if (!h) { select(null); return; }
+        select({ text: '@text', sub: '@sub', pic: '@pic' }[h.kind] || h.id);
         const ex = h.kind === 'extra' ? S.extras.find(x => x.id === h.id) : null;
         const xy = { text: [S.textX, S.textY], sub: [S.subX, S.subY], pic: [S.imgX, S.imgY] }[h.kind] || [ex.x, ex.y];
         drag = { p, h, x: xy[0], y: xy[1] };
@@ -2878,6 +2966,7 @@
       }
       // 重なりを1つ動かす（d = +1 で前へ、-1 で後ろへ）
       function moveLayer(id, d) {
+        if (!id) return;
         const i = S.order.indexOf(id), j = i + d;
         if (i < 0 || j < 0 || j >= S.order.length) return;
         [S.order[i], S.order[j]] = [S.order[j], S.order[i]];
@@ -2890,8 +2979,88 @@
       const orderBtns = (rank, n) =>
         `<button class="btn btn-sm" type="button" data-a="up" title="1つ前に重ねる" ${rank === 0 ? 'disabled' : ''}>↑ 前へ</button>`
         + `<button class="btn btn-sm" type="button" data-a="down" title="1つ後ろに重ねる" ${rank === n - 1 ? 'disabled' : ''}>↓ 後ろへ</button>`;
+      // ---- 選んでいるもの（プレビューの下のパネルで、大きさ・位置・回転を変える）
+      let selId = null, selBars = [];
+      function selDef(id) {
+        if (id === '@pic') return {
+          name: 'メインの画像', get obj() { return S; }, reset() { S.imgX = 0; S.imgY = 0; S.imgRot = 0; },
+          bars: [['imgScale', '大きさ', 0.3, 1.6, 0.05, '倍'], ['imgX', '左右', -50, 50, 1, '%'], ['imgY', '上下', -50, 50, 1, '%'], ['imgRot', '回転', -180, 180, 1, '°']],
+        };
+        if (id === '@text') return {
+          name: 'タイトル', get obj() { return S; }, reset() { S.textX = 0; S.textY = 0; },
+          bars: [['textScale', '大きさ', 0.5, 1.3, 0.05, '倍'], ['textX', '左右', -50, 50, 1, '%'], ['textY', '上下', -50, 50, 1, '%']],
+        };
+        if (id === '@sub') return {
+          name: 'サブタイトル', get obj() { return S; }, reset() { S.subX = 0; S.subY = 0; },
+          bars: [['subScale', '大きさ', 0.4, 2, 0.05, '倍'], ['subX', '左右', -60, 60, 1, '%'], ['subY', '上下', -60, 60, 1, '%']],
+        };
+        const ex = S.extras.find(e => e.id === id);
+        if (!ex) return null;
+        return {
+          name: ex.type === 'text' ? `文字「${(ex.text.split('\n')[0] || '').slice(0, 12)}」` : '画像',
+          get obj() { return S.extras.find(e => e.id === id); },
+          reset() { const e = this.obj; e.x = 50; e.y = 50; e.rot = 0; },
+          bars: EXTRA_BARS,
+        };
+      }
+      function buildSel() {
+        const def = selId && selDef(selId);
+        if (!def) selId = null;
+        $('sel-panel').classList.toggle('empty', !def);
+        const box = $('sel-bars');
+        box.innerHTML = '';
+        selBars = [];
+        if (def) {
+          for (const [key, label, min, max, step, u] of def.bars) {
+            const f = document.createElement('label');
+            f.className = 'extra-bar';
+            f.innerHTML = `<span class="field-label"><span>${label}</span><span class="field-val"></span></span><input type="range" min="${min}" max="${max}" step="${step}">`;
+            const r = f.querySelector('input'), val = f.querySelector('.field-val');
+            const show = v => { val.textContent = `${+(+v).toFixed(2)}${u}`; };
+            r.addEventListener('input', () => {
+              const o = selDef(selId).obj;
+              o[key] = parseFloat(r.value);
+              show(r.value);
+              if (o === S && inputs[key]) inputs[key].set(S[key]);
+              redraw();
+            });
+            selBars.push({ key, r, show });
+            box.appendChild(f);
+          }
+        }
+        $('extra-list').querySelectorAll(':scope > .extra-item').forEach(row => row.classList.toggle('selected', row.dataset.id === selId));
+        refreshSel();
+      }
+      // 値・名前・前へ／後ろへを今の状態に合わせる（バーを動かしている最中は、そのバーは触らない）
+      function refreshSel() {
+        const def = selId && selDef(selId);
+        if (!def) { if (selId) { selId = null; buildSel(); } return; }
+        const o = def.obj;
+        for (const b of selBars) {
+          if (document.activeElement !== b.r) b.r.value = o[b.key] ?? 0;
+          b.show(o[b.key] ?? 0);
+        }
+        $('sel-name').textContent = '選んでいるもの：' + def.name;
+        const i = S.order.indexOf(selId);
+        $('sel-up').disabled = i === S.order.length - 1;
+        $('sel-down').disabled = i <= 0;
+      }
+      function select(id) {
+        if (id === selId) { refreshSel(); return; }
+        selId = id;
+        buildSel();
+        render();
+      }
+      $('sel-up').onclick = () => selId && moveLayer(selId, 1);
+      $('sel-down').onclick = () => selId && moveLayer(selId, -1);
+      $('sel-reset').onclick = () => { const d = selId && selDef(selId); if (!d) return; d.reset(); syncUI(); redraw(); };
+      $('sel-clear').onclick = () => select(null);
+
       function hookRow(row, id) {
         row.dataset.id = id;
+        row.classList.toggle('selected', id === selId);
+        // カードの空いているところをクリックしても選べる
+        row.onclick = e => { if (!e.target.closest('input, textarea, select, button, label, .toggle')) select(id); };
         if (id === movedId) row.classList.add('moved');
         row.querySelector('[data-a="up"]').onclick = () => moveLayer(id, 1);
         row.querySelector('[data-a="down"]').onclick = () => moveLayer(id, -1);
@@ -2947,7 +3116,7 @@
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb">T</span><span class="nm">タイトル<small>（${esc(t.slice(0, 12))}…）</small>${pos}</span>`
               + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="reset" title="ずらした位置を元に戻します">位置を戻す</button></div>`
               + '<div class="main-text-slot fields"></div><div class="opts-slot"></div>'
-              + '<div class="field-note" style="padding:0 0 6px">フォント・縁取りは「🔤 文字の見た目」、ロゴは「🏷️ ロゴ」で変えます。プレビューでドラッグしても動かせます。</div>';
+              + '<div class="field-note" style="padding:0 0 6px">大きさ・位置は、プレビューでクリックすると下のパネルで変えられます（ドラッグでも動かせます）。ロゴは「🏷️ ロゴ」で変えます。</div>';
             row.querySelector('.main-text-slot').appendChild(titleField);
             row.querySelector('.opts-slot').appendChild(titleOpts);
             row.querySelector('[data-a="reset"]').onclick = () => { S.textX = 0; S.textY = 0; inputs.textX.set(0); inputs.textY.set(0); redraw(); };
@@ -2960,24 +3129,11 @@
             row.className = 'extra-item main-card';
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="font-size:12px">sub</span><span class="nm">サブタイトル${pos}</span>`
               + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="reset" title="ずらした位置を元に戻します">位置を戻す</button></div>`
-              + '<div class="main-text-slot fields"></div><div class="extra-bars"></div><div class="opts-slot"></div>'
-              + '<div class="field-note" style="padding:0 0 6px">フォント・縁取りは「🔤 文字の見た目」で変えます。「ずらす」は、置き場所から動かす量です。プレビューでドラッグしても動かせます。</div>';
+              + '<div class="main-text-slot fields"></div><div class="opts-slot"></div>'
+              + '<div class="field-note" style="padding:0 0 6px">大きさ・位置は、プレビューでクリックすると下のパネルで変えられます（ドラッグでも動かせます）。</div>';
             row.querySelector('.main-text-slot').appendChild(subField);
             row.querySelector('.opts-slot').appendChild(subOpts);
-            subBars = {};
-            const bars = row.querySelector('.extra-bars');
-            for (const [key, label] of [['subX', '左右にずらす'], ['subY', '上下にずらす']]) {
-              const f = document.createElement('label');
-              f.className = 'extra-bar';
-              f.innerHTML = `<span class="field-label"><span>${label}</span><span class="field-val"></span></span><input type="range" min="-60" max="60" step="1">`;
-              const r = f.querySelector('input'), val = f.querySelector('.field-val');
-              const set = v => { r.value = v; val.textContent = `${v}%`; };
-              set(S[key]);
-              r.addEventListener('input', () => { S[key] = parseInt(r.value, 10); set(S[key]); redraw(); });
-              subBars[key] = set;
-              bars.appendChild(f);
-            }
-            row.querySelector('[data-a="reset"]').onclick = () => { S.subX = 0; S.subY = 0; subBars.subX(0); subBars.subY(0); redraw(); };
+            row.querySelector('[data-a="reset"]').onclick = () => { S.subX = 0; S.subY = 0; redraw(); };
             hookRow(row, '@sub');
             list.appendChild(row);
             return;
@@ -2994,7 +3150,7 @@
               + '<div class="extra-font"><select aria-label="フォント" data-k="font"></select><select aria-label="文字の太さ" data-k="weight"></select></div>'
               + '<div class="extra-stroke"><label class="toggle"><span>縁取り</span><input type="checkbox"><span class="sw"></span></label>'
               + '<input type="color" aria-label="縁取りの色" title="縁取りの色"><input type="range" min="1" max="40" step="1" aria-label="縁取りの太さ" title="縁取りの太さ"><span class="field-val"></span></div>'
-              + '<div class="extra-bars"></div>';
+              ;
             const tIn = row.querySelector('.extra-text textarea'), cIn = row.querySelector('.extra-text input[type=color]:not([data-k])');
             for (const [key, opts] of [['font', LAYER_FONTS], ['weight', LAYER_WEIGHTS]]) {
               const sel = row.querySelector(`.extra-font [data-k="${key}"]`);
@@ -3035,17 +3191,12 @@
               + orderBtns(rank, n)
               + `<button class="btn btn-sm" type="button" data-a="main" title="この画像をメインの画像（文字がよける）にします">メインにする</button>`
               + `<button class="btn btn-sm" type="button" data-a="center">真ん中へ</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`
-              + '<div class="extra-bars"></div>';
+              ;
             const im = img.extras[ex.id];
             if (im) row.querySelector('.img-thumb').style.backgroundImage = `url("${im.src}")`;
             row.querySelector('[data-a="main"]').onclick = () => makeMain(ex);
           }
-          addBars(row, ex);
-          row.querySelector('[data-a="center"]').onclick = () => {
-            ex.x = 50; ex.y = 50;
-            extraInputs[ex.id].x(50); extraInputs[ex.id].y(50);
-            redraw();
-          };
+          row.querySelector('[data-a="center"]').onclick = () => { ex.x = 50; ex.y = 50; redraw(); };
           row.querySelector('[data-a="del"]').onclick = () => removeExtra(ex);
           hookRow(row, ex.id);
           list.appendChild(row);
@@ -3310,8 +3461,9 @@
 
       $('btn-reset').addEventListener('click', async () => {
         if (!await ask('文字・設定・選んだ画像をすべて初期値に戻しますか？', 'リセットする')) return;
-        S = { ...DEFAULTS };
+        // 追加した画像の保存を消してから、初期値に戻す（DEFAULTS の配列を共有しないように sanitize で新しく作る）
         for (const ex of S.extras) { try { localStorage.removeItem(EXTRA_KEY(ex.id)); } catch (e) { /* ignore */ } }
+        S = sanitize({});
         img.side = null; img.bg = null; img.logo = null; img.extras = {};
         try { [IMG_KEY, BG_KEY, LOGO_KEY].forEach(k => localStorage.removeItem(k)); } catch (e) { /* ignore */ }
         nameTouched = false;
