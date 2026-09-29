@@ -1253,6 +1253,21 @@
           </div>
         </div>
       </details>
+      <details class="sec" open>
+        <summary><span class="sec-icon">🏷️</span>ロゴ</summary>
+        <div class="fields">
+          <div class="field field-full">
+            <span class="field-label"><span>ロゴ画像（なくてもOK）</span></span>
+            <div class="img-pick">
+              <span class="img-thumb" id="logo-thumb"></span>
+              <button class="btn btn-sm" type="button" id="logo-pick">📁 ロゴを選ぶ</button>
+              <button class="btn btn-sm" type="button" id="logo-clear">外す</button>
+              <input type="file" id="logo-file" accept="image/*" hidden>
+            </div>
+            <div class="field-note">背景が透明な PNG・WebP がおすすめです。置き方は「ロゴの置き方」で選べます（タイトルの代わり・タイトルの上・隅に小さく）。</div>
+          </div>
+        </div>
+      </details>
       <!-- sections are generated from SECTIONS below -->
     </div>
 
@@ -1286,7 +1301,7 @@
         <ol class="steps">
           <li>左の「文字」に <b>タイトル</b> を入れます。Enter で改行できます。</li>
           <li>「大きさ」で使う場所に合わせたサイズを選びます（ブログのアイキャッチ・YouTubeのサムネイルは <b>1280×720</b>、SNSの共有画像は <b>1200×630</b> がおすすめ）。</li>
-          <li>「画像」で自分のキャラや写真を選び、「背景」で柄や色を選びます。</li>
+          <li>「画像」で自分のキャラや写真を、「ロゴ」で自分のロゴを選び、「背景」で柄・色・背景画像を選びます。画像はプレビューでドラッグして動かせます。</li>
           <li>右の <b>「JPG で保存」</b> を押すと、画像がダウンロードされます。</li>
         </ol>
       </div>
@@ -1360,7 +1375,9 @@
         font: 'Zen Maru Gothic', fontCustom: '', weight: '900',
         titleColor: '#ff7fa0', subColor: '#6e3551', strokeWidth: 14, strokeColor: '#ffffff', shadow: true,
         textScale: 1,
-        imgPos: 'left', imgAnchor: 'auto', imgScale: 1, sample: 'heart',
+        imgPos: 'left', imgAnchor: 'auto', imgScale: 1, imgX: 0, imgY: 0, sample: 'heart',
+        logoMode: 'none', logoCorner: 'br', logoScale: 1,
+        bgFit: 'cover', bgDim: 0,
         bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
       };
       const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
@@ -1405,10 +1422,25 @@
         },
         {
           title: '画像の置き方', icon: '🧸', fields: [
-            { k: 'imgPos', l: '画像の位置', t: 'select', o: [['left', '左'], ['right', '右'], ['none', '画像なし（文字だけ）']], note: '縦長・正方形では、上に文字・下に画像になります' },
-            { k: 'imgAnchor', l: '縦の位置', t: 'select', o: [['auto', 'おまかせ'], ['bottom', '下にそろえる（キャラの全身など）'], ['center', '真ん中']], when: s => s.imgPos !== 'none' },
-            { k: 'imgScale', l: '画像の大きさ', t: 'range', min: 0.4, max: 1.2, step: 0.05, u: '倍', when: s => s.imgPos !== 'none' },
+            {
+              k: 'imgPos', l: '画像の位置', t: 'select', o: [['left', '左'], ['right', '右'], ['top', '上（文字は下）'], ['bottom', '下（文字は上）'],
+              ['center', '真ん中（文字の後ろ）'], ['none', '画像なし（文字だけ）']], note: '縦長・正方形で「左」「右」を選ぶと、下に置きます'
+            },
+            { k: 'imgX', l: '左右にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', when: s => s.imgPos !== 'none', note: 'プレビューの画像をドラッグしても動かせます' },
+            { k: 'imgY', l: '上下にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', when: s => s.imgPos !== 'none' },
+            { k: 'imgAnchor', l: '縦の位置', t: 'select', o: [['auto', 'おまかせ'], ['bottom', '下にそろえる（キャラの全身など）'], ['center', '真ん中']], when: s => s.imgPos === 'left' || s.imgPos === 'right' },
+            { k: 'imgScale', l: '画像の大きさ', t: 'range', min: 0.3, max: 1.6, step: 0.05, u: '倍', when: s => s.imgPos !== 'none' },
             { k: 'sample', l: '画像を選ばないときのサンプル', t: 'select', o: [['heart', 'ハート'], ['star', '星'], ['bunny', 'うさぎ（どんまうんど）']], when: s => s.imgPos !== 'none' },
+          ]
+        },
+        {
+          title: 'ロゴの置き方', icon: '📍', fields: [
+            {
+              k: 'logoMode', l: 'ロゴの置き方', t: 'select', o: [['none', '使わない'], ['replace', 'タイトルの代わりに大きく（下にサブタイトル）'],
+              ['above', 'タイトルの上に'], ['corner', '隅に小さく']], note: 'ロゴ画像は上の「ロゴ」で選びます'
+            },
+            { k: 'logoCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tr', '右上'], ['bl', '左下'], ['br', '右下']], when: s => s.logoMode === 'corner' },
+            { k: 'logoScale', l: 'ロゴの大きさ', t: 'range', min: 0.3, max: 1.6, step: 0.05, u: '倍', when: s => s.logoMode !== 'none' },
           ]
         },
         {
@@ -1417,10 +1449,13 @@
               k: 'bg', l: '背景', t: 'select', o: [['dots', '水玉'], ['stripe', 'ストライプ'], ['check', 'チェック'],
               ['gradient', 'グラデーション'], ['plain', '無地'], ['image', '自分の画像'], ['none', 'なし（透明。PNGで保存）']]
             },
-            { k: 'bgColor', l: s => s.bg === 'gradient' ? '色 1' : '背景の色', t: 'color', when: s => !['none', 'image'].includes(s.bg) },
+            { k: 'bgColor', l: s => s.bg === 'gradient' ? '色 1' : '背景の色', t: 'color', when: s => s.bg !== 'none' && !(s.bg === 'image' && s.bgFit === 'cover') },
             { k: 'bgColor2', l: '色 2', t: 'color', when: s => s.bg === 'gradient' },
             { k: 'patColor', l: '柄の色', t: 'color', when: s => ['dots', 'stripe', 'check'].includes(s.bg) },
             { k: 'patScale', l: '柄の大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', when: bgPat },
+            { k: '_bgPick', l: '📁 背景画像を選ぶ', t: 'button', when: s => s.bg === 'image', action: () => $('bg-file').click() },
+            { k: 'bgFit', l: '背景画像の合わせ方', t: 'select', o: [['cover', '画面いっぱい（はみ出す分は切る）'], ['contain', '全体が入るように（余白は背景の色）']], when: s => s.bg === 'image' },
+            { k: 'bgDim', l: '背景画像を暗くする', t: 'range', min: 0, max: 0.8, step: 0.05, u: '', when: s => s.bg === 'image', note: '写真の上に白い文字をのせるときに' },
             { k: 'glow', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'check', when: s => s.bg !== 'none' },
           ]
         },
@@ -1434,7 +1469,7 @@
       const BG_KEY = 'donnma-eyecatch-bg-v1';
       let S = { ...DEFAULTS };
       try { S = sanitize(JSON.parse(localStorage.getItem(STORE_KEY) || 'null')); } catch (e) { /* storage unavailable */ }
-      const img = { side: null, samples: {}, bg: null };
+      const img = { side: null, samples: {}, bg: null, logo: null };
 
       const inputs = {};
       function buildField(f) {
@@ -1473,6 +1508,10 @@
           });
           hex.addEventListener('blur', () => { hex.value = S[f.k]; });
           set = v => { pick.value = v; hex.value = v; };
+        } else if (f.t === 'button') {
+          wrap.innerHTML = `<button class="btn btn-sm" type="button" id="${id}"><span></span></button>`;
+          wrap.querySelector('button').addEventListener('click', f.action);
+          set = () => { };
         } else if (f.t === 'number') {
           wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label>
             <input type="number" id="${id}" min="${f.min}" max="${f.max}" step="1" inputmode="numeric">`;
@@ -1490,7 +1529,7 @@
           el.addEventListener('input', () => update(f.k, el.value));
           set = v => { el.value = v; };
         }
-        const labelEl = wrap.querySelector('label > span');
+        const labelEl = wrap.querySelector('label > span, button > span');
         labelEl.textContent = typeof f.l === 'function' ? f.l(S) : f.l;
         if (f.note) {
           const n = document.createElement('div');
@@ -1525,7 +1564,7 @@
         }
       }
       function syncUI() {
-        for (const k in inputs) inputs[k].set(S[k]);
+        for (const k in inputs) if (!k.startsWith('_')) inputs[k].set(S[k]);
         $('f-title').value = S.title;
         $('f-sub').value = S.sub;
         refreshVisibility();
@@ -1608,6 +1647,7 @@
       // =====================================================
       const dims = () => S.size === 'custom' ? [S.customW, S.customH] : SIZES[S.size].slice(0, 2);
 
+      let lastPic = null;   // プレビューで画像をドラッグするための、画像の場所（canvas の座標）
       function draw(cv) {
         const [W, H] = dims();
         cv.width = W; cv.height = H;
@@ -1615,61 +1655,104 @@
         const k = Math.min(W / 1200, H / 630);
         const stacked = W / H < 1.4;
         const side = S.imgPos === 'none' ? null : (img.side || sampleImg());
+        // 縦長・正方形で左右を選んだときは、下に置く
+        const pos = side ? (stacked && (S.imgPos === 'left' || S.imgPos === 'right') ? 'bottom' : S.imgPos) : 'none';
 
         // ---- 背景
         drawBackground(c, W, H, k);
 
-        // ---- 画像と文字の場所を決める
+        // ---- 画像と文字の場所を決める（ずらす分は画像だけに足す。文字の場所はそのまま）
         let area = { l: W * 0.06, r: W * 0.94 }, band = { t: H * 0.08, b: H * 0.92 };
         let pic = null;
-        if (side) {
+        const sizeTo = (maxW, maxH) => {
+          const r = Math.min(maxW / side.width, maxH / side.height);
+          return { w: side.width * r, h: side.height * r };
+        };
+        if (pos === 'left' || pos === 'right') {
           const bottom = S.imgAnchor === 'bottom' || (S.imgAnchor === 'auto' && !!img.side);
-          if (stacked) {
-            const ph = H * 0.56 * S.imgScale;
-            let pw = side.width * ph / side.height;
-            let h2 = ph;
-            if (pw > W * 0.9) { pw = W * 0.9; h2 = side.height * pw / side.width; }
-            pic = { x: W / 2 - pw / 2, y: bottom ? H - H * 0.03 - h2 : H * 0.62 - h2 / 2 + H * 0.05, w: pw, h: h2 };
-            band = { t: H * 0.05, b: Math.min(pic.y - H * 0.01, H * 0.42) };
+          const { w, h } = sizeTo(W * 0.46 * S.imgScale, (bottom ? H - 52 * k : H * 0.72) * S.imgScale);
+          const x = pos === 'left' ? 36 * k : W - 36 * k - w;
+          pic = { x, y: bottom ? H - 26 * k - h : H / 2 - h / 2, w, h };
+          area = pos === 'left' ? { l: 36 * k + w + 24 * k, r: W - 40 * k } : { l: 40 * k, r: W - 36 * k - w - 24 * k };
+        } else if (pos === 'bottom' || pos === 'top') {
+          const { w, h } = sizeTo(W * 0.9, H * (stacked ? 0.56 : 0.5) * S.imgScale);
+          if (pos === 'bottom') {
+            pic = { x: W / 2 - w / 2, y: H - H * 0.03 - h, w, h };
+            band = { t: H * 0.05, b: Math.max(H * 0.2, pic.y - H * 0.01) };
           } else {
-            let ph = (bottom ? H - 52 * k : H * 0.72) * S.imgScale;
-            let pw = side.width * ph / side.height;
-            if (pw > W * 0.46) { pw = W * 0.46; ph = side.height * pw / side.width; }
-            const x = S.imgPos === 'left' ? 36 * k : W - 36 * k - pw;
-            const y = bottom ? H - 26 * k - ph : H / 2 - ph / 2;
-            pic = { x, y, w: pw, h: ph };
-            area = S.imgPos === 'left' ? { l: x + pw + 24 * k, r: W - 40 * k } : { l: 40 * k, r: x - 24 * k };
+            pic = { x: W / 2 - w / 2, y: H * 0.04, w, h };
+            band = { t: Math.min(H * 0.8, pic.y + h + H * 0.01), b: H * 0.95 };
           }
+        } else if (pos === 'center') {
+          const { w, h } = sizeTo(W * 0.9, H * 0.8 * S.imgScale);
+          pic = { x: W / 2 - w / 2, y: H / 2 - h / 2, w, h };
         }
+        if (pic) { pic.x += S.imgX / 100 * W; pic.y += S.imgY / 100 * H; }
         if (S.glow && S.bg !== 'none') {
-          const all = pic ? { l: Math.min(area.l, pic.x), r: Math.max(area.r, pic.x + pic.w) } : area;
+          const all = pic && pos !== 'center' ? { l: Math.min(area.l, pic.x), r: Math.max(area.r, pic.x + pic.w) } : area;
           glow(c, (all.l + all.r) / 2, H / 2, (all.r - all.l) * 0.62, H * 0.62);
         }
         if (pic) c.drawImage(side, pic.x, pic.y, pic.w, pic.h);
+        if (cv === $('cv')) lastPic = pic;
 
-        // ---- 文字
-        const lines = S.title.replace(/\s+$/, '').split('\n');
+        // ---- 文字（とロゴ）：上から ロゴ → タイトル → サブタイトル を、帯の中で上下の真ん中にそろえる
+        const logo = S.logoMode !== 'none' ? img.logo : null;
+        const mode = logo ? S.logoMode : 'none';
+        const lines = mode === 'replace' ? [] : S.title.replace(/\s+$/, '').split('\n');
         const aw = area.r - area.l, bh = band.b - band.t, mid = (area.l + area.r) / 2;
-        const lh = 1.14;
+        const lh = 1.14, gap = 14 * k;
         const sub = S.sub.trim();
-        let subFs = sub ? fit(c, [sub], 60 * k * S.textScale, aw) : 0;
-        let fs = fit(c, lines, (stacked || !side ? 150 : 124) * k * S.textScale, aw);
+        let subFs = sub ? fit(c, [sub], (mode === 'replace' ? 84 : 60) * k * S.textScale, aw) : 0;
+        let fs = lines.length ? fit(c, lines, (stacked || !side || pos === 'center' ? 150 : 124) * k * S.textScale, aw) : 0;
+        let lg = null;
+        if (mode === 'replace' || mode === 'above') {
+          const r = Math.min(aw * 0.9 / logo.width, bh * (mode === 'replace' ? 0.62 : 0.3) / logo.height) * S.logoScale;
+          lg = { w: logo.width * r, h: logo.height * r };
+          if (lg.w > aw) { const t = aw / lg.w; lg.w *= t; lg.h *= t; }
+        }
         const subH = () => sub ? subFs * 1.35 : 0;
-        while (lines.length * fs * lh + subH() > bh && fs > 12) { fs -= 2; subFs = Math.min(subFs, fs * 0.55); }
-        let y = (band.t + band.b) / 2 - (lines.length * fs * lh + subH()) / 2 + fs * lh / 2;
+        const total = () => (lg ? lg.h + (lines.length || sub ? gap : 0) : 0) + lines.length * fs * lh + subH();
+        while (total() > bh && (fs > 12 || (lg && lg.h > 20))) {
+          if (fs > 12) fs -= 2;
+          else { lg.w *= 0.95; lg.h *= 0.95; }
+          subFs = Math.min(subFs, fs ? fs * 0.55 : subFs * 0.95);
+        }
+        let y = (band.t + band.b) / 2 - total() / 2;
+        if (lg) {
+          c.save();
+          if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = 10 * k; c.shadowOffsetY = 5 * k; }
+          c.drawImage(logo, mid - lg.w / 2, y, lg.w, lg.h);
+          c.restore();
+          y += lg.h + (lines.length || sub ? gap : 0);
+        }
         for (const line of lines) {
-          text(c, line, mid, y, fs, S.titleColor, S.strokeWidth * k);
+          text(c, line, mid, y + fs * lh / 2, fs, S.titleColor, S.strokeWidth * k);
           y += fs * lh;
         }
-        if (sub) text(c, sub, mid, y - fs * lh / 2 + subH() / 2 + 2 * k, subFs, S.subColor, S.strokeWidth * k * 0.8);
+        if (sub) text(c, sub, mid, y + subH() / 2, subFs, S.subColor, S.strokeWidth * k * 0.8);
+
+        // ---- 隅に小さくロゴ
+        if (mode === 'corner') {
+          const r = Math.min(W * 0.2 / logo.width, H * 0.14 / logo.height) * S.logoScale;
+          const w = logo.width * r, h = logo.height * r, m = Math.min(W, H) * 0.04;
+          const x = S.logoCorner.endsWith('l') ? m : W - m - w;
+          const yy = S.logoCorner.startsWith('t') ? m : H - m - h;
+          c.save();
+          if (S.shadow) { c.shadowColor = 'rgba(0, 0, 0, 0.25)'; c.shadowBlur = 8 * k; c.shadowOffsetY = 3 * k; }
+          c.drawImage(logo, x, yy, w, h);
+          c.restore();
+        }
       }
 
       function drawBackground(c, W, H, k) {
         if (S.bg === 'none') return;
         if (S.bg === 'image' && img.bg) {
-          const r = Math.max(W / img.bg.width, H / img.bg.height);
+          const contain = S.bgFit === 'contain';
+          if (contain) { c.fillStyle = S.bgColor; c.fillRect(0, 0, W, H); }
+          const r = (contain ? Math.min : Math.max)(W / img.bg.width, H / img.bg.height);
           const w = img.bg.width * r, h = img.bg.height * r;
           c.drawImage(img.bg, (W - w) / 2, (H - h) / 2, w, h);
+          if (S.bgDim > 0) { c.fillStyle = `rgba(0,0,0,${S.bgDim})`; c.fillRect(Math.max(0, (W - w) / 2), Math.max(0, (H - h) / 2), Math.min(W, w), Math.min(H, h)); }
           return;
         }
         if (S.bg === 'gradient') {
@@ -1859,16 +1942,70 @@
         } catch (err) { toast(err.message); }
       });
 
+      // ---- ロゴ
+      const LOGO_KEY = 'donnma-eyecatch-logo-v1';
+      function setLogoThumb() {
+        $('logo-thumb').style.backgroundImage = img.logo ? `url("${img.logo.src}")` : '';
+      }
+      $('logo-pick').addEventListener('click', () => $('logo-file').click());
+      $('logo-file').addEventListener('change', async e => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (!f) return;
+        try {
+          const { url, im } = await readImage(f, 1600);
+          img.logo = im;
+          keep(LOGO_KEY, url);
+          if (S.logoMode === 'none') { S.logoMode = 'replace'; syncUI(); }
+          setLogoThumb();
+          redraw();
+        } catch (err) { toast(err.message); }
+      });
+      $('logo-clear').addEventListener('click', () => {
+        img.logo = null;
+        try { localStorage.removeItem(LOGO_KEY); } catch (e) { /* ignore */ }
+        setLogoThumb();
+        redraw();
+      });
+
+      // ---- プレビューの画像をドラッグして動かす
+      let drag = null;
+      const toCanvas = e => {
+        const r = cv.getBoundingClientRect();
+        return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height };
+      };
+      const onPic = p => lastPic && p.x >= lastPic.x && p.x <= lastPic.x + lastPic.w && p.y >= lastPic.y && p.y <= lastPic.y + lastPic.h;
+      cv.addEventListener('pointerdown', e => {
+        const p = toCanvas(e);
+        if (!onPic(p)) return;
+        drag = { p, x: S.imgX, y: S.imgY };
+        cv.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      });
+      cv.addEventListener('pointermove', e => {
+        const p = toCanvas(e);
+        cv.style.cursor = drag || onPic(p) ? 'move' : '';
+        if (!drag) return;
+        const clamp = v => Math.max(-50, Math.min(50, Math.round(v)));
+        S.imgX = clamp(drag.x + (p.x - drag.p.x) / cv.width * 100);
+        S.imgY = clamp(drag.y + (p.y - drag.p.y) / cv.height * 100);
+        inputs.imgX.set(S.imgX); inputs.imgY.set(S.imgY);
+        redraw();
+      });
+      const endDrag = () => { drag = null; };
+      cv.addEventListener('pointerup', endDrag);
+      cv.addEventListener('pointercancel', endDrag);
+
       $('f-title').addEventListener('input', e => { S.title = e.target.value; redraw(); });
       $('f-sub').addEventListener('input', e => { S.sub = e.target.value; redraw(); });
 
       $('btn-reset').addEventListener('click', async () => {
         if (!await ask('文字・設定・選んだ画像をすべて初期値に戻しますか？', 'リセットする')) return;
         S = { ...DEFAULTS };
-        img.side = null; img.bg = null;
-        try { [IMG_KEY, BG_KEY].forEach(k => localStorage.removeItem(k)); } catch (e) { /* ignore */ }
+        img.side = null; img.bg = null; img.logo = null;
+        try { [IMG_KEY, BG_KEY, LOGO_KEY].forEach(k => localStorage.removeItem(k)); } catch (e) { /* ignore */ }
         nameTouched = false;
-        syncUI(); setThumb(); redraw();
+        syncUI(); setThumb(); setLogoThumb(); redraw();
       });
 
       const toastEl = $('toast');
@@ -1892,6 +2029,9 @@
         if (saved) img.side = await loadImg(saved);
         try { saved = localStorage.getItem(BG_KEY); } catch (e) { saved = null; }
         if (saved) img.bg = await loadImg(saved);
+        try { saved = localStorage.getItem(LOGO_KEY); } catch (e) { saved = null; }
+        if (saved) img.logo = await loadImg(saved);
+        setLogoThumb();
         setThumb();
         redraw();
       })();
