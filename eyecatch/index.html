@@ -1386,7 +1386,7 @@
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
         bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
-        bgFit: 'cover', bgDim: 0,
+        bgFit: 'cover', bgDim: 0, bgTile: 300,
         bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
       };
       const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
@@ -1469,11 +1469,12 @@
               k: 'bg', l: '背景の種類', t: 'chips', full: true, o: [['dots', '水玉'], ['stripe', 'ストライプ'], ['check', 'チェック'],
               ['gradient', 'グラデーション'], ['plain', '無地'], ['image', '自分の画像'], ['none', 'なし（透明）']]
             },
-            { k: 'bgColor', l: s => s.bg === 'gradient' ? '色 1' : '背景の色', t: 'color', when: s => s.bg !== 'none' && !(s.bg === 'image' && s.bgFit === 'cover') },
+            { k: 'bgColor', l: s => s.bg === 'gradient' ? '色 1' : '背景の色', t: 'color', when: s => s.bg !== 'none' && !(s.bg === 'image' && s.bgFit === 'cover'), note: '透明な部分がある画像を並べるときは、この色が下に見えます' },
             { k: 'bgColor2', l: '色 2', t: 'color', when: s => s.bg === 'gradient' },
             { k: 'patColor', l: '柄の色', t: 'color', when: s => ['dots', 'stripe', 'check'].includes(s.bg) },
             { k: 'patScale', l: '柄の大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', when: bgPat },
-            { k: 'bgFit', l: '背景画像の合わせ方', t: 'select', o: [['cover', '画面いっぱい（はみ出す分は切る）'], ['contain', '全体が入るように（余白は背景の色）']], when: s => s.bg === 'image' },
+            { k: 'bgFit', l: '背景画像の合わせ方', t: 'select', o: [['cover', '画面いっぱい（はみ出す分は切る）'], ['contain', '全体が入るように（余白は背景の色）'], ['tile', '並べる（タイル）']], when: s => s.bg === 'image' },
+            { k: 'bgTile', l: '1枚の大きさ（横幅）', t: 'range', min: 40, max: 800, step: 10, u: 'px', when: s => s.bg === 'image' && s.bgFit === 'tile', note: '1280×720 のときの大きさ。ほかの大きさでは合わせて変わります' },
             { k: 'bgDim', l: '背景画像を暗くする', t: 'range', min: 0, max: 0.8, step: 0.05, u: '', when: s => s.bg === 'image', note: '写真の上に白い文字をのせるときに' },
             { k: 'glow', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'check', when: s => s.bg !== 'none' },
             { k: 'frameOn', l: '内側に細い枠を付ける', t: 'check' },
@@ -1877,6 +1878,16 @@
         if (S.bg === 'none') return;
         if (S.bg === 'image' && img.bg) {
           const contain = S.bgFit === 'contain';
+          if (S.bgFit === 'tile') {
+            // 並べる：1280×720 を基準にした大きさで、左上からすき間なく敷き詰める
+            c.fillStyle = S.bgColor;
+            c.fillRect(0, 0, W, H);
+            const tw = Math.max(8, S.bgTile * Math.min(W / 1280, H / 720));
+            const th = img.bg.height * tw / img.bg.width;
+            for (let y = 0; y < H; y += th) for (let x = 0; x < W; x += tw) c.drawImage(img.bg, x, y, tw, th);
+            if (S.bgDim > 0) { c.fillStyle = `rgba(0,0,0,${S.bgDim})`; c.fillRect(0, 0, W, H); }
+            return;
+          }
           if (contain) { c.fillStyle = S.bgColor; c.fillRect(0, 0, W, H); }
           const r = (contain ? Math.min : Math.max)(W / img.bg.width, H / img.bg.height);
           const w = img.bg.width * r, h = img.bg.height * r;
