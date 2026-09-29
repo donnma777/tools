@@ -1375,6 +1375,8 @@
         textScale: 1,
         imgPos: 'left', imgAnchor: 'auto', imgScale: 1, imgX: 0, imgY: 0, sample: 'heart',
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
+        bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
+        frameOn: false, frameColor: '#ffffff',
         bgFit: 'cover', bgDim: 0,
         bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
       };
@@ -1435,10 +1437,16 @@
           title: 'ロゴ', icon: '🏷️', open: true, fields: [
             {
               k: 'logoMode', l: 'ロゴの置き方', t: 'select', o: [['none', '使わない'], ['replace', 'タイトルの代わりに大きく（下にサブタイトル）'],
-              ['above', 'タイトルの上に'], ['below', 'タイトルの下に'], ['corner', '隅に小さく']]
+              ['above', 'タイトルの上に'], ['below', 'タイトルの下に'], ['corner', '隅に小さく'], ['band', '帯の中に（下か上に帯を敷く）']]
             },
             { k: 'logoCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], when: s => s.logoMode === 'corner' },
             { k: 'logoScale', l: 'ロゴの大きさ', t: 'range', min: 0.3, max: 1.6, step: 0.05, u: '倍', when: s => s.logoMode !== 'none' },
+            { k: 'bandPos', l: '帯の位置', t: 'select', o: [['bottom', '下'], ['top', '上']], when: s => s.logoMode === 'band' },
+            { k: 'bandColor', l: '帯の色', t: 'color', when: s => s.logoMode === 'band' },
+            { k: 'bandSize', l: '帯の太さ', t: 'range', min: 0.5, max: 2.5, step: 0.05, u: '倍', when: s => s.logoMode === 'band' },
+            { k: 'logoPlate', l: 'ロゴの後ろに色を敷く', t: 'check', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' },
+            { k: 'plateColor', l: '敷く色', t: 'color', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
+            { k: 'plateAlpha', l: '敷く色の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
           ]
         },
         {
@@ -1455,6 +1463,8 @@
             { k: 'bgFit', l: '背景画像の合わせ方', t: 'select', o: [['cover', '画面いっぱい（はみ出す分は切る）'], ['contain', '全体が入るように（余白は背景の色）']], when: s => s.bg === 'image' },
             { k: 'bgDim', l: '背景画像を暗くする', t: 'range', min: 0, max: 0.8, step: 0.05, u: '', when: s => s.bg === 'image', note: '写真の上に白い文字をのせるときに' },
             { k: 'glow', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'check', when: s => s.bg !== 'none' },
+            { k: 'frameOn', l: '内側に細い枠を付ける', t: 'check' },
+            { k: 'frameColor', l: '枠の色', t: 'color', when: s => s.frameOn },
           ]
         },
       ];
@@ -1651,6 +1661,30 @@
       let lastPic = null;   // プレビューで画像をドラッグするための、画像の場所（canvas の座標）
       function draw(cv) {
         const [W, H] = dims();
+        const band = S.logoMode === 'band' ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
+        if (!band) {
+          const pic = drawContent(cv, W, H);
+          if (cv === $('cv')) lastPic = pic;
+          return;
+        }
+        // 帯のぶんを除いた部分を描いて、帯と一緒に貼る
+        const top = S.bandPos === 'top' ? band : 0;
+        const body = document.createElement('canvas');
+        const pic = drawContent(body, W, H - band);
+        cv.width = W; cv.height = H;
+        const c = cv.getContext('2d');
+        c.drawImage(body, 0, top);
+        c.fillStyle = S.bandColor;
+        c.fillRect(0, top ? 0 : H - band, W, band);
+        if (img.logo) {
+          const r = Math.min(W * 0.5 / img.logo.width, band * 0.56 * S.logoScale / img.logo.height);
+          const w = img.logo.width * r, h = img.logo.height * r;
+          c.drawImage(img.logo, W / 2 - w / 2, (top ? 0 : H - band) + band / 2 - h / 2, w, h);
+        }
+        if (cv === $('cv')) lastPic = pic && { ...pic, y: pic.y + top };
+      }
+
+      function drawContent(cv, W, H) {
         cv.width = W; cv.height = H;
         const c = cv.getContext('2d');
         const k = Math.min(W / 1200, H / 630);
@@ -1659,8 +1693,17 @@
         // 縦長・正方形で左右を選んだときは、下に置く
         const pos = side ? (stacked && (S.imgPos === 'left' || S.imgPos === 'right') ? 'bottom' : S.imgPos) : 'none';
 
-        // ---- 背景
+        // ---- 背景（と内側の細い枠）
         drawBackground(c, W, H, k);
+        if (S.frameOn) {
+          const m = Math.min(W, H) * 0.045;
+          c.save();
+          c.strokeStyle = S.frameColor;
+          c.globalAlpha = 0.75;
+          c.lineWidth = Math.max(1.5, 2.5 * k);
+          c.strokeRect(m, m, W - m * 2, H - m * 2);
+          c.restore();
+        }
 
         // ---- 画像と文字の場所を決める（ずらす分は画像だけに足す。文字の場所はそのまま）
         let area = { l: W * 0.06, r: W * 0.94 }, band = { t: H * 0.08, b: H * 0.92 };
@@ -1694,11 +1737,10 @@
           glow(c, (all.l + all.r) / 2, H / 2, (all.r - all.l) * 0.62, H * 0.62);
         }
         if (pic) c.drawImage(side, pic.x, pic.y, pic.w, pic.h);
-        if (cv === $('cv')) lastPic = pic;
 
         // ---- 文字（とロゴ）：上から ロゴ → タイトル → サブタイトル を、帯の中で上下の真ん中にそろえる
         const logo = S.logoMode !== 'none' ? img.logo : null;
-        const mode = logo ? S.logoMode : 'none';
+        const mode = logo && S.logoMode !== 'band' ? S.logoMode : 'none';
         const lines = mode === 'replace' ? [] : S.title.replace(/\s+$/, '').split('\n');
         const aw = area.r - area.l, bh = band.b - band.t, mid = (area.l + area.r) / 2;
         const lh = 1.14, gap = 14 * k;
@@ -1721,7 +1763,19 @@
           subFs = Math.min(subFs, fs ? fs * 0.55 : subFs * 0.95);
         }
         let y = (band.t + band.b) / 2 - total() / 2;
+        const plate = (x, y, w, h) => {
+          if (!S.logoPlate) return;
+          const pad = Math.max(8 * k, h * 0.2);
+          c.save();
+          c.globalAlpha = S.plateAlpha;
+          c.fillStyle = S.plateColor;
+          c.beginPath();
+          c.roundRect(x - pad, y - pad * 0.7, w + pad * 2, h + pad * 1.4, Math.min(h * 0.45 + pad, 40 * k));
+          c.fill();
+          c.restore();
+        };
         const drawLogo = last => {
+          plate(mid - lg.w / 2, y, lg.w, lg.h);
           c.save();
           if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = 10 * k; c.shadowOffsetY = 5 * k; }
           c.drawImage(logo, mid - lg.w / 2, y, lg.w, lg.h);
@@ -1740,14 +1794,16 @@
         // ---- 隅に小さくロゴ
         if (mode === 'corner') {
           const r = Math.min(W * 0.2 / logo.width, H * 0.14 / logo.height) * S.logoScale;
-          const w = logo.width * r, h = logo.height * r, m = Math.min(W, H) * 0.04;
+          const w = logo.width * r, h = logo.height * r, m = Math.min(W, H) * (S.logoPlate ? 0.06 : 0.04);
           const x = S.logoCorner.endsWith('l') ? m : S.logoCorner.endsWith('c') ? (W - w) / 2 : W - m - w;
           const yy = S.logoCorner.startsWith('t') ? m : H - m - h;
+          plate(x, yy, w, h);
           c.save();
           if (S.shadow) { c.shadowColor = 'rgba(0, 0, 0, 0.25)'; c.shadowBlur = 8 * k; c.shadowOffsetY = 3 * k; }
           c.drawImage(logo, x, yy, w, h);
           c.restore();
         }
+        return pic;
       }
 
       function drawBackground(c, W, H, k) {
