@@ -1774,6 +1774,12 @@
               <button class="btn btn-sm btn-primary" type="button" id="tpl-save">＋ 保存</button>
             </div>
             <div class="row-list" id="tpl-list"></div>
+            <div class="data-row" style="margin-top:8px">
+              <button class="btn btn-sm" type="button" id="tpl-export" title="保存したテンプレートを、画像ごと1つのファイルにします">📤 ファイルに書き出す</button>
+              <button class="btn btn-sm" type="button" id="tpl-import" title="書き出したファイルからテンプレートを取り込みます">📥 ファイルから読み込む</button>
+              <input type="file" id="tpl-file" accept=".json,application/json" hidden>
+            </div>
+            <div class="field-note">ほかの端末やブラウザで使うときは、書き出したファイルをそちらで読み込みます（画像も一緒に入ります）。</div>
           </div>
           <div class="field field-full">
             <div class="data-row" style="margin-top:0">
@@ -4044,6 +4050,63 @@
         $('tpl-name').value = '';
       });
       $('tpl-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('tpl-save').click(); });
+
+      // ---- テンプレートをファイルに書き出す・読み込む（ほかの端末で使うため。画像は data URL のまま入れる）
+      const TPL_FILE = 'donnma-thumbnail-templates';
+      $('tpl-export').addEventListener('click', async () => {
+        let all = [];
+        try { all = await tplAll(); } catch (e) { toast('テンプレートを読み出せませんでした'); return; }
+        if (!all.length) { toast('書き出すテンプレートがありません。先に「＋ 保存」してください'); return; }
+        const blob = new Blob([JSON.stringify({ app: TPL_FILE, version: 1, exportedAt: Date.now(), templates: all })], { type: 'application/json' });
+        const d = new Date(), pad = n => String(n).padStart(2, '0');
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `thumbnail-templates_${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}.json`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+        toast(`${all.length}個のテンプレートを書き出しました`);
+      });
+      $('tpl-import').addEventListener('click', () => $('tpl-file').click());
+      $('tpl-file').addEventListener('change', async e => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (!f) return;
+        let list;
+        try {
+          const data = JSON.parse(await f.text());
+          if (!data || data.app !== TPL_FILE || !Array.isArray(data.templates)) throw new Error();
+          // 画像は data:image/ のものだけ受け取る。設定は読み込むときに sanitize で整える
+          const pic = v => typeof v === 'string' && v.startsWith('data:image/') ? v : null;
+          list = data.templates.filter(t => t && typeof t.name === 'string' && t.name.trim() && t.S && typeof t.S === 'object').slice(0, 100).map(t => {
+            const im = t.images && typeof t.images === 'object' ? t.images : {};
+            const ex = im.extras && typeof im.extras === 'object' ? im.extras : {};
+            return {
+              name: t.name.trim().slice(0, 40), savedAt: +t.savedAt || Date.now(), S: sanitize(t.S),
+              images: { side: pic(im.side), bg: pic(im.bg), logo: pic(im.logo), extras: Object.fromEntries(Object.entries(ex).filter(([id, v]) => /^[a-z0-9]{1,16}$/.test(id) && pic(v))) },
+            };
+          });
+        } catch (err) { toast('テンプレートのファイルではないようです（「📤 ファイルに書き出す」で作ったファイルを選んでください）'); return; }
+        if (!list.length) { toast('ファイルにテンプレートが入っていませんでした'); return; }
+        let have = [];
+        try { have = (await tplAll()).map(t => t.name); } catch (err) { toast('このブラウザでは保存できません'); return; }
+        const dup = list.filter(t => have.includes(t.name));
+        // 同じ名前があるとき：上書きするか、名前に (2) などを付けて両方残すか
+        const over = dup.length ? await ask(`同じ名前のテンプレートが${dup.length}個あります。上書きしますか？（しないときは、名前に番号を付けて両方残します）`, '上書きする') : false;
+        const names = new Set(have);
+        try {
+          for (const t of list) {
+            if (names.has(t.name) && !over) {
+              let n = 2;
+              while (names.has(`${t.name} (${n})`)) n++;
+              t.name = `${t.name} (${n})`;
+            }
+            names.add(t.name);
+            await tplTx('readwrite', st => st.put(t));
+          }
+        } catch (err) { toast('保存できませんでした（ブラウザの空き容量を確認してください）'); renderTpl(); return; }
+        renderTpl();
+        toast(`${list.length}個のテンプレートを読み込みました`);
+      });
 
       // =====================================================
       //  元に戻す・やり直す（設定だけ。選んだ画像そのものは戻らない）
