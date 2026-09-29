@@ -1300,7 +1300,7 @@
           <li>ブログやSNSの一覧では、画像がかなり小さく表示されます。プレビューの下の「小さく出たとき」で、文字が読めるか確かめてください。</li>
           <li>JPG のほうがファイルが軽くなります。背景を透明にしたいときだけ PNG を使ってください（背景の「なし（透明）」）。</li>
           <li>縦長や正方形では、上に文字・下に画像の縦並びになります。</li>
-          <li>作った画像は、ブログ・動画・配信の告知など、自由に使ってかまいません。ただし、<b>うさぎのキャラクターと「うさぎと桜の柄」</b>は どんまうんど のデザインです。作った画像の中で使うのはかまいませんが、切り出して素材として使ったり、再配布したりしないでください。</li>
+          <li>作った画像は、ブログ・動画・配信の告知など、自由に使ってかまいません。ただし、<b>うさぎのキャラクター</b>は どんまうんど のデザインです。作った画像の中で使うのはかまいませんが、切り出して素材として使ったり、再配布したりしないでください。</li>
         </ul>
       </div>
     </div>
@@ -1375,12 +1375,13 @@
           else if (typeof d === 'string' && typeof v === 'string' && (!COLOR_KEYS.includes(k) || /^#[0-9a-f]{6}$/i.test(v))) out[k] = v;
         }
         if (!SIZES[out.size]) out.size = 'yt';
+        if (out.bg === 'usagi') out.bg = 'dots';
         out.customW = Math.round(Math.min(4000, Math.max(200, out.customW)));
         out.customH = Math.round(Math.min(4000, Math.max(200, out.customH)));
         return out;
       }
 
-      const bgPat = s => ['usagi', 'dots', 'stripe', 'check'].includes(s.bg);
+      const bgPat = s => ['dots', 'stripe', 'check'].includes(s.bg);
       const SECTIONS = [
         {
           title: '大きさ', icon: '📐', open: true, fields: [
@@ -1414,8 +1415,7 @@
           title: '背景', icon: '🎨', fields: [
             {
               k: 'bg', l: '背景', t: 'select', o: [['dots', '水玉'], ['stripe', 'ストライプ'], ['check', 'チェック'],
-              ['gradient', 'グラデーション'], ['plain', '無地'], ['image', '自分の画像'], ['none', 'なし（透明。PNGで保存）'],
-              ['usagi', 'うさぎと桜の柄（どんまうんど）']]
+              ['gradient', 'グラデーション'], ['plain', '無地'], ['image', '自分の画像'], ['none', 'なし（透明。PNGで保存）']]
             },
             { k: 'bgColor', l: s => s.bg === 'gradient' ? '色 1' : '背景の色', t: 'color', when: s => !['none', 'image'].includes(s.bg) },
             { k: 'bgColor2', l: '色 2', t: 'color', when: s => s.bg === 'gradient' },
@@ -1434,7 +1434,7 @@
       const BG_KEY = 'donnma-eyecatch-bg-v1';
       let S = { ...DEFAULTS };
       try { S = sanitize(JSON.parse(localStorage.getItem(STORE_KEY) || 'null')); } catch (e) { /* storage unavailable */ }
-      const img = { side: null, samples: {}, pattern: null, bg: null };
+      const img = { side: null, samples: {}, bg: null };
 
       const inputs = {};
       function buildField(f) {
@@ -1683,10 +1683,7 @@
         c.fillStyle = S.bgColor;
         c.fillRect(0, 0, W, H);
         const sc = k * S.patScale;
-        if (S.bg === 'usagi' && img.pattern) {
-          const t = 300 * sc;
-          for (let y = 0; y < H; y += t) for (let x = 0; x < W; x += t) c.drawImage(img.pattern, x, y, t, t);
-        } else if (S.bg === 'dots') {
+        if (S.bg === 'dots') {
           const g = 64 * sc, r = 9 * sc;
           c.fillStyle = S.patColor;
           for (let y = 0, row = 0; y < H + g; y += g / 2, row++) {
@@ -1890,7 +1887,6 @@
       syncUI();
       (async () => {
         for (const [k, svg] of Object.entries(SAMPLES)) img.samples[k] = await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
-        img.pattern = await loadImg('../image/pattern.svg?v=20260929');
         let saved = null;
         try { saved = localStorage.getItem(IMG_KEY); } catch (e) { /* ignore */ }
         if (saved) img.side = await loadImg(saved);
