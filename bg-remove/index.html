@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>背景透過ツール | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="画像の背景をブラウザだけで透明にできる無料ツール。背景の色をクリックするだけで、似た色をまとめて透明にします。消しゴム・復元ブラシ、ふちのなめらかさ、PNG・WebP 保存つき。画像はどこにも送信しません。">
+  <meta property="og:title" content="背景透過ツール | どんまうんど-Tools">
+  <meta property="og:description" content="背景の色をクリックするだけで透明に。ブラウザだけで使える無料の背景透過ツール。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/bg-remove/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-bg-remove.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="背景透過ツール">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* ── Topnav ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    .topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace：左に設定、右に画像 ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      grid-template-areas: "settings main";
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings {
+      grid-area: settings;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .main {
+      grid-area: main;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 88px);
+      min-height: 520px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+      flex: none;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: filter 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      border-color: var(--border-strong);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* 道具の切り替え */
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .tool-btn {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 8px 4px 6px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      line-height: 1.3;
+    }
+
+    .tool-btn .ic {
+      font-size: 18px;
+    }
+
+    .tool-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .tool-btn[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 0;
+      min-width: 0;
+    }
+
+    .field[hidden] {
+      display: none;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .field-val {
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 12px;
+      color: var(--accent-2);
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select,
+    input[type=text] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    select:focus,
+    input[type=text]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+      cursor: pointer;
+      padding: 6px 0;
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle .sw {
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      position: relative;
+      flex: none;
+      transition: background 0.15s;
+    }
+
+    .toggle .sw::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .toggle input:checked+.sw {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .toggle input:checked+.sw::after {
+      transform: translateX(18px);
+      background: #fff;
+    }
+
+    .toggle input:focus-visible+.sw {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    /* 抜いた色の一覧 */
+    .picks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pick {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-family: ui-monospace, Consolas, monospace;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 3px 4px 3px 4px;
+    }
+
+    .pick .sw {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .pick button {
+      font: inherit;
+      font-size: 12px;
+      line-height: 1;
+      color: var(--muted);
+      background: none;
+      border: 0;
+      cursor: pointer;
+      padding: 2px 5px;
+      border-radius: 999px;
+    }
+
+    .pick button:hover {
+      color: var(--text);
+      background: var(--border-strong);
+    }
+
+    .picks-empty {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── 画像のところ ── */
+    .main-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .main-head .info {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .main-head .sp {
+      flex: 1;
+    }
+
+    .zoom {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .zoom .val {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      min-width: 46px;
+      text-align: center;
+      color: var(--accent-2);
+    }
+
+    .stage {
+      position: relative;
+      flex: 1;
+      overflow: auto;
+      background: #140810;
+      display: flex;
+      min-height: 0;
+    }
+
+    /* 真ん中に置く（はみ出したときも左上までスクロールできるように margin: auto で） */
+    .stage>* {
+      margin: auto;
+    }
+
+    .stage.drop-on::after {
+      content: 'ここに落とすと画像を開きます';
+      position: absolute;
+      inset: 8px;
+      display: grid;
+      place-items: center;
+      border: 3px dashed var(--accent);
+      border-radius: 12px;
+      background: rgba(20, 8, 16, 0.6);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      flex: none;
+      border: 16px solid transparent;
+      background-clip: padding-box;
+      line-height: 0;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    /* 透明なところの見え方（市松・白・黒・緑・ピンク） */
+    .canvas-wrap[data-bg="check"] {
+      background: repeating-conic-gradient(#cfcfcf 0 25%, #ffffff 0 50%) 0 0 / 16px 16px;
+    }
+
+    .canvas-wrap[data-bg="white"] {
+      background: #fff;
+    }
+
+    .canvas-wrap[data-bg="black"] {
+      background: #000;
+    }
+
+    .canvas-wrap[data-bg="green"] {
+      background: #00b140;
+    }
+
+    .canvas-wrap[data-bg="pink"] {
+      background: #ff85a1;
+    }
+
+    #cv {
+      display: block;
+      touch-action: none;
+      image-rendering: auto;
+    }
+
+    .main[data-tool="pick"] #cv {
+      cursor: crosshair;
+    }
+
+    .main[data-tool="erase"] #cv,
+    .main[data-tool="restore"] #cv {
+      cursor: none;
+    }
+
+    .main[data-tool="hand"] #cv {
+      cursor: grab;
+    }
+
+    .brush-cursor {
+      position: absolute;
+      border: 1.5px solid #fff;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      display: none;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.9;
+    }
+
+    .empty .big {
+      font-size: 42px;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .empty .btn {
+      margin-top: 14px;
+    }
+
+    .save-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .save-row input {
+      flex: 1 1 180px;
+    }
+
+    .save-row select {
+      width: auto;
+      flex: none;
+    }
+
+    .save-row .toggle {
+      padding: 0;
+      font-size: 12px;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid #a03060;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      border-bottom: none;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    @media (max-width: 1000px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "main" "settings";
+        padding: 40px 16px 40px;
+      }
+
+      .main {
+        position: static;
+        height: 70vh;
+        min-height: 420px;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      .topnav-back {
+        display: none;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .save-row input {
+        flex-basis: 140px;
+      }
+
+      #save-btn {
+        flex: 1;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720"
+          height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">← トップに戻る</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>背景透過ツール</h1>
+      <p>背景の色をクリックするだけで、似た色をまとめて透明にします。消しゴムと復元のブラシで仕上げて、PNG・WebP で保存できます。画像はどこにも送信しません。</p>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- 設定 -->
+    <div class="settings">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🧰</span>道具</div>
+          <div class="tools" role="group" aria-label="道具">
+            <button class="tool-btn" type="button" data-tool="pick" aria-pressed="true" title="クリックした色を透明にします"><span class="ic">🎯</span>色を抜く</button>
+            <button class="tool-btn" type="button" data-tool="erase" aria-pressed="false" title="なぞったところを透明にします"><span class="ic">🧽</span>消す</button>
+            <button class="tool-btn" type="button" data-tool="restore" aria-pressed="false" title="なぞったところを元の画像に戻します"><span class="ic">🖌</span>戻す</button>
+            <button class="tool-btn" type="button" data-tool="hand" aria-pressed="false" title="拡大したときに、ドラッグで見る場所を動かします"><span class="ic">✋</span>動かす</button>
+          </div>
+          <div class="field" id="brush-field" hidden>
+            <span class="field-label"><span>ブラシの大きさ</span><span class="field-val" id="brush-val"></span></span>
+            <input type="range" id="brush" min="2" max="200" step="1" value="30">
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn btn-sm" type="button" id="undo" disabled title="Ctrl+Z">↶ 戻す</button>
+            <button class="btn btn-sm" type="button" id="redo" disabled title="Ctrl+Y">↷ やり直す</button>
+            <button class="btn btn-sm" type="button" id="reset" disabled>最初の画像に戻す</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🎯</span>色を抜く</div>
+          <div class="field">
+            <span class="field-label"><span>抜き方</span></span>
+            <select id="mode">
+              <option value="flood">クリックしたところとつながった部分だけ（おすすめ）</option>
+              <option value="global">画像全体の同じような色</option>
+            </select>
+            <span class="field-note" id="mode-note"></span>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>似た色の範囲</span><span class="field-val" id="tol-val"></span></span>
+            <input type="range" id="tol" min="0" max="60" step="1" value="12">
+            <span class="field-note">大きくすると、少し違う色までまとめて抜きます。キャラまで消えるときは小さく</span>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>ふちのなめらかさ</span><span class="field-val" id="soft-val"></span></span>
+            <input type="range" id="soft" min="0" max="30" step="1" value="6">
+          </div>
+          <div class="field">
+            <span class="field-label"><span>ふちを削る</span><span class="field-val" id="erode-val"></span></span>
+            <input type="range" id="erode" min="0" max="4" step="1" value="0">
+            <span class="field-note">ふちに背景の色が細く残るときに</span>
+          </div>
+          <label class="toggle"><span>ふちの色のにじみを減らす</span><input type="checkbox" id="decon" checked><span class="sw"></span></label>
+          <div class="field">
+            <span class="field-label"><span>抜いた色</span></span>
+            <div class="picks" id="picks"></div>
+            <div class="row">
+              <button class="btn btn-sm" type="button" id="auto" disabled title="画像の四隅の色を背景として抜きます">✨ 四隅の色で抜く</button>
+              <button class="btn btn-sm" type="button" id="clear-picks" disabled>抜いた色を全部やめる</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">👀</span>見え方</div>
+          <div class="field">
+            <span class="field-label"><span>透明なところの表示</span></span>
+            <select id="view-bg">
+              <option value="check">市松模様</option>
+              <option value="white">白</option>
+              <option value="black">黒</option>
+              <option value="green">緑</option>
+              <option value="pink">ピンク</option>
+            </select>
+            <span class="field-note">黒や緑にすると、ふちの残りが見つけやすくなります（保存する画像には入りません）</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 画像 -->
+    <div class="main" id="main" data-tool="pick">
+      <div class="main-head">
+        <span>画像</span><span class="info" id="info"></span>
+        <span class="sp"></span>
+        <span class="zoom">
+          <button class="btn btn-sm" type="button" id="zoom-out" aria-label="縮小">－</button>
+          <span class="val" id="zoom-val">100%</span>
+          <button class="btn btn-sm" type="button" id="zoom-in" aria-label="拡大">＋</button>
+          <button class="btn btn-sm" type="button" id="zoom-fit">全体</button>
+        </span>
+        <button class="btn btn-sm" type="button" id="open">📁 画像を開く</button>
+        <input type="file" id="file" accept="image/*" hidden>
+      </div>
+      <div class="stage" id="stage">
+        <div class="empty" id="empty">
+          <div class="big">🖼️</div>
+          画像をここにドロップするか、コピーした画像を Ctrl+V で貼り付けます<br>
+          <button class="btn btn-primary" type="button" id="open2">📁 画像を選ぶ</button>
+        </div>
+        <div class="canvas-wrap" id="wrap" data-bg="check" hidden>
+          <canvas id="cv" aria-label="透過した画像"></canvas>
+          <div class="brush-cursor" id="cursor"></div>
+        </div>
+      </div>
+      <div class="save-row">
+        <input type="text" id="file-name" spellcheck="false" aria-label="ファイル名" placeholder="ファイル名">
+        <label class="toggle" title="透明なまわりの余白を切り取って保存します"><span>余白を切る</span><input type="checkbox" id="crop"><span class="sw"></span></label>
+        <select id="save-type" aria-label="保存の形式">
+          <option value="image/png">PNG</option>
+          <option value="image/webp">WebP</option>
+        </select>
+        <button class="btn btn-primary" id="save-btn" type="button" disabled>⬇ 保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🖌</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>「📁 画像を開く」で画像を選びます（ドロップ・Ctrl+V の貼り付けでも開けます）。四隅が同じような色なら、その色が自動で抜けます。</li>
+          <li><b>🎯 色を抜く</b> で、消したい背景をクリックします。何か所でもクリックできます。</li>
+          <li>残ったところは <b>🧽 消す</b>、消えすぎたところは <b>🖌 戻す</b> でなぞって直します。</li>
+          <li>「似た色の範囲」「ふちのなめらかさ」「ふちを削る」で、ふちの仕上がりを整えます。</li>
+          <li>形式（PNG・WebP）を選んで <b>「⬇ 保存」</b> を押すと、透明な画像がダウンロードされます。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>ヒント・注意点</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>開いた画像は、このブラウザの中だけで使います。サーバーには送信しません。</li>
+          <li>単色の背景・グリーンバック・白背景のイラストや商品写真に向いています。写真の複雑な背景は、ブラシでの手直しが多くなります。</li>
+          <li>白背景で、キャラの目や服の白まで消えるときは、抜き方を「つながった部分だけ」にするか、「似た色の範囲」を小さくしてください。</li>
+          <li>透明なところの表示を黒や緑にすると、ふちに残った背景の色が見つけやすくなります。</li>
+          <li>JPG は透明を残せないので、保存は PNG か WebP です。WebP のほうがファイルが軽くなります。</li>
+          <li>大きな画像は、長い辺が 4096px になるように縮めて開きます。</li>
+          <li>透過した画像は、<a href="../thumbnail/">サムネイルメーカー</a>でキャラや商品の画像として使えます。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929"
+            alt="どんまうんど" width="720" height="182"></a>
+        <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a
+            href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+      </div>
+      <span>
+        <a href="https://github.com/donnma777/tools" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../common/ask.js?v=20260929a"></script>
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const toastEl = $('toast');
+      let toastTimer;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3200);
+      }
+      const ask = (msg, yes) => window.DonnmaAsk.ask(msg, { yes }).then(r => r === true);
+
+      // =====================================================
+      //  状態
+      //  src … 元の画像（RGBA）
+      //  key … 色を抜いた結果の不透明さ（0〜255）。keyIdx はそのピクセルを抜いた色の番号（にじみを減らすときに使う）
+      //  mask … key にブラシを重ねた、最後の不透明さ
+      //  actions … 抜いた色・ブラシの操作の並び（戻す・やり直すは、これを並べ直して作り直す）
+      // =====================================================
+      const MAX_SIDE = 4096;
+      let W = 0, H = 0, src = null, key = null, keyIdx = null, mask = null, out = null;
+      let actions = [], redoStack = [], baseName = 'image';
+      let tool = 'pick';
+      const cv = $('cv'), ctx = cv.getContext('2d', { willReadFrequently: true });
+      const P = { mode: 'flood', tol: 12, soft: 6, erode: 0, decon: true, brush: 30 };
+
+      // 色の近さ（0〜100）
+      const dist = (r, g, b, c) => Math.sqrt((r - c[0]) ** 2 + (g - c[1]) ** 2 + (b - c[2]) ** 2) / 4.4167;
+      // 近さから不透明さへ（範囲の中は 0、なめらかさの幅で 255 まで上げる）
+      function ramp(d) {
+        if (d <= P.tol) return 0;
+        if (P.soft <= 0 || d > P.tol + P.soft) return 255;
+        return Math.round((d - P.tol) / P.soft * 255);
+      }
+      // クリックしたところのまわり 3×3 の平均の色
+      function colorAt(x, y) {
+        let r = 0, g = 0, b = 0, n = 0;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+          const xx = x + dx, yy = y + dy;
+          if (xx < 0 || yy < 0 || xx >= W || yy >= H) continue;
+          const i = (yy * W + xx) * 4;
+          if (src[i + 3] < 8) continue;
+          r += src[i]; g += src[i + 1]; b += src[i + 2]; n++;
+        }
+        return n ? [r / n, g / n, b / n] : null;
+      }
+      const hex = c => '#' + c.map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
+
+      // ---- 色を抜く（抜いた色ぜんぶから key を作る）
+      const picks = () => actions.filter(a => a.type === 'pick');
+      function buildKey() {
+        key.fill(255);
+        keyIdx.fill(255);
+        const list = picks();
+        if (!list.length) return;
+        const N = W * H;
+        if (P.mode === 'global') {
+          for (let i = 0, p = 0; i < N; i++, p += 4) {
+            let best = 255, bi = 255;
+            for (let k = 0; k < list.length; k++) {
+              const a = ramp(dist(src[p], src[p + 1], src[p + 2], list[k].color));
+              if (a < best) { best = a; bi = k; }
+            }
+            key[i] = best; keyIdx[i] = best < 255 ? bi : 255;
+          }
+        } else {
+          // つながった部分：範囲の中の色だけ広げていき、ふちのなめらかさの分はそこで止める
+          const seen = new Uint8Array(N), queue = new Int32Array(N);
+          list.forEach((pk, k) => {
+            seen.fill(0);
+            let head = 0, tail = 0;
+            const s = pk.y * W + pk.x;
+            queue[tail++] = s; seen[s] = 1;
+            while (head < tail) {
+              const i = queue[head++], p = i * 4;
+              const d = dist(src[p], src[p + 1], src[p + 2], pk.color);
+              const a = ramp(d);
+              if (a < key[i]) { key[i] = a; keyIdx[i] = k; }
+              if (d > P.tol) continue;
+              const x = i % W;
+              if (x > 0 && !seen[i - 1]) { seen[i - 1] = 1; queue[tail++] = i - 1; }
+              if (x < W - 1 && !seen[i + 1]) { seen[i + 1] = 1; queue[tail++] = i + 1; }
+              if (i >= W && !seen[i - W]) { seen[i - W] = 1; queue[tail++] = i - W; }
+              if (i < N - W && !seen[i + W]) { seen[i + W] = 1; queue[tail++] = i + W; }
+            }
+          });
+        }
+        // ふちを削る：透明なところを 1px ずつ広げる（横・縦の順に一番小さい値を取る）
+        for (let r = 0; r < P.erode; r++) {
+          for (const [step, len, lines, lstep] of [[1, W, H, W], [W, H, W, 1]]) {
+            const tmpA = new Uint8Array(len), tmpI = new Uint8Array(len);
+            for (let l = 0; l < lines; l++) {
+              const base = l * lstep;
+              for (let j = 0; j < len; j++) { tmpA[j] = key[base + j * step]; tmpI[j] = keyIdx[base + j * step]; }
+              for (let j = 0; j < len; j++) {
+                let m = tmpA[j], mi = tmpI[j];
+                if (j > 0 && tmpA[j - 1] < m) { m = tmpA[j - 1]; mi = tmpI[j - 1]; }
+                if (j < len - 1 && tmpA[j + 1] < m) { m = tmpA[j + 1]; mi = tmpI[j + 1]; }
+                key[base + j * step] = m; keyIdx[base + j * step] = mi;
+              }
+            }
+          }
+        }
+      }
+
+      // ---- ブラシ（消す・戻す）。点をつないで丸を押していく
+      function stamp(x, y, r, erase, x0, y0, rect) {
+        // 前の点から今の点まで、半径の 1/4 ごとに押す
+        const len = Math.hypot(x - x0, y - y0), n = Math.max(1, Math.ceil(len / Math.max(1, r / 4)));
+        for (let s = 1; s <= n; s++) {
+          const cx = x0 + (x - x0) * s / n, cy = y0 + (y - y0) * s / n;
+          const minX = Math.max(0, Math.floor(cx - r - 1)), maxX = Math.min(W - 1, Math.ceil(cx + r + 1));
+          const minY = Math.max(0, Math.floor(cy - r - 1)), maxY = Math.min(H - 1, Math.ceil(cy + r + 1));
+          for (let yy = minY; yy <= maxY; yy++) for (let xx = minX; xx <= maxX; xx++) {
+            const cov = Math.min(1, Math.max(0, r + 0.5 - Math.hypot(xx + 0.5 - cx, yy + 0.5 - cy)));
+            if (cov <= 0) continue;
+            const i = yy * W + xx;
+            if (erase) mask[i] = Math.min(mask[i], Math.round(255 * (1 - cov)));
+            else { mask[i] = Math.max(mask[i], Math.round(255 * cov)); if (cov >= 1) keyIdx[i] = 255; }
+          }
+          if (rect) { rect[0] = Math.min(rect[0], minX); rect[1] = Math.min(rect[1], minY); rect[2] = Math.max(rect[2], maxX); rect[3] = Math.max(rect[3], maxY); }
+        }
+      }
+      function playStroke(a, rect) {
+        let [px, py] = a.pts[0];
+        stamp(px, py, a.r, a.erase, px, py, rect);
+        for (let k = 1; k < a.pts.length; k++) { const [x, y] = a.pts[k]; stamp(x, y, a.r, a.erase, px, py, rect); px = x; py = y; }
+      }
+
+      // ---- 作り直して描く
+      function rebuild() {
+        if (!src) return;
+        buildKey();
+        mask.set(key);
+        for (const a of actions) if (a.type === 'stroke') playStroke(a);
+        compose(0, 0, W - 1, H - 1);
+        ui();
+      }
+      // 見える画像を作る（にじみを減らす：半透明のところから、抜いた色の分を引く）
+      function compose(x0, y0, x1, y1) {
+        const list = picks();
+        const d = out.data;
+        for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+          const i = y * W + x, p = i * 4, m = mask[i];
+          let r = src[p], g = src[p + 1], b = src[p + 2];
+          if (P.decon && m > 0 && m < 255 && keyIdx[i] !== 255 && list[keyIdx[i]]) {
+            const c = list[keyIdx[i]].color, t = m / 255;
+            r = Math.min(255, Math.max(0, (r - c[0] * (1 - t)) / t));
+            g = Math.min(255, Math.max(0, (g - c[1] * (1 - t)) / t));
+            b = Math.min(255, Math.max(0, (b - c[2] * (1 - t)) / t));
+          }
+          d[p] = r; d[p + 1] = g; d[p + 2] = b; d[p + 3] = src[p + 3] * m / 255;
+        }
+        ctx.putImageData(out, 0, 0, x0, y0, x1 - x0 + 1, y1 - y0 + 1);
+      }
+
+      // ---- 画面の表示
+      function ui() {
+        const has = !!src;
+        $('undo').disabled = !actions.length;
+        $('redo').disabled = !redoStack.length;
+        $('reset').disabled = !actions.length;
+        $('save-btn').disabled = !has;
+        $('auto').disabled = !has;
+        $('clear-picks').disabled = !picks().length;
+        const box = $('picks');
+        const list = picks();
+        box.innerHTML = list.length ? '' : '<span class="picks-empty">まだありません。画像の背景をクリックしてください</span>';
+        // 同じ色（表示の色コードが同じ）は1つにまとめる
+        const groups = new Map();
+        for (const pk of list) { const h = hex(pk.color); if (!groups.has(h)) groups.set(h, []); groups.get(h).push(pk); }
+        for (const [h, g] of groups) {
+          const el = document.createElement('span');
+          el.className = 'pick';
+          el.innerHTML = `<span class="sw" style="background:${h}"></span>${h}${g.length > 1 ? ` ×${g.length}` : ''}<button type="button" aria-label="この色をやめる" title="この色をやめる">✕</button>`;
+          el.querySelector('button').onclick = () => doAction({ type: 'unpick', targets: g });
+          box.appendChild(el);
+        }
+        $('mode-note').textContent = P.mode === 'flood'
+          ? 'キャラの中の同じ色（目の白など）は残ります'
+          : '離れたところの同じ色（すき間の背景など）もまとめて抜きます';
+      }
+
+      // ---- 操作（戻す・やり直すのため、actions に積む）
+      function doAction(a) {
+        if (a.type === 'unpick') actions = actions.filter(x => !a.targets.includes(x));
+        else actions.push(a);
+        if (a.type === 'unpick') { redoStack = []; rebuild(); return; }
+        redoStack = [];
+        if (a.type === 'pick') rebuild();
+        else ui();
+      }
+      $('undo').onclick = () => { if (!actions.length) return; redoStack.push(actions.pop()); rebuild(); };
+      $('redo').onclick = () => { if (!redoStack.length) return; actions.push(redoStack.pop()); rebuild(); };
+      $('reset').onclick = async () => {
+        if (!await ask('抜いた色とブラシをすべてやめて、最初の画像に戻しますか？', '戻す')) return;
+        actions = []; redoStack = []; rebuild();
+      };
+      $('clear-picks').onclick = () => {
+        actions = actions.filter(a => a.type !== 'pick'); redoStack = []; rebuild();
+      };
+      addEventListener('keydown', e => {
+        if (!(e.ctrlKey || e.metaKey) || e.target.closest('input, textarea, select')) return;
+        const k = e.key.toLowerCase();
+        if (k === 'z' && !e.shiftKey) { e.preventDefault(); $('undo').click(); }
+        else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); $('redo').click(); }
+      });
+
+      // 四隅の色で抜く（同じような色の隅はまとめる）
+      function autoCorners(quiet) {
+        const pts = [[1, 1], [W - 2, 1], [1, H - 2], [W - 2, H - 2]];
+        const cs = pts.map(([x, y]) => ({ x, y, color: colorAt(x, y) })).filter(p => p.color);
+        if (!cs.length) { if (!quiet) toast('四隅が透明なので、抜く色がありません'); return false; }
+        if (quiet) {
+          // 開いたとき：四隅がそろって同じような色のときだけ自動で抜く
+          if (cs.length < 4 || cs.some(p => dist(...p.color, cs[0].color) > 8)) return false;
+        }
+        const add = cs.filter(p => !picks().some(q => q.x === p.x && q.y === p.y));
+        if (!add.length) { if (!quiet) toast('四隅の色はもう抜いてあります'); return false; }
+        actions.push(...add.map(p => ({ type: 'pick', ...p })));
+        redoStack = [];
+        rebuild();
+        return true;
+      }
+      $('auto').onclick = () => { if (autoCorners(false)) toast('四隅の色を抜きました'); };
+
+      // =====================================================
+      //  画像を開く（ボタン・ドロップ・貼り付け）
+      // =====================================================
+      async function openFile(f) {
+        if (!f || !f.type.startsWith('image/')) { toast('画像ファイルを選んでください'); return; }
+        let bmp;
+        try { bmp = await createImageBitmap(f); } catch (e) { toast('画像を読み込めませんでした'); return; }
+        let w = bmp.width, h = bmp.height;
+        const sc = Math.min(1, MAX_SIDE / Math.max(w, h));
+        if (sc < 1) { w = Math.round(w * sc); h = Math.round(h * sc); toast(`大きい画像なので ${w}×${h} に縮めて開きました`); }
+        W = w; H = h;
+        cv.width = W; cv.height = H;
+        ctx.clearRect(0, 0, W, H);
+        ctx.drawImage(bmp, 0, 0, W, H);
+        src = ctx.getImageData(0, 0, W, H).data;
+        key = new Uint8Array(W * H); keyIdx = new Uint8Array(W * H); mask = new Uint8Array(W * H);
+        out = ctx.createImageData(W, H);
+        actions = []; redoStack = [];
+        baseName = (f.name || 'image').replace(/\.[^.]+$/, '') || 'image';
+        $('file-name').value = `${baseName}_nobg`;
+        $('info').textContent = `${W}×${H}`;
+        $('empty').hidden = true; $('wrap').hidden = false;
+        fitZoom();
+        if (!autoCorners(true)) rebuild();
+        else toast('四隅が同じような色だったので、その色を抜きました');
+      }
+      $('open').onclick = $('open2').onclick = () => $('file').click();
+      $('file').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) openFile(f); };
+      const stage = $('stage');
+      const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
+      stage.addEventListener('dragover', e => { if (!hasFiles(e)) return; e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; stage.classList.add('drop-on'); });
+      stage.addEventListener('dragleave', e => { if (!stage.contains(e.relatedTarget)) stage.classList.remove('drop-on'); });
+      stage.addEventListener('drop', e => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        stage.classList.remove('drop-on');
+        openFile([...e.dataTransfer.files].find(x => x.type.startsWith('image/')));
+      });
+      document.addEventListener('paste', e => {
+        const f = [...(e.clipboardData?.files || [])].find(x => x.type.startsWith('image/'));
+        if (!f) return;
+        e.preventDefault();
+        openFile(f);
+      });
+
+      // =====================================================
+      //  表示の大きさ
+      // =====================================================
+      let zoom = 1, fitMode = true;
+      function applyZoom() {
+        cv.style.width = `${W * zoom}px`;
+        cv.style.height = `${H * zoom}px`;
+        $('zoom-val').textContent = `${Math.round(zoom * 100)}%`;
+        updateCursorSize();
+      }
+      function fitZoom() {
+        if (!W) return;
+        fitMode = true;
+        zoom = Math.min((stage.clientWidth - 32) / W, (stage.clientHeight - 32) / H, 4);
+        applyZoom();
+      }
+      function setZoom(z) {
+        if (!W) return;
+        fitMode = false;
+        // 見ている場所の真ん中を保つ
+        const cx = (stage.scrollLeft + stage.clientWidth / 2) / zoom, cy = (stage.scrollTop + stage.clientHeight / 2) / zoom;
+        zoom = Math.min(16, Math.max(0.05, z));
+        applyZoom();
+        stage.scrollLeft = cx * zoom - stage.clientWidth / 2;
+        stage.scrollTop = cy * zoom - stage.clientHeight / 2;
+      }
+      $('zoom-in').onclick = () => setZoom(zoom * 1.25);
+      $('zoom-out').onclick = () => setZoom(zoom / 1.25);
+      $('zoom-fit').onclick = fitZoom;
+      addEventListener('resize', () => { if (fitMode) fitZoom(); });
+      stage.addEventListener('wheel', e => {
+        if (!W || !(e.ctrlKey || e.metaKey)) return;
+        e.preventDefault();
+        setZoom(zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15));
+      }, { passive: false });
+
+      // =====================================================
+      //  道具（クリック・なぞる・動かす）
+      // =====================================================
+      function setTool(t) {
+        tool = t;
+        $('main').dataset.tool = t;
+        document.querySelectorAll('.tool-btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === t)));
+        $('brush-field').hidden = !(t === 'erase' || t === 'restore');
+        $('cursor').style.display = 'none';
+      }
+      document.querySelectorAll('.tool-btn').forEach(b => b.onclick = () => setTool(b.dataset.tool));
+      const toImg = e => {
+        const r = cv.getBoundingClientRect();
+        return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H];
+      };
+      function updateCursorSize() {
+        const c = $('cursor');
+        const d = P.brush * 2 * zoom;
+        c.style.width = c.style.height = `${d}px`;
+      }
+      let drag = null;
+      cv.addEventListener('pointerdown', e => {
+        if (!src || e.button > 0) return;
+        cv.setPointerCapture(e.pointerId);
+        const [x, y] = toImg(e);
+        if (tool === 'hand') { drag = { hand: true, sx: e.clientX, sy: e.clientY, l: stage.scrollLeft, t: stage.scrollTop }; cv.style.cursor = 'grabbing'; return; }
+        if (tool === 'pick') {
+          const xi = Math.min(W - 1, Math.max(0, Math.floor(x))), yi = Math.min(H - 1, Math.max(0, Math.floor(y)));
+          const color = colorAt(xi, yi);
+          if (!color) { toast('そこはもう透明です'); return; }
+          doAction({ type: 'pick', x: xi, y: yi, color });
+          return;
+        }
+        const a = { type: 'stroke', erase: tool === 'erase', r: P.brush, pts: [[x, y]] };
+        drag = { a };
+        const rect = [W, H, 0, 0];
+        stamp(x, y, a.r, a.erase, x, y, rect);
+        compose(rect[0], rect[1], rect[2], rect[3]);
+      });
+      cv.addEventListener('pointermove', e => {
+        if (tool === 'erase' || tool === 'restore') {
+          const c = $('cursor'), r = cv.getBoundingClientRect();
+          c.style.display = 'block';
+          c.style.left = `${e.clientX - r.left}px`;
+          c.style.top = `${e.clientY - r.top}px`;
+        }
+        if (!drag) return;
+        if (drag.hand) { stage.scrollLeft = drag.l - (e.clientX - drag.sx); stage.scrollTop = drag.t - (e.clientY - drag.sy); return; }
+        const [x, y] = toImg(e), a = drag.a, [px, py] = a.pts[a.pts.length - 1];
+        if (Math.hypot(x - px, y - py) < 0.5) return;
+        a.pts.push([x, y]);
+        const rect = [W, H, 0, 0];
+        stamp(x, y, a.r, a.erase, px, py, rect);
+        compose(rect[0], rect[1], rect[2], rect[3]);
+      });
+      const endDrag = () => {
+        if (!drag) return;
+        if (drag.hand) cv.style.cursor = '';
+        else doAction(drag.a);
+        drag = null;
+      };
+      cv.addEventListener('pointerup', endDrag);
+      cv.addEventListener('pointercancel', endDrag);
+      cv.addEventListener('pointerleave', () => { $('cursor').style.display = 'none'; });
+
+      // =====================================================
+      //  設定のバー
+      // =====================================================
+      let queued = false;
+      const later = () => { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; rebuild(); }); };
+      for (const [id, k, show] of [['tol', 'tol', v => v], ['soft', 'soft', v => v], ['erode', 'erode', v => `${v}px`], ['brush', 'brush', v => `${v}px`]]) {
+        const el = $(id), val = $(id + '-val');
+        const sync = () => { P[k] = +el.value; val.textContent = show(P[k]); };
+        sync();
+        el.addEventListener('input', () => {
+          sync();
+          if (k === 'brush') { updateCursorSize(); return; }
+          later();
+        });
+      }
+      $('mode').onchange = () => { P.mode = $('mode').value; rebuild(); };
+      $('decon').onchange = () => { P.decon = $('decon').checked; if (src) compose(0, 0, W - 1, H - 1); };
+      $('view-bg').onchange = () => { $('wrap').dataset.bg = $('view-bg').value; };
+      ui();
+
+      // =====================================================
+      //  保存（余白を切る・PNG / WebP）
+      // =====================================================
+      const EXT = { 'image/png': 'png', 'image/webp': 'webp' };
+      const TYPE_KEY = 'donnma-bgremove-savetype';
+      try { const t = localStorage.getItem(TYPE_KEY); if (EXT[t]) $('save-type').value = t; } catch (e) { /* ignore */ }
+      $('save-type').onchange = () => { try { localStorage.setItem(TYPE_KEY, $('save-type').value); } catch (e) { /* ignore */ } };
+      $('save-btn').onclick = () => {
+        if (!src) return;
+        const type = $('save-type').value;
+        let x0 = 0, y0 = 0, x1 = W - 1, y1 = H - 1;
+        if ($('crop').checked) {
+          const d = out.data;
+          x0 = W; y0 = H; x1 = -1; y1 = -1;
+          for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+            if (d[(y * W + x) * 4 + 3] > 0) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+          }
+          if (x1 < 0) { toast('全部透明なので、保存するものがありません'); return; }
+        }
+        const c = document.createElement('canvas');
+        c.width = x1 - x0 + 1; c.height = y1 - y0 + 1;
+        c.getContext('2d').putImageData(out, -x0, -y0);
+        c.toBlob(b => {
+          if (!b) { toast('保存できませんでした'); return; }
+          if (b.type !== type) { toast('このブラウザは WebP で保存できません。PNG で保存してください'); return; }
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(b);
+          a.download = ($('file-name').value.trim() || `${baseName}_nobg`).replace(/[\\/:*?"<>|]+/g, '_') + '.' + EXT[type];
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+          toast('保存しました');
+        }, type, 0.92);
+      };
+    })();
+  </script>
+</body>
+
+</html>
