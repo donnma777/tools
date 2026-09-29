@@ -1292,8 +1292,47 @@
       padding-top: 4px;
     }
 
-    .extra-behind {
-      padding: 6px 0 0;
+    .extra-head .rank {
+      margin-left: 6px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+
+    .main-order {
+      display: contents;
+    }
+
+    .text-thumb {
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 15px;
+      color: var(--accent);
+    }
+
+    .extra-text {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 36px auto 36px;
+      gap: 6px;
+      align-items: center;
+      padding-top: 8px;
+    }
+
+    .extra-text input[type=color] {
+      width: 36px;
+      height: 32px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+    }
+
+    .extra-text select {
+      width: auto;
     }
 
     .extra-bars {
@@ -1406,6 +1445,7 @@
           <div class="extra-item main-card" id="main-card">
             <div class="extra-head">
               <span class="img-thumb" id="img-thumb"></span><span class="nm" id="main-name">メインの画像</span>
+              <span class="main-order" id="main-order"></span>
               <button class="btn btn-sm" type="button" id="img-pick">📁 画像を変える</button>
               <button class="btn btn-sm" type="button" id="img-clear">サンプルに戻す</button>
               <button class="btn btn-sm" type="button" id="main-free" title="この画像を、文字がよけない自由な画像にします">自由に置く</button>
@@ -1418,13 +1458,14 @@
             <span class="field-label"><span>メインの画像の置き方（文字がよける画像）</span></span>
           </div>
           <div class="field field-full" id="extra-upload">
-            <span class="field-label"><span>画像（キャラ・写真・アイコン・スタンプなど。上ほど前に重なります）</span></span>
+            <span class="field-label"><span>文字と画像（上ほど前に重なります）</span></span>
             <div class="row-list" id="extra-list"></div>
             <div class="data-row" style="margin-top:0">
+              <button class="btn btn-sm" type="button" id="text-add">＋ 文字を追加</button>
               <button class="btn btn-sm" type="button" id="extra-add">＋ 画像を追加</button>
               <input type="file" id="extra-file" accept="image/*" hidden>
             </div>
-            <div class="field-note"><b>メインの画像</b>（いちばん下）は、文字がよけて置かれます（左・右・上・下・真ん中）。画像を選んでいないときはサンプル（ハートなど）が入ります。<b>ほかの画像</b>は好きな場所に置けます。「メインにする」「自由に置く」で役割を入れ替えられます。プレビューでドラッグして動かせます。カードにマウスを乗せると、プレビューのその画像に枠が出ます。</div>
+            <div class="field-note"><b>メインの画像</b>は、メインの文字がよけて置かれます（左・右・上・下・真ん中）。画像を選んでいないときはサンプル（ハートなど）が入ります。<b>メインの文字</b>はタイトル・サブタイトル・ロゴです。<b>追加した文字・画像</b>は好きな場所に置けます。「↑ 前へ」「↓ 後ろへ」で、文字と画像をまたいで重なりを入れ替えられます。「メインにする」「自由に置く」で画像の役割を入れ替えられます。プレビューでドラッグして動かせます。カードにマウスを乗せると、プレビューのその画像に枠が出ます。</div>
           </div>
         </div>
       </div>
@@ -1569,7 +1610,7 @@
         titleColor: '#ff7fa0', hlColor: '#f0325a', hlScale: 1.15, subColor: '#6e3551', strokeWidth: 14, strokeColor: '#ffffff', shadow: true,
         textScale: 1, textAlign: 'center', textX: 0, textY: 0,
         titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
-        extras: [],
+        extras: [], order: ['@pic', '@text'],
         imgPos: 'left', imgAnchor: 'auto', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart',
         subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subArc: 0, subGap: 0,
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
@@ -1579,6 +1620,15 @@
         bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
       };
       const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
+      // order を extras に合わせる（なくなったものは外し、足りないものは上に足す。'@pic'・'@text' は必ず入れる）
+      function fixOrder(st) {
+        const ids = new Set(['@pic', '@text', ...st.extras.map(e => e.id)]);
+        const seen = new Set();
+        st.order = st.order.filter(v => ids.has(v) && !seen.has(v) && seen.add(v));
+        if (!seen.has('@pic')) st.order.unshift('@pic');
+        if (!seen.has('@text')) st.order.splice(st.order.indexOf('@pic') + 1, 0, '@text');
+        for (const e of st.extras) if (!st.order.includes(e.id)) st.order.push(e.id);
+      }
       function sanitize(o) {
         const out = { ...DEFAULTS };
         if (!o || typeof o !== 'object') return out;
@@ -1590,13 +1640,30 @@
           else if (typeof d === 'string' && typeof v === 'string' && (!COLOR_KEYS.includes(k) || /^#[0-9a-f]{6}$/i.test(v))) out[k] = v;
         }
         if (!SIZES[out.size]) out.size = 'yt';
-        // 追加の画像：[{ id, x, y, scale }]（x・y は中心の位置。幅・高さの %）
-        out.extras = Array.isArray(o.extras) ? o.extras.filter(e => e && typeof e.id === 'string' && /^[a-z0-9]{1,16}$/.test(e.id)).slice(0, 20).map(e => ({
-          id: e.id, x: +e.x >= -20 && +e.x <= 120 ? +e.x : 50, y: +e.y >= -20 && +e.y <= 120 ? +e.y : 50,
-          scale: +e.scale >= 0.05 && +e.scale <= 5 ? +e.scale : 1,
-          rot: +e.rot >= -180 && +e.rot <= 180 ? +e.rot : 0,
-          behind: e.behind === true,
-        })) : [];
+        // 追加のもの：画像 { id, type: 'image', x, y, scale, rot } と 文字 { id, type: 'text', text, color, box, boxColor, x, y, scale, rot }
+        //（x・y は中心の位置。幅・高さの %）
+        const hex = (v, d) => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v : d;
+        out.extras = Array.isArray(o.extras) ? o.extras.filter(e => e && typeof e.id === 'string' && /^[a-z0-9]{1,16}$/.test(e.id)).slice(0, 30).map(e => {
+          const base = {
+            id: e.id, type: e.type === 'text' ? 'text' : 'image',
+            x: +e.x >= -20 && +e.x <= 120 ? +e.x : 50, y: +e.y >= -20 && +e.y <= 120 ? +e.y : 50,
+            scale: +e.scale >= 0.05 && +e.scale <= 5 ? +e.scale : 1,
+            rot: +e.rot >= -180 && +e.rot <= 180 ? +e.rot : 0,
+          };
+          if (base.type === 'text') Object.assign(base, {
+            text: typeof e.text === 'string' ? e.text.slice(0, 100) : 'テキスト', color: hex(e.color, '#ff7fa0'),
+            box: ['none', 'pill', 'round'].includes(e.box) ? e.box : 'none', boxColor: hex(e.boxColor, '#ff7fa0'),
+          });
+          return base;
+        }) : [];
+        // 重なりの順番。なければ、以前の「文字の後ろ」（behind）から作る
+        out.order = Array.isArray(o.order) ? o.order.filter(v => typeof v === 'string') : null;
+        if (!out.order) {
+          const src = Array.isArray(o.extras) ? o.extras : [];
+          const ids = (b) => src.filter(e => e && !!e.behind === b).map(e => e.id);
+          out.order = ['@pic', ...ids(true), '@text', ...ids(false)];
+        }
+        fixOrder(out);
         if (out.bg === 'usagi') out.bg = 'dots';
         out.customW = Math.round(Math.min(4000, Math.max(200, out.customW)));
         out.customH = Math.round(Math.min(4000, Math.max(200, out.customH)));
@@ -2058,35 +2125,56 @@
           c.fill();
           c.restore();
         }
-        // 画像（座布団の上、文字の下）
-        if (pic) {
+        // ---- メインの画像
+        const drawPic = () => {
+          if (!pic) return;
           c.save();
           c.translate(pic.x + pic.w / 2, pic.y + pic.h / 2);
           c.rotate(S.imgRot * Math.PI / 180);
           c.drawImage(side, -pic.w / 2, -pic.h / 2, pic.w, pic.h);
           c.restore();
-        }
-        // ---- 追加の画像（アイコン・スタンプなど）。位置は中心の %、大きさは短い辺の 30% が 1倍。
-        //      「文字の後ろ」のものはここ（1枚目の画像の上・文字の下）、それ以外は文字を描いたあと
-        const extras = [];
-        const drawExtras = behind => {
-          for (const e of S.extras) {
-            if (!!e.behind !== behind) continue;
-            const im = img.extras[e.id];
-            if (!im) continue;
-            const base = Math.min(W, H) * 0.3 * e.scale;
-            const r = Math.min(base / im.width, base / im.height);
-            const w = im.width * r, h = im.height * r;
-            const x = e.x / 100 * W - w / 2, yy = e.y / 100 * H - h / 2;
-            c.save();
-            c.translate(x + w / 2, yy + h / 2);
-            c.rotate((e.rot || 0) * Math.PI / 180);
-            c.drawImage(im, -w / 2, -h / 2, w, h);
-            c.restore();
-            extras.push({ id: e.id, x, y: yy, w, h, behind });
-          }
         };
-        drawExtras(true);
+        // ---- 追加の画像・文字。位置は中心の %。画像の大きさは短い辺の 30% が 1倍、文字は 64px（1200×630 のとき）が 1倍
+        const extras = [];
+        const drawExtra = e => {
+          const cx = e.x / 100 * W, cy = e.y / 100 * H;
+          if (e.type === 'text') {
+            if (!e.text) return;
+            const f = 64 * k * e.scale, boxedT = e.box !== 'none';
+            c.font = `${S.weight} ${f}px ${family()}`;
+            const w = c.measureText(e.text).width + (boxedT ? f * 1.3 : S.strokeWidth * k), h = f * (boxedT ? 1.55 : 1.3);
+            c.save();
+            c.translate(cx, cy);
+            c.rotate((e.rot || 0) * Math.PI / 180);
+            if (boxedT) {
+              c.save();
+              if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.25)'; c.shadowBlur = f * 0.25; c.shadowOffsetY = f * 0.08; }
+              c.fillStyle = e.boxColor;
+              c.beginPath();
+              c.roundRect(-w / 2, -h / 2, w, h, e.box === 'pill' ? h / 2 : h * 0.22);
+              c.fill();
+              c.restore();
+              const keepShadow = S.shadow;
+              S.shadow = false;
+              text(c, e.text, 0, f * 0.03, f, e.color, 0);
+              S.shadow = keepShadow;
+            } else text(c, e.text, 0, 0, f, e.color, S.strokeWidth * k * 0.8);
+            c.restore();
+            extras.push({ id: e.id, x: cx - w / 2, y: cy - h / 2, w, h });
+            return;
+          }
+          const im = img.extras[e.id];
+          if (!im) return;
+          const base = Math.min(W, H) * 0.3 * e.scale;
+          const r = Math.min(base / im.width, base / im.height);
+          const w = im.width * r, h = im.height * r;
+          c.save();
+          c.translate(cx, cy);
+          c.rotate((e.rot || 0) * Math.PI / 180);
+          c.drawImage(im, -w / 2, -h / 2, w, h);
+          c.restore();
+          extras.push({ id: e.id, x: cx - w / 2, y: cy - h / 2, w, h });
+        };
         const plate = (x, y, w, h) => {
           if (!S.logoPlate) return;
           const pad = Math.max(8 * k, h * 0.2);
@@ -2165,42 +2253,50 @@
           }
           c.restore();
         };
-        if (subAbove) { subText(cxOf(subWidth(subFs)), y + subBody() / 2, subFs); y += subH(); }
-        if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow));
-        for (const line of lines) {
-          drawLine(c, line, cxOf(lineW(c, line, fs)), y + lineH(line) / 2, fs, S.strokeWidth * k);
-          y += lineH(line);
-        }
-        if (lg && mode === 'below') { if (lines.length) y += gap; drawLogo(!subBelow); }
-        if (subBelow) subText(cxOf(subWidth(subFs)), y + gapPx + subBody() / 2, subFs);
+        // ---- メインの文字（タイトル・サブタイトル・ロゴ）
+        const drawText = () => {
+          if (subAbove) { subText(cxOf(subWidth(subFs)), y + subBody() / 2, subFs); y += subH(); }
+          if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow));
+          for (const line of lines) {
+            drawLine(c, line, cxOf(lineW(c, line, fs)), y + lineH(line) / 2, fs, S.strokeWidth * k);
+            y += lineH(line);
+          }
+          if (lg && mode === 'below') { if (lines.length) y += gap; drawLogo(!subBelow); }
+          if (subBelow) subText(cxOf(subWidth(subFs)), y + gapPx + subBody() / 2, subFs);
 
-        // ---- 隅に小さくサブタイトル（隅の文字は、枠の端にそろえる）
-        if (sub && S.subPos === 'corner') {
-          const cfs = fit(c, [sub], 44 * k * S.textScale, W * 0.45);
-          c.font = `${S.weight} ${cfs}px ${family()}`;
-          const w = c.measureText(sub).width + (boxed ? cfs * 1.3 : subStroke);
-          const hh = (boxed ? cfs * 1.55 : cfs * 1.2) + arcLift(cfs);
-          const m = Math.min(W, H) * 0.045 + subStroke / 2;
-          const x = S.subCorner.endsWith('l') ? m + w / 2 : S.subCorner.endsWith('c') ? W / 2 : W - m - w / 2;
-          const yy = S.subCorner.startsWith('t') ? m + hh / 2 : H - m - hh / 2;
-          subText(x, yy, cfs);
-        }
+          // ---- 隅に小さくサブタイトル（隅の文字は、枠の端にそろえる）
+          if (sub && S.subPos === 'corner') {
+            const cfs = fit(c, [sub], 44 * k * S.textScale, W * 0.45);
+            c.font = `${S.weight} ${cfs}px ${family()}`;
+            const w = c.measureText(sub).width + (boxed ? cfs * 1.3 : subStroke);
+            const hh = (boxed ? cfs * 1.55 : cfs * 1.2) + arcLift(cfs);
+            const m = Math.min(W, H) * 0.045 + subStroke / 2;
+            const x = S.subCorner.endsWith('l') ? m + w / 2 : S.subCorner.endsWith('c') ? W / 2 : W - m - w / 2;
+            const yy = S.subCorner.startsWith('t') ? m + hh / 2 : H - m - hh / 2;
+            subText(x, yy, cfs);
+          }
 
-        // ---- 隅に小さくロゴ
-        if (mode === 'corner') {
-          const r = Math.min(W * 0.2 / logo.width, H * 0.14 / logo.height) * S.logoScale;
-          const w = logo.width * r, h = logo.height * r, m = Math.min(W, H) * (S.logoPlate ? 0.06 : 0.04);
-          const x = S.logoCorner.endsWith('l') ? m : S.logoCorner.endsWith('c') ? (W - w) / 2 : W - m - w;
-          const yy = S.logoCorner.startsWith('t') ? m : H - m - h;
-          plate(x, yy, w, h);
-          c.save();
-          if (S.shadow) { c.shadowColor = 'rgba(0, 0, 0, 0.25)'; c.shadowBlur = 8 * k; c.shadowOffsetY = 3 * k; }
-          c.drawImage(logo, x, yy, w, h);
-          c.restore();
-        }
+          // ---- 隅に小さくロゴ
+          if (mode === 'corner') {
+            const r = Math.min(W * 0.2 / logo.width, H * 0.14 / logo.height) * S.logoScale;
+            const w = logo.width * r, h = logo.height * r, m = Math.min(W, H) * (S.logoPlate ? 0.06 : 0.04);
+            const x = S.logoCorner.endsWith('l') ? m : S.logoCorner.endsWith('c') ? (W - w) / 2 : W - m - w;
+            const yy = S.logoCorner.startsWith('t') ? m : H - m - h;
+            plate(x, yy, w, h);
+            c.save();
+            if (S.shadow) { c.shadowColor = 'rgba(0, 0, 0, 0.25)'; c.shadowBlur = 8 * k; c.shadowOffsetY = 3 * k; }
+            c.drawImage(logo, x, yy, w, h);
+            c.restore();
+          }
+        };
 
-        // ---- 追加の画像のうち、文字より前のもの（あとの画像ほど上）
-        drawExtras(false);
+        // ---- 重なりの順に描く（下から）
+        const byId = Object.fromEntries(S.extras.map(e => [e.id, e]));
+        for (const id of S.order) {
+          if (id === '@pic') drawPic();
+          else if (id === '@text') drawText();
+          else if (byId[id]) drawExtra(byId[id]);
+        }
         return { pic, text: textRect, extras };
       }
 
@@ -2382,7 +2478,7 @@
       };
       function render() {
         draw(cv);
-        const hv = hoverId && lastHit.extras.find(r => r.id === hoverId);
+        const hv = hoverId === '@pic' ? lastHit.pic : hoverId === '@text' ? lastHit.text : hoverId && lastHit.extras.find(r => r.id === hoverId);
         if (hv) {
           const c = cv.getContext('2d'), lw = Math.max(3, cv.width / 300);
           c.save();
@@ -2526,12 +2622,16 @@
       };
       const inRect = (p, r) => r && p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
       function hitAt(p) {
-        // つかむ順：文字より前の追加画像 → 文字 → 文字の後ろの追加画像 → 1枚目の画像
-        const ex = lastHit.extras;
-        for (let i = ex.length - 1; i >= 0; i--) if (!ex[i].behind && inRect(p, ex[i])) return { kind: 'extra', id: ex[i].id };
-        if (inRect(p, lastHit.text)) return { kind: 'text' };
-        for (let i = ex.length - 1; i >= 0; i--) if (ex[i].behind && inRect(p, ex[i])) return { kind: 'extra', id: ex[i].id };
-        if (inRect(p, lastHit.pic)) return { kind: 'pic' };
+        // 上に重なっているものから順につかむ
+        for (let i = S.order.length - 1; i >= 0; i--) {
+          const id = S.order[i];
+          if (id === '@text') { if (inRect(p, lastHit.text)) return { kind: 'text' }; }
+          else if (id === '@pic') { if (inRect(p, lastHit.pic)) return { kind: 'pic' }; }
+          else {
+            const r = lastHit.extras.find(x => x.id === id);
+            if (inRect(p, r)) return { kind: 'extra', id };
+          }
+        }
         return null;
       }
       cv.addEventListener('pointerdown', e => {
@@ -2583,78 +2683,140 @@
       ];
       let movedId = null, movedTimer = 0, hoverId = null;
       const mainCard = $('main-card');
-      function renderMain() {
+      let mainPos = '';
+      function renderMain(pos) {
+        if (pos !== undefined) mainPos = pos;
         const has = !!img.side;
-        $('main-name').innerHTML = `メインの画像<small>（${S.imgPos === 'none' ? '置かない' : has ? '文字がよける' : 'サンプル・文字がよける'}）</small>`;
+        $('main-name').innerHTML = `メインの画像<small>（${S.imgPos === 'none' ? '置かない' : has ? '文字がよける' : 'サンプル・文字がよける'}）</small>${mainPos}`;
         $('img-clear').style.display = has ? '' : 'none';
         $('main-free').style.display = has ? '' : 'none';
         $('img-pick').textContent = has ? '📁 画像を変える' : '📁 画像を選ぶ';
+      }
+      // 重なりを1つ動かす（d = +1 で前へ、-1 で後ろへ）
+      function moveLayer(id, d) {
+        const i = S.order.indexOf(id), j = i + d;
+        if (i < 0 || j < 0 || j >= S.order.length) return;
+        [S.order[i], S.order[j]] = [S.order[j], S.order[i]];
+        movedId = id;
+        renderExtras(); redraw();
+        clearTimeout(movedTimer);
+        movedTimer = setTimeout(() => { movedId = null; }, 800);
+      }
+      const esc = v => String(v).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+      const orderBtns = (rank, n) =>
+        `<button class="btn btn-sm" type="button" data-a="up" title="1つ前に重ねる" ${rank === 0 ? 'disabled' : ''}>↑ 前へ</button>`
+        + `<button class="btn btn-sm" type="button" data-a="down" title="1つ後ろに重ねる" ${rank === n - 1 ? 'disabled' : ''}>↓ 後ろへ</button>`;
+      function hookRow(row, id) {
+        row.dataset.id = id;
+        if (id === movedId) row.classList.add('moved');
+        row.querySelector('[data-a="up"]').onclick = () => moveLayer(id, 1);
+        row.querySelector('[data-a="down"]').onclick = () => moveLayer(id, -1);
+        row.onmouseenter = () => { hoverId = id; render(); };
+        row.onmouseleave = () => { if (hoverId === id) { hoverId = null; render(); } };
+      }
+      function addBars(row, ex) {
+        const bars = row.querySelector('.extra-bars');
+        extraInputs[ex.id] = {};
+        for (const [key, label, min, max, step, u] of EXTRA_BARS) {
+          const f = document.createElement('label');
+          f.className = 'extra-bar';
+          f.innerHTML = `<span class="field-label"><span>${label}</span><span class="field-val"></span></span><input type="range" min="${min}" max="${max}" step="${step}">`;
+          const r = f.querySelector('input'), val = f.querySelector('.field-val');
+          const set = v => { r.value = v; val.textContent = `${+(+v).toFixed(2)}${u}`; };
+          set(ex[key] ?? 0);
+          r.addEventListener('input', () => { ex[key] = parseFloat(r.value); set(ex[key]); redraw(); });
+          extraInputs[ex.id][key] = set;
+          bars.appendChild(f);
+        }
+      }
+      function removeExtra(ex) {
+        S.extras = S.extras.filter(x => x !== ex);
+        S.order = S.order.filter(v => v !== ex.id);
+        delete img.extras[ex.id];
+        try { localStorage.removeItem(EXTRA_KEY(ex.id)); } catch (e) { /* ignore */ }
+        renderExtras(); redraw();
       }
       function renderExtras() {
         const list = $('extra-list');
         list.innerHTML = '';
         for (const k in extraInputs) delete extraInputs[k];
-        list.appendChild(mainCard);
-        renderMain();
-        if (!S.extras.length) return;
-        const n = S.extras.length;
-        // S.extras はあとのものほど前（上に重なる）。一覧は前のものから並べる
-        [...S.extras].reverse().forEach((ex, rank) => {
-          const i = n - 1 - rank;
-          const row = document.createElement('div');
-          row.className = 'extra-item' + (ex.id === movedId ? ' moved' : '');
-          row.dataset.id = ex.id;
-          const name = rank === 0 ? 'いちばん前' : `前から${rank + 1}番目`;
-          row.innerHTML = `<div class="extra-head"><span class="img-thumb"></span><span class="nm">${name}${ex.behind ? '<small>（文字の後ろ）</small>' : ''}</span>`
-            + `<button class="btn btn-sm" type="button" data-a="up" title="1つ前に重ねる" ${rank === 0 ? 'disabled' : ''}>↑ 前へ</button>`
-            + `<button class="btn btn-sm" type="button" data-a="down" title="1つ後ろに重ねる" ${rank === n - 1 ? 'disabled' : ''}>↓ 後ろへ</button>`
-            + `<button class="btn btn-sm" type="button" data-a="main" title="この画像をメインの画像（文字がよける）にします">メインにする</button>`
-            + `<button class="btn btn-sm" type="button" data-a="center">真ん中へ</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`
-            + `<label class="toggle extra-behind"><span>文字の後ろに置く</span><input type="checkbox" ${ex.behind ? 'checked' : ''}><span class="sw"></span></label>`
-            + '<div class="extra-bars"></div>';
-          const im = img.extras[ex.id];
-          if (im) row.querySelector('.img-thumb').style.backgroundImage = `url("${im.src}")`;
-          const bars = row.querySelector('.extra-bars');
-          extraInputs[ex.id] = {};
-          for (const [key, label, min, max, step, u] of EXTRA_BARS) {
-            const f = document.createElement('label');
-            f.className = 'extra-bar';
-            f.innerHTML = `<span class="field-label"><span>${label}</span><span class="field-val"></span></span><input type="range" min="${min}" max="${max}" step="${step}">`;
-            const r = f.querySelector('input'), val = f.querySelector('.field-val');
-            const set = v => { r.value = v; val.textContent = `${+(+v).toFixed(2)}${u}`; };
-            set(ex[key] ?? 0);
-            r.addEventListener('input', () => { ex[key] = parseFloat(r.value); set(ex[key]); redraw(); });
-            extraInputs[ex.id][key] = set;
-            bars.appendChild(f);
+        fixOrder(S);
+        const byId = Object.fromEntries(S.extras.map(e => [e.id, e]));
+        const n = S.order.length;
+        [...S.order].reverse().forEach((id, rank) => {
+          const pos = rank === 0 ? '<span class="rank">いちばん前</span>' : rank === n - 1 ? '<span class="rank">いちばん後ろ</span>' : '';
+          // メインの画像
+          if (id === '@pic') {
+            list.appendChild(mainCard);
+            $('main-order').innerHTML = orderBtns(rank, n);
+            mainCard.classList.remove('moved');
+            hookRow(mainCard, '@pic');
+            renderMain(pos);
+            return;
           }
-          const move = d => {
-            const j = i + d;
-            if (j < 0 || j >= S.extras.length) return;
-            [S.extras[i], S.extras[j]] = [S.extras[j], S.extras[i]];
-            movedId = ex.id;
-            renderExtras(); redraw();
-            clearTimeout(movedTimer);
-            movedTimer = setTimeout(() => { movedId = null; }, 800);
-          };
-          row.querySelector('[data-a="up"]').addEventListener('click', () => move(1));
-          row.querySelector('[data-a="down"]').addEventListener('click', () => move(-1));
-          row.querySelector('.extra-behind input').addEventListener('change', e => { ex.behind = e.target.checked; renderExtras(); redraw(); });
-          // カードにマウスを乗せると、プレビューのその画像に枠を出す
-          row.addEventListener('mouseenter', () => { hoverId = ex.id; render(); });
-          row.addEventListener('mouseleave', () => { if (hoverId === ex.id) { hoverId = null; render(); } });
-          row.querySelector('[data-a="main"]').addEventListener('click', () => makeMain(ex));
-          row.querySelector('[data-a="center"]').addEventListener('click', () => {
+          const row = document.createElement('div');
+          // メインの文字
+          if (id === '@text') {
+            row.className = 'extra-item main-card';
+            const t = S.title.replace(/\*/g, '').split('\n')[0] || '（タイトルなし）';
+            row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb">Aa</span><span class="nm">メインの文字<small>（${esc(t.slice(0, 12))}…）</small>${pos}</span>`
+              + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="edit">文字の欄へ</button></div>`
+              + '<div class="field-note" style="padding:4px 0 6px">タイトル・サブタイトル・ロゴです。上の「✏️ 文字」「🔤 文字の見た目」で編集します。</div>';
+            row.querySelector('[data-a="edit"]').onclick = () => {
+              const d = $('f-title').closest('details');
+              d.open = true;
+              $('f-title').focus();
+              $('f-title').scrollIntoView({ block: 'center' });
+            };
+            hookRow(row, '@text');
+            list.appendChild(row);
+            return;
+          }
+          const ex = byId[id];
+          row.className = 'extra-item';
+          if (ex.type === 'text') {
+            row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="color:${ex.color}">Aa</span><span class="nm">文字${pos}</span>`
+              + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="center">真ん中へ</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`
+              + '<div class="extra-text"><input type="text" maxlength="100" aria-label="文字" spellcheck="false">'
+              + '<input type="color" aria-label="文字の色" title="文字の色">'
+              + '<select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option></select>'
+              + '<input type="color" aria-label="形の色" title="形の色" data-k="boxColor"></div>'
+              + '<div class="extra-bars"></div>';
+            const [tIn, cIn] = row.querySelectorAll('.extra-text input');
+            const bIn = row.querySelector('.extra-text select'), bcIn = row.querySelector('[data-k="boxColor"]');
+            tIn.value = ex.text; cIn.value = ex.color; bIn.value = ex.box; bcIn.value = ex.boxColor;
+            bcIn.style.display = ex.box === 'none' ? 'none' : '';
+            tIn.oninput = () => { ex.text = tIn.value; redraw(); };
+            cIn.oninput = () => { ex.color = cIn.value; row.querySelector('.text-thumb').style.color = cIn.value; redraw(); };
+            bIn.onchange = () => {
+              ex.box = bIn.value;
+              bcIn.style.display = ex.box === 'none' ? 'none' : '';
+              // 形と文字が同じ色だと読めないので、文字を白にする
+              if (ex.box !== 'none' && ex.color.toLowerCase() === ex.boxColor.toLowerCase()) {
+                ex.color = '#ffffff'; cIn.value = '#ffffff'; row.querySelector('.text-thumb').style.color = '#ffffff';
+              }
+              redraw();
+            };
+            bcIn.oninput = () => { ex.boxColor = bcIn.value; redraw(); };
+          } else {
+            row.innerHTML = `<div class="extra-head"><span class="img-thumb"></span><span class="nm">画像${pos}</span>`
+              + orderBtns(rank, n)
+              + `<button class="btn btn-sm" type="button" data-a="main" title="この画像をメインの画像（文字がよける）にします">メインにする</button>`
+              + `<button class="btn btn-sm" type="button" data-a="center">真ん中へ</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`
+              + '<div class="extra-bars"></div>';
+            const im = img.extras[ex.id];
+            if (im) row.querySelector('.img-thumb').style.backgroundImage = `url("${im.src}")`;
+            row.querySelector('[data-a="main"]').onclick = () => makeMain(ex);
+          }
+          addBars(row, ex);
+          row.querySelector('[data-a="center"]').onclick = () => {
             ex.x = 50; ex.y = 50;
             extraInputs[ex.id].x(50); extraInputs[ex.id].y(50);
             redraw();
-          });
-          row.querySelector('[data-a="del"]').addEventListener('click', () => {
-            S.extras = S.extras.filter(x => x !== ex);
-            delete img.extras[ex.id];
-            try { localStorage.removeItem(EXTRA_KEY(ex.id)); } catch (e) { /* ignore */ }
-            renderExtras(); redraw();
-          });
-          list.insertBefore(row, mainCard);
+          };
+          row.querySelector('[data-a="del"]').onclick = () => removeExtra(ex);
+          hookRow(row, ex.id);
+          list.appendChild(row);
         });
       }
 
@@ -2669,8 +2831,8 @@
         img.extras[id] = img.side;
         keep(EXTRA_KEY(id), img.side.src);
         const e = pic
-          ? { id, x: (pic.x + pic.w / 2) / W * 100, y: (pic.y + pic.h / 2) / H * 100, scale: Math.max(pic.w, pic.h) / (Math.min(W, H) * 0.3), rot: S.imgRot, behind: true }
-          : { id, x: 50, y: 50, scale: 1, rot: 0, behind: true };
+          ? { id, type: 'image', x: (pic.x + pic.w / 2) / W * 100, y: (pic.y + pic.h / 2) / H * 100, scale: Math.max(pic.w, pic.h) / (Math.min(W, H) * 0.3), rot: S.imgRot }
+          : { id, type: 'image', x: 50, y: 50, scale: 1, rot: 0 };
         e.x = Math.round(e.x); e.y = Math.round(e.y); e.scale = Math.round(e.scale * 100) / 100;
         return e;
       }
@@ -2678,11 +2840,15 @@
         const old = mainToExtra();
         img.side = img.extras[ex.id];
         keep(IMG_KEY, img.side.src);
+        // 入れ替え：この画像がいた場所にメインの画像を、メインの画像がいた場所に前のメインを置く
+        const iEx = S.order.indexOf(ex.id), iPic = S.order.indexOf('@pic');
         S.extras = S.extras.filter(x => x !== ex);
         delete img.extras[ex.id];
         try { localStorage.removeItem(EXTRA_KEY(ex.id)); } catch (e) { /* ignore */ }
-        // 前のメインは、いちばん後ろの自由な画像に
-        if (old) S.extras.unshift(old);
+        S.order[iEx] = '@pic';
+        S.order[iPic] = old ? old.id : '@removed';
+        S.order = S.order.filter(v => v !== '@removed');
+        if (old) S.extras.push(old);
         if (S.imgPos === 'none') S.imgPos = 'left';
         S.imgX = 0; S.imgY = 0; S.imgRot = 0;
         syncUI(); setThumb(); renderExtras(); redraw();
@@ -2691,7 +2857,10 @@
       $('main-free').addEventListener('click', () => {
         const e = mainToExtra();
         if (!e) return;
-        S.extras.unshift(e);
+        // 同じ重なりの場所に置き、メインの画像（置かない）はいちばん後ろへ
+        S.extras.push(e);
+        S.order[S.order.indexOf('@pic')] = e.id;
+        S.order.unshift('@pic');
         img.side = null;
         try { localStorage.removeItem(IMG_KEY); } catch (er) { /* ignore */ }
         S.imgPos = 'none';
@@ -2699,6 +2868,15 @@
         toast('自由に置く画像にしました');
       });
       $('extra-add').addEventListener('click', () => $('extra-file').click());
+      $('text-add').addEventListener('click', () => {
+        const id = newId();
+        const n = S.extras.length;
+        S.extras.push({ id, type: 'text', text: 'テキスト', color: S.titleColor, box: 'none', boxColor: '#ff7fa0', x: 50, y: 18 + (n % 4) * 8, scale: 0.8, rot: 0 });
+        S.order.push(id);
+        renderExtras(); redraw();
+        const inp = $('extra-list').querySelector(`[data-id="${id}"] .extra-text input`);
+        if (inp) { inp.focus(); inp.select(); }
+      });
       $('extra-file').addEventListener('change', async e => {
         const f = e.target.files[0];
         e.target.value = '';
@@ -2718,7 +2896,8 @@
           keep(EXTRA_KEY(id), url);
           // 前に足したものと重ならないように、少しずつずらして置く
           const n = S.extras.length;
-          S.extras.push({ id, x: 80 - (n % 4) * 8, y: 22 + (n % 4) * 8, scale: 0.6, rot: 0 });
+          S.extras.push({ id, type: 'image', x: 80 - (n % 4) * 8, y: 22 + (n % 4) * 8, scale: 0.6, rot: 0 });
+          S.order.push(id);
           renderExtras(); redraw();
         } catch (err) { toast(err.message); }
       });
@@ -2774,7 +2953,7 @@
           name, savedAt: Date.now(), S: JSON.parse(JSON.stringify(S)),
           images: {
             side: img.side ? img.side.src : null, bg: img.bg ? img.bg.src : null, logo: img.logo ? img.logo.src : null,
-            extras: Object.fromEntries(S.extras.filter(e => img.extras[e.id]).map(e => [e.id, img.extras[e.id].src])),
+            extras: Object.fromEntries(S.extras.filter(e => e.type !== 'text' && img.extras[e.id]).map(e => [e.id, img.extras[e.id].src])),
           },
         };
         try {
@@ -2889,7 +3068,12 @@
       $('batch-jpg').addEventListener('click', () => batch('image/jpeg'));
       $('batch-png').addEventListener('click', () => batch('image/png'));
 
-      $('f-title').addEventListener('input', e => { S.title = e.target.value; redraw(); });
+      $('f-title').addEventListener('input', e => {
+        S.title = e.target.value;
+        const nm = $('extra-list').querySelector('[data-id="@text"] .nm small');
+        if (nm) nm.textContent = `（${(S.title.replace(/\*/g, '').split('\n')[0] || '（タイトルなし）').slice(0, 12)}…）`;
+        redraw();
+      });
       $('f-sub').addEventListener('input', e => { S.sub = e.target.value; redraw(); });
 
       $('btn-reset').addEventListener('click', async () => {
@@ -2927,10 +3111,12 @@
         if (saved) img.logo = await loadImg(saved);
         setLogoThumb();
         for (const ex of S.extras) {
+          if (ex.type === 'text') continue;
           try { saved = localStorage.getItem(EXTRA_KEY(ex.id)); } catch (e) { saved = null; }
           if (saved) img.extras[ex.id] = await loadImg(saved);
         }
-        S.extras = S.extras.filter(ex => img.extras[ex.id]);
+        S.extras = S.extras.filter(ex => ex.type === 'text' || img.extras[ex.id]);
+        fixOrder(S);
         renderExtras();
         renderTpl();
         snapshot();
