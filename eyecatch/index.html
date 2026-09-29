@@ -1781,7 +1781,7 @@
         subStrokeOn: true, subStrokeW: 11, subStrokeColor: '#ffffff',
         textScale: 1, textAlign: 'center', textX: 0, textY: 0,
         titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
-        extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0, subScale: 1,
+        extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0, subScale: 1, titleRot: 0, subRot: 0,
         imgPos: 'left', imgAnchor: 'auto', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart',
         subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subArc: 0,
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
@@ -2502,17 +2502,19 @@
         // タイトル（とロゴ）を描く。paint が false なら場所だけ決める（サブタイトルの場所 subAt・タイトルの範囲も）
         const y0 = y;
         let subAt = null, titleTop = y, titleBot = y;
+        // paint：false は場所だけ決める。'body' はタイトル・ロゴ、'corner' は隅のロゴ、true は両方
         const drawText = paint => {
+          const bodyOn = paint === true || paint === 'body', cornerOn = paint === true || paint === 'corner';
           y = y0;
           subAt = null;
           if (subAbove) { subAt = { x: cxOf(subWidth(subFs)), y: y + subBody() / 2, f: subFs, w: subWidth(subFs), h: subBody() }; y += subH(); }
           titleTop = y;
-          if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow), paint);
+          if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow), bodyOn);
           for (const line of lines) {
-            if (paint) drawLine(c, line, cxOf(lineW(c, line, fs)), y + lineH(line) / 2, fs, titleStroke0() * k);
+            if (bodyOn) drawLine(c, line, cxOf(lineW(c, line, fs)), y + lineH(line) / 2, fs, titleStroke0() * k);
             y += lineH(line);
           }
-          if (lg && mode === 'below') { if (lines.length) y += gap; drawLogo(!subBelow, paint); }
+          if (lg && mode === 'below') { if (lines.length) y += gap; drawLogo(!subBelow, bodyOn); }
           titleBot = y;
           if (subBelow) subAt = { x: cxOf(subWidth(subFs)), y: y + gapPx + subBody() / 2, f: subFs, w: subWidth(subFs), h: subBody() };
 
@@ -2529,7 +2531,7 @@
           }
 
           // ---- 隅に小さくロゴ
-          if (paint && mode === 'corner') {
+          if (cornerOn && mode === 'corner') {
             const r = Math.min(W * 0.2 / logo.width, H * 0.14 / logo.height) * S.logoScale;
             const w = logo.width * r, h = logo.height * r, m = Math.min(W, H) * (S.logoPlate ? 0.06 : 0.04);
             const x = S.logoCorner.endsWith('l') ? m : S.logoCorner.endsWith('c') ? (W - w) / 2 : W - m - w;
@@ -2546,13 +2548,31 @@
         drawText(false);
         const subRect = subAt && { x: subAt.x + S.subX / 100 * W - subAt.w / 2, y: subAt.y + S.subY / 100 * H - subAt.h / 2, w: subAt.w, h: subAt.h };
         const titleRect = textRect && titleBot > titleTop ? { x: textRect.x, y: titleTop, w: textRect.w, h: titleBot - titleTop } : null;
-        const drawSub = () => { if (subAt) subText(subAt.x + S.subX / 100 * W, subAt.y + S.subY / 100 * H, subAt.f); };
+        const rotAt = (cx, cy, deg, fn) => {
+          if (!deg) { fn(); return; }
+          c.save();
+          c.translate(cx, cy);
+          c.rotate(deg * Math.PI / 180);
+          c.translate(-cx, -cy);
+          fn();
+          c.restore();
+        };
+        const drawSub = () => {
+          if (!subAt) return;
+          const x = subAt.x + S.subX / 100 * W, yy = subAt.y + S.subY / 100 * H;
+          rotAt(x, yy, S.subRot, () => subText(x, yy, subAt.f));
+        };
+        const drawTitle = () => {
+          if (titleRect) rotAt(titleRect.x + titleRect.w / 2, titleRect.y + titleRect.h / 2, S.titleRot, () => drawText('body'));
+          else drawText('body');
+          drawText('corner');
+        };
 
         // ---- 重なりの順に描く（下から）
         const byId = Object.fromEntries(S.extras.map(e => [e.id, e]));
         for (const id of S.order) {
           if (id === '@pic') drawPic();
-          else if (id === '@text') drawText(true);
+          else if (id === '@text') drawTitle();
           else if (id === '@sub') drawSub();
           else if (byId[id]) drawExtra(byId[id]);
         }
@@ -3004,12 +3024,12 @@
           bars: [['imgScale', '大きさ', 0.3, 1.6, 0.05, '倍'], ['imgX', '左右', -50, 50, 1, '%'], ['imgY', '上下', -50, 50, 1, '%'], ['imgRot', '回転', -180, 180, 1, '°']],
         };
         if (id === '@text') return {
-          name: 'タイトル', get obj() { return S; }, reset() { S.textX = 0; S.textY = 0; },
-          bars: [['textScale', '大きさ', 0.5, 1.3, 0.05, '倍'], ['textX', '左右', -50, 50, 1, '%'], ['textY', '上下', -50, 50, 1, '%']],
+          name: 'タイトル', get obj() { return S; }, reset() { S.textX = 0; S.textY = 0; S.titleRot = 0; },
+          bars: [['textScale', '大きさ', 0.5, 1.3, 0.05, '倍'], ['textX', '左右', -50, 50, 1, '%'], ['textY', '上下', -50, 50, 1, '%'], ['titleRot', '回転', -180, 180, 1, '°']],
         };
         if (id === '@sub') return {
-          name: 'サブタイトル', get obj() { return S; }, reset() { S.subX = 0; S.subY = 0; },
-          bars: [['subScale', '大きさ', 0.4, 2, 0.05, '倍'], ['subX', '左右', -60, 60, 1, '%'], ['subY', '上下', -60, 60, 1, '%']],
+          name: 'サブタイトル', get obj() { return S; }, reset() { S.subX = 0; S.subY = 0; S.subRot = 0; },
+          bars: [['subScale', '大きさ', 0.4, 2, 0.05, '倍'], ['subX', '左右', -60, 60, 1, '%'], ['subY', '上下', -60, 60, 1, '%'], ['subRot', '回転', -180, 180, 1, '°']],
         };
         const ex = S.extras.find(e => e.id === id);
         if (!ex) return null;
@@ -3137,7 +3157,7 @@
               + '<div class="field-note" style="padding:0 0 6px">大きさ・位置は、プレビューでクリックすると下のパネルで変えられます（ドラッグでも動かせます）。ロゴは「🏷️ ロゴ」で変えます。</div>';
             row.querySelector('.main-text-slot').appendChild(titleField);
             row.querySelector('.opts-slot').appendChild(titleOpts);
-            row.querySelector('[data-a="reset"]').onclick = () => { S.textX = 0; S.textY = 0; inputs.textX.set(0); inputs.textY.set(0); redraw(); };
+            row.querySelector('[data-a="reset"]').onclick = () => { S.textX = 0; S.textY = 0; S.titleRot = 0; inputs.textX.set(0); inputs.textY.set(0); redraw(); };
             hookRow(row, '@text');
             list.appendChild(row);
             return;
@@ -3151,7 +3171,7 @@
               + '<div class="field-note" style="padding:0 0 6px">大きさ・位置は、プレビューでクリックすると下のパネルで変えられます（ドラッグでも動かせます）。</div>';
             row.querySelector('.main-text-slot').appendChild(subField);
             row.querySelector('.opts-slot').appendChild(subOpts);
-            row.querySelector('[data-a="reset"]').onclick = () => { S.subX = 0; S.subY = 0; redraw(); };
+            row.querySelector('[data-a="reset"]').onclick = () => { S.subX = 0; S.subY = 0; S.subRot = 0; redraw(); };
             hookRow(row, '@sub');
             list.appendChild(row);
             return;
@@ -3160,7 +3180,7 @@
           row.className = 'extra-item';
           if (ex.type === 'text') {
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="color:${ex.color}">Aa</span><span class="nm">文字${pos}</span>`
-              + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="center">真ん中へ</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`
+              + orderBtns(rank, n) + `<button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button><button class="btn btn-sm" type="button" data-a="center">真ん中へ</button></div>`
               + '<div class="extra-text"><textarea maxlength="300" rows="2" aria-label="文字（Enter で改行）" placeholder="Enter で改行できます" spellcheck="false"></textarea>'
               + '<input type="color" aria-label="文字の色" title="文字の色">'
               + '<select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option></select>'
@@ -3206,9 +3226,9 @@
             bcIn.oninput = () => { ex.boxColor = bcIn.value; redraw(); };
           } else {
             row.innerHTML = `<div class="extra-head"><span class="img-thumb"></span><span class="nm">画像${pos}</span>`
-              + orderBtns(rank, n)
+              + orderBtns(rank, n) + `<button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button>`
               + `<button class="btn btn-sm" type="button" data-a="main" title="この画像をメインの画像（文字がよける）にします">メインにする</button>`
-              + `<button class="btn btn-sm" type="button" data-a="center">真ん中へ</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`
+              + `<button class="btn btn-sm" type="button" data-a="center">真ん中へ</button></div>`
               ;
             const im = img.extras[ex.id];
             if (im) row.querySelector('.img-thumb').style.backgroundImage = `url("${im.src}")`;
