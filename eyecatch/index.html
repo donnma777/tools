@@ -1274,6 +1274,24 @@
       }
     }
 
+    .main-card {
+      border-style: dashed;
+    }
+
+    .main-opts {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 0 14px;
+      padding: 6px 12px 4px;
+      border: 1px dashed var(--border-strong);
+      border-radius: 10px;
+    }
+
+    .main-opts > .field-label {
+      grid-column: 1 / -1;
+      padding-top: 4px;
+    }
+
     .extra-behind {
       padding: 6px 0 0;
     }
@@ -1385,28 +1403,28 @@
 
       <div hidden>
         <div class="fields">
-          <div class="field field-full" id="img-upload">
-            <span class="field-label"><span>横に置く画像（キャラ・写真・アイコンなど）</span></span>
-            <div class="extra-item">
-              <div class="extra-head">
-                <span class="img-thumb" id="img-thumb"></span><span class="nm">画像 1</span>
-                <button class="btn btn-sm" type="button" id="img-pick">📁 画像を選ぶ</button>
-                <button class="btn btn-sm" type="button" id="img-clear">サンプルに戻す</button>
-                <button class="btn btn-sm" type="button" id="img-center" title="ずらした位置を元に戻します">位置を戻す</button>
-                <input type="file" id="img-file" accept="image/*" hidden>
-              </div>
-              <div class="extra-bars" id="img-bars"></div>
+          <div class="extra-item main-card" id="main-card">
+            <div class="extra-head">
+              <span class="img-thumb" id="img-thumb"></span><span class="nm" id="main-name">メインの画像</span>
+              <button class="btn btn-sm" type="button" id="img-pick">📁 画像を変える</button>
+              <button class="btn btn-sm" type="button" id="img-clear">サンプルに戻す</button>
+              <button class="btn btn-sm" type="button" id="main-free" title="この画像を、文字がよけない自由な画像にします">自由に置く</button>
+              <button class="btn btn-sm" type="button" id="img-center" title="ずらした位置を元に戻します">位置を戻す</button>
+              <input type="file" id="img-file" accept="image/*" hidden>
             </div>
-            <div class="field-note">背景が透明な PNG・WebP だと、柄の上にきれいに乗ります。選ばないときは、下の「画像を選ばないときのサンプル」で選んだもの（ハート・星など）が入ります。プレビューの画像はドラッグしても動かせます。</div>
+            <div class="extra-bars" id="img-bars"></div>
+          </div>
+          <div class="field field-full main-opts" id="main-opts">
+            <span class="field-label"><span>メインの画像の置き方（文字がよける画像）</span></span>
           </div>
           <div class="field field-full" id="extra-upload">
-            <span class="field-label"><span>追加の画像（アイコン・スタンプなど。いくつでも）</span></span>
+            <span class="field-label"><span>画像（キャラ・写真・アイコン・スタンプなど。上ほど前に重なります）</span></span>
             <div class="row-list" id="extra-list"></div>
             <div class="data-row" style="margin-top:0">
               <button class="btn btn-sm" type="button" id="extra-add">＋ 画像を追加</button>
               <input type="file" id="extra-file" accept="image/*" hidden>
             </div>
-            <div class="field-note">追加した画像は、プレビューでドラッグして好きな場所に置けます。一覧は上ほど前に重なります。「↑ 前へ」「↓ 後ろへ」で入れ替えられます（1枚目の画像はいちばん下）。カードにマウスを乗せると、プレビューのその画像に枠が出ます。</div>
+            <div class="field-note"><b>メインの画像</b>（いちばん下）は、文字がよけて置かれます（左・右・上・下・真ん中）。画像を選んでいないときはサンプル（ハートなど）が入ります。<b>ほかの画像</b>は好きな場所に置けます。「メインにする」「自由に置く」で役割を入れ替えられます。プレビューでドラッグして動かせます。カードにマウスを乗せると、プレビューのその画像に枠が出ます。</div>
           </div>
         </div>
       </div>
@@ -1624,8 +1642,8 @@
         {
           title: '画像', icon: '🖼️', open: true, fields: [
             {
-              k: 'imgPos', l: '画像の位置', t: 'select', o: [['left', '左'], ['right', '右'], ['top', '上（文字は下）'], ['bottom', '下（文字は上）'],
-              ['center', '真ん中（文字の後ろ）'], ['none', '画像なし（文字だけ）']], note: '縦長・正方形で「左」「右」を選ぶと、下に置きます'
+              k: 'imgPos', l: '位置', t: 'select', o: [['left', '左'], ['right', '右'], ['top', '上（文字は下）'], ['bottom', '下（文字は上）'],
+              ['center', '真ん中（文字の後ろ）'], ['none', '置かない（文字だけ）']], note: '縦長・正方形で「左」「右」を選ぶと、下に置きます'
             },
             { k: 'imgAnchor', l: '縦の位置', t: 'select', o: [['auto', 'おまかせ'], ['bottom', '下にそろえる（キャラの全身など）'], ['center', '真ん中']], when: s => s.imgPos === 'left' || s.imgPos === 'right' },
             { k: 'sample', l: '画像を選ばないときのサンプル', t: 'select', o: [['heart', 'ハート'], ['star', '星'], ['bunny', 'うさぎ（どんまうんど）']], when: s => s.imgPos !== 'none' },
@@ -1777,7 +1795,7 @@
           grid.className = 'fields';
           // ロゴの欄は、先頭にロゴのアップロードを置く
           if (sec.title === 'ロゴ') grid.appendChild($('logo-upload'));
-          if (sec.title === '画像') { grid.appendChild($('img-upload')); grid.appendChild($('extra-upload')); }
+          if (sec.title === '画像') { grid.appendChild($('main-opts')); grid.appendChild($('extra-upload')); }
           for (const f of sec.fields) grid.appendChild(buildField(f));
           det.appendChild(grid);
           // 「大きさ」は文字の前に出す
@@ -1786,6 +1804,8 @@
         }
         // 「まとめて作る」はいちばん下に
         $('settings').appendChild($('batch-sec'));
+        // メインの画像の置き方は、メインのカードの中に
+        $('main-opts').append(inputs.imgPos.wrap, inputs.imgAnchor.wrap, inputs.sample.wrap);
         // 1枚目の画像のバー（追加の画像と同じ形）
         for (const [k, label, min, max, step, u] of [
           ['imgScale', '大きさ', 0.3, 1.6, 0.05, '倍'], ['imgX', '左右', -50, 50, 1, '%'],
@@ -1819,6 +1839,7 @@
         S[k] = v;
         refreshVisibility();
         if (k === 'sample') setThumb();
+        if (k === 'imgPos') renderMain();
         redraw();
       }
       function redraw() {
@@ -2443,6 +2464,7 @@
           keep(IMG_KEY, url);
           if (S.imgPos === 'none') { S.imgPos = 'left'; syncUI(); }
           setThumb();
+          renderMain();
           redraw();
         } catch (err) { toast(err.message); }
       });
@@ -2450,6 +2472,7 @@
         img.side = null;
         try { localStorage.removeItem(IMG_KEY); } catch (e) { /* ignore */ }
         setThumb();
+        renderMain();
         redraw();
       });
       const bgFile = document.createElement('input');
@@ -2559,11 +2582,21 @@
         ['rot', '回転', -180, 180, 1, '°'],
       ];
       let movedId = null, movedTimer = 0, hoverId = null;
+      const mainCard = $('main-card');
+      function renderMain() {
+        const has = !!img.side;
+        $('main-name').innerHTML = `メインの画像<small>（${S.imgPos === 'none' ? '置かない' : has ? '文字がよける' : 'サンプル・文字がよける'}）</small>`;
+        $('img-clear').style.display = has ? '' : 'none';
+        $('main-free').style.display = has ? '' : 'none';
+        $('img-pick').textContent = has ? '📁 画像を変える' : '📁 画像を選ぶ';
+      }
       function renderExtras() {
         const list = $('extra-list');
         list.innerHTML = '';
         for (const k in extraInputs) delete extraInputs[k];
-        if (!S.extras.length) { list.innerHTML = '<div class="row-empty">まだありません</div>'; return; }
+        list.appendChild(mainCard);
+        renderMain();
+        if (!S.extras.length) return;
         const n = S.extras.length;
         // S.extras はあとのものほど前（上に重なる）。一覧は前のものから並べる
         [...S.extras].reverse().forEach((ex, rank) => {
@@ -2571,10 +2604,11 @@
           const row = document.createElement('div');
           row.className = 'extra-item' + (ex.id === movedId ? ' moved' : '');
           row.dataset.id = ex.id;
-          const name = n === 1 ? '追加の画像' : rank === 0 ? 'いちばん前' : rank === n - 1 ? 'いちばん後ろ' : `前から${rank + 1}番目`;
+          const name = rank === 0 ? 'いちばん前' : `前から${rank + 1}番目`;
           row.innerHTML = `<div class="extra-head"><span class="img-thumb"></span><span class="nm">${name}${ex.behind ? '<small>（文字の後ろ）</small>' : ''}</span>`
             + `<button class="btn btn-sm" type="button" data-a="up" title="1つ前に重ねる" ${rank === 0 ? 'disabled' : ''}>↑ 前へ</button>`
             + `<button class="btn btn-sm" type="button" data-a="down" title="1つ後ろに重ねる" ${rank === n - 1 ? 'disabled' : ''}>↓ 後ろへ</button>`
+            + `<button class="btn btn-sm" type="button" data-a="main" title="この画像をメインの画像（文字がよける）にします">メインにする</button>`
             + `<button class="btn btn-sm" type="button" data-a="center">真ん中へ</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`
             + `<label class="toggle extra-behind"><span>文字の後ろに置く</span><input type="checkbox" ${ex.behind ? 'checked' : ''}><span class="sw"></span></label>`
             + '<div class="extra-bars"></div>';
@@ -2608,6 +2642,7 @@
           // カードにマウスを乗せると、プレビューのその画像に枠を出す
           row.addEventListener('mouseenter', () => { hoverId = ex.id; render(); });
           row.addEventListener('mouseleave', () => { if (hoverId === ex.id) { hoverId = null; render(); } });
+          row.querySelector('[data-a="main"]').addEventListener('click', () => makeMain(ex));
           row.querySelector('[data-a="center"]').addEventListener('click', () => {
             ex.x = 50; ex.y = 50;
             extraInputs[ex.id].x(50); extraInputs[ex.id].y(50);
@@ -2619,17 +2654,66 @@
             try { localStorage.removeItem(EXTRA_KEY(ex.id)); } catch (e) { /* ignore */ }
             renderExtras(); redraw();
           });
-          list.appendChild(row);
+          list.insertBefore(row, mainCard);
         });
       }
+
+      // メインの画像 ⇔ 自由な画像 の入れ替え
+      const newId = () => Math.random().toString(36).slice(2, 10);
+      // 今のメインの画像を、表示されている場所・大きさのまま自由な画像にする
+      function mainToExtra() {
+        if (!img.side) return null;
+        const [W, H] = dims();
+        const pic = lastHit.pic;
+        const id = newId();
+        img.extras[id] = img.side;
+        keep(EXTRA_KEY(id), img.side.src);
+        const e = pic
+          ? { id, x: (pic.x + pic.w / 2) / W * 100, y: (pic.y + pic.h / 2) / H * 100, scale: Math.max(pic.w, pic.h) / (Math.min(W, H) * 0.3), rot: S.imgRot, behind: true }
+          : { id, x: 50, y: 50, scale: 1, rot: 0, behind: true };
+        e.x = Math.round(e.x); e.y = Math.round(e.y); e.scale = Math.round(e.scale * 100) / 100;
+        return e;
+      }
+      function makeMain(ex) {
+        const old = mainToExtra();
+        img.side = img.extras[ex.id];
+        keep(IMG_KEY, img.side.src);
+        S.extras = S.extras.filter(x => x !== ex);
+        delete img.extras[ex.id];
+        try { localStorage.removeItem(EXTRA_KEY(ex.id)); } catch (e) { /* ignore */ }
+        // 前のメインは、いちばん後ろの自由な画像に
+        if (old) S.extras.unshift(old);
+        if (S.imgPos === 'none') S.imgPos = 'left';
+        S.imgX = 0; S.imgY = 0; S.imgRot = 0;
+        syncUI(); setThumb(); renderExtras(); redraw();
+        toast('メインの画像にしました（文字がよけて置かれます）');
+      }
+      $('main-free').addEventListener('click', () => {
+        const e = mainToExtra();
+        if (!e) return;
+        S.extras.unshift(e);
+        img.side = null;
+        try { localStorage.removeItem(IMG_KEY); } catch (er) { /* ignore */ }
+        S.imgPos = 'none';
+        syncUI(); setThumb(); renderExtras(); redraw();
+        toast('自由に置く画像にしました');
+      });
       $('extra-add').addEventListener('click', () => $('extra-file').click());
       $('extra-file').addEventListener('change', async e => {
         const f = e.target.files[0];
         e.target.value = '';
         if (!f) return;
         try {
-          const { url, im } = await readImage(f, 1000);
-          const id = Math.random().toString(36).slice(2, 10);
+          const { url, im } = await readImage(f, 1600);
+          if (!img.side) {
+            img.side = im;
+            keep(IMG_KEY, url);
+            if (S.imgPos === 'none') S.imgPos = 'left';
+            syncUI(); setThumb(); renderExtras(); redraw();
+            toast('メインの画像にしました（文字がよけて置かれます）');
+            return;
+          }
+          const id = newId();
           img.extras[id] = im;
           keep(EXTRA_KEY(id), url);
           // 前に足したものと重ならないように、少しずつずらして置く
