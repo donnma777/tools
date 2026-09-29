@@ -1274,6 +1274,21 @@
       }
     }
 
+    .card-opts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 14px;
+      padding: 0;
+    }
+
+    .card-opts .field {
+      padding: 6px 0;
+    }
+
+    .card-opts .field-note {
+      grid-column: 1 / -1;
+    }
+
     .main-text-slot.fields {
       display: block;
       padding: 4px 0 0;
@@ -1442,11 +1457,13 @@
       </details>
 
       <div hidden>
+        <div class="fields card-opts" id="title-opts"></div>
+        <div class="fields card-opts" id="sub-opts"></div>
         <div class="fields" id="main-text-fields">
           <div class="field field-full" id="title-field">
             <label class="field-label" for="f-title"><span>タイトル（Enter で改行）</span></label>
             <textarea class="title-in" id="f-title" spellcheck="false"></textarea>
-            <div class="field-note">長い文字は、枠に収まるように自動で小さくなります。<b>*〜*</b> で囲んだところは強調（色・大きさは「文字の見た目」）。例: マジカルミライ *2026* レポ</div>
+            <div class="field-note">長い文字は、枠に収まるように自動で小さくなります。<b>*〜*</b> で囲んだところは強調（色・大きさは下の「強調」）。例: マジカルミライ *2026* レポ</div>
           </div>
           <div class="field field-full" id="sub-field">
             <label class="field-label" for="f-sub"><span>サブタイトル（小さい文字。空欄でなし）</span></label>
@@ -1625,7 +1642,7 @@
         titleColor: '#ff7fa0', hlColor: '#f0325a', hlScale: 1.15, subColor: '#6e3551', strokeWidth: 14, strokeColor: '#ffffff', shadow: true,
         textScale: 1, textAlign: 'center', textX: 0, textY: 0,
         titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
-        extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0,
+        extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0, subScale: 1,
         imgPos: 'left', imgAnchor: 'auto', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart',
         subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subArc: 0, subGap: 0,
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
@@ -1680,6 +1697,7 @@
           const ids = (b) => src.filter(e => e && !!e.behind === b).map(e => e.id);
           out.order = ['@pic', ...ids(true), '@text', ...ids(false)];
         }
+        if (o.subScale === undefined && typeof o.textScale === 'number') out.subScale = out.textScale;
         fixOrder(out);
         if (out.bg === 'usagi') out.bg = 'dots';
         out.customW = Math.round(Math.min(4000, Math.max(200, out.customW)));
@@ -1698,29 +1716,32 @@
         },
         {
           title: '文字の見た目', icon: '🔤', open: true, fields: [
+            // 全部の文字（タイトル・サブタイトル・追加した文字）に効くもの
             { k: 'font', l: 'フォント', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]) },
             { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
             { k: 'weight', l: '文字の太さ', t: 'select', o: C.WEIGHTS },
-            { k: 'textScale', l: '文字の大きさ', t: 'range', min: 0.5, max: 1.3, step: 0.05, u: '倍', note: '枠に収まらないときは、これより小さくなります' },
-            { k: 'titleColor', l: 'タイトルの色', t: 'color' },
-            { k: 'hlColor', l: '強調（*〜*）の色', t: 'color' },
-            { k: 'hlScale', l: '強調（*〜*）の大きさ', t: 'range', min: 0.8, max: 1.6, step: 0.05, u: '倍' },
-            { k: 'textAlign', l: '文字のそろえ方', t: 'select', o: [['center', '中央'], ['left', '左寄せ'], ['right', '右寄せ']] },
-            { k: 'textX', l: '文字を左右にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', note: 'プレビューの文字をドラッグしても動かせます' },
-            { k: 'textY', l: '文字を上下にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%' },
-            { k: 'titlePlate', l: '文字の後ろに敷く（座布団）', t: 'select', o: [['none', 'なし'], ['box', '角丸の四角'], ['band', '横いっぱいの帯']], note: '写真の上でも文字が読みやすくなります' },
-            { k: 'tpColor', l: '敷く色', t: 'color', when: s => s.titlePlate !== 'none' },
-            { k: 'tpAlpha', l: '敷く色の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', when: s => s.titlePlate !== 'none' },
-            { k: 'subColor', l: 'サブタイトルの色', t: 'color' },
-            { k: 'subBox', l: 'サブタイトルの後ろの形', t: 'select', o: [['none', 'なし'], ['pill', '楕円（まるい札）'], ['round', '角丸の四角']], note: '形を敷いたときは、サブタイトルの縁取りを付けません' },
-            { k: 'subBoxColor', l: '形の色', t: 'color', when: s => s.subBox !== 'none' },
-            { k: 'subArc', l: 'サブタイトルの曲がり', t: 'range', min: -1, max: 1, step: 0.05, u: '', note: '0 でまっすぐ。プラスで上に反る（アーチ）、マイナスで下に反る。曲げたときは後ろの形は付きません' },
-            { k: 'subPos', l: 'サブタイトルの位置', t: 'select', o: [['below', 'タイトルの下'], ['above', 'タイトルの上'], ['corner', '隅に小さく']] },
-            { k: 'subGap', l: 'サブタイトルとタイトルの間', t: 'range', min: 0, max: 200, step: 2, u: 'px', when: s => s.subPos !== 'corner' },
-            { k: 'subCorner', l: 'サブタイトルの隅', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], when: s => s.subPos === 'corner' },
             { k: 'strokeWidth', l: '縁取りの太さ（0でなし）', t: 'range', min: 0, max: 30, step: 1, u: 'px' },
             { k: 'strokeColor', l: '縁取りの色', t: 'color', when: s => s.strokeWidth > 0 },
             { k: 'shadow', l: '文字にほんのり影を付ける', t: 'check' },
+            // ここから下は、タイトル（home: 'title'）・サブタイトル（home: 'sub'）のカードの中に出す
+            { k: 'textScale', l: '大きさ', t: 'range', min: 0.5, max: 1.3, step: 0.05, u: '倍', home: 'title', note: '枠に収まらないときは、これより小さくなります' },
+            { k: 'titleColor', l: '色', t: 'color', home: 'title' },
+            { k: 'textAlign', l: 'そろえ方', t: 'select', o: [['center', '中央'], ['left', '左寄せ'], ['right', '右寄せ']], home: 'title' },
+            { k: 'textX', l: '左右にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', home: 'title' },
+            { k: 'textY', l: '上下にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', home: 'title' },
+            { k: 'hlColor', l: '強調（*〜*）の色', t: 'color', home: 'title' },
+            { k: 'hlScale', l: '強調（*〜*）の大きさ', t: 'range', min: 0.8, max: 1.6, step: 0.05, u: '倍', home: 'title' },
+            { k: 'titlePlate', l: '後ろに敷く（座布団）', t: 'select', o: [['none', 'なし'], ['box', '角丸の四角'], ['band', '横いっぱいの帯']], home: 'title', note: '写真の上でも文字が読みやすくなります（サブタイトル・ロゴもまとめて敷きます）' },
+            { k: 'tpColor', l: '座布団の色', t: 'color', home: 'title', when: s => s.titlePlate !== 'none' },
+            { k: 'tpAlpha', l: '座布団の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', home: 'title', when: s => s.titlePlate !== 'none' },
+            { k: 'subScale', l: '大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', home: 'sub' },
+            { k: 'subColor', l: '色', t: 'color', home: 'sub' },
+            { k: 'subPos', l: '置き場所', t: 'select', o: [['below', 'タイトルの下'], ['above', 'タイトルの上'], ['corner', '隅に小さく']], home: 'sub' },
+            { k: 'subGap', l: 'タイトルとの間', t: 'range', min: 0, max: 200, step: 2, u: 'px', home: 'sub', when: s => s.subPos !== 'corner' },
+            { k: 'subCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], home: 'sub', when: s => s.subPos === 'corner' },
+            { k: 'subBox', l: '後ろの形', t: 'select', o: [['none', 'なし'], ['pill', '楕円（まるい札）'], ['round', '角丸の四角']], home: 'sub', note: '形を敷いたときは、縁取りを付けません' },
+            { k: 'subBoxColor', l: '形の色', t: 'color', home: 'sub', when: s => s.subBox !== 'none' },
+            { k: 'subArc', l: '曲がり', t: 'range', min: -1, max: 1, step: 0.05, u: '', home: 'sub', note: '0 でまっすぐ。プラスで上に反る（アーチ）、マイナスで下に反る。曲げたときは後ろの形は付きません' },
           ]
         },
         {
@@ -1745,8 +1766,8 @@
             { k: 'bandColor', l: '帯の色', t: 'color', when: s => s.logoMode === 'band' },
             { k: 'bandSize', l: '帯の太さ', t: 'range', min: 0.5, max: 2.5, step: 0.05, u: '倍', when: s => s.logoMode === 'band' },
             { k: 'logoPlate', l: 'ロゴの後ろに色を敷く', t: 'check', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' },
-            { k: 'plateColor', l: '敷く色', t: 'color', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
-            { k: 'plateAlpha', l: '敷く色の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
+            { k: 'plateColor', l: 'ロゴの後ろの色', t: 'color', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
+            { k: 'plateAlpha', l: 'ロゴの後ろの色の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
           ]
         },
         {
@@ -1890,6 +1911,11 @@
         const secOf = t => [...$('settings').querySelectorAll(':scope > details.sec')].find(d => d.querySelector('summary').textContent.includes(t));
         for (const t of ['大きさ', '文字と画像を追加', '文字の見た目', 'ロゴ', '背景']) $('settings').appendChild(secOf(t));
         $('settings').appendChild($('batch-sec'));
+        // タイトル・サブタイトルの項目は、それぞれのカードの中に（一覧を作り直しても使い回す）
+        for (const sec of SECTIONS) for (const f of sec.fields) {
+          if (f.home === 'title') titleOpts.appendChild(inputs[f.k].wrap);
+          if (f.home === 'sub') subOpts.appendChild(inputs[f.k].wrap);
+        }
         // メインの画像の置き方は、メインのカードの中に
         $('main-opts').append(inputs.imgPos.wrap, inputs.imgAnchor.wrap, inputs.sample.wrap);
         // 1枚目の画像のバー（追加の画像と同じ形）
@@ -2089,7 +2115,7 @@
         const aw = area.r - area.l, bh = band.b - band.t, mid = (area.l + area.r) / 2;
         const lh = 1.14, gap = 14 * k;
         const sub = S.sub.trim();
-        let subFs = sub ? fit(c, [sub], (mode === 'replace' ? 84 : 60) * k * S.textScale, aw) : 0;
+        let subFs = sub ? fit(c, [sub], (mode === 'replace' ? 84 : 60) * k * S.subScale, aw) : 0;
         let fs = lines.length ? fitTitle(c, lines, (stacked || !side || pos === 'center' ? 150 : 124) * k * S.textScale, aw) : 0;
         let lg = null;
         if (mode === 'replace' || mode === 'above' || mode === 'below') {
@@ -2294,7 +2320,7 @@
 
           // ---- 隅に小さくサブタイトル（隅の文字は、枠の端にそろえる）
           if (sub && S.subPos === 'corner') {
-            const cfs = fit(c, [sub], 44 * k * S.textScale, W * 0.45);
+            const cfs = fit(c, [sub], 44 * k * S.subScale, W * 0.45);
             c.font = `${S.weight} ${cfs}px ${family()}`;
             const w = c.measureText(sub).width + (boxed ? cfs * 1.3 : subStroke);
             const hh = (boxed ? cfs * 1.55 : cfs * 1.2) + arcLift(cfs);
@@ -2723,8 +2749,9 @@
       ];
       let movedId = null, movedTimer = 0, hoverId = null;
       const mainCard = $('main-card');
-      // タイトル・サブタイトルの入力欄（一覧を作り直しても、同じ入力欄を使い回す）
+      // タイトル・サブタイトルの入力欄と設定（一覧を作り直しても、同じものを使い回す）
       const titleField = $('title-field'), subField = $('sub-field');
+      const titleOpts = $('title-opts'), subOpts = $('sub-opts');
       let subBars = null;
       let mainPos = '';
       function renderMain(pos) {
@@ -2799,21 +2826,17 @@
           }
           const row = document.createElement('div');
           // メインの文字
-          const openStyle = () => {
-            const d = inputs.font.wrap.closest('details');
-            d.open = true;
-            d.scrollIntoView({ block: 'start' });
-          };
           // タイトル
           if (id === '@text') {
             row.className = 'extra-item main-card';
             const t = S.title.replace(/\*/g, '').split('\n')[0] || '（タイトルなし）';
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb">T</span><span class="nm">タイトル<small>（${esc(t.slice(0, 12))}…）</small>${pos}</span>`
-              + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="style">見た目を変える</button></div>`
-              + '<div class="main-text-slot fields"></div>'
-              + '<div class="field-note" style="padding:0 0 6px">フォント・色・位置・ロゴは「🔤 文字の見た目」「🏷️ ロゴ」で変えます。</div>';
+              + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="reset" title="ずらした位置を元に戻します">位置を戻す</button></div>`
+              + '<div class="main-text-slot fields"></div><div class="opts-slot"></div>'
+              + '<div class="field-note" style="padding:0 0 6px">フォント・縁取りは「🔤 文字の見た目」、ロゴは「🏷️ ロゴ」で変えます。プレビューでドラッグしても動かせます。</div>';
             row.querySelector('.main-text-slot').appendChild(titleField);
-            row.querySelector('[data-a="style"]').onclick = openStyle;
+            row.querySelector('.opts-slot').appendChild(titleOpts);
+            row.querySelector('[data-a="reset"]').onclick = () => { S.textX = 0; S.textY = 0; inputs.textX.set(0); inputs.textY.set(0); redraw(); };
             hookRow(row, '@text');
             list.appendChild(row);
             return;
@@ -2822,11 +2845,11 @@
           if (id === '@sub') {
             row.className = 'extra-item main-card';
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="font-size:12px">sub</span><span class="nm">サブタイトル${pos}</span>`
-              + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="style">見た目を変える</button><button class="btn btn-sm" type="button" data-a="reset" title="ずらした位置を元に戻します">位置を戻す</button></div>`
-              + '<div class="main-text-slot fields"></div><div class="extra-bars"></div>'
-              + '<div class="field-note" style="padding:0 0 6px">置き場所（タイトルの上・下・隅）・色・形・曲がりは「🔤 文字の見た目」で変えます。プレビューでドラッグしても動かせます。</div>';
+              + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="reset" title="ずらした位置を元に戻します">位置を戻す</button></div>`
+              + '<div class="main-text-slot fields"></div><div class="extra-bars"></div><div class="opts-slot"></div>'
+              + '<div class="field-note" style="padding:0 0 6px">フォント・縁取りは「🔤 文字の見た目」で変えます。「ずらす」は、置き場所から動かす量です。プレビューでドラッグしても動かせます。</div>';
             row.querySelector('.main-text-slot').appendChild(subField);
-            row.querySelector('[data-a="style"]').onclick = openStyle;
+            row.querySelector('.opts-slot').appendChild(subOpts);
             subBars = {};
             const bars = row.querySelector('.extra-bars');
             for (const [key, label] of [['subX', '左右にずらす'], ['subY', '上下にずらす']]) {
