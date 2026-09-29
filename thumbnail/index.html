@@ -1,0 +1,4058 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>サムネイルメーカー | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="ブログのアイキャッチ、YouTubeのサムネイル、SNSの共有画像をブラウザだけで作れる無料ツール。文字を入れて、背景の柄と画像を選ぶだけ。長い文字は自動で収まります。画像はどこにも送信しません。">
+  <meta property="og:title" content="サムネイルメーカー | どんまうんど-Tools">
+  <meta property="og:description" content="ブログのアイキャッチ・サムネイル・SNSの共有画像を、ブラウザだけで作れる無料ツール。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/thumbnail/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-thumbnail.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="サムネイルメーカー">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --code-bg: #1a0a14;
+      --code-text: #f3dbe5;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* ── Topnav ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    .topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* スマホで開いたときだけ出すお知らせ */
+    .pc-notice {
+      display: none;
+      background: var(--accent-soft);
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.6;
+      padding: 10px 16px;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .pc-notice {
+        display: block;
+      }
+    }
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    /* 下端をスカラップ（波）にして本文へつなぐ */
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 460px;
+      grid-template-areas: "settings side";
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings {
+      grid-area: settings;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .side {
+      grid-area: side;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: calc(100vh - 88px);
+      min-height: 560px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .kicker {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    /* platform switch */
+    .seg {
+      display: inline-flex;
+      padding: 3px;
+      gap: 3px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+
+    .seg button {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+      padding: 7px 18px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
+    .sc-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 0;
+    }
+
+    .sc-tabs button[aria-selected="true"] {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .seg button:hover {
+      color: var(--text);
+    }
+
+    .seg button[aria-checked="true"][data-platform="youtube"] {
+      background: #ff3b3b;
+      color: #fff;
+    }
+
+    .seg button[aria-checked="true"][data-platform="twitch"] {
+      background: #9147ff;
+      color: #fff;
+    }
+
+    [data-for][hidden],
+    details.sec[hidden] {
+      display: none;
+    }
+
+    .tw-out {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tw-out textarea {
+      width: 100%;
+      height: 52px;
+      resize: vertical;
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 11.5px;
+      color: var(--code-text);
+      background: var(--code-bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+      word-break: break-all;
+    }
+
+    /* presets */
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* テンプレートのブロック */
+    .preset-body {
+      padding: 14px 16px 16px;
+    }
+
+    .preset-count {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .chip-btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .chip-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .chip-btn[aria-checked="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: filter 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      border-color: var(--accent);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .btn-danger:hover {
+      border-color: #ff5a5a;
+      color: #ff8a8a;
+    }
+
+    .data-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    /* settings sections */
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 4px 20px;
+      padding: 12px 16px 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 0;
+      min-width: 0;
+    }
+
+    .field[hidden] {
+      display: none;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .field-val {
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 12px;
+      color: var(--accent-2);
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select,
+    input[type=text],
+    input[type=number],
+    input[type=password] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    select:focus,
+    input[type=text]:focus,
+    input[type=number]:focus,
+    input[type=password]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .color-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .color-row input[type=color] {
+      width: 40px;
+      height: 34px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .color-row input[type=text] {
+      font-family: ui-monospace, Consolas, monospace;
+      text-transform: lowercase;
+    }
+
+    /* toggle */
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle .sw {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--border-strong);
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .toggle .sw::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.15s;
+    }
+
+    .toggle input:checked+.sw {
+      background: var(--accent);
+    }
+
+    .toggle input:checked+.sw::after {
+      transform: translateX(18px);
+    }
+
+    .toggle input:focus-visible+.sw {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    /* preview */
+    .preview-panel {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .preview-tools {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .preview-tools select {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    /* テスト送信（プレビューの下。YouTube のチャット入力欄の位置） */
+    .test-bar {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 12px 10px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .test-tabs {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .test-label {
+      margin-right: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .test-tab {
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .test-tab:hover {
+      color: var(--text);
+    }
+
+    .test-tab[aria-selected="true"] {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .test-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-height: 26px;
+    }
+
+    .chip {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      line-height: 1.5;
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+    }
+
+    .test-free {
+      display: flex;
+      gap: 6px;
+    }
+
+    .test-free input {
+      flex: 1;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .test-free select {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    /* プレビューを大きく表示 */
+    body.preview-expanded {
+      overflow: hidden;
+    }
+
+    /* sticky の .side は重なり順が閉じるので、ヘッダー（z-index: 100）より手前に出す */
+    body.preview-expanded .side {
+      z-index: 400;
+    }
+
+    body.preview-expanded .preview-panel {
+      position: fixed;
+      inset: 24px;
+      z-index: 300;
+      box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.65);
+    }
+
+    .stage {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 240px;
+      overflow: hidden;
+    }
+
+    .stage iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: transparent;
+      color-scheme: normal;
+    }
+
+    .bg-checker {
+      background-color: #2a2a36;
+      background-image:
+        linear-gradient(45deg, #353544 25%, transparent 25%),
+        linear-gradient(-45deg, #353544 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #353544 75%),
+        linear-gradient(-45deg, transparent 75%, #353544 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    }
+
+    .bg-dark {
+      background: #111;
+    }
+
+    .bg-light {
+      background: #f2f2f2;
+    }
+
+    .bg-green {
+      background: #00b140;
+    }
+
+    .bg-game {
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255, 190, 90, 0.55), transparent 45%),
+        radial-gradient(circle at 70% 70%, rgba(80, 160, 255, 0.55), transparent 50%),
+        linear-gradient(160deg, #3b6d3a 0%, #7aa6c8 55%, #d9c7a0 100%);
+    }
+
+    /* output */
+    .output-panel {
+      flex: 0 0 auto;
+    }
+
+    .output-panel textarea {
+      display: block;
+      width: 100%;
+      height: 150px;
+      resize: vertical;
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: var(--code-text);
+      background: var(--code-bg);
+      border: 0;
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .output-panel textarea[hidden] {
+      display: none;
+    }
+
+    .output-panel textarea.react-out {
+      height: 90px;
+    }
+
+    .output-panel textarea:focus {
+      outline: none;
+    }
+
+    .out-meta {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .guide h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    code {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      word-break: break-all;
+    }
+
+    .url-tool {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .url-out {
+      display: flex;
+      gap: 8px;
+    }
+
+    .url-out input {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    details.hints {
+      align-self: start;
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid #a03060;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      border-bottom: none;
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    @media (max-width: 1000px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "side" "settings";
+        padding: 40px 16px 40px;
+      }
+
+      .side {
+        position: static;
+        height: auto;
+        min-height: 0;
+      }
+
+      .stage {
+        height: 420px;
+        flex: none;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+      }
+
+      .guide {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      .topnav-back {
+        display: none;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .fields {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* ── サムネイルメーカー用 ── */
+    .side {
+      height: auto;
+      min-height: 0;
+    }
+
+    .preview-panel {
+      flex: none;
+    }
+
+    .ec-stage {
+      position: relative;
+      background: #140810;
+      padding: 14px;
+      display: grid;
+      place-items: center;
+    }
+
+    .ec-stage.drop-on::after {
+      content: 'ここに落とすと画像を追加';
+      position: absolute;
+      inset: 8px;
+      display: grid;
+      place-items: center;
+      border: 3px dashed var(--accent);
+      border-radius: 12px;
+      background: rgba(20, 8, 16, 0.55);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    #cv {
+      display: block;
+      max-width: 100%;
+      max-height: calc(100vh - 250px);
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    /* 大きく見る */
+    .big-view {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 10px;
+      background: rgba(10, 4, 8, 0.92);
+      cursor: zoom-out;
+    }
+
+    .big-view canvas {
+      display: block;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .big-hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* 小さく見る：プレビューの左下に、一覧で出るくらいの大きさで重ねる */
+    .mini-pop {
+      position: absolute;
+      left: 22px;
+      bottom: 22px;
+      padding: 8px 10px 10px;
+      border-radius: 10px;
+      background: rgba(20, 8, 16, 0.92);
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .mini-pop[hidden] {
+      display: none;
+    }
+
+    .mini-pop canvas {
+      display: block;
+      margin-top: 6px;
+      border-radius: 4px;
+    }
+
+    .sel-panel {
+      padding: 10px 14px 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .sel-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      padding-right: 10px;
+      margin-right: 4px;
+      border-right: 1px solid var(--border-strong);
+    }
+
+    .sel-head[hidden] {
+      display: none;
+    }
+
+    .undo-row {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .sel-icon {
+      min-width: 30px;
+      justify-content: center;
+      font-size: 15px;
+      padding-top: 3px;
+      padding-bottom: 3px;
+    }
+
+    .sel-color {
+      width: 32px;
+      height: 28px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      cursor: pointer;
+    }
+
+    .sel-align {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    .sel-align[hidden],
+    .sel-color[hidden] {
+      display: none;
+    }
+
+    .sel-name {
+      max-width: 200px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sel-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .sel-bars {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 4px 16px;
+      padding-top: 6px;
+    }
+
+    .sel-empty {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 4px 0;
+    }
+
+    .sel-panel.empty .sel-bars,
+    .sel-panel:not(.empty) .sel-empty {
+      display: none;
+    }
+
+    .extra-item.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    @media (max-width: 700px) {
+      .sel-bars {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .save-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .save-row input {
+      flex: 1 1 180px;
+      min-width: 0;
+    }
+
+    .save-row select {
+      width: auto;
+      flex: none;
+    }
+
+    @media (max-width: 600px) {
+      .view-btn .lbl {
+        display: none;
+      }
+
+      .save-row input {
+        flex-basis: 120px;
+      }
+
+      #save-btn {
+        flex: 1;
+      }
+
+      /* カードの見出し：前へ・後ろへ・削除が1行に収まるように詰める（名前は長ければ …） */
+      .extra-head {
+        column-gap: 6px;
+      }
+
+      .extra-head .btn-sm {
+        padding-left: 7px;
+        padding-right: 7px;
+      }
+
+      .extra-head .nm {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .img-pick {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .img-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2) center / contain no-repeat;
+      flex: none;
+    }
+
+    textarea.title-in {
+      width: 100%;
+      min-height: 76px;
+      resize: vertical;
+      font: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    textarea.title-in:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .field-full {
+      grid-column: 1 / -1;
+    }
+
+    /* テンプレート・追加の画像の一覧 */
+    .row-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .row-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .row-item .nm {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .row-item .dt {
+      color: var(--muted);
+      font-size: 11.5px;
+      white-space: nowrap;
+    }
+
+    .row-item input[type=range] {
+      flex: 1;
+      min-width: 80px;
+    }
+
+    .row-item .img-thumb {
+      width: 36px;
+      height: 36px;
+    }
+
+    .extra-item {
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 8px 10px 4px;
+    }
+
+    .extra-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 8px;
+      font-size: 13px;
+    }
+
+    .extra-head .nm {
+      flex: 1;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .extra-head .img-thumb {
+      width: 36px;
+      height: 36px;
+    }
+
+    .extra-head .nm small {
+      font-weight: 500;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    .extra-head .btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+      border-color: var(--border-strong);
+    }
+
+    .extra-item.moved {
+      animation: extra-moved 0.8s ease-out;
+    }
+
+    @keyframes extra-moved {
+      from {
+        background: var(--accent-soft);
+        border-color: var(--accent);
+      }
+    }
+
+    .card-opts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 14px;
+      padding: 0;
+    }
+
+    .card-opts .field {
+      padding: 6px 0;
+    }
+
+    .card-opts .field-note {
+      grid-column: 1 / -1;
+    }
+
+    .main-text-slot.fields {
+      display: block;
+      padding: 4px 0 0;
+    }
+
+    .add-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .add-row .btn {
+      justify-content: center;
+    }
+
+    .main-card {
+      border-style: dashed;
+    }
+
+    .main-opts {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 0 14px;
+      padding: 6px 12px 4px;
+      border: 1px dashed var(--border-strong);
+      border-radius: 10px;
+    }
+
+    .main-opts > .field-label {
+      grid-column: 1 / -1;
+      padding-top: 4px;
+    }
+
+    .main-order {
+      display: contents;
+    }
+
+    .thumb-pick {
+      padding: 0;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .thumb-pick:hover {
+      border-color: var(--accent);
+    }
+
+    .text-thumb {
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 15px;
+      color: var(--accent);
+    }
+
+    .extra-text {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 36px;
+      gap: 6px;
+      align-items: center;
+      padding-top: 8px;
+    }
+
+    .extra-text textarea {
+      grid-column: 1 / -1;
+      width: 100%;
+      min-height: 44px;
+      resize: vertical;
+      font: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 6px 10px;
+    }
+
+    .extra-text textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .extra-text input[type=color] {
+      width: 36px;
+      height: 32px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+    }
+
+    .extra-font {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 6px;
+      padding-top: 8px;
+    }
+
+    .extra-stroke {
+      display: grid;
+      grid-template-columns: auto 36px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      padding-top: 8px;
+    }
+
+    .extra-stroke input[type=color] {
+      width: 36px;
+      height: 30px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+    }
+
+    .extra-stroke .field-val {
+      text-align: right;
+    }
+
+    .extra-hl {
+      display: grid;
+      grid-template-columns: auto 36px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      padding-top: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .extra-hl input[type=color] {
+      width: 36px;
+      height: 30px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+    }
+
+    .extra-arc {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) 40px;
+      gap: 8px;
+      align-items: center;
+      padding-top: 8px;
+    }
+
+    .extra-arc .field-val {
+      text-align: right;
+    }
+
+    .main-card > .extra-arc {
+      padding-top: 0;
+      padding-bottom: 8px;
+    }
+
+    .num-px {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    .num-px input[type=number] {
+      width: 52px;
+      padding: 4px 6px;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .main-card > .extra-stroke {
+      padding-top: 0;
+      padding-bottom: 8px;
+    }
+
+    .main-card > .extra-font {
+      padding-top: 0;
+      padding-bottom: 8px;
+    }
+
+    .title-shape-row,
+    .sub-box-row,
+    .extra-shape {
+      grid-template-columns: minmax(0, 1fr) 36px 80px 36px;
+    }
+
+    .shape-alpha-val {
+      text-align: right;
+    }
+
+    .sub-box-row {
+      padding-top: 8px;
+      padding-bottom: 4px;
+    }
+
+    .extra-text select {
+      width: auto;
+    }
+
+    .extra-bars {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px 14px;
+      padding: 6px 0 2px;
+    }
+
+    .extra-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .inline-add {
+      display: flex;
+      gap: 8px;
+    }
+
+    .inline-add input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .row-empty {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .undo-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    @media (min-width: 1001px) {
+      .workspace {
+        grid-template-columns: 440px minmax(0, 1fr);
+        max-width: 1680px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720"
+          height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">← トップに戻る</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>サムネイルメーカー</h1>
+      <p>ブログのアイキャッチ、YouTubeのサムネイル、SNSの共有画像をブラウザだけで作れます。文字を入れて、背景と画像を選ぶだけ。画像はどこにも送信しません。</p>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- Settings column -->
+    <div class="settings" id="settings">
+      <details class="sec" open>
+        <summary><span class="sec-icon">🎭</span>テンプレート</summary>
+        <div class="fields">
+          <div class="field field-full">
+            <div class="inline-add">
+              <input type="text" id="tpl-name" maxlength="40" placeholder="名前（例: レポ記事用）" spellcheck="false">
+              <button class="btn btn-sm btn-primary" type="button" id="tpl-save">＋ 保存</button>
+            </div>
+            <div class="row-list" id="tpl-list"></div>
+          </div>
+          <div class="field field-full">
+            <div class="data-row" style="margin-top:0">
+              <button class="btn btn-sm btn-danger" id="btn-reset" type="button">すべてリセット</button>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <div hidden>
+        <div class="fields card-opts" id="title-opts"></div>
+        <div class="fields card-opts" id="sub-opts"></div>
+        <div class="fields" id="main-text-fields">
+          <div class="field field-full" id="title-field">
+            <label class="field-label" for="f-title"><span>タイトル（Enter で改行・*〜* で囲むと強調）</span></label>
+            <textarea class="title-in" id="f-title" spellcheck="false"></textarea>
+          </div>
+          <div class="field field-full" id="sub-field">
+            <label class="field-label" for="f-sub"><span>サブタイトル（小さい文字。空欄でなし）</span></label>
+            <input type="text" id="f-sub" spellcheck="false" placeholder="例: 初心者向けにやさしく解説">
+          </div>
+        </div>
+      </div>
+
+      <div hidden>
+        <div class="fields">
+          <div class="extra-item main-card" id="main-card">
+            <div class="extra-head">
+              <button class="img-thumb thumb-pick" type="button" id="img-thumb" title="クリックで画像を選ぶ" aria-label="メインの画像を選ぶ"></button><span class="nm" id="main-name">メインの画像</span>
+              <span class="main-order" id="main-order"></span>
+              <button class="btn btn-sm btn-danger" type="button" id="img-clear">削除</button>
+              <input type="file" id="img-file" accept="image/*" hidden>
+            </div>
+          </div>
+          <div class="field field-full main-opts" id="main-opts">
+            <span class="field-label"><span>メインの画像の置き方</span></span>
+          </div>
+          <div class="field field-full" id="extra-upload">
+            <div class="add-row">
+              <button class="btn btn-primary" type="button" id="text-add">＋ 文字を追加</button>
+              <button class="btn btn-primary" type="button" id="extra-add">＋ 画像を追加</button>
+              <input type="file" id="extra-file" accept="image/*" hidden>
+            </div>
+            <span class="field-label"><span>重なりの順（上ほど前）</span></span>
+            <div class="row-list" id="extra-list"></div>
+          </div>
+        </div>
+      </div>
+      <div hidden>
+        <div class="fields">
+          <div class="field field-full" id="logo-upload">
+            <span class="field-label"><span>ロゴ画像（なくてもOK）</span></span>
+            <div class="img-pick">
+              <button class="img-thumb thumb-pick" type="button" id="logo-thumb" title="クリックでロゴを選ぶ" aria-label="ロゴを選ぶ"></button>
+              <button class="btn btn-sm" type="button" id="logo-pick">📁 ロゴを選ぶ</button>
+              <button class="btn btn-sm" type="button" id="logo-clear">外す</button>
+              <input type="file" id="logo-file" accept="image/*" hidden>
+            </div>
+            <div class="field-note">背景が透明な PNG・WebP がおすすめです。</div>
+          </div>
+        </div>
+      </div>
+      <!-- sections are generated from SECTIONS below -->
+      <details class="sec" id="batch-sec">
+        <summary><span class="sec-icon">📦</span>まとめて作る</summary>
+        <div class="fields">
+          <div class="field field-full">
+            <label class="field-label" for="batch-text"><span>1行に1枚（同じデザインで、タイトルだけ変えて書き出します）</span></label>
+            <textarea class="title-in" id="batch-text" spellcheck="false" style="min-height:120px" placeholder="BLOG&#10;PROFILE&#10;マジカルミライ｜2026レポ / 幕張">ブログ
+プロフィール / 自己紹介
+*イベント*｜レポート / 2026.10.12</textarea>
+            <div class="field-note">「｜」で改行、「 / 」のあとはサブタイトル（なければ今のサブタイトル）、「*〜*」で強調です。上の3行は例なので、書き換えて使ってください。ZIP ファイルでまとめてダウンロードします。</div>
+            <div class="data-row" style="margin-top:6px">
+              <button class="btn btn-sm btn-primary" type="button" id="batch-jpg">📦 JPG でまとめて書き出す</button>
+              <button class="btn btn-sm" type="button" id="batch-png">PNG で</button>
+              <button class="btn btn-sm" type="button" id="batch-webp">WebP で</button>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- Preview column -->
+    <div class="side">
+      <div class="panel preview-panel">
+        <div class="panel-head">
+          <span>プレビュー <span class="out-meta" id="size-meta"></span></span>
+          <div class="undo-row">
+            <div class="sel-head" id="sel-head" hidden>
+              <span class="sel-name" id="sel-name"></span>
+              <input type="color" class="sel-color" id="sel-color" title="文字の色" aria-label="選んでいる文字の色">
+              <select class="sel-align" id="sel-align" title="そろえ方" aria-label="そろえ方"><option value="left">左寄せ</option><option value="center">中央</option><option value="right">右寄せ</option></select>
+              <button class="btn btn-sm" type="button" id="sel-up" title="1つ前に重ねる">↑ 前へ</button>
+              <button class="btn btn-sm" type="button" id="sel-down" title="1つ後ろに重ねる">↓ 後ろへ</button>
+              <button class="btn btn-sm sel-icon" type="button" id="sel-reset" title="位置・回転を元に戻す" aria-label="位置・回転を元に戻す">↺</button>
+              <button class="btn btn-sm" type="button" id="sel-clear" title="選ぶのをやめる" aria-label="選ぶのをやめる">✕</button>
+            </div>
+            <button class="btn btn-sm" type="button" id="btn-undo" title="元に戻す（Ctrl+Z）">↶ 戻す</button>
+            <button class="btn btn-sm" type="button" id="btn-redo" title="やり直す（Ctrl+Y）">↷ やり直す</button>
+          </div>
+        </div>
+        <div class="ec-stage" id="ec-stage">
+          <canvas id="cv" width="1280" height="720" aria-label="アイキャッチのプレビュー"></canvas>
+          <div class="mini-pop" id="mini-pop" hidden>一覧などで小さく出たとき<canvas id="mini" width="160" height="90"></canvas></div>
+        </div>
+        <div class="sel-panel empty" id="sel-panel">
+          <div class="sel-bars" id="sel-bars"></div>
+          <div class="sel-empty" id="sel-empty">プレビューの文字や画像をクリックすると、ここで大きさ・位置・回転を変えられます（ドラッグでも動かせます）。</div>
+        </div>
+        <div class="save-row">
+          <button class="btn view-btn" type="button" id="btn-big" aria-label="大きく見る" title="画面いっぱいに大きく表示します（保存される画像と同じ見た目）">⛶<span class="lbl"> 大きく見る</span></button>
+          <button class="btn view-btn" type="button" id="btn-mini" aria-pressed="false" aria-label="小さく見る" title="一覧などで小さく表示されたときの見え方を確かめます">🔍<span class="lbl"> 小さく見る</span></button>
+          <input type="text" id="file-name" spellcheck="false" aria-label="ファイル名">
+          <select id="save-type" aria-label="保存の形式" title="JPG：軽い／PNG：透明を残せる／WebP：いちばん軽く、透明も残せる">
+            <option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option>
+          </select>
+          <button class="btn btn-primary" id="save-btn" type="button">⬇ 保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec hints">
+      <summary><span class="sec-icon">🖌</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>「🧩 文字と画像を追加」の <b>メインの文字</b> のカードに、タイトルを入れます。Enter で改行できます。</li>
+          <li>「大きさ」で使う場所に合わせたサイズを選びます（ブログのアイキャッチ・YouTubeのサムネイルは <b>1280×720</b>、SNSの共有画像は <b>1200×630</b> がおすすめ）。</li>
+          <li>「文字と画像を追加」で自分のキャラや写真、好きな文字を足し、「ロゴ」で自分のロゴを選び、「背景」で柄・色・背景画像を選びます。文字や画像はプレビューでドラッグして動かせます。</li>
+          <li>よく使う見た目は「🎭 テンプレート」に名前を付けて保存しておくと、次からはタイトルと写真を変えるだけで作れます。同じデザインで何枚も作るときは「📦 まとめて作る」が便利です。</li>
+          <li>プレビューの下で形式（JPG・PNG・WebP）を選んで <b>「⬇ 保存」</b> を押すと、画像がダウンロードされます。</li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="sec hints">
+      <summary><span class="sec-icon">💡</span>ヒント・注意点</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>選んだ画像は、このブラウザの中だけで使います。サーバーには送信しません。</li>
+          <li>ブログやSNSの一覧では、画像がかなり小さく表示されます。プレビューの下の「🔍 小さく見る」で、文字が読めるか確かめてください。</li>
+          <li>JPG のほうがファイルが軽くなります。背景を透明にしたいときは PNG を使ってください（背景の「なし（透明）」）。WebP は JPG よりさらに軽く、透明も残せます（ブログなどが WebP に対応しているか確かめてから使ってください）。</li>
+          <li>縦長や正方形では、上に文字・下に画像の縦並びになります。</li>
+          <li>文字や画像の色・大きさ・位置・回転は、プレビューでクリックすると変えられます（ドラッグでも動かせます）。ロゴは「🏷️ ロゴ」で変えます。</li>
+          <li><b>メインの画像</b>は、タイトル・サブタイトル・ロゴをよけて置かれます（左・右・上・下・真ん中）。画像を選んでいないときはサンプル（ハートなど）が入ります。位置の「自由に置く」で、メインの画像を文字がよけない画像にできます。</li>
+          <li>画像は、プレビューにファイルをドロップしたり、コピーした画像を Ctrl+V で貼り付けたりしても追加できます。</li>
+          <li>「↑ 前へ」「↓ 後ろへ」で、文字と画像をまたいで重なりを入れ替えられます。カードにマウスを乗せると、プレビューのその画像に枠が出ます。</li>
+          <li>「🎭 テンプレート」は、今の見た目（背景・画像・ロゴ・色・フォント・置き方など）を名前を付けて保存します。読み込んでも、タイトルとサブタイトルは今のままです。このブラウザに保存されます。</li>
+          <li>作った画像は、ブログ・動画・配信の告知など、自由に使ってかまいません。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929"
+            alt="どんまうんど" width="720" height="182"></a>
+        <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a
+            href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+      </div>
+      <span>
+        <a href="https://github.com/donnma777/tools" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- フォント一覧はチャットCSSジェネレーターと共通。確認はページの中に出す（common/ask.js） -->
+  <script src="../common/ask.js?v=20260929a"></script>
+  <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
+  <script>
+    (() => {
+      'use strict';
+      const C = window.ChatCore;
+      const $ = id => document.getElementById(id);
+      const ask = (msg, yes) => window.DonnmaAsk.ask(msg, { yes }).then(r => r === true);
+
+      // =====================================================
+      //  設定
+      // =====================================================
+      const SIZES = {
+        yt: [1280, 720, 'アイキャッチ・YouTubeサムネ（1280×720）'],
+        ogp: [1200, 630, 'SNS共有・OGP（1200×630）'],
+        x: [1600, 900, 'X（旧Twitter）の投稿画像（1600×900）'],
+        sq: [1080, 1080, '正方形（1080×1080）'],
+        tall: [1080, 1920, '縦長・ストーリー（1080×1920）'],
+        custom: [0, 0, '自由に入力'],
+      };
+      const DEFAULTS = {
+        title: '*タイトル*を\n入力してね', sub: 'サブタイトル',
+        size: 'yt', customW: 1280, customH: 720,
+        font: 'Zen Maru Gothic', fontCustom: '', weight: '900',
+        titleColor: '#ff7fa0', hlColor: '#f0325a', hlScale: 1.15, subColor: '#6e3551', shadow: true,
+        titleFont: '@inherit', titleWeight: '@inherit', subFont: '@inherit', subWeight: '@inherit',
+        titleStrokeOn: true, titleStrokeW: 14, titleStrokeColor: '#ffffff',
+        subStrokeOn: true, subStrokeW: 11, subStrokeColor: '#ffffff',
+        textScale: 1, textAlign: 'center', textX: 0, textY: 0,
+        titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
+        extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0, subScale: 1, titleRot: 0, subRot: 0, titleArc: 0,
+        imgPos: 'left', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart',
+        subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subBoxAlpha: 1, subArc: 0,
+        logoMode: 'none', logoCorner: 'br', logoScale: 1,
+        bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
+        frameOn: false, frameColor: '#ffffff',
+        bgFit: 'cover', bgBright: 0, bgTile: 300,
+        bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
+      };
+      const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
+      // order を extras に合わせる（なくなったものは外し、足りないものは上に足す。'@pic'・'@text'・'@sub' は必ず入れる）
+      function fixOrder(st) {
+        const ids = new Set(['@pic', '@text', '@sub', ...st.extras.map(e => e.id)]);
+        const seen = new Set();
+        st.order = st.order.filter(v => ids.has(v) && !seen.has(v) && seen.add(v));
+        if (!seen.has('@pic')) st.order.unshift('@pic');
+        if (!seen.has('@text')) st.order.splice(st.order.indexOf('@pic') + 1, 0, '@text');
+        // サブタイトル（以前はタイトルと一緒だった）は、タイトルのすぐ前に
+        if (!seen.has('@sub')) st.order.splice(st.order.indexOf('@text') + 1, 0, '@sub');
+        for (const e of st.extras) if (!st.order.includes(e.id)) st.order.push(e.id);
+      }
+      // メインの画像の置き場所。left-bottom などは「左・下にそろえる」（キャラの全身など）
+      const IMG_POS = [['left', '左・真ん中（文字は右）'], ['left-bottom', '左・下（文字は右）'], ['left-top', '左・上（文字は右）'],
+        ['right', '右・真ん中（文字は左）'], ['right-bottom', '右・下（文字は左）'], ['right-top', '右・上（文字は左）'],
+        ['top', '上（文字は下）'], ['bottom', '下（文字は上）'], ['center', '真ん中（文字の後ろ）'],
+        ['free', '自由に置く（文字はよけない）'], ['none', '置かない（文字だけ）']];
+      function sanitize(o) {
+        const out = { ...DEFAULTS };
+        if (!o || typeof o !== 'object') return out;
+        for (const k of Object.keys(DEFAULTS)) {
+          const d = DEFAULTS[k], v = o[k];
+          if (v === undefined) continue;
+          if (typeof d === 'number' && typeof v === 'number' && isFinite(v)) out[k] = v;
+          else if (typeof d === 'boolean' && typeof v === 'boolean') out[k] = v;
+          else if (typeof d === 'string' && typeof v === 'string' && (!COLOR_KEYS.includes(k) || /^#[0-9a-f]{6}$/i.test(v))) out[k] = v;
+        }
+        if (!SIZES[out.size]) out.size = 'yt';
+        // 前の「背景画像を暗くする」（0〜0.8）→ 明るさのマイナス
+        if (o.bgBright === undefined && +o.bgDim > 0) out.bgBright = -Math.round(Math.min(0.8, +o.bgDim) * 100);
+        out.bgBright = Math.max(-80, Math.min(80, out.bgBright));
+        // 前の「縦の位置」を置き場所に入れ込む
+        if (o.imgAnchor === 'bottom' && (out.imgPos === 'left' || out.imgPos === 'right')) out.imgPos += '-bottom';
+        if (!['heart', 'star', 'bunny'].includes(out.sample)) out.sample = 'heart';
+        if (out.imgPos === 'free' || !IMG_POS.some(([v]) => v === out.imgPos)) out.imgPos = 'left';
+        // 追加のもの：画像 { id, type: 'image', x, y, scale, rot } と 文字 { id, type: 'text', text, color, box, boxColor, x, y, scale, rot }
+        //（x・y は中心の位置。幅・高さの %）
+        const hex = (v, d) => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v : d;
+        out.extras = Array.isArray(o.extras) ? o.extras.filter(e => e && typeof e.id === 'string' && /^[a-z0-9]{1,16}$/.test(e.id)).slice(0, 30).map(e => {
+          const base = {
+            id: e.id, type: e.type === 'text' ? 'text' : 'image',
+            x: +e.x >= -20 && +e.x <= 120 ? +e.x : 50, y: +e.y >= -20 && +e.y <= 120 ? +e.y : 50,
+            scale: +e.scale >= 0.05 && +e.scale <= 5 ? +e.scale : 1,
+            rot: +e.rot >= -180 && +e.rot <= 180 ? +e.rot : 0,
+          };
+          if (base.type === 'text') Object.assign(base, {
+            text: typeof e.text === 'string' ? e.text.slice(0, 300) : 'テキスト', color: hex(e.color, '#ff7fa0'),
+            box: ['none', 'pill', 'round'].includes(e.box) ? e.box : 'none', boxColor: hex(e.boxColor, '#ff7fa0'),
+            boxAlpha: +e.boxAlpha >= 0.1 && +e.boxAlpha <= 1 ? +e.boxAlpha : 1,
+            strokeOn: e.strokeOn !== false, strokeW: +e.strokeW >= 1 && +e.strokeW <= 40 ? +e.strokeW : 11, strokeColor: hex(e.strokeColor, '#ffffff'),
+            font: typeof e.font === 'string' ? e.font : '@inherit', weight: typeof e.weight === 'string' ? e.weight : '@inherit',
+            align: ['left', 'center', 'right'].includes(e.align) ? e.align : 'center',
+            arc: +e.arc >= -1 && +e.arc <= 1 ? +e.arc : 0,
+            hlColor: hex(e.hlColor, '#f0325a'), hlScale: +e.hlScale >= 0.8 && +e.hlScale <= 1.6 ? +e.hlScale : 1.15,
+          });
+          return base;
+        }) : [];
+        // 重なりの順番。なければ、以前の「文字の後ろ」（behind）から作る
+        out.order = Array.isArray(o.order) ? o.order.filter(v => typeof v === 'string') : null;
+        if (!out.order) {
+          const src = Array.isArray(o.extras) ? o.extras : [];
+          const ids = (b) => src.filter(e => e && !!e.behind === b).map(e => e.id);
+          out.order = ['@pic', ...ids(true), '@text', ...ids(false)];
+        }
+        if (o.subScale === undefined && typeof o.textScale === 'number') out.subScale = out.textScale;
+        if (out.titlePlate === 'box') out.titlePlate = 'round';
+        if (!['none', 'pill', 'round', 'band'].includes(out.titlePlate)) out.titlePlate = 'none';
+        // 以前の「タイトルとの間」（subGap・px）は、同じ見た目になるように上下のずらしに置き換える
+        //（間を空けると、まとまりの真ん中がずれていたので、タイトルは半分、サブタイトルは残りを動かす）
+        const og = typeof o.subGap === 'number' ? o.subGap : 0;
+        if (og > 0 && out.subPos !== 'corner') {
+          const g = og / 630 * 100, d = out.subPos === 'above' ? -1 : 1;
+          const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
+          out.textY = clamp(out.textY - d * g / 2, -50, 50);
+          out.subY = clamp(out.subY + d * g, -60, 60);
+        }
+        const oldW = typeof o.strokeWidth === 'number' ? o.strokeWidth : null, oldC = hex(o.strokeColor, '#ffffff');
+        if (oldW !== null && o.titleStrokeW === undefined) {
+          Object.assign(out, {
+            titleStrokeOn: oldW > 0, titleStrokeW: oldW || 14, titleStrokeColor: oldC,
+            subStrokeOn: oldW > 0, subStrokeW: Math.round(oldW * 0.8) || 11, subStrokeColor: oldC,
+          });
+          out.extras.forEach(e => { if (e.type === 'text') Object.assign(e, { strokeOn: oldW > 0, strokeW: Math.round(oldW * 0.8) || 11, strokeColor: oldC }); });
+        }
+        fixOrder(out);
+        if (out.bg === 'usagi') out.bg = 'dots';
+        out.customW = Math.round(Math.min(4000, Math.max(200, out.customW)));
+        out.customH = Math.round(Math.min(4000, Math.max(200, out.customH)));
+        return out;
+      }
+
+      const bgPat = s => ['dots', 'stripe', 'check'].includes(s.bg);
+      // 文字ごとのフォント・太さ（'@inherit' は「全体と同じ」。PCのフォントを手動で指定するのは全体だけ）
+      const LAYER_FONTS = [['@inherit', '全体と同じ'], ...C.FONTS.filter(f => f[0] !== '__custom').map(f => [f[0], f[1]])];
+      const LAYER_WEIGHTS = [['@inherit', '全体と同じ'], ...C.WEIGHTS];
+      // タイトルに *〜* があるか（強調の色・大きさは、あるときだけ出す）
+      const hasHLText = t => /\*[^*\n]+\*/.test(t);
+      const SECTIONS = [
+        {
+          title: '大きさ', icon: '📐', open: true, fields: [
+            { k: 'size', l: '使う場所', t: 'select', o: Object.entries(SIZES).map(([v, a]) => [v, a[2]]) },
+            { k: 'customW', l: '幅（px）', t: 'number', min: 200, max: 4000, when: s => s.size === 'custom' },
+            { k: 'customH', l: '高さ（px）', t: 'number', min: 200, max: 4000, when: s => s.size === 'custom' },
+          ]
+        },
+        {
+          title: '文字の見た目', icon: '🔤', open: true, fields: [
+            // 全部の文字（タイトル・サブタイトル・追加した文字）に効くもの
+            { k: 'font', l: 'フォント（全体）', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]), note: 'タイトル・サブタイトル・追加した文字は、それぞれのカードで別のフォントにもできます' },
+            { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
+            { k: 'weight', l: '文字の太さ（全体）', t: 'select', o: C.WEIGHTS },
+            { k: 'shadow', l: '文字にほんのり影を付ける', t: 'check' },
+            // ここから下は、タイトル（home: 'title'）・サブタイトル（home: 'sub'）のカードの中に出す
+            { k: 'titleFont', l: 'フォント', t: 'select', o: LAYER_FONTS, home: 'none' },
+            { k: 'titleWeight', l: '文字の太さ', t: 'select', o: LAYER_WEIGHTS, home: 'none' },
+            { k: 'textScale', l: '大きさ', t: 'range', min: 0.5, max: 1.3, step: 0.05, u: '倍', home: 'none' },
+            { k: 'titleColor', l: '色', t: 'color', home: 'none' },
+            { k: 'textAlign', l: 'そろえ方', t: 'select', o: [['center', '中央'], ['left', '左寄せ'], ['right', '右寄せ']], home: 'none' },
+            { k: 'textX', l: '左右にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', home: 'none' },
+            { k: 'textY', l: '上下にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', home: 'none' },
+            { k: 'hlColor', l: '強調（*〜*）の色', t: 'color', home: 'none' },
+            { k: 'hlScale', l: '強調（*〜*）の大きさ', t: 'range', min: 0.8, max: 1.6, step: 0.05, u: '倍', home: 'none' },
+            { k: 'titleStrokeOn', l: '縁取り', t: 'check', home: 'none' },
+            { k: 'titleStrokeColor', l: '縁取りの色', t: 'color', home: 'none', when: s => s.titleStrokeOn },
+            { k: 'titleStrokeW', l: '縁取りの太さ', t: 'range', min: 1, max: 40, step: 1, u: 'px', home: 'none', when: s => s.titleStrokeOn },
+            { k: 'titlePlate', l: '後ろの形', t: 'select', o: [['none', '形なし'], ['pill', '楕円'], ['round', '角丸'], ['band', '横いっぱいの帯']], home: 'none' },
+            { k: 'tpColor', l: '形の色', t: 'color', home: 'none' },
+            { k: 'tpAlpha', l: '形の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', home: 'none' },
+            { k: 'subFont', l: 'フォント', t: 'select', o: LAYER_FONTS, home: 'none' },
+            { k: 'subWeight', l: '文字の太さ', t: 'select', o: LAYER_WEIGHTS, home: 'none' },
+            { k: 'subScale', l: '大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', home: 'none' },
+            { k: 'subColor', l: '色', t: 'color', home: 'none' },
+            { k: 'subPos', l: '置き場所', t: 'select', o: [['below', 'タイトルの下'], ['above', 'タイトルの上'], ['corner', '隅に小さく']], home: 'sub' },
+            { k: 'subCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], home: 'sub', when: s => s.subPos === 'corner' },
+            { k: 'subStrokeOn', l: '縁取り', t: 'check', home: 'none', when: s => s.subBox === 'none' || !!s.subArc },
+            { k: 'subStrokeColor', l: '縁取りの色', t: 'color', home: 'none', when: s => s.subStrokeOn && (s.subBox === 'none' || !!s.subArc) },
+            { k: 'subStrokeW', l: '縁取りの太さ', t: 'range', min: 1, max: 40, step: 1, u: 'px', home: 'none', when: s => s.subStrokeOn && (s.subBox === 'none' || !!s.subArc) },
+            { k: 'subBox', l: '後ろの形', t: 'select', o: [['none', '形なし'], ['pill', '楕円'], ['round', '角丸']], home: 'none' },
+            { k: 'subBoxColor', l: '形の色', t: 'color', home: 'none' },
+            { k: 'subArc', l: '曲がり', t: 'range', min: -1, max: 1, step: 0.05, u: '', home: 'none', note: '0 でまっすぐ。プラスで上に反る（アーチ）、マイナスで下に反る。曲げたときは後ろの形は付きません' },
+          ]
+        },
+        {
+          title: '文字と画像を追加', icon: '🧩', open: true, fields: [
+            {
+              k: 'imgPos', l: '位置', t: 'select', o: IMG_POS, note: '大きさが縦長・正方形のときは、左・右を選んでも画像は文字の下に置きます'
+            },
+            { k: 'sample', l: '画像', t: 'select', o: [['own', '選んだ画像'], ['heart', 'サンプル：ハート'], ['star', 'サンプル：星'], ['bunny', 'サンプル：うさぎ（どんまうんど）'], ['pick', '📁 画像を選ぶ…']] },
+          ]
+        },
+        {
+          title: 'ロゴ', icon: '🏷️', open: true, fields: [
+            {
+              k: 'logoMode', l: 'ロゴの置き方', t: 'select', o: [['none', '使わない'], ['replace', 'タイトルの代わりに大きく（下にサブタイトル）'],
+              ['above', 'タイトルの上に'], ['below', 'タイトルの下に'], ['corner', '隅に小さく'], ['band', '帯の中に（下か上に帯を敷く）']]
+            },
+            { k: 'logoCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], when: s => s.logoMode === 'corner' },
+            { k: 'logoScale', l: 'ロゴの大きさ', t: 'range', min: 0.3, max: 1.6, step: 0.05, u: '倍', when: s => s.logoMode !== 'none' },
+            { k: 'bandPos', l: '帯の位置', t: 'select', o: [['bottom', '下'], ['top', '上']], when: s => s.logoMode === 'band' },
+            { k: 'bandColor', l: '帯の色', t: 'color', when: s => s.logoMode === 'band' },
+            { k: 'bandSize', l: '帯の太さ', t: 'range', min: 0.5, max: 2.5, step: 0.05, u: '倍', when: s => s.logoMode === 'band' },
+            { k: 'logoPlate', l: 'ロゴの後ろに色を敷く', t: 'check', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' },
+            { k: 'plateColor', l: 'ロゴの後ろの色', t: 'color', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
+            { k: 'plateAlpha', l: 'ロゴの後ろの色の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
+          ]
+        },
+        {
+          title: '背景', icon: '🎨', fields: [
+            { k: '_bgPick', l: '📁 背景画像を選ぶ', t: 'button', full: true, action: () => $('bg-file').click(), note: '選ぶと、背景がその画像になります' },
+            {
+              k: 'bg', l: '背景の種類', t: 'chips', full: true, o: [['dots', '水玉'], ['stripe', 'ストライプ'], ['check', 'チェック'],
+              ['gradient', 'グラデーション'], ['plain', '無地'], ['image', '自分の画像'], ['none', 'なし（透明）']]
+            },
+            { k: 'bgColor', l: s => s.bg === 'gradient' ? '色 1' : '背景の色', t: 'color', when: s => s.bg !== 'none' && !(s.bg === 'image' && s.bgFit === 'cover'), note: '透明な部分がある画像を並べるときは、この色が下に見えます' },
+            { k: 'bgColor2', l: '色 2', t: 'color', when: s => s.bg === 'gradient' },
+            { k: 'patColor', l: '柄の色', t: 'color', when: s => ['dots', 'stripe', 'check'].includes(s.bg) },
+            { k: 'patScale', l: '柄の大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', when: bgPat },
+            { k: 'bgFit', l: '背景画像の合わせ方', t: 'select', o: [['cover', '画面いっぱい（はみ出す分は切る）'], ['contain', '全体が入るように（余白は背景の色）'], ['tile', '並べる（タイル）']], when: s => s.bg === 'image' },
+            { k: 'bgTile', l: '1枚の大きさ（横幅）', t: 'range', min: 40, max: 800, step: 10, u: 'px', when: s => s.bg === 'image' && s.bgFit === 'tile', note: '1280×720 のときの大きさ。ほかの大きさでは合わせて変わります' },
+            { k: 'bgBright', l: '背景の明るさ', t: 'range', min: -80, max: 80, step: 5, u: '%', when: s => s.bg !== 'none', note: 'マイナスで暗く、プラスで明るく。写真の上に白い文字をのせるときは暗めに' },
+            { k: 'glow', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'check', when: s => s.bg !== 'none' },
+            { k: 'frameOn', l: '内側に細い枠を付ける', t: 'check' },
+            { k: 'frameColor', l: '枠の色', t: 'color', when: s => s.frameOn },
+          ]
+        },
+      ];
+
+      // =====================================================
+      //  状態・保存
+      // =====================================================
+      const STORE_KEY = 'donnma-eyecatch-v1';
+      const IMG_KEY = 'donnma-eyecatch-img-v1';
+      const BG_KEY = 'donnma-eyecatch-bg-v1';
+      // DEFAULTS の配列（extras・order）を共有しないように、sanitize で新しく作る
+      let S = sanitize({});
+      try { S = sanitize(JSON.parse(localStorage.getItem(STORE_KEY) || 'null')); } catch (e) { /* storage unavailable */ }
+      const img = { side: null, samples: {}, bg: null, logo: null, extras: {} };
+
+      const inputs = {};
+      function buildField(f) {
+        const wrap = document.createElement('div');
+        wrap.className = 'field';
+        const id = 'f-' + f.k;
+        let set;
+        if (f.t === 'check') {
+          wrap.innerHTML = `<label class="toggle" for="${id}"><span></span><input type="checkbox" id="${id}"><span class="sw"></span></label>`;
+          const el = wrap.querySelector('input');
+          el.addEventListener('change', () => update(f.k, el.checked));
+          set = v => { el.checked = v; };
+        } else if (f.t === 'range') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span><span class="field-val"></span></label>
+            <input type="range" id="${id}" min="${f.min}" max="${f.max}" step="${f.step}">`;
+          const el = wrap.querySelector('input'), val = wrap.querySelector('.field-val');
+          const show = v => { val.textContent = `${+(+v).toFixed(2)}${f.u}`; };
+          el.addEventListener('input', () => { show(el.value); update(f.k, parseFloat(el.value)); });
+          set = v => { el.value = v; show(v); };
+        } else if (f.t === 'select') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label><select id="${id}"></select>`;
+          const el = wrap.querySelector('select');
+          for (const [v, label] of f.o) el.add(new Option(label, v));
+          el.addEventListener('change', () => update(f.k, el.value));
+          set = v => { el.value = v; };
+        } else if (f.t === 'color') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label>
+            <div class="color-row"><input type="color" id="${id}"><input type="text" maxlength="7" spellcheck="false"></div>`;
+          const [pick, hex] = wrap.querySelectorAll('input');
+          hex.setAttribute('aria-label', 'カラーコード');
+          pick.addEventListener('input', () => { hex.value = pick.value; update(f.k, pick.value); });
+          hex.addEventListener('input', () => {
+            let v = hex.value.trim();
+            if (!v.startsWith('#')) v = '#' + v;
+            if (/^#[0-9a-f]{6}$/i.test(v)) { pick.value = v.toLowerCase(); update(f.k, v.toLowerCase()); }
+          });
+          hex.addEventListener('blur', () => { hex.value = S[f.k]; });
+          set = v => { pick.value = v; hex.value = v; };
+        } else if (f.t === 'chips') {
+          wrap.innerHTML = `<span class="field-label"><span></span></span><div class="preset-row" role="radiogroup"></div>`;
+          const row = wrap.querySelector('.preset-row');
+          const btns = f.o.map(([v, label]) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'chip-btn';
+            b.textContent = label;
+            b.setAttribute('role', 'radio');
+            b.addEventListener('click', () => {
+              // 自分の画像をまだ選んでいなければ、選ぶ画面を開く
+              if (v === 'image' && !img.bg) { $('bg-file').click(); return; }
+              update(f.k, v); set(v);
+            });
+            row.appendChild(b);
+            return [v, b];
+          });
+          set = v => btns.forEach(([bv, b]) => b.setAttribute('aria-checked', String(bv === v)));
+        } else if (f.t === 'button') {
+          wrap.innerHTML = `<button class="btn btn-sm" type="button" id="${id}"><span></span></button>`;
+          wrap.querySelector('button').addEventListener('click', f.action);
+          set = () => { };
+        } else if (f.t === 'number') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label>
+            <input type="number" id="${id}" min="${f.min}" max="${f.max}" step="1" inputmode="numeric">`;
+          const el = wrap.querySelector('input');
+          el.addEventListener('input', () => {
+            const v = parseInt(el.value, 10);
+            if (v >= f.min && v <= f.max) update(f.k, v);
+          });
+          el.addEventListener('blur', () => { el.value = S[f.k]; });
+          set = v => { el.value = v; };
+        } else {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label><input type="text" id="${id}">`;
+          const el = wrap.querySelector('input');
+          el.placeholder = f.ph || '';
+          el.addEventListener('input', () => update(f.k, el.value));
+          set = v => { el.value = v; };
+        }
+        const labelEl = wrap.querySelector('label > span, button > span, .field-label > span');
+        if (f.full) wrap.classList.add('field-full');
+        labelEl.textContent = typeof f.l === 'function' ? f.l(S) : f.l;
+        if (f.note) {
+          const n = document.createElement('div');
+          n.className = 'field-note';
+          n.textContent = f.note;
+          wrap.appendChild(n);
+        }
+        inputs[f.k] = { f, wrap, set, labelEl };
+        return wrap;
+      }
+
+      // カードから外した項目の置き場所（値の出し入れはそのまま使う）
+      const hiddenBin = document.createElement('div');
+      hiddenBin.hidden = true;
+      document.body.appendChild(hiddenBin);
+      function buildUI() {
+        for (const sec of SECTIONS) {
+          const det = document.createElement('details');
+          det.className = 'sec';
+          if (sec.open) det.open = true;
+          det.innerHTML = `<summary><span class="sec-icon">${sec.icon}</span>${sec.title}</summary>`;
+          const grid = document.createElement('div');
+          grid.className = 'fields';
+          // ロゴの欄は、先頭にロゴのアップロードを置く
+          if (sec.title === 'ロゴ') grid.appendChild($('logo-upload'));
+          if (sec.title === '文字と画像を追加') { grid.appendChild($('extra-upload')); grid.appendChild($('main-opts')); }
+          for (const f of sec.fields) grid.appendChild(buildField(f));
+          det.appendChild(grid);
+          // 「大きさ」は文字の前に出す
+          if (sec.title === '大きさ') $('settings').insertBefore(det, $('settings').children[1]);
+          else $('settings').appendChild(det);
+        }
+        // 欄の並び（よく使う順）：テンプレート → 大きさ → 文字と画像を追加 → 文字の見た目 → ロゴ → 背景 → まとめて作る
+        const secOf = t => [...$('settings').querySelectorAll(':scope > details.sec')].find(d => d.querySelector('summary').textContent.includes(t));
+        for (const t of ['大きさ', '文字と画像を追加', '文字の見た目', 'ロゴ', '背景']) $('settings').appendChild(secOf(t));
+        $('settings').appendChild($('batch-sec'));
+        // タイトル・サブタイトルの項目は、それぞれのカードの中に（一覧を作り直しても使い回す）
+        for (const sec of SECTIONS) for (const f of sec.fields) {
+          if (f.home === 'title') titleOpts.appendChild(inputs[f.k].wrap);
+          if (f.home === 'sub') subOpts.appendChild(inputs[f.k].wrap);
+          if (f.home === 'none') hiddenBin.appendChild(inputs[f.k].wrap);
+        }
+        // メインの画像の置き方は、メインのカードの中に
+        $('main-opts').append(inputs.imgPos.wrap, inputs.sample.wrap);
+        // 1枚目の画像のバー（追加の画像と同じ形）
+        for (const [k, label, min, max, step, u] of [
+          ['imgScale', '大きさ', 0.3, 1.6, 0.05, '倍'], ['imgX', '左右', -50, 50, 1, '%'],
+          ['imgY', '上下', -50, 50, 1, '%'], ['imgRot', '回転', -180, 180, 1, '°']]) {
+          const f = document.createElement('label');
+          f.className = 'extra-bar';
+          f.innerHTML = `<span class="field-label"><span>${label}</span><span class="field-val"></span></span><input type="range" min="${min}" max="${max}" step="${step}">`;
+          const r = f.querySelector('input'), val = f.querySelector('.field-val');
+          const set = v => { r.value = v; val.textContent = `${+(+v).toFixed(2)}${u}`; };
+          r.addEventListener('input', () => { set(r.value); update(k, parseFloat(r.value)); });
+          inputs[k] = { f: { k }, wrap: f, set, labelEl: f.querySelector('.field-label > span') };
+          hiddenBin.appendChild(f);
+        }
+      }
+      function refreshVisibility() {
+        for (const k in inputs) {
+          const { f, wrap, labelEl } = inputs[k];
+          wrap.hidden = f.when ? !f.when(S) : false;
+          if (typeof f.l === 'function') labelEl.textContent = f.l(S);
+        }
+      }
+      function syncUI() {
+        for (const k in inputs) if (!k.startsWith('_')) inputs[k].set(S[k]);
+        $('f-title').value = S.title;
+        $('f-sub').value = S.sub;
+        refreshVisibility();
+        renderMain();
+      }
+
+      let queued = false;
+      function update(k, v) {
+        // 「自由に置く」は、メインの画像を追加した画像に変える（置き場所としては残さない）
+        if (k === 'imgPos' && v === 'free') { freeMain(); return; }
+        if (k === 'sample' && (v === 'own' || v === 'pick' || img.side || S.imgPos === 'none')) { pickSample(v); return; }
+        S[k] = v;
+        refreshVisibility();
+        if (k === 'sample') setThumb();
+        if (k === 'imgPos') renderMain();
+        if ((k === 'subBox' || k === 'subArc') && subStrokeUi) subStrokeUi();
+        redraw();
+      }
+      function redraw() {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => {
+          queued = false;
+          try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* ignore */ }
+          clearTimeout(histTimer);
+          histTimer = setTimeout(snapshot, 400);
+          loadFont().then(render, render);
+        });
+      }
+
+      // =====================================================
+      //  フォント（Google フォントは読み込み終わってから描く）
+      // =====================================================
+      let fontKey = '';
+      function family() {
+        const f = C.fontInfo(S);
+        return f ? f.family : '"Zen Maru Gothic", sans-serif';
+      }
+      const fontKeyOf = role => role === 'title' ? S.titleFont : role === 'sub' ? S.subFont : (role && role.font) || '@inherit';
+      const weightKeyOf = role => role === 'title' ? S.titleWeight : role === 'sub' ? S.subWeight : (role && role.weight) || '@inherit';
+      function famOf(role) {
+        const key = fontKeyOf(role);
+        if (key === '@inherit') return family();
+        const f = C.fontInfo({ font: key, fontCustom: '' });
+        return f ? f.family : '"Zen Maru Gothic", sans-serif';
+      }
+      const weightOf = role => { const w = weightKeyOf(role); return w === '@inherit' ? S.weight : w; };
+      // c.font に入れる文字列
+      const fontOf = (role, size) => `${weightOf(role)} ${size}px ${famOf(role)}`;
+      // 使っているフォントを全部読み込む（Google フォントは読み込み終わってから描く）
+      const loadedFonts = new Map();
+      function loadFont() {
+        const roles = [null, 'title', 'sub', ...S.extras.filter(e => e.type === 'text')];
+        const jobs = [];
+        for (const role of roles) {
+          const key = role === null ? S.font : fontKeyOf(role);
+          if (key === '@inherit') continue;
+          const f = role === null ? C.fontInfo(S) : C.fontInfo({ font: key, fontCustom: '' });
+          if (f && f.url && !loadedFonts.has(f.url)) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = f.url;
+            document.head.appendChild(link);
+            loadedFonts.set(f.url, new Promise(res => { link.onload = res; link.onerror = res; }));
+          }
+          const txt = (role === 'sub' ? S.sub : role === 'title' || role === null ? S.title + S.sub : role.text) + 'あ';
+          const w = role === null ? S.weight : weightOf(role), fam = role === null ? family() : famOf(role);
+          jobs.push((f && f.url ? loadedFonts.get(f.url) : Promise.resolve()).then(() => document.fonts.load(`${w} 80px ${fam}`, txt)));
+        }
+        return Promise.all(jobs);
+      }
+
+      // =====================================================
+      //  サンプル画像（画像を選ばないとき）。うさぎは どんまうんど のデザインなので、選択肢のいちばん下に置く
+      // =====================================================
+      const SAMPLES = {
+        heart: `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="-30 -30 60 60">
+          <path d="M0 22 C-26 6 -24 -16 -11 -18 C-5 -19 -1 -15 0 -11 C1 -15 5 -19 11 -18 C24 -16 26 6 0 22 Z" fill="#ff9fb6" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+          <ellipse cx="-11" cy="-8" rx="4.5" ry="2.8" fill="#fff" opacity="0.6" transform="rotate(-30 -11 -8)"/>
+        </svg>`,
+        star: `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="-30 -30 60 60">
+          <path d="M0 -24 L6.5 -8.5 L23 -7.5 L10.5 3.5 L14.5 20 L0 11 L-14.5 20 L-10.5 3.5 L-23 -7.5 L-6.5 -8.5 Z" fill="#ffd66b" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+          <ellipse cx="-3" cy="-8" rx="2.4" ry="4" fill="#fff" opacity="0.6" transform="rotate(20 -3 -8)"/>
+        </svg>`,
+        bunny: `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="-30 -34 60 60">
+          <g fill="#ffc4d2">
+            <ellipse cx="-6.5" cy="-11" rx="4.4" ry="8.5" transform="rotate(-8 -6.5 -11)"/>
+            <ellipse cx="6.5" cy="-11" rx="4.4" ry="8.5" transform="rotate(8 6.5 -11)"/>
+            <ellipse cx="0" cy="2" rx="16" ry="12"/>
+          </g>
+          <ellipse cx="-6.5" cy="-11" rx="2" ry="5.6" fill="#ffe3ea" transform="rotate(-8 -6.5 -11)"/>
+          <ellipse cx="6.5" cy="-11" rx="2" ry="5.6" fill="#ffe3ea" transform="rotate(8 6.5 -11)"/>
+          <ellipse cx="-5.2" cy="2.6" rx="1.5" ry="1.9" fill="#6b4a48"/>
+          <ellipse cx="5.2" cy="2.6" rx="1.5" ry="1.9" fill="#6b4a48"/>
+          <circle cx="-4.6" cy="2" r="0.5" fill="#fff"/><circle cx="5.8" cy="2" r="0.5" fill="#fff"/>
+          <ellipse cx="-9.6" cy="6" rx="2.4" ry="1.4" fill="#ff9fb6" opacity="0.8"/>
+          <ellipse cx="9.6" cy="6" rx="2.4" ry="1.4" fill="#ff9fb6" opacity="0.8"/>
+          <path d="M-2.2 5.8 Q-1.1 7.3 0 6 Q1.1 7.3 2.2 5.8" fill="none" stroke="#6b4a48" stroke-width="0.9" stroke-linecap="round"/>
+        </svg>`,
+      };
+      const sampleImg = () => img.samples[S.sample] || img.samples.heart;
+      const loadImg = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
+
+      // =====================================================
+      //  描く（数字は 1200×630 のときの大きさ。ほかの大きさでは合わせて拡大・縮小する）
+      // =====================================================
+      const dims = () => S.size === 'custom' ? [S.customW, S.customH] : SIZES[S.size].slice(0, 2);
+
+      // プレビューでドラッグするための、画像・文字・追加の画像の場所（canvas の座標）
+      let lastHit = { pic: null, text: null, sub: null, extras: [] };
+      function draw(cv) {
+        const [W, H] = dims();
+        const band = S.logoMode === 'band' ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
+        if (!band) {
+          const hit = drawContent(cv, W, H);
+          if (cv === $('cv')) lastHit = hit;
+          return;
+        }
+        // 帯のぶんを除いた部分を描いて、帯と一緒に貼る
+        const top = S.bandPos === 'top' ? band : 0;
+        const body = document.createElement('canvas');
+        const hit = drawContent(body, W, H - band);
+        cv.width = W; cv.height = H;
+        const c = cv.getContext('2d');
+        c.drawImage(body, 0, top);
+        c.fillStyle = S.bandColor;
+        c.fillRect(0, top ? 0 : H - band, W, band);
+        if (img.logo) {
+          const r = Math.min(W * 0.5 / img.logo.width, band * 0.56 * S.logoScale / img.logo.height);
+          const w = img.logo.width * r, h = img.logo.height * r;
+          c.drawImage(img.logo, W / 2 - w / 2, (top ? 0 : H - band) + band / 2 - h / 2, w, h);
+        }
+        if (cv === $('cv')) {
+          const sh = r => r && { ...r, y: r.y + top };
+          lastHit = { pic: sh(hit.pic), text: sh(hit.text), sub: sh(hit.sub), extras: hit.extras.map(sh) };
+        }
+      }
+
+      function drawContent(cv, W, H) {
+        cv.width = W; cv.height = H;
+        const c = cv.getContext('2d');
+        const k = Math.min(W / 1200, H / 630);
+        const stacked = W / H < 1.4;
+        const side = S.imgPos === 'none' ? null : (img.side || sampleImg());
+        // 縦長・正方形で左右を選んだときは、下に置く
+        const [hPos, vPos] = S.imgPos.split('-');
+        const pos = side ? (stacked && (hPos === 'left' || hPos === 'right') ? 'bottom' : hPos) : 'none';
+
+        // ---- 背景（と内側の細い枠）
+        drawBackground(c, W, H, k);
+        if (S.frameOn) {
+          const m = Math.min(W, H) * 0.045;
+          c.save();
+          c.strokeStyle = S.frameColor;
+          c.globalAlpha = 0.75;
+          c.lineWidth = Math.max(1.5, 2.5 * k);
+          c.strokeRect(m, m, W - m * 2, H - m * 2);
+          c.restore();
+        }
+
+        // ---- 画像と文字の場所を決める（ずらす分は画像だけに足す。文字の場所はそのまま）
+        let area = { l: W * 0.06, r: W * 0.94 }, band = { t: H * 0.08, b: H * 0.92 };
+        let pic = null;
+        const sizeTo = (maxW, maxH) => {
+          const r = Math.min(maxW / side.width, maxH / side.height);
+          return { w: side.width * r, h: side.height * r };
+        };
+        if (pos === 'left' || pos === 'right') {
+          const { w, h } = sizeTo(W * 0.46 * S.imgScale, H * 0.72 * S.imgScale);
+          const x = pos === 'left' ? 36 * k : W - 36 * k - w;
+          pic = { x, y: vPos === 'bottom' ? H - 26 * k - h : vPos === 'top' ? 26 * k : H / 2 - h / 2, w, h };
+          area = pos === 'left' ? { l: 36 * k + w + 24 * k, r: W - 40 * k } : { l: 40 * k, r: W - 36 * k - w - 24 * k };
+        } else if (pos === 'bottom' || pos === 'top') {
+          const { w, h } = sizeTo(W * 0.9, H * (stacked ? 0.56 : 0.5) * S.imgScale);
+          if (pos === 'bottom') {
+            pic = { x: W / 2 - w / 2, y: H - H * 0.03 - h, w, h };
+            band = { t: H * 0.05, b: Math.max(H * 0.2, pic.y - H * 0.01) };
+          } else {
+            pic = { x: W / 2 - w / 2, y: H * 0.04, w, h };
+            band = { t: Math.min(H * 0.8, pic.y + h + H * 0.01), b: H * 0.95 };
+          }
+        } else if (pos === 'center') {
+          const { w, h } = sizeTo(W * 0.9, H * 0.8 * S.imgScale);
+          pic = { x: W / 2 - w / 2, y: H / 2 - h / 2, w, h };
+        }
+        if (pic) { pic.x += S.imgX / 100 * W; pic.y += S.imgY / 100 * H; }
+        if (S.glow && S.bg !== 'none') {
+          const all = pic && pos !== 'center' ? { l: Math.min(area.l, pic.x), r: Math.max(area.r, pic.x + pic.w) } : area;
+          glow(c, (all.l + all.r) / 2, H / 2, (all.r - all.l) * 0.62, H * 0.62);
+        }
+        brighten(c, W, H);
+
+        // ---- 文字（とロゴ）：上から ロゴ → タイトル → サブタイトル を、帯の中で上下の真ん中にそろえる
+        const logo = S.logoMode !== 'none' ? img.logo : null;
+        const mode = logo && S.logoMode !== 'band' ? S.logoMode : 'none';
+        const lines = mode === 'replace' ? [] : S.title.replace(/\s+$/, '').split('\n');
+        const aw = area.r - area.l, bh = band.b - band.t, mid = (area.l + area.r) / 2;
+        const lh = 1.14, gap = 14 * k;
+        const sub = S.sub.trim();
+        let subFs = sub ? fit(c, [sub], (mode === 'replace' ? 84 : 60) * k * S.subScale, aw, subStroke0() * k * 2) : 0;
+        let fs = lines.length ? fitTitle(c, lines, (stacked || !side || pos === 'center' ? 150 : 124) * k * S.textScale, aw) : 0;
+        let lg = null;
+        if (mode === 'replace' || mode === 'above' || mode === 'below') {
+          const r = Math.min(aw * 0.9 / logo.width, bh * (mode === 'replace' ? 0.62 : 0.3) / logo.height) * S.logoScale;
+          lg = { w: logo.width * r, h: logo.height * r };
+          if (lg.w > aw) { const t = aw / lg.w; lg.w *= t; lg.h *= t; }
+        }
+        // サブタイトル：タイトルの上か下（ブロックの中）、または隅（ブロックの外）
+        const subIn = !!sub && S.subPos !== 'corner';
+        const subAbove = subIn && S.subPos === 'above', subBelow = subIn && S.subPos === 'below';
+        const boxed = S.subBox !== 'none' && !S.subArc;
+        // 曲げたときに、反りのぶん高くなる量（サブタイトルの文字の大きさに対して）
+        const arcLift = f => {
+          if (!S.subArc) return 0;
+          c.font = fontOf('sub', f);
+          const a = Math.abs(S.subArc) * 1.4, R = c.measureText(sub).width / a;
+          return R * (1 - Math.cos(a / 2));
+        };
+        // サブタイトルの高さ（タイトルとの間は、サブタイトルの「上下」のずらしで空ける）
+        const gapPx = 0;
+        const subBody = () => subFs * (boxed ? 1.9 : 1.35) + arcLift(subFs);
+        const subH = () => subIn ? subBody() + gapPx : 0;
+        // ロゴの前後のすきま：タイトルの下なら「タイトルとの間」と「サブタイトルとの間」、それ以外は「次との間」
+        const logoGaps = () => !lg ? 0 : mode === 'below' ? (lines.length ? 1 : 0) + (subBelow ? 1 : 0) : (lines.length || subBelow ? 1 : 0);
+        // 行の高さ（強調を大きくした行は、そのぶん高く）
+        const lineH = l => fs * lh * (hasHL(l) ? Math.max(1, S.hlScale) : 1);
+        const total = () => (lg ? lg.h + logoGaps() * gap : 0) + lines.reduce((a, l) => a + lineH(l), 0) + subH();
+        while (total() > bh && (fs > 12 || (lg && lg.h > 20))) {
+          if (fs > 12) fs -= 2;
+          else { lg.w *= 0.95; lg.h *= 0.95; }
+          subFs = Math.min(subFs, fs ? fs * 0.55 : subFs * 0.95);
+        }
+        // 文字のまとまり：そろえ方（中央・左・右）と、ずらし（textX・textY）
+        const tx = S.textX / 100 * W, ty = S.textY / 100 * H;
+        const cxOf = w => (S.textAlign === 'left' ? area.l + w / 2 : S.textAlign === 'right' ? area.r - w / 2 : mid) + tx;
+        const subWidth = f => {
+          c.font = fontOf('sub', f);
+          return c.measureText(sub).width + (S.subBox !== 'none' && !S.subArc ? f * 1.3 : subStroke0() * k);
+        };
+        const blockW = Math.max(0, ...lines.map(l => lineW(c, l, fs) + titleStroke0() * k), lg ? lg.w : 0, subIn ? subWidth(subFs) : 0);
+        let y = (band.t + band.b) / 2 - total() / 2 + ty;
+        const textRect = blockW > 0 ? { x: cxOf(blockW) - blockW / 2, y, w: blockW, h: total() } : null;
+        // ---- メインの画像
+        const drawPic = () => {
+          if (!pic) return;
+          c.save();
+          c.translate(pic.x + pic.w / 2, pic.y + pic.h / 2);
+          c.rotate(S.imgRot * Math.PI / 180);
+          c.drawImage(side, -pic.w / 2, -pic.h / 2, pic.w, pic.h);
+          c.restore();
+        };
+        // ---- 追加の画像・文字。位置は中心の %。画像の大きさは短い辺の 30% が 1倍、文字は 64px（1200×630 のとき）が 1倍
+        const extras = [];
+        const drawExtra = e => {
+          const cx = e.x / 100 * W, cy = e.y / 100 * H;
+          if (e.type === 'text') {
+            if (!e.text.trim()) return;
+            // 複数行：行ごとに真ん中そろえ。形はいちばん長い行と行数に合わせる
+            const tLines = e.text.replace(/\s+$/, '').split('\n');
+            const f = 64 * k * e.scale, boxedT = e.box !== 'none' && !e.arc, tlh = f * 1.2;
+            c.font = fontOf(e, f);
+            const eStroke = e.strokeOn ? e.strokeW * k : 0;
+            const est = extraStyle(e);
+            const w = Math.max(...tLines.map(l => lineW(c, l, f, est))) + (boxedT ? f * 1.3 : eStroke);
+            const h = tlh * (tLines.length - 1) + f * (boxedT ? 1.55 : 1.3) + arcSag(w, e.arc);
+            const lineY = i => (i - (tLines.length - 1) / 2) * tlh;
+            // 行のそろえ方：いちばん長い行の幅の中で、左・中央・右に寄せる
+            const tPad = boxedT ? f * 0.65 : eStroke / 2;
+            const lineX = l => {
+              if (e.align === 'center') return 0;
+              const lw = lineW(c, l, f, est);
+              return e.align === 'left' ? -w / 2 + tPad + lw / 2 : w / 2 - tPad - lw / 2;
+            };
+            c.save();
+            c.translate(cx, cy);
+            c.rotate((e.rot || 0) * Math.PI / 180);
+            if (boxedT) {
+              c.save();
+              if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.25)'; c.shadowBlur = f * 0.25; c.shadowOffsetY = f * 0.08; }
+              c.fillStyle = e.boxColor;
+              c.globalAlpha = e.boxAlpha;
+              c.beginPath();
+              c.roundRect(-w / 2, -h / 2, w, h, e.box === 'pill' ? h / 2 : h * 0.22);
+              c.fill();
+              c.restore();
+              const keepShadow = S.shadow;
+              S.shadow = false;
+              tLines.forEach((l, i) => drawLine(c, l, lineX(l), lineY(i) + f * 0.03, f, 0, est));
+              S.shadow = keepShadow;
+            } else if (e.arc) {
+              tLines.forEach((l, i) => drawLine(c, l, 0, lineY(i), f, eStroke, est));
+            } else tLines.forEach((l, i) => drawLine(c, l, lineX(l), lineY(i), f, eStroke, est));
+            c.restore();
+            extras.push({ id: e.id, x: cx - w / 2, y: cy - h / 2, w, h });
+            return;
+          }
+          const im = img.extras[e.id];
+          if (!im) return;
+          const base = Math.min(W, H) * 0.3 * e.scale;
+          const r = Math.min(base / im.width, base / im.height);
+          const w = im.width * r, h = im.height * r;
+          c.save();
+          c.translate(cx, cy);
+          c.rotate((e.rot || 0) * Math.PI / 180);
+          c.drawImage(im, -w / 2, -h / 2, w, h);
+          c.restore();
+          extras.push({ id: e.id, x: cx - w / 2, y: cy - h / 2, w, h });
+        };
+        const plate = (x, y, w, h) => {
+          if (!S.logoPlate) return;
+          const pad = Math.max(8 * k, h * 0.2);
+          c.save();
+          c.globalAlpha = S.plateAlpha;
+          c.fillStyle = S.plateColor;
+          c.beginPath();
+          c.roundRect(x - pad, y - pad * 0.7, w + pad * 2, h + pad * 1.4, Math.min(h * 0.45 + pad, 40 * k));
+          c.fill();
+          c.restore();
+        };
+        const drawLogo = (last, paint) => {
+          if (paint) {
+            const lx = cxOf(lg.w) - lg.w / 2;
+            plate(lx, y, lg.w, lg.h);
+            c.save();
+            if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = 10 * k; c.shadowOffsetY = 5 * k; }
+            c.drawImage(logo, lx, y, lg.w, lg.h);
+            c.restore();
+          }
+          y += lg.h + (last ? 0 : gap);
+        };
+        // 上から：サブタイトル（タイトルの上）→ ロゴ（タイトルの上・代わり）→ タイトル → ロゴ（タイトルの下）→ サブタイトル（タイトルの下）
+        const subStroke = boxed ? 0 : subStroke0() * k;
+        // サブタイトル：形を敷くなら、文字の幅に合わせて楕円／角丸の四角を描いてから文字
+        const subText = (x, yy, f) => {
+          if (boxed) {
+            c.font = fontOf('sub', f);
+            const w = c.measureText(sub).width + f * 1.3, h = f * 1.55;
+            c.save();
+            if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.25)'; c.shadowBlur = f * 0.25; c.shadowOffsetY = f * 0.08; }
+            c.fillStyle = S.subBoxColor;
+            c.globalAlpha = S.subBoxAlpha;
+            c.beginPath();
+            c.roundRect(x - w / 2, yy - h / 2, w, h, S.subBox === 'pill' ? h / 2 : h * 0.22);
+            c.fill();
+            c.restore();
+          }
+          if (S.subArc) { arcText(sub, x, yy, f); return; }
+          const keep = S.shadow;
+          if (boxed) S.shadow = false;   // 札の上の文字には影を付けない
+          text(c, sub, x, yy + (boxed ? f * 0.03 : 0), f, S.subColor, subStroke, S.subStrokeColor);
+          S.shadow = keep;
+        };
+        const arcText = (str, x, yy, f) => {
+          arcRun(c, [...str].map(ch => ({ t: ch, font: fontOf('sub', f), color: S.subColor })), x, yy, S.subArc, subStroke, S.subStrokeColor, f);
+        };
+        // ---- メインの文字（タイトル・サブタイトル・ロゴ）
+        // タイトル（とロゴ）を描く。paint が false なら場所だけ決める（サブタイトルの場所 subAt・タイトルの範囲も）
+        const y0 = y;
+        let subAt = null, titleTop = y, titleBot = y;
+        // paint：false は場所だけ決める。'body' はタイトル・ロゴ、'corner' は隅のロゴ、true は両方
+        const drawText = paint => {
+          const bodyOn = paint === true || paint === 'body', cornerOn = paint === true || paint === 'corner';
+          y = y0;
+          subAt = null;
+          if (subAbove) { subAt = { x: cxOf(subWidth(subFs)), y: y + subBody() / 2, f: subFs, w: subWidth(subFs), h: subBody() }; y += subH(); }
+          titleTop = y;
+          if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow), bodyOn);
+          for (const line of lines) {
+            if (bodyOn) drawLine(c, line, cxOf(lineW(c, line, fs)), y + lineH(line) / 2, fs, titleStroke0() * k);
+            y += lineH(line);
+          }
+          if (lg && mode === 'below') { if (lines.length) y += gap; drawLogo(!subBelow, bodyOn); }
+          titleBot = y;
+          if (subBelow) subAt = { x: cxOf(subWidth(subFs)), y: y + gapPx + subBody() / 2, f: subFs, w: subWidth(subFs), h: subBody() };
+
+          // ---- 隅に小さくサブタイトル（隅の文字は、枠の端にそろえる）
+          if (sub && S.subPos === 'corner') {
+            const cfs = fit(c, [sub], 44 * k * S.subScale, W * 0.45, subStroke0() * k * 2);
+            c.font = fontOf('sub', cfs);
+            const w = c.measureText(sub).width + (boxed ? cfs * 1.3 : subStroke);
+            const hh = (boxed ? cfs * 1.55 : cfs * 1.2) + arcLift(cfs);
+            const m = Math.min(W, H) * 0.045 + subStroke / 2;
+            const x = S.subCorner.endsWith('l') ? m + w / 2 : S.subCorner.endsWith('c') ? W / 2 : W - m - w / 2;
+            const yy = S.subCorner.startsWith('t') ? m + hh / 2 : H - m - hh / 2;
+            subAt = { x, y: yy, f: cfs, w, h: hh };
+          }
+
+          // ---- 隅に小さくロゴ
+          if (cornerOn && mode === 'corner') {
+            const r = Math.min(W * 0.2 / logo.width, H * 0.14 / logo.height) * S.logoScale;
+            const w = logo.width * r, h = logo.height * r, m = Math.min(W, H) * (S.logoPlate ? 0.06 : 0.04);
+            const x = S.logoCorner.endsWith('l') ? m : S.logoCorner.endsWith('c') ? (W - w) / 2 : W - m - w;
+            const yy = S.logoCorner.startsWith('t') ? m : H - m - h;
+            plate(x, yy, w, h);
+            c.save();
+            if (S.shadow) { c.shadowColor = 'rgba(0, 0, 0, 0.25)'; c.shadowBlur = 8 * k; c.shadowOffsetY = 3 * k; }
+            c.drawImage(logo, x, yy, w, h);
+            c.restore();
+          }
+        };
+
+        // ---- サブタイトル（タイトルとは別の重なり。subX・subY でサブタイトルだけずらせる）
+        drawText(false);
+        const subRect = subAt && { x: subAt.x + S.subX / 100 * W - subAt.w / 2, y: subAt.y + S.subY / 100 * H - subAt.h / 2, w: subAt.w, h: subAt.h };
+        const titleRect = textRect && titleBot > titleTop ? { x: textRect.x, y: titleTop, w: textRect.w, h: titleBot - titleTop } : null;
+        const rotAt = (cx, cy, deg, fn) => {
+          if (!deg) { fn(); return; }
+          c.save();
+          c.translate(cx, cy);
+          c.rotate(deg * Math.PI / 180);
+          c.translate(-cx, -cy);
+          fn();
+          c.restore();
+        };
+        const drawSub = () => {
+          if (!subAt) return;
+          const x = subAt.x + S.subX / 100 * W, yy = subAt.y + S.subY / 100 * H;
+          rotAt(x, yy, S.subRot, () => subText(x, yy, subAt.f));
+        };
+        // タイトルの後ろの形（楕円・角丸・横いっぱいの帯）。タイトル（とロゴ）の範囲に合わせる
+        const titleShape = () => {
+          if (!titleRect || S.titlePlate === 'none') return;
+          const r = titleRect, pad = Math.max(12 * k, (fs || subFs) * 0.28);
+          c.save();
+          c.globalAlpha = S.tpAlpha;
+          c.fillStyle = S.tpColor;
+          c.beginPath();
+          if (S.titlePlate === 'band') c.rect(-W, r.y - pad, W * 3, r.h + pad * 2);
+          else {
+            const h = r.h + pad * 2, w = r.w + pad * (S.titlePlate === 'pill' ? 3.6 : 2.8);
+            c.roundRect(r.x + r.w / 2 - w / 2, r.y - pad, w, h, S.titlePlate === 'pill' ? h / 2 : pad * 1.2);
+          }
+          c.fill();
+          c.restore();
+        };
+        // 横いっぱいの帯は、画像などの後ろ（いちばん後ろ）に敷く。楕円・角丸はタイトルのすぐ後ろ
+        const titleCenter = () => [titleRect.x + titleRect.w / 2, titleRect.y + titleRect.h / 2];
+        if (titleRect && S.titlePlate === 'band') rotAt(...titleCenter(), S.titleRot, titleShape);
+        const drawTitle = () => {
+          const body = () => { if (S.titlePlate !== 'band') titleShape(); drawText('body'); };
+          if (titleRect) rotAt(titleRect.x + titleRect.w / 2, titleRect.y + titleRect.h / 2, S.titleRot, body);
+          else body();
+          drawText('corner');
+        };
+
+        // ---- 重なりの順に描く（下から）
+        const byId = Object.fromEntries(S.extras.map(e => [e.id, e]));
+        for (const id of S.order) {
+          if (id === '@pic') drawPic();
+          else if (id === '@text') drawTitle();
+          else if (id === '@sub') drawSub();
+          else if (byId[id]) drawExtra(byId[id]);
+        }
+        return { pic, text: titleRect, sub: subRect, extras };
+      }
+
+      // 背景の明るさ：背景（と、まわりを明るくする分）の上に黒か白を重ねる
+      function brighten(c, W, H) {
+        if (S.bg === 'none' || !S.bgBright) return;
+        c.save();
+        c.fillStyle = S.bgBright < 0 ? '#000' : '#fff';
+        c.globalAlpha = Math.abs(S.bgBright) / 100;
+        c.fillRect(0, 0, W, H);
+        c.restore();
+      }
+      function drawBackground(c, W, H, k) {
+        if (S.bg === 'image' && img.bg) {
+          const contain = S.bgFit === 'contain';
+          if (S.bgFit === 'tile') {
+            // 並べる：1280×720 を基準にした大きさで、左上からすき間なく敷き詰める
+            c.fillStyle = S.bgColor;
+            c.fillRect(0, 0, W, H);
+            const tw = Math.max(8, S.bgTile * Math.min(W / 1280, H / 720));
+            const th = img.bg.height * tw / img.bg.width;
+            for (let y = 0; y < H; y += th) for (let x = 0; x < W; x += tw) c.drawImage(img.bg, x, y, tw, th);
+            return;
+          }
+          if (contain) { c.fillStyle = S.bgColor; c.fillRect(0, 0, W, H); }
+          const r = (contain ? Math.min : Math.max)(W / img.bg.width, H / img.bg.height);
+          const w = img.bg.width * r, h = img.bg.height * r;
+          c.drawImage(img.bg, (W - w) / 2, (H - h) / 2, w, h);
+          return;
+        }
+        if (S.bg === 'gradient') {
+          const g = c.createLinearGradient(0, 0, W, H);
+          g.addColorStop(0, S.bgColor);
+          g.addColorStop(1, S.bgColor2);
+          c.fillStyle = g;
+          c.fillRect(0, 0, W, H);
+          return;
+        }
+        c.fillStyle = S.bgColor;
+        c.fillRect(0, 0, W, H);
+        const sc = k * S.patScale;
+        if (S.bg === 'dots') {
+          const g = 64 * sc, r = 9 * sc;
+          c.fillStyle = S.patColor;
+          for (let y = 0, row = 0; y < H + g; y += g / 2, row++) {
+            for (let x = row % 2 ? g / 2 : 0; x < W + g; x += g) { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); }
+          }
+        } else if (S.bg === 'stripe') {
+          const g = 56 * sc;
+          c.save();
+          c.fillStyle = S.patColor;
+          c.translate(W / 2, H / 2);
+          c.rotate(-Math.PI / 4);
+          const d = Math.hypot(W, H);
+          for (let x = -d; x < d; x += g) c.fillRect(x, -d, g / 2, d * 2);
+          c.restore();
+        } else if (S.bg === 'check') {
+          const g = 60 * sc;
+          c.save();
+          c.fillStyle = S.patColor;
+          c.globalAlpha = 0.55;
+          for (let x = 0; x < W; x += g * 2) c.fillRect(x, 0, g, H);
+          for (let y = 0; y < H; y += g * 2) c.fillRect(0, y, W, g);
+          c.restore();
+        }
+      }
+
+      // 文字と画像のまわりを背景色でふんわり明るくして、柄を薄くする
+      function glow(c, x, y, rx, ry) {
+        const base = S.bg === 'gradient' ? S.bgColor : S.bg === 'image' ? '#ffffff' : S.bgColor;
+        const [r, g, b] = [1, 3, 5].map(i => parseInt(base.slice(i, i + 2), 16));
+        c.save();
+        c.translate(x, y);
+        c.scale(rx / ry, 1);
+        const gr = c.createRadialGradient(0, 0, 0, 0, 0, ry);
+        const a = S.bg === 'image' ? 0.55 : 0.95;
+        gr.addColorStop(0, `rgba(${r},${g},${b},${a})`);
+        gr.addColorStop(0.5, `rgba(${r},${g},${b},${a})`);
+        gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        c.fillStyle = gr;
+        c.fillRect(-ry * 4, -ry, ry * 8, ry * 2);
+        c.restore();
+      }
+
+      // タイトルの *〜* を強調に分ける
+      const splitHL = line => {
+        const out = [];
+        let last = 0;
+        for (const m of line.matchAll(/\*([^*]+)\*/g)) {
+          if (m.index > last) out.push({ t: line.slice(last, m.index), hl: false });
+          out.push({ t: m[1], hl: true });
+          last = m.index + m[0].length;
+        }
+        if (last < line.length) out.push({ t: line.slice(last), hl: false });
+        return out;
+      };
+      const hasHL = line => /\*[^*]+\*/.test(line);
+      // 1行の見た目：role（フォント）・色・強調の色と大きさ・曲がり・縁取りの色。省くとタイトル
+      const titleStyle = () => ({ role: 'title', color: S.titleColor, hlColor: S.hlColor, hlScale: S.hlScale, arc: S.titleArc, strokeColor: S.titleStrokeColor });
+      const extraStyle = e => ({ role: e, color: e.color, hlColor: e.hlColor, hlScale: e.hlScale, arc: e.arc, strokeColor: e.strokeColor });
+      function lineW(c, line, fs, st = titleStyle()) {
+        return splitHL(line).reduce((a, sg) => {
+          c.font = fontOf(st.role, sg.hl ? fs * st.hlScale : fs);
+          return a + c.measureText(sg.t).width;
+        }, 0);
+      }
+      // タイトル・サブタイトルの縁取りの太さ（1200×630 のときの px。なしなら 0）
+      const titleStroke0 = () => S.titleStrokeOn ? S.titleStrokeW : 0;
+      const subStroke0 = () => S.subStrokeOn ? S.subStrokeW : 0;
+      function fitTitle(c, lines, start, width) {
+        let fs = start;
+        while (Math.max(...lines.map(l => lineW(c, l, fs))) + titleStroke0() * 2 > width && fs > 12) fs -= 2;
+        return fs;
+      }
+      // 1行を描く（cx は行の真ん中）。縁取りを全部描いてから文字を描く。文字の下のラインをそろえる
+      function drawLine(c, line, cx, y, fs, stroke, st = titleStyle()) {
+        const segs = splitHL(line);
+        if (st.arc) {
+          const items = [];
+          for (const sg of segs) {
+            const f = sg.hl ? fs * st.hlScale : fs;
+            for (const ch of sg.t) items.push({ t: ch, font: fontOf(st.role, f), color: sg.hl ? st.hlColor : st.color });
+          }
+          arcRun(c, items, cx, y, st.arc, stroke, st.strokeColor, fs);
+          return;
+        }
+        const w = lineW(c, line, fs, st);
+        c.save();
+        c.textAlign = 'left';
+        c.textBaseline = 'alphabetic';
+        c.lineJoin = 'round';
+        const base = y + fs * 0.36;
+        const each = fn => {
+          let x = cx - w / 2;
+          for (const sg of segs) {
+            const f = sg.hl ? fs * st.hlScale : fs;
+            c.font = fontOf(st.role, f);
+            fn(sg, x, f);
+            x += c.measureText(sg.t).width;
+          }
+        };
+        const shadowOn = () => {
+          if (!S.shadow) return;
+          c.shadowColor = 'rgba(120, 40, 70, 0.28)';
+          c.shadowBlur = Math.max(4, fs * 0.08);
+          c.shadowOffsetY = Math.max(2, fs * 0.05);
+        };
+        if (stroke > 0) {
+          shadowOn();
+          c.lineWidth = stroke;
+          c.strokeStyle = st.strokeColor;
+          each((sg, x) => c.strokeText(sg.t, x, base));
+          c.shadowColor = 'transparent';
+        } else shadowOn();
+        each((sg, x) => { c.fillStyle = sg.hl ? st.hlColor : st.color; c.fillText(sg.t, x, base); });
+        c.restore();
+      }
+
+      // 1行ぶんの文字を弧に沿って並べる。items は 1文字ずつ { t, font, color }。(x, yy) が真ん中
+      // arc：プラスで上に反る（アーチ）、マイナスで下に反る
+      function arcRun(c, items, x, yy, arc, stroke, strokeColor, fs) {
+        if (!items.length) return;
+        c.save();
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.lineJoin = 'round';
+        const ws = items.map(it => { c.font = it.font; return c.measureText(it.t).width; });
+        const total = ws.reduce((a, b) => a + b, 0) || 1;
+        const d = Math.sign(arc), a = Math.abs(arc) * 1.4, R = total / a;
+        const sag = R * (1 - Math.cos(a / 2));
+        // 真ん中の文字と両端の文字の高さの中間が yy になるように、円の中心を置く
+        const cy = yy - d * sag / 2 + d * R;
+        const shadow = () => {
+          if (!S.shadow) return;
+          c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = Math.max(4, fs * 0.08); c.shadowOffsetY = Math.max(2, fs * 0.05);
+        };
+        for (const pass of (stroke > 0 ? ['stroke', 'fill'] : ['fill'])) {
+          let acc = 0;
+          items.forEach((it, i) => {
+            const th = -a / 2 + (acc + ws[i] / 2) / R;
+            acc += ws[i];
+            c.save();
+            c.translate(x + R * Math.sin(th), cy - d * R * Math.cos(th));
+            c.rotate(d * th);
+            c.font = it.font;
+            if (pass === 'stroke') { shadow(); c.lineWidth = stroke; c.strokeStyle = strokeColor; c.strokeText(it.t, 0, 0); }
+            else { if (stroke <= 0) shadow(); c.fillStyle = it.color; c.fillText(it.t, 0, 0); }
+            c.restore();
+          });
+        }
+        c.restore();
+      }
+      // 弧にしたときに、反りのぶん高くなる量
+      function arcSag(width, arc) {
+        if (!arc) return 0;
+        const a = Math.abs(arc) * 1.4, R = width / a;
+        return R * (1 - Math.cos(a / 2));
+      }
+
+      // pad は縁取りのぶんの余白（px）
+      function fit(c, lines, start, width, pad = 0, role = 'sub') {
+        let fs = start;
+        for (;;) {
+          c.font = fontOf(role, fs);
+          const w = Math.max(...lines.map(l => c.measureText(l).width)) + pad;
+          if (w <= width || fs <= 12) return fs;
+          fs -= 2;
+        }
+      }
+
+      function text(c, str, x, y, fs, color, stroke, strokeColor = '#ffffff', role = 'sub') {
+        c.save();
+        c.font = fontOf(role, fs);
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.lineJoin = 'round';
+        if (S.shadow) {
+          c.shadowColor = 'rgba(120, 40, 70, 0.28)';
+          c.shadowBlur = Math.max(4, fs * 0.08);
+          c.shadowOffsetY = Math.max(2, fs * 0.05);
+        }
+        if (stroke > 0) {
+          c.lineWidth = stroke;
+          c.strokeStyle = strokeColor;
+          c.strokeText(str, x, y);
+          c.shadowColor = 'transparent';
+        }
+        c.fillStyle = color;
+        c.fillText(str, x, y);
+        c.restore();
+      }
+
+      // =====================================================
+      //  プレビュー・保存
+      // =====================================================
+      const cv = $('cv'), mini = $('mini');
+      $('btn-mini').addEventListener('click', () => {
+        const on = $('mini-pop').hidden;
+        $('mini-pop').hidden = !on;
+        $('btn-mini').setAttribute('aria-pressed', String(on));
+      });
+      // 大きく見る：保存される画像と同じもの（選択の枠なし）を画面いっぱいに出す。クリックか Esc で閉じる
+      $('btn-big').addEventListener('click', () => {
+        const out = document.createElement('canvas');
+        draw(out);
+        const box = document.createElement('div');
+        box.className = 'big-view';
+        box.setAttribute('role', 'dialog');
+        box.setAttribute('aria-label', '大きく見る');
+        box.innerHTML = '<div class="big-hint">クリックか Esc で閉じる</div>';
+        box.prepend(out);
+        // 画面に収まるいちばん大きな大きさにする（元より大きくもする）
+        const fit = () => {
+          const r = Math.min(innerWidth * 0.96 / out.width, (innerHeight - 60) / out.height);
+          out.style.width = `${out.width * r}px`; out.style.height = `${out.height * r}px`;
+        };
+        fit();
+        addEventListener('resize', fit);
+        const close = () => { box.remove(); document.removeEventListener('keydown', onKey); removeEventListener('resize', fit); };
+        const onKey = e => { if (e.key === 'Escape') close(); };
+        box.addEventListener('click', close);
+        document.addEventListener('keydown', onKey);
+        document.body.appendChild(box);
+      });
+      let nameTouched = false;
+      const defaultName = () => {
+        const t = S.title.replace(/\*/g, '').split('\n').join('').trim().slice(0, 30) || 'image';
+        const [W, H] = dims();
+        return `thumbnail_${t}_${W}x${H}`.replace(/[\\/:*?"<>|\s]+/g, '_');
+      };
+      function render() {
+        draw(cv);
+        const rectOf = id => id === '@pic' ? lastHit.pic : id === '@text' ? lastHit.text : id === '@sub' ? lastHit.sub : id && lastHit.extras.find(r => r.id === id);
+        const sr = rectOf(selId);
+        if (sr) {
+          const c = cv.getContext('2d'), lw = Math.max(3, cv.width / 320);
+          c.save();
+          c.lineWidth = lw;
+          c.strokeStyle = 'rgba(255, 61, 127, 0.9)';
+          c.strokeRect(sr.x - lw * 2, sr.y - lw * 2, sr.w + lw * 4, sr.h + lw * 4);
+          c.restore();
+        }
+        refreshSel();
+        const hv = hoverId === '@pic' ? lastHit.pic : hoverId === '@text' ? lastHit.text : hoverId === '@sub' ? lastHit.sub : hoverId && lastHit.extras.find(r => r.id === hoverId);
+        if (hv) {
+          const c = cv.getContext('2d'), lw = Math.max(3, cv.width / 300);
+          c.save();
+          c.lineWidth = lw;
+          c.setLineDash([lw * 3, lw * 2]);
+          c.strokeStyle = '#ff3d7f';
+          c.strokeRect(hv.x - lw, hv.y - lw, hv.w + lw * 2, hv.h + lw * 2);
+          c.restore();
+        }
+        // 背景を「なし（透明）」にしたときだけ、透明が分かるように市松模様を敷く
+        $('ec-stage').classList.toggle('bg-checker', S.bg === 'none');
+        const [W, H] = dims();
+        $('size-meta').textContent = `${W}×${H}`;
+        mini.width = 160;
+        mini.height = Math.round(160 * H / W);
+        const m = mini.getContext('2d');
+        m.imageSmoothingQuality = 'high';
+        m.drawImage(cv, 0, 0, mini.width, mini.height);
+        if (!nameTouched) $('file-name').value = defaultName();
+      }
+      $('file-name').addEventListener('input', () => { nameTouched = !!$('file-name').value.trim(); });
+
+      // WebP は保存できないブラウザがある（そのときは PNG などになって返ってくる）
+      const EXT = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+      const noWebp = () => toast('このブラウザは WebP で保存できません。JPG か PNG で保存してください');
+      function save(type) {
+        const out = document.createElement('canvas');
+        draw(out);
+        out.toBlob(b => {
+          if (!b) { toast('保存できませんでした'); return; }
+          if (b.type !== type) { noWebp(); return; }
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(b);
+          a.download = ($('file-name').value.trim() || defaultName()) + '.' + EXT[type];
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+          toast('保存しました');
+        }, type, 0.9);
+      }
+      // 保存の形式は、このブラウザで前に選んだものを使う
+      const TYPE_KEY = 'donnma-eyecatch-savetype';
+      try { const t = localStorage.getItem(TYPE_KEY); if (EXT[t]) $('save-type').value = t; } catch (e) { /* ignore */ }
+      $('save-type').addEventListener('change', () => { try { localStorage.setItem(TYPE_KEY, $('save-type').value); } catch (e) { /* ignore */ } });
+      $('save-btn').addEventListener('click', () => {
+        const type = $('save-type').value;
+        if (type === 'image/jpeg' && S.bg === 'none') toast('背景が透明なので、JPG では黒くなります。PNG か WebP での保存がおすすめです');
+        save(type);
+      });
+
+      // ---- 画像を選ぶ（このブラウザの中だけで使う。保存できる大きさなら縮めて残す）
+      function readImage(file, maxSide) {
+        return new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = async () => {
+            const i = await loadImg(r.result);
+            if (!i) { reject(new Error('画像を読み込めませんでした')); return; }
+            const s = Math.min(1, maxSide / Math.max(i.width, i.height));
+            const t = document.createElement('canvas');
+            t.width = Math.round(i.width * s); t.height = Math.round(i.height * s);
+            t.getContext('2d').drawImage(i, 0, 0, t.width, t.height);
+            const url = t.toDataURL(file.type === 'image/jpeg' ? 'image/jpeg' : 'image/webp', 0.9);
+            resolve({ url, im: await loadImg(url) });
+          };
+          r.onerror = () => reject(new Error('画像を読み込めませんでした'));
+          r.readAsDataURL(file);
+        });
+      }
+      function keep(key, url) {
+        try { localStorage.setItem(key, url); } catch (e) { toast('画像が大きいので、このブラウザには残せません（このページを開いている間は使えます）'); }
+      }
+      function setThumb() {
+        $('img-thumb').style.backgroundImage = `url("${(img.side || sampleImg()).src}")`;
+      }
+      $('img-thumb').addEventListener('click', () => $('img-file').click());
+      // 画像の選択：「画像を選ぶ」はファイルを開く。選んだ画像があるときにサンプルを選ぶと、確かめてから外す
+      async function pickSample(v) {
+        renderMain();
+        if (v === 'pick') { $('img-file').click(); return; }
+        if (v === 'own') return;
+        if (img.side) {
+          if (!await ask('選んだ画像を外して、サンプルにしますか？', 'サンプルにする')) return;
+          img.side = null;
+          try { localStorage.removeItem(IMG_KEY); } catch (e) { /* ignore */ }
+        }
+        S.sample = v;
+        if (S.imgPos === 'none') S.imgPos = 'left';
+        syncUI(); setThumb(); renderMain(); redraw();
+      }
+      $('img-file').addEventListener('change', async e => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (!f) return;
+        try {
+          const { url, im } = await readImage(f, 1600);
+          img.side = im;
+          keep(IMG_KEY, url);
+          if (S.imgPos === 'none') { S.imgPos = 'left'; syncUI(); }
+          setThumb();
+          renderMain();
+          redraw();
+        } catch (err) { toast(err.message); }
+      });
+      // 削除：メインの画像を外して、置かない（文字だけ）にする。位置を選び直すとサンプルが出る
+      $('img-clear').addEventListener('click', () => {
+        img.side = null;
+        try { localStorage.removeItem(IMG_KEY); } catch (e) { /* ignore */ }
+        S.imgPos = 'none';
+        syncUI(); setThumb(); renderMain(); redraw();
+      });
+      const bgFile = document.createElement('input');
+      bgFile.type = 'file'; bgFile.accept = 'image/*'; bgFile.id = 'bg-file'; bgFile.hidden = true;
+      document.body.appendChild(bgFile);
+      bgFile.addEventListener('change', async e => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (!f) return;
+        try {
+          const { url, im } = await readImage(f, 2400);
+          img.bg = im;
+          keep(BG_KEY, url);
+          S.bg = 'image';
+          syncUI();
+          redraw();
+        } catch (err) { toast(err.message); }
+      });
+
+      // ---- ロゴ
+      const LOGO_KEY = 'donnma-eyecatch-logo-v1';
+      function setLogoThumb() {
+        $('logo-thumb').style.backgroundImage = img.logo ? `url("${img.logo.src}")` : '';
+      }
+      $('logo-pick').addEventListener('click', () => $('logo-file').click());
+      $('logo-thumb').addEventListener('click', () => $('logo-file').click());
+      $('logo-file').addEventListener('change', async e => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (!f) return;
+        try {
+          const { url, im } = await readImage(f, 1600);
+          img.logo = im;
+          keep(LOGO_KEY, url);
+          if (S.logoMode === 'none') { S.logoMode = 'replace'; syncUI(); }
+          setLogoThumb();
+          redraw();
+        } catch (err) { toast(err.message); }
+      });
+      $('logo-clear').addEventListener('click', () => {
+        img.logo = null;
+        try { localStorage.removeItem(LOGO_KEY); } catch (e) { /* ignore */ }
+        setLogoThumb();
+        redraw();
+      });
+
+      // ---- プレビューでドラッグして動かす（追加の画像 → 文字 → 画像 の順に、上にあるものをつかむ）
+      let drag = null;
+      const toCanvas = e => {
+        const r = cv.getBoundingClientRect();
+        return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height };
+      };
+      const inRect = (p, r) => r && p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
+      function hitAt(p) {
+        // 上に重なっているものから順につかむ
+        for (let i = S.order.length - 1; i >= 0; i--) {
+          const id = S.order[i];
+          if (id === '@text') { if (inRect(p, lastHit.text)) return { kind: 'text' }; }
+          else if (id === '@sub') { if (inRect(p, lastHit.sub)) return { kind: 'sub' }; }
+          else if (id === '@pic') { if (inRect(p, lastHit.pic)) return { kind: 'pic' }; }
+          else {
+            const r = lastHit.extras.find(x => x.id === id);
+            if (inRect(p, r)) return { kind: 'extra', id };
+          }
+        }
+        return null;
+      }
+      cv.addEventListener('pointerdown', e => {
+        const p = toCanvas(e);
+        const h = hitAt(p);
+        if (!h) { select(null); return; }
+        select({ text: '@text', sub: '@sub', pic: '@pic' }[h.kind] || h.id);
+        const ex = h.kind === 'extra' ? S.extras.find(x => x.id === h.id) : null;
+        const xy = { text: [S.textX, S.textY], sub: [S.subX, S.subY], pic: [S.imgX, S.imgY] }[h.kind] || [ex.x, ex.y];
+        drag = { p, h, x: xy[0], y: xy[1] };
+        cv.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      });
+      cv.addEventListener('pointermove', e => {
+        const p = toCanvas(e);
+        cv.style.cursor = drag || hitAt(p) ? 'move' : '';
+        if (!drag) return;
+        const dx = (p.x - drag.p.x) / cv.width * 100, dy = (p.y - drag.p.y) / cv.height * 100;
+        const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
+        if (drag.h.kind === 'pic') {
+          S.imgX = clamp(drag.x + dx, -50, 50); S.imgY = clamp(drag.y + dy, -50, 50);
+          inputs.imgX.set(S.imgX); inputs.imgY.set(S.imgY);
+        } else if (drag.h.kind === 'text') {
+          S.textX = clamp(drag.x + dx, -50, 50); S.textY = clamp(drag.y + dy, -50, 50);
+          inputs.textX.set(S.textX); inputs.textY.set(S.textY);
+        } else if (drag.h.kind === 'sub') {
+          S.subX = clamp(drag.x + dx, -60, 60); S.subY = clamp(drag.y + dy, -60, 60);
+          if (subBars) { subBars.subX(S.subX); subBars.subY(S.subY); }
+        } else {
+          const ex = S.extras.find(x => x.id === drag.h.id);
+          if (ex) {
+            ex.x = clamp(drag.x + dx, -20, 120); ex.y = clamp(drag.y + dy, -20, 120);
+            const bars = extraInputs[ex.id];
+            if (bars) { bars.x(ex.x); bars.y(ex.y); }
+          }
+        }
+        redraw();
+      });
+      const endDrag = () => { drag = null; };
+      cv.addEventListener('pointerup', endDrag);
+      cv.addEventListener('pointercancel', endDrag);
+
+      // =====================================================
+      //  追加の画像
+      // =====================================================
+      const EXTRA_KEY = id => 'donnma-eyecatch-extra-' + id;
+      // 追加の画像：1枚ずつ「大きさ・左右・上下・回転」のバー。ドラッグで動かしたときもバーを合わせる
+      const extraInputs = {};
+      const EXTRA_BARS = [
+        ['scale', '大きさ', 0.1, 3, 0.05, '倍'],
+        ['x', '左右', -20, 120, 1, '%'],
+        ['y', '上下', -20, 120, 1, '%'],
+        ['rot', '回転', -180, 180, 1, '°'],
+      ];
+      let movedId = null, movedTimer = 0, hoverId = null;
+      const mainCard = $('main-card');
+      // タイトル・サブタイトルの入力欄と設定（一覧を作り直しても、同じものを使い回す）
+      const titleField = $('title-field'), subField = $('sub-field');
+      const titleOpts = $('title-opts'), subOpts = $('sub-opts');
+      let subBars = null;
+      function renderMain() {
+        const has = !!img.side;
+        $('main-name').textContent = 'メインの画像';
+        $('img-clear').style.display = S.imgPos === 'none' ? 'none' : '';
+        inputs.imgPos.wrap.querySelector('option[value="free"]').disabled = !has;
+        const sel = inputs.sample.wrap.querySelector('select');
+        sel.querySelector('option[value="own"]').hidden = sel.querySelector('option[value="own"]').disabled = !has;
+        sel.value = has ? 'own' : S.sample;
+      }
+      // 重なりを1つ動かす（d = +1 で前へ、-1 で後ろへ）
+      function moveLayer(id, d) {
+        if (!id) return;
+        const i = S.order.indexOf(id), j = i + d;
+        if (i < 0 || j < 0 || j >= S.order.length) return;
+        [S.order[i], S.order[j]] = [S.order[j], S.order[i]];
+        movedId = id;
+        renderExtras(); redraw();
+        clearTimeout(movedTimer);
+        movedTimer = setTimeout(() => { movedId = null; }, 800);
+      }
+      const esc = v => String(v).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+      const orderBtns = (rank, n) =>
+        `<button class="btn btn-sm" type="button" data-a="up" title="1つ前に重ねる" ${rank === 0 ? 'disabled' : ''}>↑ 前へ</button>`
+        + `<button class="btn btn-sm" type="button" data-a="down" title="1つ後ろに重ねる" ${rank === n - 1 ? 'disabled' : ''}>↓ 後ろへ</button>`;
+      // ---- 選んでいるもの（プレビューの下のパネルで、大きさ・位置・回転を変える）
+      let selId = null, selBars = [];
+      function selDef(id) {
+        if (id === '@pic') return {
+          name: 'メインの画像', get obj() { return S; }, reset() { S.imgX = 0; S.imgY = 0; S.imgRot = 0; },
+          bars: [['imgScale', '大きさ', 0.3, 1.6, 0.05, '倍'], ['imgX', '左右', -50, 50, 1, '%'], ['imgY', '上下', -50, 50, 1, '%'], ['imgRot', '回転', -180, 180, 1, '°']],
+        };
+        if (id === '@text') return {
+          name: 'タイトル', get obj() { return S; }, reset() { S.textX = 0; S.textY = 0; S.titleRot = 0; },
+          bars: [['textScale', '大きさ', 0.5, 1.3, 0.05, '倍'], ['textX', '左右', -50, 50, 1, '%'], ['textY', '上下', -50, 50, 1, '%'], ['titleRot', '回転', -180, 180, 1, '°']],
+        };
+        if (id === '@sub') return {
+          name: 'サブタイトル', get obj() { return S; }, reset() { S.subX = 0; S.subY = 0; S.subRot = 0; },
+          bars: [['subScale', '大きさ', 0.4, 2, 0.05, '倍'], ['subX', '左右', -60, 60, 1, '%'], ['subY', '上下', -60, 60, 1, '%'], ['subRot', '回転', -180, 180, 1, '°']],
+        };
+        const ex = S.extras.find(e => e.id === id);
+        if (!ex) return null;
+        return {
+          name: ex.type === 'text' ? `文字「${(ex.text.split('\n')[0] || '').slice(0, 12)}」` : '画像',
+          get obj() { return S.extras.find(e => e.id === id); },
+          reset() { const e = this.obj; e.x = 50; e.y = 50; e.rot = 0; },
+          bars: EXTRA_BARS,
+        };
+      }
+      function buildSel() {
+        const def = selId && selDef(selId);
+        if (!def) selId = null;
+        $('sel-panel').classList.toggle('empty', !def);
+        $('sel-head').hidden = !def;
+        const box = $('sel-bars');
+        box.innerHTML = '';
+        selBars = [];
+        if (def) {
+          for (const [key, label, min, max, step, u] of def.bars) {
+            const f = document.createElement('label');
+            f.className = 'extra-bar';
+            f.innerHTML = `<span class="field-label"><span>${label}</span><span class="field-val"></span></span><input type="range" min="${min}" max="${max}" step="${step}">`;
+            const r = f.querySelector('input'), val = f.querySelector('.field-val');
+            const show = v => { val.textContent = `${+(+v).toFixed(2)}${u}`; };
+            r.addEventListener('input', () => {
+              const o = selDef(selId).obj;
+              o[key] = parseFloat(r.value);
+              show(r.value);
+              if (o === S && inputs[key]) inputs[key].set(S[key]);
+              redraw();
+            });
+            selBars.push({ key, r, show });
+            box.appendChild(f);
+          }
+        }
+        $('extra-list').querySelectorAll(':scope > .extra-item').forEach(row => row.classList.toggle('selected', row.dataset.id === selId));
+        refreshSel();
+      }
+      // 値・名前・前へ／後ろへを今の状態に合わせる（バーを動かしている最中は、そのバーは触らない）
+      function refreshSel() {
+        const def = selId && selDef(selId);
+        if (!def) { if (selId) { selId = null; buildSel(); } return; }
+        const o = def.obj;
+        for (const b of selBars) {
+          if (document.activeElement !== b.r) b.r.value = o[b.key] ?? 0;
+          b.show(o[b.key] ?? 0);
+        }
+        $('sel-name').textContent = '選択中：' + def.name;
+        const ak = selAlignKey();
+        $('sel-align').hidden = !ak;
+        if (ak) $('sel-align').value = ak.obj[ak.key];
+        const ck = selColorKey();
+        $('sel-color').hidden = !ck;
+        if (ck && document.activeElement !== $('sel-color')) $('sel-color').value = ck.obj[ck.key];
+        const i = S.order.indexOf(selId);
+        $('sel-up').disabled = i === S.order.length - 1;
+        $('sel-down').disabled = i <= 0;
+      }
+      function select(id) {
+        if (id === selId) { refreshSel(); return; }
+        selId = id;
+        buildSel();
+        render();
+      }
+      $('sel-up').onclick = () => selId && moveLayer(selId, 1);
+      $('sel-down').onclick = () => selId && moveLayer(selId, -1);
+      $('sel-reset').onclick = () => { const d = selId && selDef(selId); if (!d) return; d.reset(); syncUI(); redraw(); };
+      $('sel-clear').onclick = () => select(null);
+      // 選んでいる文字のそろえ方（タイトル textAlign・追加した文字 align。サブタイトルは1行なので出さない）
+      function selAlignKey() {
+        if (selId === '@text') return { obj: S, key: 'textAlign' };
+        const ex = S.extras.find(e => e.id === selId);
+        return ex && ex.type === 'text' ? { obj: ex, key: 'align' } : null;
+      }
+      $('sel-align').addEventListener('change', e => {
+        const ak = selAlignKey();
+        if (!ak) return;
+        ak.obj[ak.key] = e.target.value;
+        if (ak.obj === S) inputs.textAlign.set(e.target.value);
+        redraw();
+      });
+      // 選んでいる文字の色（タイトル titleColor・サブタイトル subColor・追加した文字 color）
+      function selColorKey() {
+        if (selId === '@text') return { obj: S, key: 'titleColor' };
+        if (selId === '@sub') return { obj: S, key: 'subColor' };
+        const ex = S.extras.find(e => e.id === selId);
+        return ex && ex.type === 'text' ? { obj: ex, key: 'color' } : null;
+      }
+      $('sel-color').addEventListener('input', e => {
+        const ck = selColorKey();
+        if (!ck) return;
+        ck.obj[ck.key] = e.target.value;
+        if (ck.obj === S) inputs[ck.key].set(e.target.value);
+        else {
+          // カードの色と、見出しの Aa の色も合わせる
+          const row = $('extra-list').querySelector(`[data-id="${selId}"]`);
+          const ci = row && row.querySelector('.extra-text input[type=color]:not([data-k])');
+          if (ci) ci.value = e.target.value;
+          const th = row && row.querySelector('.text-thumb');
+          if (th) th.style.color = e.target.value;
+        }
+        redraw();
+      });
+
+      const STROKE_ROW = '<div class="extra-stroke"><label class="toggle"><span>縁取り</span><input type="checkbox"><span class="sw"></span></label>'
+        + '<input type="color" aria-label="縁取りの色" title="縁取りの色"><input type="range" min="1" max="40" step="1" aria-label="縁取りの太さ" title="縁取りの太さ">'
+        + '<span class="num-px"><input type="number" min="1" max="40" step="1" inputmode="numeric" aria-label="縁取りの太さ（px）">px</span></div>';
+      // 縁取りの1行。get / set は 'on' / 'color' / 'w'、visible は出すかどうか。見た目を合わせ直す関数を返す
+      function strokeRow(row, get, set, visible) {
+        const el = row.querySelector('.extra-stroke');
+        const [so, sc, sw, num] = el.querySelectorAll('input');
+        const val = el.querySelector('.num-px');
+        const ui = () => {
+          so.checked = get('on'); sc.value = get('color'); sw.value = get('w');
+          if (document.activeElement !== num) num.value = get('w');
+          el.style.display = visible() ? '' : 'none';
+          sc.style.visibility = sw.style.visibility = val.style.visibility = get('on') ? '' : 'hidden';
+        };
+        ui();
+        so.onchange = () => { set('on', so.checked); ui(); };
+        sc.oninput = () => set('color', sc.value);
+        sw.oninput = () => { set('w', parseInt(sw.value, 10)); num.value = sw.value; };
+        // 数字で打ち込む（1〜40。範囲の外は、欄を離れたときに収める）
+        num.oninput = () => {
+          const v = parseInt(num.value, 10);
+          if (v >= 1 && v <= 40) { set('w', v); sw.value = v; }
+        };
+        num.onblur = num.onchange = () => {
+          const v = Math.min(40, Math.max(1, parseInt(num.value, 10) || get('w')));
+          set('w', v); sw.value = v; num.value = v;
+        };
+        return ui;
+      }
+      let subStrokeUi = null, titleHlUi = null;
+      const HL_ROW = '<div class="extra-hl"><span class="hl-label">強調（*〜*）</span><input type="color" aria-label="強調の色" title="強調の色">'
+        + '<input type="range" min="0.8" max="1.6" step="0.05" aria-label="強調の大きさ" title="強調の大きさ"><span class="field-val"></span></div>';
+      // 強調の1行。get / set は 'color' / 'scale'、hasText は *〜* があるか。出す／隠すを合わせ直す関数を返す
+      function hlRow(row, get, set, hasText) {
+        const el = row.querySelector('.extra-hl');
+        const [col, r] = el.querySelectorAll('input');
+        const val = el.querySelector('.field-val');
+        const ui = () => {
+          col.value = get('color'); r.value = get('scale'); val.textContent = `${(+get('scale')).toFixed(2)}倍`;
+          el.style.display = hasText() ? '' : 'none';
+        };
+        ui();
+        col.oninput = () => set('color', col.value);
+        r.oninput = () => { set('scale', parseFloat(r.value)); val.textContent = `${(+r.value).toFixed(2)}倍`; };
+        return ui;
+      }
+      function shapeAlpha(el, get, set, visible) {
+        const r = el.querySelector('.shape-alpha'), v = el.querySelector('.shape-alpha-val');
+        const show = () => { v.textContent = `${Math.round(get() * 100)}%`; };
+        el.alphaUi = () => { r.value = get(); show(); r.style.display = v.style.display = visible() ? '' : 'none'; };
+        el.alphaUi();
+        r.oninput = () => { set(parseFloat(r.value)); show(); };
+      }
+      const ARC_ROW = '<div class="extra-arc"><label class="toggle"><span>曲げる</span><input type="checkbox"><span class="sw"></span></label>'
+        + '<input type="range" min="-1" max="1" step="0.05" aria-label="曲がり（プラスで上に反る・マイナスで下に反る）" title="プラスで上に反る（アーチ）、マイナスで下に反る"><span class="field-val"></span></div>';
+      // 曲げるの1行：オンで 0.4 から、オフで 0（まっすぐ）
+      function arcRow(row, get, set) {
+        const el = row.querySelector('.extra-arc');
+        const [on, r] = el.querySelectorAll('input');
+        const val = el.querySelector('.field-val');
+        const ui = () => {
+          const v = get();
+          on.checked = !!v; r.value = v; val.textContent = (+v).toFixed(2);
+          r.style.visibility = val.style.visibility = v ? '' : 'hidden';
+        };
+        ui();
+        on.onchange = () => { set(on.checked ? (get() || 0.4) : 0); ui(); };
+        r.oninput = () => { set(parseFloat(r.value) || 0.05 * Math.sign(parseFloat(r.value) || 1)); val.textContent = (+r.value).toFixed(2); };
+      }
+      const FONT_ROW = '<div class="extra-font"><select aria-label="フォント" data-k="font"></select><select aria-label="文字の太さ" data-k="weight"></select></div>';
+      function fontRow(row, get, set) {
+        for (const [key, opts] of [['font', LAYER_FONTS], ['weight', LAYER_WEIGHTS]]) {
+          const sel = row.querySelector(`.extra-font [data-k="${key}"]`);
+          for (const [v, label] of opts) sel.add(new Option(v === '@inherit' ? (key === 'font' ? 'フォント：全体と同じ' : '太さ：全体と同じ') : label, v));
+          sel.value = get(key);
+          sel.onchange = () => set(key, sel.value);
+        }
+      }
+      function hookRow(row, id) {
+        row.dataset.id = id;
+        row.classList.toggle('selected', id === selId);
+        // カードの空いているところをクリックしても選べる
+        row.onclick = e => { if (!e.target.closest('input, textarea, select, button, label, .toggle')) select(id); };
+        if (id === movedId) row.classList.add('moved');
+        row.querySelector('[data-a="up"]').onclick = () => moveLayer(id, 1);
+        row.querySelector('[data-a="down"]').onclick = () => moveLayer(id, -1);
+        row.onmouseenter = () => { hoverId = id; render(); };
+        row.onmouseleave = () => { if (hoverId === id) { hoverId = null; render(); } };
+      }
+      function addBars(row, ex) {
+        const bars = row.querySelector('.extra-bars');
+        extraInputs[ex.id] = {};
+        for (const [key, label, min, max, step, u] of EXTRA_BARS) {
+          const f = document.createElement('label');
+          f.className = 'extra-bar';
+          f.innerHTML = `<span class="field-label"><span>${label}</span><span class="field-val"></span></span><input type="range" min="${min}" max="${max}" step="${step}">`;
+          const r = f.querySelector('input'), val = f.querySelector('.field-val');
+          const set = v => { r.value = v; val.textContent = `${+(+v).toFixed(2)}${u}`; };
+          set(ex[key] ?? 0);
+          r.addEventListener('input', () => { ex[key] = parseFloat(r.value); set(ex[key]); redraw(); });
+          extraInputs[ex.id][key] = set;
+          bars.appendChild(f);
+        }
+      }
+      // 画像は img.extras に残しておく（「戻す」で戻せるように）。保存からは消す
+      const dropped = new Set();
+      function removeExtra(ex) {
+        S.extras = S.extras.filter(x => x !== ex);
+        S.order = S.order.filter(v => v !== ex.id);
+        if (ex.type === 'image') dropped.add(ex.id);
+        try { localStorage.removeItem(EXTRA_KEY(ex.id)); } catch (e) { /* ignore */ }
+        renderExtras(); redraw();
+      }
+      function renderExtras() {
+        const list = $('extra-list');
+        list.innerHTML = '';
+        for (const k in extraInputs) delete extraInputs[k];
+        fixOrder(S);
+        const byId = Object.fromEntries(S.extras.map(e => [e.id, e]));
+        const n = S.order.length;
+        [...S.order].reverse().forEach((id, rank) => {
+          // メインの画像
+          if (id === '@pic') {
+            list.appendChild(mainCard);
+            $('main-order').innerHTML = orderBtns(rank, n);
+            mainCard.classList.remove('moved');
+            hookRow(mainCard, '@pic');
+            renderMain();
+            return;
+          }
+          const row = document.createElement('div');
+          // メインの文字
+          // タイトル
+          if (id === '@text') {
+            row.className = 'extra-item main-card';
+            const t = S.title.replace(/\*/g, '').split('\n')[0] || '（タイトルなし）';
+            row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb">T</span><span class="nm">タイトル<small>（${esc(t.slice(0, 12))}…）</small></span>`
+              + orderBtns(rank, n) + `</div>`
+              + '<div class="main-text-slot fields"></div>' + FONT_ROW
+              + '<div class="extra-text sub-box-row title-shape-row"><select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option><option value="band">横いっぱいの帯</option></select>'
+              + '<input type="color" aria-label="形の色" title="形の色">'
+              + '<input type="range" class="shape-alpha" min="0.1" max="1" step="0.05" aria-label="形の濃さ" title="形の濃さ（写真の上では少し薄くするとなじみます）"><span class="field-val shape-alpha-val"></span></div>'
+              + STROKE_ROW + ARC_ROW + HL_ROW + '<div class="opts-slot"></div>';
+            row.querySelector('.main-text-slot').appendChild(titleField);
+            titleHlUi = hlRow(row, key => S[key === 'color' ? 'hlColor' : 'hlScale'], (key, v) => {
+              const k2 = key === 'color' ? 'hlColor' : 'hlScale';
+              inputs[k2].set(v); update(k2, v);
+            }, () => hasHLText(S.title));
+            fontRow(row, key => S[key === 'font' ? 'titleFont' : 'titleWeight'], (key, v) => {
+              const k2 = key === 'font' ? 'titleFont' : 'titleWeight';
+              inputs[k2].set(v); update(k2, v);
+            });
+            {
+              const tSel = row.querySelector('.title-shape-row select'), tCol = row.querySelector('.title-shape-row input[type=color]');
+              const tA = row.querySelector('.shape-alpha'), tAv = row.querySelector('.shape-alpha-val');
+              const showA = () => { tAv.textContent = `${Math.round(S.tpAlpha * 100)}%`; };
+              tSel.value = S.titlePlate; tCol.value = S.tpColor; tA.value = S.tpAlpha; showA();
+              const vis = () => { for (const el of [tCol, tA, tAv]) el.style.display = tSel.value === 'none' ? 'none' : ''; };
+              vis();
+              tSel.onchange = () => { vis(); inputs.titlePlate.set(tSel.value); update('titlePlate', tSel.value); };
+              tA.oninput = () => { const v = parseFloat(tA.value); inputs.tpAlpha.set(v); update('tpAlpha', v); showA(); };
+              tCol.oninput = () => { inputs.tpColor.set(tCol.value); update('tpColor', tCol.value); };
+            }
+            {
+              const K = { on: 'titleStrokeOn', color: 'titleStrokeColor', w: 'titleStrokeW' };
+              strokeRow(row, key => S[K[key]], (key, v) => { inputs[K[key]].set(v); update(K[key], v); }, () => true);
+              arcRow(row, () => S.titleArc, v => update('titleArc', v));
+            }
+            row.querySelector('.opts-slot').appendChild(titleOpts);
+            hookRow(row, '@text');
+            list.appendChild(row);
+            return;
+          }
+          // サブタイトル
+          if (id === '@sub') {
+            row.className = 'extra-item main-card';
+            row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="font-size:12px">sub</span><span class="nm">サブタイトル</span>`
+              + orderBtns(rank, n) + `</div>`
+              + '<div class="main-text-slot fields"></div>' + FONT_ROW
+              + '<div class="extra-text sub-box-row"><select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option></select>'
+              + '<input type="color" aria-label="形の色" title="形の色"><input type="range" class="shape-alpha" min="0.1" max="1" step="0.05" aria-label="形の濃さ" title="形の濃さ"><span class="field-val shape-alpha-val"></span></div>'
+              + STROKE_ROW + ARC_ROW
+              + '<div class="opts-slot"></div>';
+            row.querySelector('.main-text-slot').appendChild(subField);
+            fontRow(row, key => S[key === 'font' ? 'subFont' : 'subWeight'], (key, v) => {
+              const k2 = key === 'font' ? 'subFont' : 'subWeight';
+              inputs[k2].set(v); update(k2, v);
+            });
+            {
+              const bSel = row.querySelector('.sub-box-row select'), bCol = row.querySelector('.sub-box-row input[type=color]');
+              shapeAlpha(row.querySelector('.sub-box-row'), () => S.subBoxAlpha, v => update('subBoxAlpha', v), () => bSel.value !== 'none');
+              bSel.value = S.subBox; bCol.value = S.subBoxColor;
+              bCol.style.display = S.subBox === 'none' ? 'none' : '';
+              bSel.onchange = () => { bCol.style.display = bSel.value === 'none' ? 'none' : ''; inputs.subBox.set(bSel.value); update('subBox', bSel.value); row.querySelector('.sub-box-row').alphaUi(); };
+              const K = { on: 'subStrokeOn', color: 'subStrokeColor', w: 'subStrokeW' };
+              subStrokeUi = strokeRow(row, key => S[K[key]], (key, v) => { inputs[K[key]].set(v); update(K[key], v); },
+                () => S.subBox === 'none' || !!S.subArc);
+              arcRow(row, () => S.subArc, v => { inputs.subArc.set(v); update('subArc', v); });
+              bCol.oninput = () => { inputs.subBoxColor.set(bCol.value); update('subBoxColor', bCol.value); };
+            }
+            row.querySelector('.opts-slot').appendChild(subOpts);
+            hookRow(row, '@sub');
+            list.appendChild(row);
+            return;
+          }
+          const ex = byId[id];
+          row.className = 'extra-item';
+          if (ex.type === 'text') {
+            row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="color:${ex.color}">Aa</span><span class="nm">文字</span>`
+              + orderBtns(rank, n) + `<button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`
+              + '<div class="extra-text"><textarea maxlength="300" rows="2" aria-label="文字（Enter で改行・*〜* で囲むと強調）" placeholder="Enter で改行・*〜* で囲むと強調" spellcheck="false"></textarea></div>'
+              + FONT_ROW
+              + '<div class="extra-text extra-shape"><select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option></select>'
+              + '<input type="color" aria-label="形の色" title="形の色" data-k="boxColor"><input type="range" class="shape-alpha" min="0.1" max="1" step="0.05" aria-label="形の濃さ" title="形の濃さ"><span class="field-val shape-alpha-val"></span></div>'
+              + STROKE_ROW + ARC_ROW + HL_ROW
+              ;
+            const tIn = row.querySelector('.extra-text textarea');
+            fontRow(row, key => ex[key], (key, v) => { ex[key] = v; redraw(); });
+            // 形を敷いたときは縁取りを付けないので、出さない
+            const XK = { on: 'strokeOn', color: 'strokeColor', w: 'strokeW' };
+            const strokeUi = strokeRow(row, key => ex[XK[key]], (key, v) => { ex[XK[key]] = v; redraw(); }, () => ex.box === 'none' || !!ex.arc);
+            arcRow(row, () => ex.arc, v => { ex.arc = v; strokeUi(); redraw(); });
+            const bIn = row.querySelector('.extra-text select'), bcIn = row.querySelector('[data-k="boxColor"]');
+            shapeAlpha(row.querySelector('.extra-shape'), () => ex.boxAlpha, v => { ex.boxAlpha = v; redraw(); }, () => ex.box !== 'none');
+            tIn.value = ex.text; bIn.value = ex.box; bcIn.value = ex.boxColor;
+            bcIn.style.display = ex.box === 'none' ? 'none' : '';
+            const hlUi = hlRow(row, key => ex[key === 'color' ? 'hlColor' : 'hlScale'], (key, v) => { ex[key === 'color' ? 'hlColor' : 'hlScale'] = v; redraw(); }, () => hasHLText(ex.text));
+            tIn.oninput = () => { ex.text = tIn.value; hlUi(); redraw(); };
+            bIn.onchange = () => {
+              ex.box = bIn.value;
+              row.querySelector('.extra-shape').alphaUi();
+              strokeUi();
+              bcIn.style.display = ex.box === 'none' ? 'none' : '';
+              // 形と文字が同じ色だと読めないので、文字を白にする
+              if (ex.box !== 'none' && ex.color.toLowerCase() === ex.boxColor.toLowerCase()) {
+                ex.color = '#ffffff'; row.querySelector('.text-thumb').style.color = '#ffffff';
+              }
+              redraw();
+            };
+            bcIn.oninput = () => { ex.boxColor = bcIn.value; redraw(); };
+          } else {
+            row.innerHTML = `<div class="extra-head"><button class="img-thumb thumb-pick" type="button" title="クリックで画像を変える" aria-label="この画像を変える"></button><span class="nm">画像</span>`
+              + orderBtns(rank, n) + `<button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`;
+            const im = img.extras[ex.id];
+            if (im) row.querySelector('.img-thumb').style.backgroundImage = `url("${im.src}")`;
+            row.querySelector('.img-thumb').onclick = () => pickFile(async f => {
+              const { url, im: nim } = await readImage(f, 1600);
+              img.extras[ex.id] = nim;
+              keep(EXTRA_KEY(ex.id), url);
+              renderExtras(); redraw();
+            });
+          }
+          row.querySelector('[data-a="del"]').onclick = () => removeExtra(ex);
+          hookRow(row, ex.id);
+          list.appendChild(row);
+        });
+      }
+
+      // メインの画像 → 自由な画像
+      const newId = () => Math.random().toString(36).slice(2, 10);
+      // 今のメインの画像を、表示されている場所・大きさのまま自由な画像にする
+      function mainToExtra() {
+        if (!img.side) return null;
+        const [W, H] = dims();
+        const pic = lastHit.pic;
+        const id = newId();
+        img.extras[id] = img.side;
+        keep(EXTRA_KEY(id), img.side.src);
+        const e = pic
+          ? { id, type: 'image', x: (pic.x + pic.w / 2) / W * 100, y: (pic.y + pic.h / 2) / H * 100, scale: Math.max(pic.w, pic.h) / (Math.min(W, H) * 0.3), rot: S.imgRot }
+          : { id, type: 'image', x: 50, y: 50, scale: 1, rot: 0 };
+        e.x = Math.round(e.x); e.y = Math.round(e.y); e.scale = Math.round(e.scale * 100) / 100;
+        return e;
+      }
+      function freeMain() {
+        const e = mainToExtra();
+        if (!e) { inputs.imgPos.set(S.imgPos); return; }
+        // 同じ重なりの場所に置き、メインの画像（置かない）はいちばん後ろへ
+        S.extras.push(e);
+        S.order[S.order.indexOf('@pic')] = e.id;
+        S.order.unshift('@pic');
+        img.side = null;
+        try { localStorage.removeItem(IMG_KEY); } catch (er) { /* ignore */ }
+        S.imgPos = 'none';
+        syncUI(); setThumb(); renderExtras(); redraw();
+        toast('自由に置く画像にしました');
+      }
+      $('extra-add').addEventListener('click', () => $('extra-file').click());
+      // ファイルを1つ選んで fn に渡す（追加した画像の差し替え用）
+      function pickFile(fn) {
+        const inp = document.createElement('input');
+        inp.type = 'file'; inp.accept = 'image/*';
+        inp.onchange = async () => { const f = inp.files[0]; if (f) { try { await fn(f); } catch (err) { toast(err.message); } } };
+        inp.click();
+      }
+      // 追加したものを選んで、カードを光らせ、見える場所までスクロールする
+      function showAdded(id) {
+        clearTimeout(movedTimer);
+        movedTimer = setTimeout(() => { movedId = null; }, 800);
+        select(id);
+        const row = $('extra-list').querySelector(`[data-id="${id}"]`);
+        if (row) row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+      $('text-add').addEventListener('click', () => {
+        const id = newId();
+        const n = S.extras.length;
+        S.extras.push({ id, type: 'text', text: 'テキスト', color: S.titleColor, box: 'none', boxColor: '#ff7fa0', boxAlpha: 1, strokeOn: true, strokeW: 11, strokeColor: '#ffffff', font: '@inherit', weight: '@inherit', align: 'center', arc: 0, hlColor: '#f0325a', hlScale: 1.15, x: 50, y: 18 + (n % 4) * 8, scale: 0.8, rot: 0 });
+        S.order.push(id);
+        renderExtras(); redraw();
+        const inp = $('extra-list').querySelector(`[data-id="${id}"] .extra-text textarea`);
+        if (inp) { inp.focus(); inp.select(); }
+      });
+      $('extra-file').addEventListener('change', e => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (f) addImage(f);
+      });
+      // 画像を足す。at は置く場所（キャンバスの %）。まだメインの画像がなければメインにする
+      async function addImage(f, at) {
+        try {
+          const { url, im } = await readImage(f, 1600);
+          if (!img.side) {
+            img.side = im;
+            keep(IMG_KEY, url);
+            if (S.imgPos === 'none') S.imgPos = 'left';
+            movedId = '@pic';
+            syncUI(); setThumb(); renderExtras(); redraw();
+            showAdded('@pic');
+            toast('サンプルの代わりに、メインの画像にしました（文字がよけて置かれます）');
+            return;
+          }
+          const id = newId();
+          img.extras[id] = im;
+          keep(EXTRA_KEY(id), url);
+          // 前に足したものと重ならないように、少しずつずらして置く
+          const n = S.extras.length;
+          S.extras.push({ id, type: 'image', x: at ? at.x : 80 - (n % 4) * 8, y: at ? at.y : 22 + (n % 4) * 8, scale: 0.6, rot: 0 });
+          S.order.push(id);
+          movedId = id;
+          renderExtras(); redraw();
+          showAdded(id);
+        } catch (err) { toast(err.message); }
+      }
+      // プレビューに画像ファイルを落とすと、その場所に足す
+      const stage = $('ec-stage');
+      const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
+      stage.addEventListener('dragover', e => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        stage.classList.add('drop-on');
+      });
+      stage.addEventListener('dragleave', e => { if (!stage.contains(e.relatedTarget)) stage.classList.remove('drop-on'); });
+      stage.addEventListener('drop', e => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        stage.classList.remove('drop-on');
+        const f = [...e.dataTransfer.files].find(x => x.type.startsWith('image/'));
+        if (!f) { toast('画像ファイルを落としてください'); return; }
+        const r = $('cv').getBoundingClientRect();
+        const pc = (v, a, b) => Math.round(Math.min(95, Math.max(5, (v - a) / (b - a) * 100)));
+        addImage(f, { x: pc(e.clientX, r.left, r.right), y: pc(e.clientY, r.top, r.bottom) });
+      });
+      // スクショなどをコピーして Ctrl+V で足す（文字を貼るときは今までどおり）
+      document.addEventListener('paste', e => {
+        const f = [...(e.clipboardData?.files || [])].find(x => x.type.startsWith('image/'));
+        if (!f) return;
+        e.preventDefault();
+        addImage(f);
+      });
+
+      // =====================================================
+      //  テンプレート（IndexedDB。画像ごと保存するので localStorage では入りきらない）
+      // =====================================================
+      const TPL_DB = 'donnma-eyecatch', TPL_STORE = 'templates';
+      const openTpl = () => new Promise((res, rej) => {
+        const r = indexedDB.open(TPL_DB, 1);
+        r.onupgradeneeded = () => r.result.createObjectStore(TPL_STORE, { keyPath: 'name' });
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+      const tplTx = async (mode, fn) => {
+        const db = await openTpl();
+        return new Promise((res, rej) => {
+          const t = db.transaction(TPL_STORE, mode);
+          const out = fn(t.objectStore(TPL_STORE));
+          t.oncomplete = () => res(out && out.result);
+          t.onerror = () => rej(t.error);
+        });
+      };
+      const tplAll = () => tplTx('readonly', st => st.getAll());
+      async function renderTpl() {
+        const list = $('tpl-list');
+        let all = [];
+        try { all = await tplAll(); } catch (e) { list.innerHTML = '<div class="row-empty">このブラウザでは保存できません</div>'; return; }
+        all.sort((a, b) => b.savedAt - a.savedAt);
+        list.innerHTML = all.length ? '' : '<div class="row-empty">まだありません</div>';
+        for (const t of all) {
+          const row = document.createElement('div');
+          row.className = 'row-item';
+          const d = new Date(t.savedAt);
+          row.innerHTML = `<span class="nm"></span><span class="dt">${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}</span>`
+            + '<button class="btn btn-sm" type="button" data-a="load">読み込む</button><button class="btn btn-sm" type="button" data-a="over">上書き</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button>';
+          row.querySelector('.nm').textContent = t.name;
+          row.querySelector('[data-a="load"]').addEventListener('click', () => loadTpl(t));
+          row.querySelector('[data-a="over"]').addEventListener('click', async () => {
+            if (!await ask(`「${t.name}」を今の見た目で上書きしますか？`, '上書きする')) return;
+            saveTpl(t.name);
+          });
+          row.querySelector('[data-a="del"]').addEventListener('click', async () => {
+            if (!await ask(`「${t.name}」を削除しますか？`, '削除する')) return;
+            await tplTx('readwrite', st => st.delete(t.name));
+            renderTpl();
+          });
+          list.appendChild(row);
+        }
+      }
+      async function saveTpl(name) {
+        const data = {
+          name, savedAt: Date.now(), S: JSON.parse(JSON.stringify(S)),
+          images: {
+            side: img.side ? img.side.src : null, bg: img.bg ? img.bg.src : null, logo: img.logo ? img.logo.src : null,
+            extras: Object.fromEntries(S.extras.filter(e => e.type !== 'text' && img.extras[e.id]).map(e => [e.id, img.extras[e.id].src])),
+          },
+        };
+        try {
+          await tplTx('readwrite', st => st.put(data));
+          toast(`「${name}」を保存しました`);
+        } catch (e) { toast('保存できませんでした（ブラウザの空き容量を確認してください）'); }
+        renderTpl();
+      }
+      async function loadTpl(t) {
+        const keepText = { title: S.title, sub: S.sub };
+        S = sanitize({ ...t.S, ...keepText });
+        const im = t.images || {};
+        img.side = im.side ? await loadImg(im.side) : null;
+        img.bg = im.bg ? await loadImg(im.bg) : null;
+        img.logo = im.logo ? await loadImg(im.logo) : null;
+        img.extras = {};
+        for (const [id, src] of Object.entries(im.extras || {})) img.extras[id] = await loadImg(src);
+        // 今の状態としても残す（開き直したときに同じになるように）
+        const put = (key, v) => { try { v ? localStorage.setItem(key, v) : localStorage.removeItem(key); } catch (e) { /* 入りきらなければ、開いている間だけ */ } };
+        put(IMG_KEY, im.side); put(BG_KEY, im.bg); put(LOGO_KEY, im.logo);
+        for (const [id, src] of Object.entries(im.extras || {})) put(EXTRA_KEY(id), src);
+        syncUI(); setThumb(); setLogoThumb(); renderExtras(); redraw();
+        toast(`「${t.name}」を読み込みました`);
+      }
+      $('tpl-save').addEventListener('click', async () => {
+        const name = $('tpl-name').value.trim();
+        if (!name) { toast('名前を入れてください'); $('tpl-name').focus(); return; }
+        let exists = false;
+        try { exists = (await tplAll()).some(t => t.name === name); } catch (e) { /* ignore */ }
+        if (exists && !await ask(`「${name}」はすでにあります。上書きしますか？`, '上書きする')) return;
+        await saveTpl(name);
+        $('tpl-name').value = '';
+      });
+      $('tpl-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('tpl-save').click(); });
+
+      // =====================================================
+      //  元に戻す・やり直す（設定だけ。選んだ画像そのものは戻らない）
+      // =====================================================
+      let hist = [], histAt = -1, histTimer = 0;
+      // 履歴には設定と、そのときのメインの画像を入れる（追加した画像は id で img.extras から引く）
+      function snapshot() {
+        const j = JSON.stringify(S);
+        const cur = hist[histAt];
+        if (cur && j === cur.j && img.side === cur.side) return;
+        hist = hist.slice(0, histAt + 1);
+        hist.push({ j, side: img.side });
+        if (hist.length > 100) hist.shift();
+        histAt = hist.length - 1;
+        undoUi();
+      }
+      function undoUi() {
+        $('btn-undo').disabled = histAt <= 0;
+        $('btn-redo').disabled = histAt >= hist.length - 1;
+      }
+      function goHist(d) {
+        const i = histAt + d;
+        if (i < 0 || i >= hist.length) return;
+        histAt = i;
+        const h = hist[i];
+        S = sanitize(JSON.parse(h.j));
+        if (img.side !== h.side) {
+          img.side = h.side;
+          if (img.side) keep(IMG_KEY, img.side.src);
+          else try { localStorage.removeItem(IMG_KEY); } catch (e) { /* ignore */ }
+        }
+        // 追加した画像：戻ってきたものは保存し直し、なくなったものは保存から消す
+        const ids = new Set(S.extras.filter(e => e.type === 'image').map(e => e.id));
+        S.extras = S.extras.filter(e => e.type === 'text' || img.extras[e.id]);
+        for (const id of Object.keys(img.extras)) {
+          if (ids.has(id) && dropped.has(id)) { keep(EXTRA_KEY(id), img.extras[id].src); dropped.delete(id); }
+          else if (!ids.has(id) && !dropped.has(id)) { dropped.add(id); try { localStorage.removeItem(EXTRA_KEY(id)); } catch (e) { /* ignore */ } }
+        }
+        fixOrder(S);
+        nameTouched = false;
+        syncUI(); setThumb(); renderExtras(); undoUi(); redraw();
+      }
+      $('btn-undo').addEventListener('click', () => goHist(-1));
+      $('btn-redo').addEventListener('click', () => goHist(1));
+      addEventListener('keydown', e => {
+        if (!(e.ctrlKey || e.metaKey) || e.target.closest('input, textarea, select')) return;
+        const key = e.key.toLowerCase();
+        if (key === 'z' && !e.shiftKey) { e.preventDefault(); goHist(-1); }
+        else if (key === 'y' || (key === 'z' && e.shiftKey)) { e.preventDefault(); goHist(1); }
+      });
+
+      // =====================================================
+      //  まとめて作る（ZIP は押したときだけ JSZip を読み込む）
+      // =====================================================
+      const loadScript = src => new Promise((res, rej) => {
+        const sc = document.createElement('script');
+        sc.src = src; sc.onload = res; sc.onerror = () => rej(new Error('読み込めませんでした'));
+        document.head.appendChild(sc);
+      });
+      async function batch(type) {
+        const rows = $('batch-text').value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        if (!rows.length) { toast('1行に1枚ずつ、タイトルを書いてください'); return; }
+        try {
+          if (!window.JSZip) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+        } catch (e) { toast('ZIP を作る部品を読み込めませんでした（ネットにつながっているか確認してください）'); return; }
+        const zip = new JSZip();
+        const keepText = { title: S.title, sub: S.sub };
+        const ext = EXT[type];
+        toast(`${rows.length}枚を作っています…`);
+        try {
+          for (const [i, row] of rows.entries()) {
+            const [t, sb] = row.split(/\s+\/\s+/);
+            S.title = t.replace(/[｜|]/g, '\n');
+            S.sub = sb !== undefined ? sb : keepText.sub;
+            await loadFont();
+            const out = document.createElement('canvas');
+            draw(out);
+            const blob = await new Promise(r => out.toBlob(r, type, 0.9));
+            if (blob && blob.type !== type) { noWebp(); return; }
+            const nm = `${String(i + 1).padStart(2, '0')}_${t.replace(/[｜|*]/g, '')}`.replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 60);
+            zip.file(`${nm}.${ext}`, blob);
+          }
+        } finally {
+          S.title = keepText.title; S.sub = keepText.sub;
+          redraw();
+        }
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'thumbnail.zip';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+        toast(`${rows.length}枚を ZIP で保存しました`);
+      }
+      $('batch-jpg').addEventListener('click', () => batch('image/jpeg'));
+      $('batch-png').addEventListener('click', () => batch('image/png'));
+      $('batch-webp').addEventListener('click', () => batch('image/webp'));
+
+      $('f-title').addEventListener('input', e => {
+        S.title = e.target.value;
+        refreshVisibility();
+        if (titleHlUi) titleHlUi();
+        const nm = $('extra-list').querySelector('[data-id="@text"] .nm small');
+        if (nm) nm.textContent = `（${(S.title.replace(/\*/g, '').split('\n')[0] || '（タイトルなし）').slice(0, 12)}…）`;
+        redraw();
+      });
+      $('f-sub').addEventListener('input', e => { S.sub = e.target.value; redraw(); });
+
+      $('btn-reset').addEventListener('click', async () => {
+        if (!await ask('文字・設定・選んだ画像をすべて初期値に戻しますか？', 'リセットする')) return;
+        // 追加した画像の保存を消してから、初期値に戻す（DEFAULTS の配列を共有しないように sanitize で新しく作る）
+        for (const ex of S.extras) { try { localStorage.removeItem(EXTRA_KEY(ex.id)); } catch (e) { /* ignore */ } }
+        S = sanitize({});
+        img.side = null; img.bg = null; img.logo = null; img.extras = {};
+        try { [IMG_KEY, BG_KEY, LOGO_KEY].forEach(k => localStorage.removeItem(k)); } catch (e) { /* ignore */ }
+        nameTouched = false;
+        syncUI(); setThumb(); setLogoThumb(); renderExtras(); redraw();
+      });
+
+      const toastEl = $('toast');
+      let toastTimer;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
+      }
+
+      // =====================================================
+      //  はじめ
+      // =====================================================
+      buildUI();
+      syncUI();
+      (async () => {
+        for (const [k, svg] of Object.entries(SAMPLES)) img.samples[k] = await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
+        let saved = null;
+        try { saved = localStorage.getItem(IMG_KEY); } catch (e) { /* ignore */ }
+        if (saved) img.side = await loadImg(saved);
+        try { saved = localStorage.getItem(BG_KEY); } catch (e) { saved = null; }
+        if (saved) img.bg = await loadImg(saved);
+        try { saved = localStorage.getItem(LOGO_KEY); } catch (e) { saved = null; }
+        if (saved) img.logo = await loadImg(saved);
+        setLogoThumb();
+        for (const ex of S.extras) {
+          if (ex.type === 'text') continue;
+          try { saved = localStorage.getItem(EXTRA_KEY(ex.id)); } catch (e) { saved = null; }
+          if (saved) img.extras[ex.id] = await loadImg(saved);
+        }
+        S.extras = S.extras.filter(ex => ex.type === 'text' || img.extras[ex.id]);
+        fixOrder(S);
+        renderExtras();
+        renderTpl();
+        snapshot();
+        setThumb();
+        redraw();
+      })();
+      document.fonts.addEventListener('loadingdone', () => redraw());
+    })();
+  </script>
+
+</body>
+
+</html>
