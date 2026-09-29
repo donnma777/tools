@@ -1362,6 +1362,34 @@
       background: var(--surface-2);
     }
 
+    .extra-font {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 6px;
+      padding-top: 8px;
+    }
+
+    .extra-stroke {
+      display: grid;
+      grid-template-columns: auto 36px minmax(0, 1fr) 40px;
+      gap: 8px;
+      align-items: center;
+      padding-top: 8px;
+    }
+
+    .extra-stroke input[type=color] {
+      width: 36px;
+      height: 30px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+    }
+
+    .extra-stroke .field-val {
+      text-align: right;
+    }
+
     .extra-text select {
       width: auto;
     }
@@ -1639,7 +1667,10 @@
         title: 'タイトルを\n入力してね', sub: '',
         size: 'yt', customW: 1280, customH: 720,
         font: 'Zen Maru Gothic', fontCustom: '', weight: '900',
-        titleColor: '#ff7fa0', hlColor: '#f0325a', hlScale: 1.15, subColor: '#6e3551', strokeWidth: 14, strokeColor: '#ffffff', shadow: true,
+        titleColor: '#ff7fa0', hlColor: '#f0325a', hlScale: 1.15, subColor: '#6e3551', shadow: true,
+        titleFont: '@inherit', titleWeight: '@inherit', subFont: '@inherit', subWeight: '@inherit',
+        titleStrokeOn: true, titleStrokeW: 14, titleStrokeColor: '#ffffff',
+        subStrokeOn: true, subStrokeW: 11, subStrokeColor: '#ffffff',
         textScale: 1, textAlign: 'center', textX: 0, textY: 0,
         titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
         extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0, subScale: 1,
@@ -1687,6 +1718,8 @@
           if (base.type === 'text') Object.assign(base, {
             text: typeof e.text === 'string' ? e.text.slice(0, 100) : 'テキスト', color: hex(e.color, '#ff7fa0'),
             box: ['none', 'pill', 'round'].includes(e.box) ? e.box : 'none', boxColor: hex(e.boxColor, '#ff7fa0'),
+            strokeOn: e.strokeOn !== false, strokeW: +e.strokeW >= 1 && +e.strokeW <= 40 ? +e.strokeW : 11, strokeColor: hex(e.strokeColor, '#ffffff'),
+            font: typeof e.font === 'string' ? e.font : '@inherit', weight: typeof e.weight === 'string' ? e.weight : '@inherit',
           });
           return base;
         }) : [];
@@ -1698,6 +1731,14 @@
           out.order = ['@pic', ...ids(true), '@text', ...ids(false)];
         }
         if (o.subScale === undefined && typeof o.textScale === 'number') out.subScale = out.textScale;
+        const oldW = typeof o.strokeWidth === 'number' ? o.strokeWidth : null, oldC = hex(o.strokeColor, '#ffffff');
+        if (oldW !== null && o.titleStrokeW === undefined) {
+          Object.assign(out, {
+            titleStrokeOn: oldW > 0, titleStrokeW: oldW || 14, titleStrokeColor: oldC,
+            subStrokeOn: oldW > 0, subStrokeW: Math.round(oldW * 0.8) || 11, subStrokeColor: oldC,
+          });
+          out.extras.forEach(e => { if (e.type === 'text') Object.assign(e, { strokeOn: oldW > 0, strokeW: Math.round(oldW * 0.8) || 11, strokeColor: oldC }); });
+        }
         fixOrder(out);
         if (out.bg === 'usagi') out.bg = 'dots';
         out.customW = Math.round(Math.min(4000, Math.max(200, out.customW)));
@@ -1706,6 +1747,9 @@
       }
 
       const bgPat = s => ['dots', 'stripe', 'check'].includes(s.bg);
+      // 文字ごとのフォント・太さ（'@inherit' は「全体と同じ」。PCのフォントを手動で指定するのは全体だけ）
+      const LAYER_FONTS = [['@inherit', '全体と同じ'], ...C.FONTS.filter(f => f[0] !== '__custom').map(f => [f[0], f[1]])];
+      const LAYER_WEIGHTS = [['@inherit', '全体と同じ'], ...C.WEIGHTS];
       const SECTIONS = [
         {
           title: '大きさ', icon: '📐', open: true, fields: [
@@ -1717,13 +1761,13 @@
         {
           title: '文字の見た目', icon: '🔤', open: true, fields: [
             // 全部の文字（タイトル・サブタイトル・追加した文字）に効くもの
-            { k: 'font', l: 'フォント', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]) },
+            { k: 'font', l: 'フォント（全体）', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]), note: 'タイトル・サブタイトル・追加した文字は、それぞれのカードで別のフォントにもできます' },
             { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
-            { k: 'weight', l: '文字の太さ', t: 'select', o: C.WEIGHTS },
-            { k: 'strokeWidth', l: '縁取りの太さ（0でなし）', t: 'range', min: 0, max: 30, step: 1, u: 'px' },
-            { k: 'strokeColor', l: '縁取りの色', t: 'color', when: s => s.strokeWidth > 0 },
+            { k: 'weight', l: '文字の太さ（全体）', t: 'select', o: C.WEIGHTS },
             { k: 'shadow', l: '文字にほんのり影を付ける', t: 'check' },
             // ここから下は、タイトル（home: 'title'）・サブタイトル（home: 'sub'）のカードの中に出す
+            { k: 'titleFont', l: 'フォント', t: 'select', o: LAYER_FONTS, home: 'title' },
+            { k: 'titleWeight', l: '文字の太さ', t: 'select', o: LAYER_WEIGHTS, home: 'title' },
             { k: 'textScale', l: '大きさ', t: 'range', min: 0.5, max: 1.3, step: 0.05, u: '倍', home: 'title', note: '枠に収まらないときは、これより小さくなります' },
             { k: 'titleColor', l: '色', t: 'color', home: 'title' },
             { k: 'textAlign', l: 'そろえ方', t: 'select', o: [['center', '中央'], ['left', '左寄せ'], ['right', '右寄せ']], home: 'title' },
@@ -1731,14 +1775,22 @@
             { k: 'textY', l: '上下にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', home: 'title' },
             { k: 'hlColor', l: '強調（*〜*）の色', t: 'color', home: 'title' },
             { k: 'hlScale', l: '強調（*〜*）の大きさ', t: 'range', min: 0.8, max: 1.6, step: 0.05, u: '倍', home: 'title' },
+            { k: 'titleStrokeOn', l: '縁取り', t: 'check', home: 'title' },
+            { k: 'titleStrokeColor', l: '縁取りの色', t: 'color', home: 'title', when: s => s.titleStrokeOn },
+            { k: 'titleStrokeW', l: '縁取りの太さ', t: 'range', min: 1, max: 40, step: 1, u: 'px', home: 'title', when: s => s.titleStrokeOn },
             { k: 'titlePlate', l: '後ろに敷く（座布団）', t: 'select', o: [['none', 'なし'], ['box', '角丸の四角'], ['band', '横いっぱいの帯']], home: 'title', note: '写真の上でも文字が読みやすくなります（サブタイトル・ロゴもまとめて敷きます）' },
             { k: 'tpColor', l: '座布団の色', t: 'color', home: 'title', when: s => s.titlePlate !== 'none' },
             { k: 'tpAlpha', l: '座布団の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', home: 'title', when: s => s.titlePlate !== 'none' },
+            { k: 'subFont', l: 'フォント', t: 'select', o: LAYER_FONTS, home: 'sub' },
+            { k: 'subWeight', l: '文字の太さ', t: 'select', o: LAYER_WEIGHTS, home: 'sub' },
             { k: 'subScale', l: '大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', home: 'sub' },
             { k: 'subColor', l: '色', t: 'color', home: 'sub' },
             { k: 'subPos', l: '置き場所', t: 'select', o: [['below', 'タイトルの下'], ['above', 'タイトルの上'], ['corner', '隅に小さく']], home: 'sub' },
             { k: 'subGap', l: 'タイトルとの間', t: 'range', min: 0, max: 200, step: 2, u: 'px', home: 'sub', when: s => s.subPos !== 'corner' },
             { k: 'subCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], home: 'sub', when: s => s.subPos === 'corner' },
+            { k: 'subStrokeOn', l: '縁取り', t: 'check', home: 'sub', when: s => s.subBox === 'none' || !!s.subArc },
+            { k: 'subStrokeColor', l: '縁取りの色', t: 'color', home: 'sub', when: s => s.subStrokeOn && (s.subBox === 'none' || !!s.subArc) },
+            { k: 'subStrokeW', l: '縁取りの太さ', t: 'range', min: 1, max: 40, step: 1, u: 'px', home: 'sub', when: s => s.subStrokeOn && (s.subBox === 'none' || !!s.subArc) },
             { k: 'subBox', l: '後ろの形', t: 'select', o: [['none', 'なし'], ['pill', '楕円（まるい札）'], ['round', '角丸の四角']], home: 'sub', note: '形を敷いたときは、縁取りを付けません' },
             { k: 'subBoxColor', l: '形の色', t: 'color', home: 'sub', when: s => s.subBox !== 'none' },
             { k: 'subArc', l: '曲がり', t: 'range', min: -1, max: 1, step: 0.05, u: '', home: 'sub', note: '0 でまっすぐ。プラスで上に反る（アーチ）、マイナスで下に反る。曲げたときは後ろの形は付きません' },
@@ -1974,19 +2026,38 @@
         const f = C.fontInfo(S);
         return f ? f.family : '"Zen Maru Gothic", sans-serif';
       }
+      const fontKeyOf = role => role === 'title' ? S.titleFont : role === 'sub' ? S.subFont : (role && role.font) || '@inherit';
+      const weightKeyOf = role => role === 'title' ? S.titleWeight : role === 'sub' ? S.subWeight : (role && role.weight) || '@inherit';
+      function famOf(role) {
+        const key = fontKeyOf(role);
+        if (key === '@inherit') return family();
+        const f = C.fontInfo({ font: key, fontCustom: '' });
+        return f ? f.family : '"Zen Maru Gothic", sans-serif';
+      }
+      const weightOf = role => { const w = weightKeyOf(role); return w === '@inherit' ? S.weight : w; };
+      // c.font に入れる文字列
+      const fontOf = (role, size) => `${weightOf(role)} ${size}px ${famOf(role)}`;
+      // 使っているフォントを全部読み込む（Google フォントは読み込み終わってから描く）
+      const loadedFonts = new Map();
       function loadFont() {
-        const f = C.fontInfo(S);
-        const key = `${S.font}|${S.fontCustom}`;
-        if (f && f.url && key !== fontKey) {
-          fontKey = key;
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = f.url;
-          document.head.appendChild(link);
-          return new Promise(res => { link.onload = res; link.onerror = res; })
-            .then(() => document.fonts.load(`${S.weight} 80px ${family()}`, S.title + S.sub + 'あ'));
+        const roles = [null, 'title', 'sub', ...S.extras.filter(e => e.type === 'text')];
+        const jobs = [];
+        for (const role of roles) {
+          const key = role === null ? S.font : fontKeyOf(role);
+          if (key === '@inherit') continue;
+          const f = role === null ? C.fontInfo(S) : C.fontInfo({ font: key, fontCustom: '' });
+          if (f && f.url && !loadedFonts.has(f.url)) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = f.url;
+            document.head.appendChild(link);
+            loadedFonts.set(f.url, new Promise(res => { link.onload = res; link.onerror = res; }));
+          }
+          const txt = (role === 'sub' ? S.sub : role === 'title' || role === null ? S.title + S.sub : role.text) + 'あ';
+          const w = role === null ? S.weight : weightOf(role), fam = role === null ? family() : famOf(role);
+          jobs.push((f && f.url ? loadedFonts.get(f.url) : Promise.resolve()).then(() => document.fonts.load(`${w} 80px ${fam}`, txt)));
         }
-        return document.fonts.load(`${S.weight} 80px ${family()}`, S.title + S.sub + 'あ');
+        return Promise.all(jobs);
       }
 
       // =====================================================
@@ -2115,7 +2186,7 @@
         const aw = area.r - area.l, bh = band.b - band.t, mid = (area.l + area.r) / 2;
         const lh = 1.14, gap = 14 * k;
         const sub = S.sub.trim();
-        let subFs = sub ? fit(c, [sub], (mode === 'replace' ? 84 : 60) * k * S.subScale, aw) : 0;
+        let subFs = sub ? fit(c, [sub], (mode === 'replace' ? 84 : 60) * k * S.subScale, aw, subStroke0() * k * 2) : 0;
         let fs = lines.length ? fitTitle(c, lines, (stacked || !side || pos === 'center' ? 150 : 124) * k * S.textScale, aw) : 0;
         let lg = null;
         if (mode === 'replace' || mode === 'above' || mode === 'below') {
@@ -2130,7 +2201,7 @@
         // 曲げたときに、反りのぶん高くなる量（サブタイトルの文字の大きさに対して）
         const arcLift = f => {
           if (!S.subArc) return 0;
-          c.font = `${S.weight} ${f}px ${family()}`;
+          c.font = fontOf('sub', f);
           const a = Math.abs(S.subArc) * 1.4, R = c.measureText(sub).width / a;
           return R * (1 - Math.cos(a / 2));
         };
@@ -2152,10 +2223,10 @@
         const tx = S.textX / 100 * W, ty = S.textY / 100 * H;
         const cxOf = w => (S.textAlign === 'left' ? area.l + w / 2 : S.textAlign === 'right' ? area.r - w / 2 : mid) + tx;
         const subWidth = f => {
-          c.font = `${S.weight} ${f}px ${family()}`;
-          return c.measureText(sub).width + (S.subBox !== 'none' && !S.subArc ? f * 1.3 : S.strokeWidth * k * 0.8);
+          c.font = fontOf('sub', f);
+          return c.measureText(sub).width + (S.subBox !== 'none' && !S.subArc ? f * 1.3 : subStroke0() * k);
         };
-        const blockW = Math.max(0, ...lines.map(l => lineW(c, l, fs) + S.strokeWidth * k), lg ? lg.w : 0, subIn ? subWidth(subFs) : 0);
+        const blockW = Math.max(0, ...lines.map(l => lineW(c, l, fs) + titleStroke0() * k), lg ? lg.w : 0, subIn ? subWidth(subFs) : 0);
         let y = (band.t + band.b) / 2 - total() / 2 + ty;
         const textRect = blockW > 0 ? { x: cxOf(blockW) - blockW / 2, y, w: blockW, h: total() } : null;
         // 文字の後ろに敷く（座布団）
@@ -2186,8 +2257,9 @@
           if (e.type === 'text') {
             if (!e.text) return;
             const f = 64 * k * e.scale, boxedT = e.box !== 'none';
-            c.font = `${S.weight} ${f}px ${family()}`;
-            const w = c.measureText(e.text).width + (boxedT ? f * 1.3 : S.strokeWidth * k), h = f * (boxedT ? 1.55 : 1.3);
+            c.font = fontOf(e, f);
+            const eStroke = e.strokeOn ? e.strokeW * k : 0;
+            const w = c.measureText(e.text).width + (boxedT ? f * 1.3 : eStroke), h = f * (boxedT ? 1.55 : 1.3);
             c.save();
             c.translate(cx, cy);
             c.rotate((e.rot || 0) * Math.PI / 180);
@@ -2201,9 +2273,9 @@
               c.restore();
               const keepShadow = S.shadow;
               S.shadow = false;
-              text(c, e.text, 0, f * 0.03, f, e.color, 0);
+              text(c, e.text, 0, f * 0.03, f, e.color, 0, '#ffffff', e);
               S.shadow = keepShadow;
-            } else text(c, e.text, 0, 0, f, e.color, S.strokeWidth * k * 0.8);
+            } else text(c, e.text, 0, 0, f, e.color, eStroke, e.strokeColor, e);
             c.restore();
             extras.push({ id: e.id, x: cx - w / 2, y: cy - h / 2, w, h });
             return;
@@ -2243,11 +2315,11 @@
           y += lg.h + (last ? 0 : gap);
         };
         // 上から：サブタイトル（タイトルの上）→ ロゴ（タイトルの上・代わり）→ タイトル → ロゴ（タイトルの下）→ サブタイトル（タイトルの下）
-        const subStroke = boxed ? 0 : S.strokeWidth * k * 0.8;
+        const subStroke = boxed ? 0 : subStroke0() * k;
         // サブタイトル：形を敷くなら、文字の幅に合わせて楕円／角丸の四角を描いてから文字
         const subText = (x, yy, f) => {
           if (boxed) {
-            c.font = `${S.weight} ${f}px ${family()}`;
+            c.font = fontOf('sub', f);
             const w = c.measureText(sub).width + f * 1.3, h = f * 1.55;
             c.save();
             if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.25)'; c.shadowBlur = f * 0.25; c.shadowOffsetY = f * 0.08; }
@@ -2260,13 +2332,13 @@
           if (S.subArc) { arcText(sub, x, yy, f); return; }
           const keep = S.shadow;
           if (boxed) S.shadow = false;   // 札の上の文字には影を付けない
-          text(c, sub, x, yy + (boxed ? f * 0.03 : 0), f, S.subColor, subStroke);
+          text(c, sub, x, yy + (boxed ? f * 0.03 : 0), f, S.subColor, subStroke, S.subStrokeColor);
           S.shadow = keep;
         };
         const arcText = (str, x, yy, f) => {
           const chars = [...str];
           c.save();
-          c.font = `${S.weight} ${f}px ${family()}`;
+          c.font = fontOf('sub', f);
           c.textAlign = 'center';
           c.textBaseline = 'middle';
           c.lineJoin = 'round';
@@ -2290,7 +2362,7 @@
               c.rotate(p.r);
               if (pass === 'stroke') {
                 if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = Math.max(4, f * 0.08); c.shadowOffsetY = Math.max(2, f * 0.05); }
-                c.lineWidth = subStroke; c.strokeStyle = S.strokeColor; c.strokeText(ch, 0, 0);
+                c.lineWidth = subStroke; c.strokeStyle = S.subStrokeColor; c.strokeText(ch, 0, 0);
               } else {
                 if (S.shadow && subStroke <= 0) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = Math.max(4, f * 0.08); c.shadowOffsetY = Math.max(2, f * 0.05); }
                 c.fillStyle = S.subColor; c.fillText(ch, 0, 0);
@@ -2311,7 +2383,7 @@
           titleTop = y;
           if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow), paint);
           for (const line of lines) {
-            if (paint) drawLine(c, line, cxOf(lineW(c, line, fs)), y + lineH(line) / 2, fs, S.strokeWidth * k);
+            if (paint) drawLine(c, line, cxOf(lineW(c, line, fs)), y + lineH(line) / 2, fs, titleStroke0() * k);
             y += lineH(line);
           }
           if (lg && mode === 'below') { if (lines.length) y += gap; drawLogo(!subBelow, paint); }
@@ -2320,8 +2392,8 @@
 
           // ---- 隅に小さくサブタイトル（隅の文字は、枠の端にそろえる）
           if (sub && S.subPos === 'corner') {
-            const cfs = fit(c, [sub], 44 * k * S.subScale, W * 0.45);
-            c.font = `${S.weight} ${cfs}px ${family()}`;
+            const cfs = fit(c, [sub], 44 * k * S.subScale, W * 0.45, subStroke0() * k * 2);
+            c.font = fontOf('sub', cfs);
             const w = c.measureText(sub).width + (boxed ? cfs * 1.3 : subStroke);
             const hh = (boxed ? cfs * 1.55 : cfs * 1.2) + arcLift(cfs);
             const m = Math.min(W, H) * 0.045 + subStroke / 2;
@@ -2451,13 +2523,16 @@
       const hasHL = line => /\*[^*]+\*/.test(line);
       function lineW(c, line, fs) {
         return splitHL(line).reduce((a, sg) => {
-          c.font = `${S.weight} ${sg.hl ? fs * S.hlScale : fs}px ${family()}`;
+          c.font = fontOf('title', sg.hl ? fs * S.hlScale : fs);
           return a + c.measureText(sg.t).width;
         }, 0);
       }
+      // タイトル・サブタイトルの縁取りの太さ（1200×630 のときの px。なしなら 0）
+      const titleStroke0 = () => S.titleStrokeOn ? S.titleStrokeW : 0;
+      const subStroke0 = () => S.subStrokeOn ? S.subStrokeW : 0;
       function fitTitle(c, lines, start, width) {
         let fs = start;
-        while (Math.max(...lines.map(l => lineW(c, l, fs))) + S.strokeWidth * 2 > width && fs > 12) fs -= 2;
+        while (Math.max(...lines.map(l => lineW(c, l, fs))) + titleStroke0() * 2 > width && fs > 12) fs -= 2;
         return fs;
       }
       // 1行を描く（cx は行の真ん中）。縁取りを全部描いてから文字を描く。文字の下のラインをそろえる
@@ -2473,7 +2548,7 @@
           let x = cx - w / 2;
           for (const sg of segs) {
             const f = sg.hl ? fs * S.hlScale : fs;
-            c.font = `${S.weight} ${f}px ${family()}`;
+            c.font = fontOf('title', f);
             fn(sg, x, f);
             x += c.measureText(sg.t).width;
           }
@@ -2487,7 +2562,7 @@
         if (stroke > 0) {
           shadowOn();
           c.lineWidth = stroke;
-          c.strokeStyle = S.strokeColor;
+          c.strokeStyle = S.titleStrokeColor;
           each((sg, x) => c.strokeText(sg.t, x, base));
           c.shadowColor = 'transparent';
         } else shadowOn();
@@ -2495,19 +2570,20 @@
         c.restore();
       }
 
-      function fit(c, lines, start, width) {
+      // pad は縁取りのぶんの余白（px）
+      function fit(c, lines, start, width, pad = 0, role = 'sub') {
         let fs = start;
         for (;;) {
-          c.font = `${S.weight} ${fs}px ${family()}`;
-          const w = Math.max(...lines.map(l => c.measureText(l).width)) + S.strokeWidth * 2;
+          c.font = fontOf(role, fs);
+          const w = Math.max(...lines.map(l => c.measureText(l).width)) + pad;
           if (w <= width || fs <= 12) return fs;
           fs -= 2;
         }
       }
 
-      function text(c, str, x, y, fs, color, stroke) {
+      function text(c, str, x, y, fs, color, stroke, strokeColor = '#ffffff', role = 'sub') {
         c.save();
-        c.font = `${S.weight} ${fs}px ${family()}`;
+        c.font = fontOf(role, fs);
         c.textAlign = 'center';
         c.textBaseline = 'middle';
         c.lineJoin = 'round';
@@ -2518,7 +2594,7 @@
         }
         if (stroke > 0) {
           c.lineWidth = stroke;
-          c.strokeStyle = S.strokeColor;
+          c.strokeStyle = strokeColor;
           c.strokeText(str, x, y);
           c.shadowColor = 'transparent';
         }
@@ -2877,8 +2953,29 @@
               + '<input type="color" aria-label="文字の色" title="文字の色">'
               + '<select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option></select>'
               + '<input type="color" aria-label="形の色" title="形の色" data-k="boxColor"></div>'
+              + '<div class="extra-font"><select aria-label="フォント" data-k="font"></select><select aria-label="文字の太さ" data-k="weight"></select></div>'
+              + '<div class="extra-stroke"><label class="toggle"><span>縁取り</span><input type="checkbox"><span class="sw"></span></label>'
+              + '<input type="color" aria-label="縁取りの色" title="縁取りの色"><input type="range" min="1" max="40" step="1" aria-label="縁取りの太さ" title="縁取りの太さ"><span class="field-val"></span></div>'
               + '<div class="extra-bars"></div>';
             const [tIn, cIn] = row.querySelectorAll('.extra-text input');
+            for (const [key, opts] of [['font', LAYER_FONTS], ['weight', LAYER_WEIGHTS]]) {
+              const sel = row.querySelector(`.extra-font [data-k="${key}"]`);
+              for (const [v, label] of opts) sel.add(new Option(key === 'font' ? label : (v === '@inherit' ? '太さ：全体と同じ' : label), v));
+              sel.value = ex[key];
+              sel.onchange = () => { ex[key] = sel.value; redraw(); };
+            }
+            const [soIn, scIn, swIn] = row.querySelectorAll('.extra-stroke input');
+            const swVal = row.querySelector('.extra-stroke .field-val');
+            const strokeUi = () => {
+              soIn.checked = ex.strokeOn; scIn.value = ex.strokeColor; swIn.value = ex.strokeW; swVal.textContent = `${ex.strokeW}px`;
+              // 形を敷いたときは縁取りを付けないので、出さない
+              row.querySelector('.extra-stroke').style.display = ex.box === 'none' ? '' : 'none';
+              scIn.style.visibility = swIn.style.visibility = swVal.style.visibility = ex.strokeOn ? '' : 'hidden';
+            };
+            strokeUi();
+            soIn.onchange = () => { ex.strokeOn = soIn.checked; strokeUi(); redraw(); };
+            scIn.oninput = () => { ex.strokeColor = scIn.value; redraw(); };
+            swIn.oninput = () => { ex.strokeW = parseInt(swIn.value, 10); swVal.textContent = `${ex.strokeW}px`; redraw(); };
             const bIn = row.querySelector('.extra-text select'), bcIn = row.querySelector('[data-k="boxColor"]');
             tIn.value = ex.text; cIn.value = ex.color; bIn.value = ex.box; bcIn.value = ex.boxColor;
             bcIn.style.display = ex.box === 'none' ? 'none' : '';
@@ -2886,6 +2983,7 @@
             cIn.oninput = () => { ex.color = cIn.value; row.querySelector('.text-thumb').style.color = cIn.value; redraw(); };
             bIn.onchange = () => {
               ex.box = bIn.value;
+              strokeUi();
               bcIn.style.display = ex.box === 'none' ? 'none' : '';
               // 形と文字が同じ色だと読めないので、文字を白にする
               if (ex.box !== 'none' && ex.color.toLowerCase() === ex.boxColor.toLowerCase()) {
@@ -2967,7 +3065,7 @@
       $('text-add').addEventListener('click', () => {
         const id = newId();
         const n = S.extras.length;
-        S.extras.push({ id, type: 'text', text: 'テキスト', color: S.titleColor, box: 'none', boxColor: '#ff7fa0', x: 50, y: 18 + (n % 4) * 8, scale: 0.8, rot: 0 });
+        S.extras.push({ id, type: 'text', text: 'テキスト', color: S.titleColor, box: 'none', boxColor: '#ff7fa0', strokeOn: true, strokeW: 11, strokeColor: '#ffffff', font: '@inherit', weight: '@inherit', x: 50, y: 18 + (n % 4) * 8, scale: 0.8, rot: 0 });
         S.order.push(id);
         renderExtras(); redraw();
         const inp = $('extra-list').querySelector(`[data-id="${id}"] .extra-text input`);
