@@ -1251,6 +1251,29 @@
       height: 36px;
     }
 
+    .extra-head .nm small {
+      font-weight: 500;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    .extra-head .btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+      border-color: var(--border-strong);
+    }
+
+    .extra-item.moved {
+      animation: extra-moved 0.8s ease-out;
+    }
+
+    @keyframes extra-moved {
+      from {
+        background: var(--accent-soft);
+        border-color: var(--accent);
+      }
+    }
+
     .extra-behind {
       padding: 6px 0 0;
     }
@@ -1383,7 +1406,7 @@
               <button class="btn btn-sm" type="button" id="extra-add">＋ 画像を追加</button>
               <input type="file" id="extra-file" accept="image/*" hidden>
             </div>
-            <div class="field-note">追加した画像は、プレビューでドラッグして好きな場所に置けます。重なりは「前へ」「後ろへ」で入れ替えられます（1枚目の画像はいちばん下）。</div>
+            <div class="field-note">追加した画像は、プレビューでドラッグして好きな場所に置けます。一覧は上ほど前に重なります。「↑ 前へ」「↓ 後ろへ」で入れ替えられます（1枚目の画像はいちばん下）。カードにマウスを乗せると、プレビューのその画像に枠が出ます。</div>
           </div>
         </div>
       </div>
@@ -2338,6 +2361,16 @@
       };
       function render() {
         draw(cv);
+        const hv = hoverId && lastHit.extras.find(r => r.id === hoverId);
+        if (hv) {
+          const c = cv.getContext('2d'), lw = Math.max(3, cv.width / 300);
+          c.save();
+          c.lineWidth = lw;
+          c.setLineDash([lw * 3, lw * 2]);
+          c.strokeStyle = '#ff3d7f';
+          c.strokeRect(hv.x - lw, hv.y - lw, hv.w + lw * 2, hv.h + lw * 2);
+          c.restore();
+        }
         // 背景を「なし（透明）」にしたときだけ、透明が分かるように市松模様を敷く
         $('ec-stage').classList.toggle('bg-checker', S.bg === 'none');
         const [W, H] = dims();
@@ -2525,17 +2558,23 @@
         ['y', '上下', -20, 120, 1, '%'],
         ['rot', '回転', -180, 180, 1, '°'],
       ];
+      let movedId = null, movedTimer = 0, hoverId = null;
       function renderExtras() {
         const list = $('extra-list');
         list.innerHTML = '';
         for (const k in extraInputs) delete extraInputs[k];
         if (!S.extras.length) { list.innerHTML = '<div class="row-empty">まだありません</div>'; return; }
-        S.extras.forEach((ex, i) => {
+        const n = S.extras.length;
+        // S.extras はあとのものほど前（上に重なる）。一覧は前のものから並べる
+        [...S.extras].reverse().forEach((ex, rank) => {
+          const i = n - 1 - rank;
           const row = document.createElement('div');
-          row.className = 'extra-item';
-          row.innerHTML = `<div class="extra-head"><span class="img-thumb"></span><span class="nm">画像 ${i + 2}</span>`
-            + `<button class="btn btn-sm" type="button" data-a="up" title="重なりを1つ上に" ${i === S.extras.length - 1 ? 'disabled' : ''}>前へ</button>`
-            + `<button class="btn btn-sm" type="button" data-a="down" title="重なりを1つ下に" ${i === 0 ? 'disabled' : ''}>後ろへ</button>`
+          row.className = 'extra-item' + (ex.id === movedId ? ' moved' : '');
+          row.dataset.id = ex.id;
+          const name = n === 1 ? '追加の画像' : rank === 0 ? 'いちばん前' : rank === n - 1 ? 'いちばん後ろ' : `前から${rank + 1}番目`;
+          row.innerHTML = `<div class="extra-head"><span class="img-thumb"></span><span class="nm">${name}${ex.behind ? '<small>（文字の後ろ）</small>' : ''}</span>`
+            + `<button class="btn btn-sm" type="button" data-a="up" title="1つ前に重ねる" ${rank === 0 ? 'disabled' : ''}>↑ 前へ</button>`
+            + `<button class="btn btn-sm" type="button" data-a="down" title="1つ後ろに重ねる" ${rank === n - 1 ? 'disabled' : ''}>↓ 後ろへ</button>`
             + `<button class="btn btn-sm" type="button" data-a="center">真ん中へ</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`
             + `<label class="toggle extra-behind"><span>文字の後ろに置く</span><input type="checkbox" ${ex.behind ? 'checked' : ''}><span class="sw"></span></label>`
             + '<div class="extra-bars"></div>';
@@ -2558,11 +2597,17 @@
             const j = i + d;
             if (j < 0 || j >= S.extras.length) return;
             [S.extras[i], S.extras[j]] = [S.extras[j], S.extras[i]];
+            movedId = ex.id;
             renderExtras(); redraw();
+            clearTimeout(movedTimer);
+            movedTimer = setTimeout(() => { movedId = null; }, 800);
           };
           row.querySelector('[data-a="up"]').addEventListener('click', () => move(1));
           row.querySelector('[data-a="down"]').addEventListener('click', () => move(-1));
-          row.querySelector('.extra-behind input').addEventListener('change', e => { ex.behind = e.target.checked; redraw(); });
+          row.querySelector('.extra-behind input').addEventListener('change', e => { ex.behind = e.target.checked; renderExtras(); redraw(); });
+          // カードにマウスを乗せると、プレビューのその画像に枠を出す
+          row.addEventListener('mouseenter', () => { hoverId = ex.id; render(); });
+          row.addEventListener('mouseleave', () => { if (hoverId === ex.id) { hoverId = null; render(); } });
           row.querySelector('[data-a="center"]').addEventListener('click', () => {
             ex.x = 50; ex.y = 50;
             extraInputs[ex.id].x(50); extraInputs[ex.id].y(50);
