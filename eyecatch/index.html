@@ -408,6 +408,12 @@
       background: var(--accent-soft);
     }
 
+    .chip-btn[aria-checked="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
     .btn {
       font: inherit;
       font-size: 13px;
@@ -1099,6 +1105,7 @@
     }
 
     .ec-stage {
+      background: #140810;
       padding: 14px;
       display: grid;
       place-items: center;
@@ -1107,7 +1114,7 @@
     #cv {
       display: block;
       max-width: 100%;
-      max-height: calc(100vh - 330px);
+      max-height: calc(100vh - 250px);
       height: auto;
       border-radius: 6px;
       box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
@@ -1179,7 +1186,8 @@
 
     @media (min-width: 1001px) {
       .workspace {
-        grid-template-columns: minmax(0, 1fr) 620px;
+        grid-template-columns: 440px minmax(0, 1fr);
+        max-width: 1680px;
       }
     }
   </style>
@@ -1275,7 +1283,7 @@
         <div class="panel-head">
           <span>プレビュー <span class="out-meta" id="size-meta"></span></span>
         </div>
-        <div class="ec-stage bg-checker">
+        <div class="ec-stage" id="ec-stage">
           <canvas id="cv" width="1280" height="720" aria-label="アイキャッチのプレビュー"></canvas>
         </div>
         <div class="mini-row">
@@ -1451,15 +1459,15 @@
         },
         {
           title: '背景', icon: '🎨', fields: [
+            { k: '_bgPick', l: '📁 背景画像を選ぶ', t: 'button', full: true, action: () => $('bg-file').click(), note: '選ぶと、背景がその画像になります' },
             {
-              k: 'bg', l: '背景', t: 'select', o: [['dots', '水玉'], ['stripe', 'ストライプ'], ['check', 'チェック'],
-              ['gradient', 'グラデーション'], ['plain', '無地'], ['image', '自分の画像'], ['none', 'なし（透明。PNGで保存）']]
+              k: 'bg', l: '背景の種類', t: 'chips', full: true, o: [['dots', '水玉'], ['stripe', 'ストライプ'], ['check', 'チェック'],
+              ['gradient', 'グラデーション'], ['plain', '無地'], ['image', '自分の画像'], ['none', 'なし（透明）']]
             },
             { k: 'bgColor', l: s => s.bg === 'gradient' ? '色 1' : '背景の色', t: 'color', when: s => s.bg !== 'none' && !(s.bg === 'image' && s.bgFit === 'cover') },
             { k: 'bgColor2', l: '色 2', t: 'color', when: s => s.bg === 'gradient' },
             { k: 'patColor', l: '柄の色', t: 'color', when: s => ['dots', 'stripe', 'check'].includes(s.bg) },
             { k: 'patScale', l: '柄の大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', when: bgPat },
-            { k: '_bgPick', l: '📁 背景画像を選ぶ', t: 'button', when: s => s.bg === 'image', action: () => $('bg-file').click() },
             { k: 'bgFit', l: '背景画像の合わせ方', t: 'select', o: [['cover', '画面いっぱい（はみ出す分は切る）'], ['contain', '全体が入るように（余白は背景の色）']], when: s => s.bg === 'image' },
             { k: 'bgDim', l: '背景画像を暗くする', t: 'range', min: 0, max: 0.8, step: 0.05, u: '', when: s => s.bg === 'image', note: '写真の上に白い文字をのせるときに' },
             { k: 'glow', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'check', when: s => s.bg !== 'none' },
@@ -1516,6 +1524,24 @@
           });
           hex.addEventListener('blur', () => { hex.value = S[f.k]; });
           set = v => { pick.value = v; hex.value = v; };
+        } else if (f.t === 'chips') {
+          wrap.innerHTML = `<span class="field-label"><span></span></span><div class="preset-row" role="radiogroup"></div>`;
+          const row = wrap.querySelector('.preset-row');
+          const btns = f.o.map(([v, label]) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'chip-btn';
+            b.textContent = label;
+            b.setAttribute('role', 'radio');
+            b.addEventListener('click', () => {
+              // 自分の画像をまだ選んでいなければ、選ぶ画面を開く
+              if (v === 'image' && !img.bg) { $('bg-file').click(); return; }
+              update(f.k, v); set(v);
+            });
+            row.appendChild(b);
+            return [v, b];
+          });
+          set = v => btns.forEach(([bv, b]) => b.setAttribute('aria-checked', String(bv === v)));
         } else if (f.t === 'button') {
           wrap.innerHTML = `<button class="btn btn-sm" type="button" id="${id}"><span></span></button>`;
           wrap.querySelector('button').addEventListener('click', f.action);
@@ -1537,7 +1563,8 @@
           el.addEventListener('input', () => update(f.k, el.value));
           set = v => { el.value = v; };
         }
-        const labelEl = wrap.querySelector('label > span, button > span');
+        const labelEl = wrap.querySelector('label > span, button > span, .field-label > span');
+        if (f.full) wrap.classList.add('field-full');
         labelEl.textContent = typeof f.l === 'function' ? f.l(S) : f.l;
         if (f.note) {
           const n = document.createElement('div');
@@ -1585,7 +1612,6 @@
       function update(k, v) {
         S[k] = v;
         refreshVisibility();
-        if (k === 'bg' && v === 'image' && !img.bg) $('bg-file').click();
         if (k === 'sample') setThumb();
         redraw();
       }
@@ -1915,6 +1941,8 @@
       };
       function render() {
         draw(cv);
+        // 背景を「なし（透明）」にしたときだけ、透明が分かるように市松模様を敷く
+        $('ec-stage').classList.toggle('bg-checker', S.bg === 'none');
         const [W, H] = dims();
         $('size-meta').textContent = `${W}×${H}`;
         mini.width = 160;
@@ -2000,6 +2028,8 @@
           const { url, im } = await readImage(f, 2400);
           img.bg = im;
           keep(BG_KEY, url);
+          S.bg = 'image';
+          syncUI();
           redraw();
         } catch (err) { toast(err.message); }
       });
