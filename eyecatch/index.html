@@ -1274,6 +1274,17 @@
       }
     }
 
+    .add-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .add-row .btn {
+      justify-content: center;
+    }
+
     .main-card {
       border-style: dashed;
     }
@@ -1458,13 +1469,13 @@
             <span class="field-label"><span>メインの画像の置き方（文字がよける画像）</span></span>
           </div>
           <div class="field field-full" id="extra-upload">
-            <span class="field-label"><span>文字と画像（上ほど前に重なります）</span></span>
-            <div class="row-list" id="extra-list"></div>
-            <div class="data-row" style="margin-top:0">
-              <button class="btn btn-sm" type="button" id="text-add">＋ 文字を追加</button>
-              <button class="btn btn-sm" type="button" id="extra-add">＋ 画像を追加</button>
+            <div class="add-row">
+              <button class="btn btn-primary" type="button" id="text-add">＋ 文字を追加</button>
+              <button class="btn btn-primary" type="button" id="extra-add">＋ 画像を追加</button>
               <input type="file" id="extra-file" accept="image/*" hidden>
             </div>
+            <span class="field-label"><span>重なりの順（上ほど前）</span></span>
+            <div class="row-list" id="extra-list"></div>
             <div class="field-note"><b>メインの画像</b>は、メインの文字がよけて置かれます（左・右・上・下・真ん中）。画像を選んでいないときはサンプル（ハートなど）が入ります。<b>メインの文字</b>はタイトル・サブタイトル・ロゴです。<b>追加した文字・画像</b>は好きな場所に置けます。「↑ 前へ」「↓ 後ろへ」で、文字と画像をまたいで重なりを入れ替えられます。「メインにする」「自由に置く」で画像の役割を入れ替えられます。プレビューでドラッグして動かせます。カードにマウスを乗せると、プレビューのその画像に枠が出ます。</div>
           </div>
         </div>
@@ -1534,7 +1545,7 @@
         <ol class="steps">
           <li>左の「文字」に <b>タイトル</b> を入れます。Enter で改行できます。</li>
           <li>「大きさ」で使う場所に合わせたサイズを選びます（ブログのアイキャッチ・YouTubeのサムネイルは <b>1280×720</b>、SNSの共有画像は <b>1200×630</b> がおすすめ）。</li>
-          <li>「画像」で自分のキャラや写真を、「ロゴ」で自分のロゴを選び、「背景」で柄・色・背景画像を選びます。画像はプレビューでドラッグして動かせます。</li>
+          <li>「文字と画像を追加」で自分のキャラや写真、好きな文字を足し、「ロゴ」で自分のロゴを選び、「背景」で柄・色・背景画像を選びます。文字や画像はプレビューでドラッグして動かせます。</li>
           <li>よく使う見た目は「🎭 テンプレート」に名前を付けて保存しておくと、次からはタイトルと写真を変えるだけで作れます。同じデザインで何枚も作るときは「📦 まとめて作る」が便利です。</li>
           <li>右の <b>「JPG で保存」</b> を押すと、画像がダウンロードされます。</li>
         </ol>
@@ -1707,7 +1718,7 @@
           ]
         },
         {
-          title: '画像', icon: '🖼️', open: true, fields: [
+          title: '文字と画像を追加', icon: '🧩', open: true, fields: [
             {
               k: 'imgPos', l: '位置', t: 'select', o: [['left', '左'], ['right', '右'], ['top', '上（文字は下）'], ['bottom', '下（文字は上）'],
               ['center', '真ん中（文字の後ろ）'], ['none', '置かない（文字だけ）']], note: '縦長・正方形で「左」「右」を選ぶと、下に置きます'
@@ -1862,7 +1873,7 @@
           grid.className = 'fields';
           // ロゴの欄は、先頭にロゴのアップロードを置く
           if (sec.title === 'ロゴ') grid.appendChild($('logo-upload'));
-          if (sec.title === '画像') { grid.appendChild($('main-opts')); grid.appendChild($('extra-upload')); }
+          if (sec.title === '文字と画像を追加') { grid.appendChild($('extra-upload')); grid.appendChild($('main-opts')); }
           for (const f of sec.fields) grid.appendChild(buildField(f));
           det.appendChild(grid);
           // 「大きさ」は文字の前に出す
