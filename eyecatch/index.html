@@ -1274,7 +1274,7 @@
       }
     }
 
-    .main-text-slot .fields {
+    .main-text-slot.fields {
       display: block;
       padding: 4px 0 0;
     }
@@ -1443,12 +1443,12 @@
 
       <div hidden>
         <div class="fields" id="main-text-fields">
-          <div class="field field-full">
+          <div class="field field-full" id="title-field">
             <label class="field-label" for="f-title"><span>タイトル（Enter で改行）</span></label>
             <textarea class="title-in" id="f-title" spellcheck="false"></textarea>
             <div class="field-note">長い文字は、枠に収まるように自動で小さくなります。<b>*〜*</b> で囲んだところは強調（色・大きさは「文字の見た目」）。例: マジカルミライ *2026* レポ</div>
           </div>
-          <div class="field field-full">
+          <div class="field field-full" id="sub-field">
             <label class="field-label" for="f-sub"><span>サブタイトル（小さい文字。空欄でなし）</span></label>
             <input type="text" id="f-sub" spellcheck="false" placeholder="例: 初心者向けにやさしく解説">
           </div>
@@ -1625,7 +1625,7 @@
         titleColor: '#ff7fa0', hlColor: '#f0325a', hlScale: 1.15, subColor: '#6e3551', strokeWidth: 14, strokeColor: '#ffffff', shadow: true,
         textScale: 1, textAlign: 'center', textX: 0, textY: 0,
         titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
-        extras: [], order: ['@pic', '@text'],
+        extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0,
         imgPos: 'left', imgAnchor: 'auto', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart',
         subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subArc: 0, subGap: 0,
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
@@ -1635,13 +1635,15 @@
         bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
       };
       const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
-      // order を extras に合わせる（なくなったものは外し、足りないものは上に足す。'@pic'・'@text' は必ず入れる）
+      // order を extras に合わせる（なくなったものは外し、足りないものは上に足す。'@pic'・'@text'・'@sub' は必ず入れる）
       function fixOrder(st) {
-        const ids = new Set(['@pic', '@text', ...st.extras.map(e => e.id)]);
+        const ids = new Set(['@pic', '@text', '@sub', ...st.extras.map(e => e.id)]);
         const seen = new Set();
         st.order = st.order.filter(v => ids.has(v) && !seen.has(v) && seen.add(v));
         if (!seen.has('@pic')) st.order.unshift('@pic');
         if (!seen.has('@text')) st.order.splice(st.order.indexOf('@pic') + 1, 0, '@text');
+        // サブタイトル（以前はタイトルと一緒だった）は、タイトルのすぐ前に
+        if (!seen.has('@sub')) st.order.splice(st.order.indexOf('@text') + 1, 0, '@sub');
         for (const e of st.extras) if (!st.order.includes(e.id)) st.order.push(e.id);
       }
       function sanitize(o) {
@@ -1998,7 +2000,7 @@
       const dims = () => S.size === 'custom' ? [S.customW, S.customH] : SIZES[S.size].slice(0, 2);
 
       // プレビューでドラッグするための、画像・文字・追加の画像の場所（canvas の座標）
-      let lastHit = { pic: null, text: null, extras: [] };
+      let lastHit = { pic: null, text: null, sub: null, extras: [] };
       function draw(cv) {
         const [W, H] = dims();
         const band = S.logoMode === 'band' ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
@@ -2023,7 +2025,7 @@
         }
         if (cv === $('cv')) {
           const sh = r => r && { ...r, y: r.y + top };
-          lastHit = { pic: sh(hit.pic), text: sh(hit.text), extras: hit.extras.map(sh) };
+          lastHit = { pic: sh(hit.pic), text: sh(hit.text), sub: sh(hit.sub), extras: hit.extras.map(sh) };
         }
       }
 
@@ -2203,13 +2205,15 @@
           c.fill();
           c.restore();
         };
-        const drawLogo = last => {
-          const lx = cxOf(lg.w) - lg.w / 2;
-          plate(lx, y, lg.w, lg.h);
-          c.save();
-          if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = 10 * k; c.shadowOffsetY = 5 * k; }
-          c.drawImage(logo, lx, y, lg.w, lg.h);
-          c.restore();
+        const drawLogo = (last, paint) => {
+          if (paint) {
+            const lx = cxOf(lg.w) - lg.w / 2;
+            plate(lx, y, lg.w, lg.h);
+            c.save();
+            if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = 10 * k; c.shadowOffsetY = 5 * k; }
+            c.drawImage(logo, lx, y, lg.w, lg.h);
+            c.restore();
+          }
           y += lg.h + (last ? 0 : gap);
         };
         // 上から：サブタイトル（タイトルの上）→ ロゴ（タイトルの上・代わり）→ タイトル → ロゴ（タイトルの下）→ サブタイトル（タイトルの下）
@@ -2271,15 +2275,22 @@
           c.restore();
         };
         // ---- メインの文字（タイトル・サブタイトル・ロゴ）
-        const drawText = () => {
-          if (subAbove) { subText(cxOf(subWidth(subFs)), y + subBody() / 2, subFs); y += subH(); }
-          if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow));
+        // タイトル（とロゴ）を描く。paint が false なら場所だけ決める（サブタイトルの場所 subAt・タイトルの範囲も）
+        const y0 = y;
+        let subAt = null, titleTop = y, titleBot = y;
+        const drawText = paint => {
+          y = y0;
+          subAt = null;
+          if (subAbove) { subAt = { x: cxOf(subWidth(subFs)), y: y + subBody() / 2, f: subFs, w: subWidth(subFs), h: subBody() }; y += subH(); }
+          titleTop = y;
+          if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow), paint);
           for (const line of lines) {
-            drawLine(c, line, cxOf(lineW(c, line, fs)), y + lineH(line) / 2, fs, S.strokeWidth * k);
+            if (paint) drawLine(c, line, cxOf(lineW(c, line, fs)), y + lineH(line) / 2, fs, S.strokeWidth * k);
             y += lineH(line);
           }
-          if (lg && mode === 'below') { if (lines.length) y += gap; drawLogo(!subBelow); }
-          if (subBelow) subText(cxOf(subWidth(subFs)), y + gapPx + subBody() / 2, subFs);
+          if (lg && mode === 'below') { if (lines.length) y += gap; drawLogo(!subBelow, paint); }
+          titleBot = y;
+          if (subBelow) subAt = { x: cxOf(subWidth(subFs)), y: y + gapPx + subBody() / 2, f: subFs, w: subWidth(subFs), h: subBody() };
 
           // ---- 隅に小さくサブタイトル（隅の文字は、枠の端にそろえる）
           if (sub && S.subPos === 'corner') {
@@ -2290,11 +2301,11 @@
             const m = Math.min(W, H) * 0.045 + subStroke / 2;
             const x = S.subCorner.endsWith('l') ? m + w / 2 : S.subCorner.endsWith('c') ? W / 2 : W - m - w / 2;
             const yy = S.subCorner.startsWith('t') ? m + hh / 2 : H - m - hh / 2;
-            subText(x, yy, cfs);
+            subAt = { x, y: yy, f: cfs, w, h: hh };
           }
 
           // ---- 隅に小さくロゴ
-          if (mode === 'corner') {
+          if (paint && mode === 'corner') {
             const r = Math.min(W * 0.2 / logo.width, H * 0.14 / logo.height) * S.logoScale;
             const w = logo.width * r, h = logo.height * r, m = Math.min(W, H) * (S.logoPlate ? 0.06 : 0.04);
             const x = S.logoCorner.endsWith('l') ? m : S.logoCorner.endsWith('c') ? (W - w) / 2 : W - m - w;
@@ -2307,14 +2318,21 @@
           }
         };
 
+        // ---- サブタイトル（タイトルとは別の重なり。subX・subY でサブタイトルだけずらせる）
+        drawText(false);
+        const subRect = subAt && { x: subAt.x + S.subX / 100 * W - subAt.w / 2, y: subAt.y + S.subY / 100 * H - subAt.h / 2, w: subAt.w, h: subAt.h };
+        const titleRect = textRect && titleBot > titleTop ? { x: textRect.x, y: titleTop, w: textRect.w, h: titleBot - titleTop } : null;
+        const drawSub = () => { if (subAt) subText(subAt.x + S.subX / 100 * W, subAt.y + S.subY / 100 * H, subAt.f); };
+
         // ---- 重なりの順に描く（下から）
         const byId = Object.fromEntries(S.extras.map(e => [e.id, e]));
         for (const id of S.order) {
           if (id === '@pic') drawPic();
-          else if (id === '@text') drawText();
+          else if (id === '@text') drawText(true);
+          else if (id === '@sub') drawSub();
           else if (byId[id]) drawExtra(byId[id]);
         }
-        return { pic, text: textRect, extras };
+        return { pic, text: titleRect, sub: subRect, extras };
       }
 
       function drawBackground(c, W, H, k) {
@@ -2495,7 +2513,7 @@
       };
       function render() {
         draw(cv);
-        const hv = hoverId === '@pic' ? lastHit.pic : hoverId === '@text' ? lastHit.text : hoverId && lastHit.extras.find(r => r.id === hoverId);
+        const hv = hoverId === '@pic' ? lastHit.pic : hoverId === '@text' ? lastHit.text : hoverId === '@sub' ? lastHit.sub : hoverId && lastHit.extras.find(r => r.id === hoverId);
         if (hv) {
           const c = cv.getContext('2d'), lw = Math.max(3, cv.width / 300);
           c.save();
@@ -2643,6 +2661,7 @@
         for (let i = S.order.length - 1; i >= 0; i--) {
           const id = S.order[i];
           if (id === '@text') { if (inRect(p, lastHit.text)) return { kind: 'text' }; }
+          else if (id === '@sub') { if (inRect(p, lastHit.sub)) return { kind: 'sub' }; }
           else if (id === '@pic') { if (inRect(p, lastHit.pic)) return { kind: 'pic' }; }
           else {
             const r = lastHit.extras.find(x => x.id === id);
@@ -2656,7 +2675,8 @@
         const h = hitAt(p);
         if (!h) return;
         const ex = h.kind === 'extra' ? S.extras.find(x => x.id === h.id) : null;
-        drag = { p, h, x: h.kind === 'text' ? S.textX : h.kind === 'pic' ? S.imgX : ex.x, y: h.kind === 'text' ? S.textY : h.kind === 'pic' ? S.imgY : ex.y };
+        const xy = { text: [S.textX, S.textY], sub: [S.subX, S.subY], pic: [S.imgX, S.imgY] }[h.kind] || [ex.x, ex.y];
+        drag = { p, h, x: xy[0], y: xy[1] };
         cv.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
@@ -2672,6 +2692,9 @@
         } else if (drag.h.kind === 'text') {
           S.textX = clamp(drag.x + dx, -50, 50); S.textY = clamp(drag.y + dy, -50, 50);
           inputs.textX.set(S.textX); inputs.textY.set(S.textY);
+        } else if (drag.h.kind === 'sub') {
+          S.subX = clamp(drag.x + dx, -60, 60); S.subY = clamp(drag.y + dy, -60, 60);
+          if (subBars) { subBars.subX(S.subX); subBars.subY(S.subY); }
         } else {
           const ex = S.extras.find(x => x.id === drag.h.id);
           if (ex) {
@@ -2700,8 +2723,9 @@
       ];
       let movedId = null, movedTimer = 0, hoverId = null;
       const mainCard = $('main-card');
-      // メインの文字の入力欄（一覧を作り直しても、同じ入力欄を使い回す）
-      const mainTextFields = $('main-text-fields');
+      // タイトル・サブタイトルの入力欄（一覧を作り直しても、同じ入力欄を使い回す）
+      const titleField = $('title-field'), subField = $('sub-field');
+      let subBars = null;
       let mainPos = '';
       function renderMain(pos) {
         if (pos !== undefined) mainPos = pos;
@@ -2775,20 +2799,49 @@
           }
           const row = document.createElement('div');
           // メインの文字
+          const openStyle = () => {
+            const d = inputs.font.wrap.closest('details');
+            d.open = true;
+            d.scrollIntoView({ block: 'start' });
+          };
+          // タイトル
           if (id === '@text') {
             row.className = 'extra-item main-card';
             const t = S.title.replace(/\*/g, '').split('\n')[0] || '（タイトルなし）';
-            row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb">Aa</span><span class="nm">メインの文字<small>（${esc(t.slice(0, 12))}…）</small>${pos}</span>`
+            row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb">T</span><span class="nm">タイトル<small>（${esc(t.slice(0, 12))}…）</small>${pos}</span>`
               + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="style">見た目を変える</button></div>`
-              + '<div class="main-text-slot"></div>'
+              + '<div class="main-text-slot fields"></div>'
               + '<div class="field-note" style="padding:0 0 6px">フォント・色・位置・ロゴは「🔤 文字の見た目」「🏷️ ロゴ」で変えます。</div>';
-            row.querySelector('.main-text-slot').appendChild(mainTextFields);
-            row.querySelector('[data-a="style"]').onclick = () => {
-              const d = inputs.font.wrap.closest('details');
-              d.open = true;
-              d.scrollIntoView({ block: 'start' });
-            };
+            row.querySelector('.main-text-slot').appendChild(titleField);
+            row.querySelector('[data-a="style"]').onclick = openStyle;
             hookRow(row, '@text');
+            list.appendChild(row);
+            return;
+          }
+          // サブタイトル
+          if (id === '@sub') {
+            row.className = 'extra-item main-card';
+            row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="font-size:12px">sub</span><span class="nm">サブタイトル${pos}</span>`
+              + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="style">見た目を変える</button><button class="btn btn-sm" type="button" data-a="reset" title="ずらした位置を元に戻します">位置を戻す</button></div>`
+              + '<div class="main-text-slot fields"></div><div class="extra-bars"></div>'
+              + '<div class="field-note" style="padding:0 0 6px">置き場所（タイトルの上・下・隅）・色・形・曲がりは「🔤 文字の見た目」で変えます。プレビューでドラッグしても動かせます。</div>';
+            row.querySelector('.main-text-slot').appendChild(subField);
+            row.querySelector('[data-a="style"]').onclick = openStyle;
+            subBars = {};
+            const bars = row.querySelector('.extra-bars');
+            for (const [key, label] of [['subX', '左右にずらす'], ['subY', '上下にずらす']]) {
+              const f = document.createElement('label');
+              f.className = 'extra-bar';
+              f.innerHTML = `<span class="field-label"><span>${label}</span><span class="field-val"></span></span><input type="range" min="-60" max="60" step="1">`;
+              const r = f.querySelector('input'), val = f.querySelector('.field-val');
+              const set = v => { r.value = v; val.textContent = `${v}%`; };
+              set(S[key]);
+              r.addEventListener('input', () => { S[key] = parseInt(r.value, 10); set(S[key]); redraw(); });
+              subBars[key] = set;
+              bars.appendChild(f);
+            }
+            row.querySelector('[data-a="reset"]').onclick = () => { S.subX = 0; S.subY = 0; subBars.subX(0); subBars.subY(0); redraw(); };
+            hookRow(row, '@sub');
             list.appendChild(row);
             return;
           }
