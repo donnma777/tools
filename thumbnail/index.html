@@ -1373,6 +1373,22 @@
     }
 
     /* テンプレート・追加の画像の一覧 */
+    details.adv > summary {
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--label);
+      padding: 2px 0;
+    }
+
+    details.adv[open] > summary {
+      margin-bottom: 8px;
+    }
+
+    details.adv .row-list {
+      margin-top: 8px;
+    }
+
     .row-list {
       display: flex;
       flex-direction: column;
@@ -1792,6 +1808,17 @@
               <input type="file" id="img-file" accept="image/*" hidden>
             </div>
           </div>
+          <div class="field field-full" id="ufont-field">
+            <details class="adv">
+              <summary>フォントを追加（上級者向け）</summary>
+              <div class="inline-add">
+                <input type="text" id="ufont-name" maxlength="60" placeholder="例: メイリオ / Kiwi Maru" spellcheck="false" aria-label="追加するフォントの名前">
+                <button class="btn btn-sm btn-primary" type="button" id="ufont-add">＋ 追加</button>
+              </div>
+              <div class="row-list" id="ufont-list"></div>
+              <div class="field-note">PCに入っているフォントの名前か、Google Fonts のフォントの名前（英語）を入れます。追加したフォントは、全体と各カードのフォントの選択に出ます。PCのフォントは、そのパソコンでしか表示されません。</div>
+            </details>
+          </div>
           <div class="field field-full main-opts" id="main-opts">
             <span class="field-label"><span>メインの画像の置き方</span></span>
           </div>
@@ -1965,7 +1992,7 @@
       const DEFAULTS = {
         title: '*タイトル*を\n入力してね', sub: 'サブタイトル',
         size: 'yt', customW: 1280, customH: 720,
-        font: 'Zen Maru Gothic', fontCustom: '', weight: '900',
+        font: 'Zen Maru Gothic', fontCustom: '', weight: '900', userFonts: [],
         titleColor: '#ff7fa0', hlColor: '#f0325a', hlScale: 1.15, subColor: '#6e3551', shadow: true,
         titleFont: '@inherit', titleWeight: '@inherit', subFont: '@inherit', subWeight: '@inherit',
         titleStrokeOn: true, titleStrokeW: 14, titleStrokeColor: '#ffffff',
@@ -2065,6 +2092,19 @@
           });
           out.extras.forEach(e => { if (e.type === 'text') Object.assign(e, { strokeOn: oldW > 0, strokeW: Math.round(oldW * 0.8) || 11, strokeColor: oldC }); });
         }
+        // 追加したフォント。前の「手動で指定（PCのフォント）」は、追加したフォントに引き継ぐ
+        out.userFonts = [...new Set((Array.isArray(o.userFonts) ? o.userFonts : []).filter(v => typeof v === 'string').map(cleanFont).filter(Boolean))].slice(0, 20);
+        if (out.font === '__custom') {
+          const name = cleanFont(typeof o.fontCustom === 'string' ? o.fontCustom : '');
+          if (name && !out.userFonts.includes(name)) out.userFonts.push(name);
+          out.font = name ? 'u:' + name : 'Zen Maru Gothic';
+        }
+        // 外したフォントを使っていたら、全体は Zen Maru Gothic、カードは「全体と同じ」に
+        const okFont = k => typeof k === 'string' && (!k.startsWith('u:') || out.userFonts.includes(k.slice(2)));
+        if (!okFont(out.font)) out.font = 'Zen Maru Gothic';
+        if (!okFont(out.titleFont)) out.titleFont = '@inherit';
+        if (!okFont(out.subFont)) out.subFont = '@inherit';
+        for (const e of out.extras) if (e.type === 'text' && !okFont(e.font)) e.font = '@inherit';
         fixOrder(out);
         if (out.bg === 'usagi') out.bg = 'dots';
         out.customW = Math.round(Math.min(4000, Math.max(200, out.customW)));
@@ -2074,8 +2114,25 @@
 
       const bgPat = s => ['dots', 'stripe', 'check'].includes(s.bg);
       // 文字ごとのフォント・太さ（'@inherit' は「全体と同じ」。PCのフォントを手動で指定するのは全体だけ）
-      const LAYER_FONTS = [['@inherit', '全体と同じ'], ...C.FONTS.filter(f => f[0] !== '__custom').map(f => [f[0], f[1]])];
-      const LAYER_WEIGHTS = [['@inherit', '全体と同じ'], ...C.WEIGHTS];
+      const cleanFont = v => v.replace(/["'<>;{}\\]/g, '').trim().slice(0, 60);
+      // フォントの選択肢：決まったもの ＋ 追加したもの
+      const BASE_FONTS = C.FONTS.filter(f => f[0] !== '__custom').map(f => [f[0], f[1]]);
+      const fontOpts = () => [...BASE_FONTS, ...S.userFonts.map(n => ['u:' + n, `${n}（追加）`])];
+      // フォントが持っている太さ（chat-core の FONTS の3つ目。空なら 400 だけ、'100..900' は幅の中の標準の太さ）
+      const W_LABEL = { 100: 'Thin 100', 200: 'ExtraLight 200', 300: 'Light 300', 400: 'Regular 400', 500: 'Medium 500', 600: 'SemiBold 600', 700: 'Bold 700', 800: 'ExtraBold 800', 900: 'Black 900' };
+      const STD_W = C.WEIGHTS.map(w => w[0]);
+      function weightsOf(font) {
+        if (font.startsWith('u:')) return STD_W;  // 追加したフォントは持っている太さが分からない
+        if (!font) return ['500', '700', '900'];  // サイト標準：ページで読み込んでいる Zen Maru Gothic
+        const f = C.FONTS.find(x => x[0] === font);
+        const spec = f ? f[2] : '';
+        if (!spec) return ['400'];
+        if (spec.includes('..')) { const [a, b] = spec.split('..').map(Number); return STD_W.filter(w => +w >= a && +w <= b); }
+        return spec.split(';');
+      }
+      // いちばん近い太さ（そのフォントにない太さを選んでいたとき用。選んだ値は残しておく）
+      const nearestW = (font, w) => weightsOf(font).reduce((a, b) => Math.abs(b - w) < Math.abs(a - w) ? b : a);
+      const weightOpts = font => weightsOf(font).map(w => [w, W_LABEL[w] || w]);
       // タイトルに *〜* があるか（強調の色・大きさは、あるときだけ出す）
       const hasHLText = t => /\*[^*\n]+\*/.test(t);
       const SECTIONS = [
@@ -2089,13 +2146,12 @@
         {
           title: '文字の見た目', icon: '🔤', open: true, fields: [
             // 全部の文字（タイトル・サブタイトル・追加した文字）に効くもの
-            { k: 'font', l: 'フォント（全体）', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]), note: 'タイトル・サブタイトル・追加した文字は、それぞれのカードで別のフォントにもできます' },
-            { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
-            { k: 'weight', l: '文字の太さ（全体）', t: 'select', o: C.WEIGHTS },
+            { k: 'font', l: 'フォント（全体）', t: 'select', o: BASE_FONTS, note: 'タイトル・サブタイトル・追加した文字は、それぞれのカードで別のフォントにもできます' },
+            { k: 'weight', l: '文字の太さ（全体）', t: 'select', o: C.WEIGHTS, note: 'フォントが持っている太さだけ出します' },
             { k: 'shadow', l: '文字にほんのり影を付ける', t: 'check' },
             // ここから下は、タイトル（home: 'title'）・サブタイトル（home: 'sub'）のカードの中に出す
-            { k: 'titleFont', l: 'フォント', t: 'select', o: LAYER_FONTS, home: 'none' },
-            { k: 'titleWeight', l: '文字の太さ', t: 'select', o: LAYER_WEIGHTS, home: 'none' },
+            { k: 'titleFont', l: 'フォント', t: 'select', o: [['@inherit', '全体と同じ'], ...BASE_FONTS], home: 'none' },
+            { k: 'titleWeight', l: '文字の太さ', t: 'select', o: [['@inherit', '全体と同じ'], ...C.WEIGHTS], home: 'none' },
             { k: 'textScale', l: '大きさ', t: 'range', min: 0.5, max: 1.3, step: 0.05, u: '倍', home: 'none' },
             { k: 'titleColor', l: '色', t: 'color', home: 'none' },
             { k: 'textAlign', l: 'そろえ方', t: 'select', o: [['center', '中央'], ['left', '左寄せ'], ['right', '右寄せ']], home: 'none' },
@@ -2109,8 +2165,8 @@
             { k: 'titlePlate', l: '後ろの形', t: 'select', o: [['none', '形なし'], ['pill', '楕円'], ['round', '角丸'], ['band', '横いっぱいの帯']], home: 'none' },
             { k: 'tpColor', l: '形の色', t: 'color', home: 'none' },
             { k: 'tpAlpha', l: '形の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', home: 'none' },
-            { k: 'subFont', l: 'フォント', t: 'select', o: LAYER_FONTS, home: 'none' },
-            { k: 'subWeight', l: '文字の太さ', t: 'select', o: LAYER_WEIGHTS, home: 'none' },
+            { k: 'subFont', l: 'フォント', t: 'select', o: [['@inherit', '全体と同じ'], ...BASE_FONTS], home: 'none' },
+            { k: 'subWeight', l: '文字の太さ', t: 'select', o: [['@inherit', '全体と同じ'], ...C.WEIGHTS], home: 'none' },
             { k: 'subScale', l: '大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', home: 'none' },
             { k: 'subColor', l: '色', t: 'color', home: 'none' },
             { k: 'subPos', l: '置き場所', t: 'select', o: [['below', 'タイトルの下'], ['above', 'タイトルの上'], ['corner', '隅に小さく']], home: 'sub' },
@@ -2284,6 +2340,7 @@
           if (sec.title === 'ロゴ') grid.appendChild($('logo-upload'));
           if (sec.title === '文字と画像を追加') { grid.appendChild($('extra-upload')); grid.appendChild($('main-opts')); }
           for (const f of sec.fields) grid.appendChild(buildField(f));
+          if (sec.title === '文字の見た目') grid.appendChild($('ufont-field'));
           det.appendChild(grid);
           // 「大きさ」は文字の前に出す
           if (sec.title === '大きさ') $('settings').insertBefore(det, $('settings').children[1]);
@@ -2328,6 +2385,8 @@
         $('f-sub').value = S.sub;
         refreshVisibility();
         renderMain();
+        refreshFonts();
+        refreshWeights();
       }
 
       let queued = false;
@@ -2338,6 +2397,7 @@
         S[k] = v;
         refreshVisibility();
         if (k === 'sample') setThumb();
+        if (k === 'font') refreshWeights();
         if (k === 'imgPos') renderMain();
         if ((k === 'subBox' || k === 'subArc') && subStrokeUi) subStrokeUi();
         redraw();
@@ -2358,8 +2418,32 @@
       //  フォント（Google フォントは読み込み終わってから描く）
       // =====================================================
       let fontKey = '';
+      // そのフォントが使えるか（ない名前だと、代わりのフォントと同じ幅になる）
+      const probe = document.createElement('canvas').getContext('2d');
+      const availSeen = new Set();  // 一度使えたフォントは覚えておく（描くたびに測らない）
+      function fontAvail(name) {
+        if (availSeen.has(name)) return true;
+        const t = 'あいうえおアイウ漢字ABCabcgjy0123';
+        const ok = ['monospace', 'serif', 'sans-serif'].some(base => {
+          probe.font = `40px ${base}`;
+          const w0 = probe.measureText(t).width;
+          probe.font = `40px "${name}", ${base}`;
+          return probe.measureText(t).width !== w0;
+        });
+        if (ok) availSeen.add(name);
+        return ok;
+      }
+      // Google Fonts の名前は英数字だけ。古い形の API は、ない太さがあっても使える太さだけ返す
+      const gfontUrl = name => /^[A-Za-z0-9 ]+$/.test(name) ? `https://fonts.googleapis.com/css?family=${name.replace(/ /g, '+')}:100,200,300,400,500,600,700,800,900&display=swap` : '';
+      function infoOf(key) {
+        if (key && key.startsWith('u:')) {
+          const name = key.slice(2);
+          return { family: `"${name}", sans-serif`, url: fontAvail(name) ? '' : gfontUrl(name) };
+        }
+        return C.fontInfo({ font: key, fontCustom: '' });
+      }
       function family() {
-        const f = C.fontInfo(S);
+        const f = infoOf(S.font);
         return f ? f.family : '"Zen Maru Gothic", sans-serif';
       }
       const fontKeyOf = role => role === 'title' ? S.titleFont : role === 'sub' ? S.subFont : (role && role.font) || '@inherit';
@@ -2367,30 +2451,35 @@
       function famOf(role) {
         const key = fontKeyOf(role);
         if (key === '@inherit') return family();
-        const f = C.fontInfo({ font: key, fontCustom: '' });
+        const f = infoOf(key);
         return f ? f.family : '"Zen Maru Gothic", sans-serif';
       }
-      const weightOf = role => { const w = weightKeyOf(role); return w === '@inherit' ? S.weight : w; };
+      const fontOfRole = role => { const k = role === null ? '@inherit' : fontKeyOf(role); return k === '@inherit' ? S.font : k; };
+      const weightOf = role => { const w = role === null ? '@inherit' : weightKeyOf(role); return nearestW(fontOfRole(role), w === '@inherit' ? S.weight : w); };
       // c.font に入れる文字列
       const fontOf = (role, size) => `${weightOf(role)} ${size}px ${famOf(role)}`;
       // 使っているフォントを全部読み込む（Google フォントは読み込み終わってから描く）
       const loadedFonts = new Map();
+      function cssOnce(url) {
+        if (!loadedFonts.has(url)) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = url;
+          document.head.appendChild(link);
+          loadedFonts.set(url, new Promise(res => { link.onload = res; link.onerror = res; }));
+        }
+        return loadedFonts.get(url);
+      }
       function loadFont() {
         const roles = [null, 'title', 'sub', ...S.extras.filter(e => e.type === 'text')];
         const jobs = [];
         for (const role of roles) {
           const key = role === null ? S.font : fontKeyOf(role);
           if (key === '@inherit') continue;
-          const f = role === null ? C.fontInfo(S) : C.fontInfo({ font: key, fontCustom: '' });
-          if (f && f.url && !loadedFonts.has(f.url)) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = f.url;
-            document.head.appendChild(link);
-            loadedFonts.set(f.url, new Promise(res => { link.onload = res; link.onerror = res; }));
-          }
+          const f = infoOf(key);
+          if (f && f.url) cssOnce(f.url);
           const txt = (role === 'sub' ? S.sub : role === 'title' || role === null ? S.title + S.sub : role.text) + 'あ';
-          const w = role === null ? S.weight : weightOf(role), fam = role === null ? family() : famOf(role);
+          const w = weightOf(role), fam = role === null ? family() : famOf(role);
           jobs.push((f && f.url ? loadedFonts.get(f.url) : Promise.resolve()).then(() => document.fonts.load(`${w} 80px ${fam}`, txt)));
         }
         return Promise.all(jobs);
@@ -3506,13 +3595,74 @@
         r.oninput = () => { set(parseFloat(r.value) || 0.05 * Math.sign(parseFloat(r.value) || 1)); val.textContent = (+r.value).toFixed(2); };
       }
       const FONT_ROW = '<div class="extra-font"><select aria-label="フォント" data-k="font"></select><select aria-label="文字の太さ" data-k="weight"></select></div>';
-      function fontRow(row, get, set) {
-        for (const [key, opts] of [['font', LAYER_FONTS], ['weight', LAYER_WEIGHTS]]) {
-          const sel = row.querySelector(`.extra-font [data-k="${key}"]`);
-          for (const [v, label] of opts) sel.add(new Option(v === '@inherit' ? (key === 'font' ? 'フォント：全体と同じ' : '太さ：全体と同じ') : label, v));
-          sel.value = get(key);
-          sel.onchange = () => set(key, sel.value);
+      // 太さの選択肢を、そのフォントが持っている太さで作り直す。inherit は「全体と同じ」を付けるときの表示
+      function fillWeights(sel, font, value, inherit) {
+        sel.length = 0;
+        if (inherit) sel.add(new Option(inherit, '@inherit'));
+        for (const [v, label] of weightOpts(font)) sel.add(new Option(label, v));
+        sel.value = value === '@inherit' ? '@inherit' : nearestW(font, value);
+      }
+      // 追加したフォント：全体のフォントの選択肢と、一覧を作り直す
+      function refreshFonts() {
+        const sel = inputs.font.wrap.querySelector('select');
+        sel.length = 0;
+        for (const [v, label] of fontOpts()) sel.add(new Option(label, v));
+        sel.value = S.font;
+        const list = $('ufont-list');
+        list.innerHTML = S.userFonts.length ? '' : '<div class="row-empty">まだありません</div>';
+        for (const name of S.userFonts) {
+          const row = document.createElement('div');
+          row.className = 'row-item';
+          row.innerHTML = '<span class="nm"></span><button class="btn btn-sm btn-danger" type="button">外す</button>';
+          row.querySelector('.nm').textContent = name;
+          row.querySelector('.nm').style.fontFamily = `"${name}", sans-serif`;
+          row.querySelector('button').onclick = () => {
+            const key = 'u:' + name;
+            S.userFonts = S.userFonts.filter(n => n !== name);
+            if (S.font === key) S.font = 'Zen Maru Gothic';
+            if (S.titleFont === key) S.titleFont = '@inherit';
+            if (S.subFont === key) S.subFont = '@inherit';
+            for (const e of S.extras) if (e.font === key) e.font = '@inherit';
+            syncUI(); renderExtras(); redraw();
+          };
+          list.appendChild(row);
         }
+      }
+      $('ufont-add').addEventListener('click', async () => {
+        const name = cleanFont($('ufont-name').value);
+        if (!name) return;
+        if (S.userFonts.includes(name) || BASE_FONTS.some(f => f[0] === name)) { toast('そのフォントはもう選べます'); return; }
+        if (S.userFonts.length >= 20) { toast('追加できるのは20個までです'); return; }
+        const btn = $('ufont-add');
+        btn.disabled = true;
+        try {
+          if (!fontAvail(name) && gfontUrl(name)) {
+            await cssOnce(gfontUrl(name));
+            try { await document.fonts.load(`400 40px "${name}"`, 'あA'); } catch (e) { /* ignore */ }
+          }
+          if (!fontAvail(name)) { toast(`「${name}」は見つかりませんでした（PCに入っているか、Google Fonts の名前か確かめてください）`); return; }
+          S.userFonts = [...S.userFonts, name];
+          $('ufont-name').value = '';
+          refreshFonts(); renderExtras(); redraw();
+          toast(`「${name}」を追加しました。フォントの選択に出ます`);
+        } finally { btn.disabled = false; }
+      });
+      $('ufont-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('ufont-add').click(); });
+      let weightUis = [];
+      function refreshWeights() {
+        fillWeights(inputs.weight.wrap.querySelector('select'), S.font, S.weight);
+        weightUis.forEach(f => f());
+      }
+      function fontRow(row, get, set) {
+        const fSel = row.querySelector('.extra-font [data-k="font"]'), wSel = row.querySelector('.extra-font [data-k="weight"]');
+        fSel.add(new Option('フォント：全体と同じ', '@inherit'));
+        for (const [v, label] of fontOpts()) fSel.add(new Option(label, v));
+        fSel.value = get('font');
+        const wUi = () => fillWeights(wSel, get('font') === '@inherit' ? S.font : get('font'), get('weight'), '太さ：全体と同じ');
+        wUi();
+        weightUis.push(wUi);
+        fSel.onchange = () => { set('font', fSel.value); wUi(); };
+        wSel.onchange = () => set('weight', wSel.value);
       }
       function hookRow(row, id) {
         row.dataset.id = id;
@@ -3550,6 +3700,7 @@
         renderExtras(); redraw();
       }
       function renderExtras() {
+        weightUis = [];
         const list = $('extra-list');
         list.innerHTML = '';
         for (const k in extraInputs) delete extraInputs[k];
