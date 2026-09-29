@@ -1105,6 +1105,7 @@
     }
 
     .ec-stage {
+      position: relative;
       background: #140810;
       padding: 14px;
       display: grid;
@@ -1120,16 +1121,27 @@
       box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
     }
 
-    .mini-row {
-      display: flex;
-      align-items: flex-end;
-      gap: 12px;
-      padding: 0 14px 14px;
-      font-size: 11.5px;
+    /* 小さく見る：プレビューの左下に、一覧で出るくらいの大きさで重ねる */
+    .mini-pop {
+      position: absolute;
+      left: 22px;
+      bottom: 22px;
+      padding: 8px 10px 10px;
+      border-radius: 10px;
+      background: rgba(20, 8, 16, 0.92);
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      font-size: 11px;
       color: var(--muted);
     }
 
-    #mini {
+    .mini-pop[hidden] {
+      display: none;
+    }
+
+    .mini-pop canvas {
+      display: block;
+      margin-top: 6px;
       border-radius: 4px;
     }
 
@@ -1347,10 +1359,29 @@
 
     .extra-text {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 36px auto 36px;
+      grid-template-columns: 36px minmax(0, 1fr) 36px;
       gap: 6px;
       align-items: center;
       padding-top: 8px;
+    }
+
+    .extra-text textarea {
+      grid-column: 1 / -1;
+      width: 100%;
+      min-height: 44px;
+      resize: vertical;
+      font: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 6px 10px;
+    }
+
+    .extra-text textarea:focus {
+      outline: none;
+      border-color: var(--accent);
     }
 
     .extra-text input[type=color] {
@@ -1566,16 +1597,14 @@
         <div class="panel-head">
           <span>プレビュー <span class="out-meta" id="size-meta"></span></span>
           <div class="undo-row">
+            <button class="btn btn-sm" type="button" id="btn-mini" aria-pressed="false" title="一覧などで小さく表示されたときの見え方を確かめます">🔍 小さく見る</button>
             <button class="btn btn-sm" type="button" id="btn-undo" title="元に戻す（Ctrl+Z）">↶ 戻す</button>
             <button class="btn btn-sm" type="button" id="btn-redo" title="やり直す（Ctrl+Y）">↷ やり直す</button>
           </div>
         </div>
         <div class="ec-stage" id="ec-stage">
           <canvas id="cv" width="1280" height="720" aria-label="アイキャッチのプレビュー"></canvas>
-        </div>
-        <div class="mini-row">
-          <span>一覧などで小さく出たとき：</span>
-          <canvas id="mini" width="160" height="90"></canvas>
+          <div class="mini-pop" id="mini-pop" hidden>一覧などで小さく出たとき<canvas id="mini" width="160" height="90"></canvas></div>
         </div>
         <div class="save-row">
           <input type="text" id="file-name" spellcheck="false" aria-label="ファイル名">
@@ -1606,7 +1635,7 @@
         <h2>💡 ヒント・注意点</h2>
         <ul class="notes">
           <li>選んだ画像は、このブラウザの中だけで使います。サーバーには送信しません。</li>
-          <li>ブログやSNSの一覧では、画像がかなり小さく表示されます。プレビューの下の「小さく出たとき」で、文字が読めるか確かめてください。</li>
+          <li>ブログやSNSの一覧では、画像がかなり小さく表示されます。プレビューの右上の「🔍 小さく見る」で、文字が読めるか確かめてください。</li>
           <li>JPG のほうがファイルが軽くなります。背景を透明にしたいときだけ PNG を使ってください（背景の「なし（透明）」）。</li>
           <li>縦長や正方形では、上に文字・下に画像の縦並びになります。</li>
           <li>作った画像は、ブログ・動画・配信の告知など、自由に使ってかまいません。ただし、<b>うさぎのキャラクター</b>は どんまうんど のデザインです。作った画像の中で使うのはかまいませんが、切り出して素材として使ったり、再配布したりしないでください。</li>
@@ -1664,7 +1693,7 @@
         custom: [0, 0, '自由に入力'],
       };
       const DEFAULTS = {
-        title: 'タイトルを\n入力してね', sub: '',
+        title: 'タイトルを\n入力してね', sub: 'サブタイトル',
         size: 'yt', customW: 1280, customH: 720,
         font: 'Zen Maru Gothic', fontCustom: '', weight: '900',
         titleColor: '#ff7fa0', hlColor: '#f0325a', hlScale: 1.15, subColor: '#6e3551', shadow: true,
@@ -1716,7 +1745,7 @@
             rot: +e.rot >= -180 && +e.rot <= 180 ? +e.rot : 0,
           };
           if (base.type === 'text') Object.assign(base, {
-            text: typeof e.text === 'string' ? e.text.slice(0, 100) : 'テキスト', color: hex(e.color, '#ff7fa0'),
+            text: typeof e.text === 'string' ? e.text.slice(0, 300) : 'テキスト', color: hex(e.color, '#ff7fa0'),
             box: ['none', 'pill', 'round'].includes(e.box) ? e.box : 'none', boxColor: hex(e.boxColor, '#ff7fa0'),
             strokeOn: e.strokeOn !== false, strokeW: +e.strokeW >= 1 && +e.strokeW <= 40 ? +e.strokeW : 11, strokeColor: hex(e.strokeColor, '#ffffff'),
             font: typeof e.font === 'string' ? e.font : '@inherit', weight: typeof e.weight === 'string' ? e.weight : '@inherit',
@@ -2255,11 +2284,15 @@
         const drawExtra = e => {
           const cx = e.x / 100 * W, cy = e.y / 100 * H;
           if (e.type === 'text') {
-            if (!e.text) return;
-            const f = 64 * k * e.scale, boxedT = e.box !== 'none';
+            if (!e.text.trim()) return;
+            // 複数行：行ごとに真ん中そろえ。形はいちばん長い行と行数に合わせる
+            const tLines = e.text.replace(/\s+$/, '').split('\n');
+            const f = 64 * k * e.scale, boxedT = e.box !== 'none', tlh = f * 1.2;
             c.font = fontOf(e, f);
             const eStroke = e.strokeOn ? e.strokeW * k : 0;
-            const w = c.measureText(e.text).width + (boxedT ? f * 1.3 : eStroke), h = f * (boxedT ? 1.55 : 1.3);
+            const w = Math.max(...tLines.map(l => c.measureText(l).width)) + (boxedT ? f * 1.3 : eStroke);
+            const h = tlh * (tLines.length - 1) + f * (boxedT ? 1.55 : 1.3);
+            const lineY = i => (i - (tLines.length - 1) / 2) * tlh;
             c.save();
             c.translate(cx, cy);
             c.rotate((e.rot || 0) * Math.PI / 180);
@@ -2273,9 +2306,9 @@
               c.restore();
               const keepShadow = S.shadow;
               S.shadow = false;
-              text(c, e.text, 0, f * 0.03, f, e.color, 0, '#ffffff', e);
+              tLines.forEach((l, i) => text(c, l, 0, lineY(i) + f * 0.03, f, e.color, 0, '#ffffff', e));
               S.shadow = keepShadow;
-            } else text(c, e.text, 0, 0, f, e.color, eStroke, e.strokeColor, e);
+            } else tLines.forEach((l, i) => text(c, l, 0, lineY(i), f, e.color, eStroke, e.strokeColor, e));
             c.restore();
             extras.push({ id: e.id, x: cx - w / 2, y: cy - h / 2, w, h });
             return;
@@ -2607,6 +2640,11 @@
       //  プレビュー・保存
       // =====================================================
       const cv = $('cv'), mini = $('mini');
+      $('btn-mini').addEventListener('click', () => {
+        const on = $('mini-pop').hidden;
+        $('mini-pop').hidden = !on;
+        $('btn-mini').setAttribute('aria-pressed', String(on));
+      });
       let nameTouched = false;
       const defaultName = () => {
         const t = S.title.split('\n').join('').trim().slice(0, 30) || 'image';
@@ -2949,7 +2987,7 @@
           if (ex.type === 'text') {
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="color:${ex.color}">Aa</span><span class="nm">文字${pos}</span>`
               + orderBtns(rank, n) + `<button class="btn btn-sm" type="button" data-a="center">真ん中へ</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`
-              + '<div class="extra-text"><input type="text" maxlength="100" aria-label="文字" spellcheck="false">'
+              + '<div class="extra-text"><textarea maxlength="300" rows="2" aria-label="文字（Enter で改行）" placeholder="Enter で改行できます" spellcheck="false"></textarea>'
               + '<input type="color" aria-label="文字の色" title="文字の色">'
               + '<select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option></select>'
               + '<input type="color" aria-label="形の色" title="形の色" data-k="boxColor"></div>'
@@ -2957,7 +2995,7 @@
               + '<div class="extra-stroke"><label class="toggle"><span>縁取り</span><input type="checkbox"><span class="sw"></span></label>'
               + '<input type="color" aria-label="縁取りの色" title="縁取りの色"><input type="range" min="1" max="40" step="1" aria-label="縁取りの太さ" title="縁取りの太さ"><span class="field-val"></span></div>'
               + '<div class="extra-bars"></div>';
-            const [tIn, cIn] = row.querySelectorAll('.extra-text input');
+            const tIn = row.querySelector('.extra-text textarea'), cIn = row.querySelector('.extra-text input[type=color]:not([data-k])');
             for (const [key, opts] of [['font', LAYER_FONTS], ['weight', LAYER_WEIGHTS]]) {
               const sel = row.querySelector(`.extra-font [data-k="${key}"]`);
               for (const [v, label] of opts) sel.add(new Option(key === 'font' ? label : (v === '@inherit' ? '太さ：全体と同じ' : label), v));
@@ -3068,7 +3106,7 @@
         S.extras.push({ id, type: 'text', text: 'テキスト', color: S.titleColor, box: 'none', boxColor: '#ff7fa0', strokeOn: true, strokeW: 11, strokeColor: '#ffffff', font: '@inherit', weight: '@inherit', x: 50, y: 18 + (n % 4) * 8, scale: 0.8, rot: 0 });
         S.order.push(id);
         renderExtras(); redraw();
-        const inp = $('extra-list').querySelector(`[data-id="${id}"] .extra-text input`);
+        const inp = $('extra-list').querySelector(`[data-id="${id}"] .extra-text textarea`);
         if (inp) { inp.focus(); inp.select(); }
       });
       $('extra-file').addEventListener('change', async e => {
