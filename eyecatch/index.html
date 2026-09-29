@@ -1234,19 +1234,25 @@
 
     .extra-head {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
+      gap: 6px 8px;
       font-size: 13px;
     }
 
     .extra-head .nm {
       flex: 1;
       font-weight: 700;
+      white-space: nowrap;
     }
 
     .extra-head .img-thumb {
       width: 36px;
       height: 36px;
+    }
+
+    .extra-behind {
+      padding: 6px 0 0;
     }
 
     .extra-bars {
@@ -1358,13 +1364,17 @@
         <div class="fields">
           <div class="field field-full" id="img-upload">
             <span class="field-label"><span>横に置く画像（キャラ・写真・アイコンなど）</span></span>
-            <div class="img-pick">
-              <span class="img-thumb" id="img-thumb"></span>
-              <button class="btn btn-sm" type="button" id="img-pick">📁 画像を選ぶ</button>
-              <button class="btn btn-sm" type="button" id="img-clear">サンプルに戻す</button>
-              <input type="file" id="img-file" accept="image/*" hidden>
+            <div class="extra-item">
+              <div class="extra-head">
+                <span class="img-thumb" id="img-thumb"></span><span class="nm">画像 1</span>
+                <button class="btn btn-sm" type="button" id="img-pick">📁 画像を選ぶ</button>
+                <button class="btn btn-sm" type="button" id="img-clear">サンプルに戻す</button>
+                <button class="btn btn-sm" type="button" id="img-center" title="ずらした位置を元に戻します">位置を戻す</button>
+                <input type="file" id="img-file" accept="image/*" hidden>
+              </div>
+              <div class="extra-bars" id="img-bars"></div>
             </div>
-            <div class="field-note">背景が透明な PNG・WebP だと、柄の上にきれいに乗ります。選ばないときは、下の「画像を選ばないときのサンプル」で選んだもの（ハート・星など）が入ります。</div>
+            <div class="field-note">背景が透明な PNG・WebP だと、柄の上にきれいに乗ります。選ばないときは、下の「画像を選ばないときのサンプル」で選んだもの（ハート・星など）が入ります。プレビューの画像はドラッグしても動かせます。</div>
           </div>
           <div class="field field-full" id="extra-upload">
             <span class="field-label"><span>追加の画像（アイコン・スタンプなど。いくつでも）</span></span>
@@ -1373,7 +1383,7 @@
               <button class="btn btn-sm" type="button" id="extra-add">＋ 画像を追加</button>
               <input type="file" id="extra-file" accept="image/*" hidden>
             </div>
-            <div class="field-note">追加した画像は、プレビューでドラッグして好きな場所に置けます。</div>
+            <div class="field-note">追加した画像は、プレビューでドラッグして好きな場所に置けます。重なりは「前へ」「後ろへ」で入れ替えられます（1枚目の画像はいちばん下）。</div>
           </div>
         </div>
       </div>
@@ -1519,7 +1529,7 @@
         textScale: 1, textAlign: 'center', textX: 0, textY: 0,
         titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
         extras: [],
-        imgPos: 'left', imgAnchor: 'auto', imgScale: 1, imgX: 0, imgY: 0, sample: 'heart',
+        imgPos: 'left', imgAnchor: 'auto', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart',
         subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subArc: 0, subGap: 0,
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
         bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
@@ -1544,6 +1554,7 @@
           id: e.id, x: +e.x >= -20 && +e.x <= 120 ? +e.x : 50, y: +e.y >= -20 && +e.y <= 120 ? +e.y : 50,
           scale: +e.scale >= 0.05 && +e.scale <= 5 ? +e.scale : 1,
           rot: +e.rot >= -180 && +e.rot <= 180 ? +e.rot : 0,
+          behind: e.behind === true,
         })) : [];
         if (out.bg === 'usagi') out.bg = 'dots';
         out.customW = Math.round(Math.min(4000, Math.max(200, out.customW)));
@@ -1593,10 +1604,7 @@
               k: 'imgPos', l: '画像の位置', t: 'select', o: [['left', '左'], ['right', '右'], ['top', '上（文字は下）'], ['bottom', '下（文字は上）'],
               ['center', '真ん中（文字の後ろ）'], ['none', '画像なし（文字だけ）']], note: '縦長・正方形で「左」「右」を選ぶと、下に置きます'
             },
-            { k: 'imgX', l: '左右にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', when: s => s.imgPos !== 'none', note: 'プレビューの画像をドラッグしても動かせます' },
-            { k: 'imgY', l: '上下にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', when: s => s.imgPos !== 'none' },
             { k: 'imgAnchor', l: '縦の位置', t: 'select', o: [['auto', 'おまかせ'], ['bottom', '下にそろえる（キャラの全身など）'], ['center', '真ん中']], when: s => s.imgPos === 'left' || s.imgPos === 'right' },
-            { k: 'imgScale', l: '画像の大きさ', t: 'range', min: 0.3, max: 1.6, step: 0.05, u: '倍', when: s => s.imgPos !== 'none' },
             { k: 'sample', l: '画像を選ばないときのサンプル', t: 'select', o: [['heart', 'ハート'], ['star', '星'], ['bunny', 'うさぎ（どんまうんど）']], when: s => s.imgPos !== 'none' },
           ]
         },
@@ -1755,6 +1763,19 @@
         }
         // 「まとめて作る」はいちばん下に
         $('settings').appendChild($('batch-sec'));
+        // 1枚目の画像のバー（追加の画像と同じ形）
+        for (const [k, label, min, max, step, u] of [
+          ['imgScale', '大きさ', 0.3, 1.6, 0.05, '倍'], ['imgX', '左右', -50, 50, 1, '%'],
+          ['imgY', '上下', -50, 50, 1, '%'], ['imgRot', '回転', -180, 180, 1, '°']]) {
+          const f = document.createElement('label');
+          f.className = 'extra-bar';
+          f.innerHTML = `<span class="field-label"><span>${label}</span><span class="field-val"></span></span><input type="range" min="${min}" max="${max}" step="${step}">`;
+          const r = f.querySelector('input'), val = f.querySelector('.field-val');
+          const set = v => { r.value = v; val.textContent = `${+(+v).toFixed(2)}${u}`; };
+          r.addEventListener('input', () => { set(r.value); update(k, parseFloat(r.value)); });
+          inputs[k] = { f: { k }, wrap: f, set, labelEl: f.querySelector('.field-label > span') };
+          $('img-bars').appendChild(f);
+        }
       }
       function refreshVisibility() {
         for (const k in inputs) {
@@ -1994,7 +2015,34 @@
           c.restore();
         }
         // 画像（座布団の上、文字の下）
-        if (pic) c.drawImage(side, pic.x, pic.y, pic.w, pic.h);
+        if (pic) {
+          c.save();
+          c.translate(pic.x + pic.w / 2, pic.y + pic.h / 2);
+          c.rotate(S.imgRot * Math.PI / 180);
+          c.drawImage(side, -pic.w / 2, -pic.h / 2, pic.w, pic.h);
+          c.restore();
+        }
+        // ---- 追加の画像（アイコン・スタンプなど）。位置は中心の %、大きさは短い辺の 30% が 1倍。
+        //      「文字の後ろ」のものはここ（1枚目の画像の上・文字の下）、それ以外は文字を描いたあと
+        const extras = [];
+        const drawExtras = behind => {
+          for (const e of S.extras) {
+            if (!!e.behind !== behind) continue;
+            const im = img.extras[e.id];
+            if (!im) continue;
+            const base = Math.min(W, H) * 0.3 * e.scale;
+            const r = Math.min(base / im.width, base / im.height);
+            const w = im.width * r, h = im.height * r;
+            const x = e.x / 100 * W - w / 2, yy = e.y / 100 * H - h / 2;
+            c.save();
+            c.translate(x + w / 2, yy + h / 2);
+            c.rotate((e.rot || 0) * Math.PI / 180);
+            c.drawImage(im, -w / 2, -h / 2, w, h);
+            c.restore();
+            extras.push({ id: e.id, x, y: yy, w, h, behind });
+          }
+        };
+        drawExtras(true);
         const plate = (x, y, w, h) => {
           if (!S.logoPlate) return;
           const pad = Math.max(8 * k, h * 0.2);
@@ -2107,22 +2155,8 @@
           c.restore();
         }
 
-        // ---- 追加の画像（アイコン・スタンプなど）。位置は中心の %、大きさは短い辺の 30% が 1倍
-        const extras = [];
-        for (const e of S.extras) {
-          const im = img.extras[e.id];
-          if (!im) continue;
-          const base = Math.min(W, H) * 0.3 * e.scale;
-          const r = Math.min(base / im.width, base / im.height);
-          const w = im.width * r, h = im.height * r;
-          const x = e.x / 100 * W - w / 2, yy = e.y / 100 * H - h / 2;
-          c.save();
-          c.translate(x + w / 2, yy + h / 2);
-          c.rotate((e.rot || 0) * Math.PI / 180);
-          c.drawImage(im, -w / 2, -h / 2, w, h);
-          c.restore();
-          extras.push({ id: e.id, x, y: yy, w, h });
-        }
+        // ---- 追加の画像のうち、文字より前のもの（あとの画像ほど上）
+        drawExtras(false);
         return { pic, text: textRect, extras };
       }
 
@@ -2361,6 +2395,11 @@
         $('img-thumb').style.backgroundImage = `url("${(img.side || sampleImg()).src}")`;
       }
       $('img-pick').addEventListener('click', () => $('img-file').click());
+      $('img-center').addEventListener('click', () => {
+        S.imgX = 0; S.imgY = 0; S.imgRot = 0;
+        ['imgX', 'imgY', 'imgRot'].forEach(k => inputs[k].set(0));
+        redraw();
+      });
       $('img-file').addEventListener('change', async e => {
         const f = e.target.files[0];
         e.target.value = '';
@@ -2431,8 +2470,11 @@
       };
       const inRect = (p, r) => r && p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
       function hitAt(p) {
-        for (let i = lastHit.extras.length - 1; i >= 0; i--) if (inRect(p, lastHit.extras[i])) return { kind: 'extra', id: lastHit.extras[i].id };
+        // つかむ順：文字より前の追加画像 → 文字 → 文字の後ろの追加画像 → 1枚目の画像
+        const ex = lastHit.extras;
+        for (let i = ex.length - 1; i >= 0; i--) if (!ex[i].behind && inRect(p, ex[i])) return { kind: 'extra', id: ex[i].id };
         if (inRect(p, lastHit.text)) return { kind: 'text' };
+        for (let i = ex.length - 1; i >= 0; i--) if (ex[i].behind && inRect(p, ex[i])) return { kind: 'extra', id: ex[i].id };
         if (inRect(p, lastHit.pic)) return { kind: 'pic' };
         return null;
       }
@@ -2492,7 +2534,10 @@
           const row = document.createElement('div');
           row.className = 'extra-item';
           row.innerHTML = `<div class="extra-head"><span class="img-thumb"></span><span class="nm">画像 ${i + 2}</span>`
+            + `<button class="btn btn-sm" type="button" data-a="up" title="重なりを1つ上に" ${i === S.extras.length - 1 ? 'disabled' : ''}>前へ</button>`
+            + `<button class="btn btn-sm" type="button" data-a="down" title="重なりを1つ下に" ${i === 0 ? 'disabled' : ''}>後ろへ</button>`
             + `<button class="btn btn-sm" type="button" data-a="center">真ん中へ</button><button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`
+            + `<label class="toggle extra-behind"><span>文字の後ろに置く</span><input type="checkbox" ${ex.behind ? 'checked' : ''}><span class="sw"></span></label>`
             + '<div class="extra-bars"></div>';
           const im = img.extras[ex.id];
           if (im) row.querySelector('.img-thumb').style.backgroundImage = `url("${im.src}")`;
@@ -2509,6 +2554,15 @@
             extraInputs[ex.id][key] = set;
             bars.appendChild(f);
           }
+          const move = d => {
+            const j = i + d;
+            if (j < 0 || j >= S.extras.length) return;
+            [S.extras[i], S.extras[j]] = [S.extras[j], S.extras[i]];
+            renderExtras(); redraw();
+          };
+          row.querySelector('[data-a="up"]').addEventListener('click', () => move(1));
+          row.querySelector('[data-a="down"]').addEventListener('click', () => move(-1));
+          row.querySelector('.extra-behind input').addEventListener('change', e => { ex.behind = e.target.checked; redraw(); });
           row.querySelector('[data-a="center"]').addEventListener('click', () => {
             ex.x = 50; ex.y = 50;
             extraInputs[ex.id].x(50); extraInputs[ex.id].y(50);
