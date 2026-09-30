@@ -221,6 +221,26 @@
       width: auto;
     }
 
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    footer .footer-menu a {
+      border-bottom: none;
+    }
+
     @media (max-width: 600px) {
       .topnav {
         padding: 0 16px;
@@ -238,6 +258,10 @@
       .footer-brand {
         flex-direction: column;
         text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
       }
     }
     /* /shared:header-footer */
@@ -1331,11 +1355,18 @@
     <div class="footer-inner">
       <div class="footer-brand">
         <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
-        <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+        </div>
       </div>
-      <span>
-        <a href="https://github.com/donnma777/tools" target="_blank" rel="noopener">GitHub</a>
-      </span>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
     </div>
   </footer>
   <!-- /shared:footer -->

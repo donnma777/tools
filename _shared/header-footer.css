@@ -142,6 +142,26 @@ footer a.footer-logo:hover {
   width: auto;
 }
 
+.footer-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.6;
+}
+
+/* donnma.com のメニュー */
+.footer-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+footer .footer-menu a {
+  border-bottom: none;
+}
+
 @media (max-width: 600px) {
   .topnav {
     padding: 0 16px;
@@ -159,5 +179,9 @@ footer a.footer-logo:hover {
   .footer-brand {
     flex-direction: column;
     text-align: center;
+  }
+
+  .footer-menu {
+    justify-content: center;
   }
 }
