@@ -244,12 +244,28 @@
         padding: 0 16px;
       }
 
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
       .topnav-back {
-        display: none;
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
       }
 
       .topnav-brand img {
         height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
       }
 
       .footer-inner,
@@ -260,6 +276,31 @@
 
       .footer-menu {
         justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
       }
     }
     /* /shared:header-footer */
@@ -959,7 +1000,7 @@
     <div class="topnav-inner">
       <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
       <div class="topnav-right">
-        <a class="topnav-back" href="../">← トップに戻る</a>
+        <a class="topnav-back" href="../">ツール一覧</a>
         <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
           <span class="topnav-site-dot"></span>
           donnma.com
