@@ -168,24 +168,6 @@
       flex-shrink: 0;
     }
 
-    /* スマホで開いたときだけ出すお知らせ */
-    .pc-notice {
-      display: none;
-      background: var(--accent-soft);
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-      font-size: 12.5px;
-      font-weight: 700;
-      line-height: 1.6;
-      padding: 10px 16px;
-      text-align: center;
-    }
-
-    @media (max-width: 760px) {
-      .pc-notice {
-        display: block;
-      }
-    }
 
     /* ── Hero（トップと同じうさぎ柄） ── */
     .hero {
@@ -1390,7 +1372,6 @@
 
     /* OBSのカスタムブラウザドック（?dock=1）：操作に要るものだけを出す */
     body.dock .topnav,
-    body.dock .pc-notice,
     body.dock .hero,
     body.dock .guide,
     body.dock .ad-wrap,
@@ -1460,7 +1441,6 @@
     </div>
   </nav>
 
-  <p class="pc-notice" role="note">PCでの利用がおすすめです（スマホでも回せますが、画面が狭く設定しにくいです）。</p>
 
   <!-- Hero -->
   <header class="hero">
@@ -1581,6 +1561,7 @@
           </div>
           <input type="text" id="copy-fallback" readonly hidden aria-label="コピーするURL">
           <p class="field-note" style="margin-top:10px">「ルーレット」はOBSの「ソース ＋ → ブラウザ」に貼り付けます（幅1080・高さ1080がおすすめ）。「操作パネル」はOBSのメニュー「ドック → カスタムブラウザドック」に貼り付けると、OBSの中で項目を直したり回したりできます。くわしくは下の「使い方」へ。</p>
+          <p class="field-note" style="margin-top:8px">※ OBSに入れる機能（ブラウザソース・ドック・OBS接続）は、PCのOBS Studio向けです。スマホでは、このページでそのまま使えます。</p>
         </div>
       </div>
 

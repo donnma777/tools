@@ -168,24 +168,6 @@
       flex-shrink: 0;
     }
 
-    /* スマホで開いたときだけ出すお知らせ */
-    .pc-notice {
-      display: none;
-      background: var(--accent-soft);
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-      font-size: 12.5px;
-      font-weight: 700;
-      line-height: 1.6;
-      padding: 10px 16px;
-      text-align: center;
-    }
-
-    @media (max-width: 760px) {
-      .pc-notice {
-        display: block;
-      }
-    }
 
     /* ── Hero（トップと同じうさぎ柄） ── */
     .hero {
@@ -1751,7 +1733,6 @@
     </div>
   </nav>
 
-  <p class="pc-notice" role="note">このツールはPCのOBSで使う前提です。スマホでは正しく表示されません。</p>
 
   <!-- Hero -->
   <header class="hero">
@@ -1829,6 +1810,7 @@
           </div>
           <input type="text" id="copy-fallback" readonly hidden aria-label="コピーするURL">
           <p class="field-note" style="margin-top:10px">上の3つは、OBSの「ソース ＋ → ブラウザ」に貼り付けます（幅1920・高さ1080）。「操作パネル」は、OBSのメニュー「ドック → カスタムブラウザドック」に貼り付けると、OBSの中で結果を入れられるようになり、そのまま配信画面に反映されます。くわしくは下の「使い方」へ。</p>
+          <p class="field-note" style="margin-top:8px">※ OBSに入れる機能（ブラウザソース・ドック・OBS接続）は、PCのOBS Studio向けです。スマホでは、このページでそのまま使えます。</p>
         </div>
       </div>
 
