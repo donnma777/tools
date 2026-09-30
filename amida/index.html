@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>あみだくじ | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="参加者と結果を入れるだけで作れる無料のあみだくじ。横線を足してから始めたり、結果を隠して1人ずつ開けたり、全員まとめて開けたりできます。ブラウザでそのまま使えて、OBSの配信画面にも出せます（ドックやChromeから操作、透過背景・効果音・画像保存に対応）。">
+  <meta property="og:title" content="あみだくじ | どんまうんど-Tools">
+  <meta property="og:description" content="ブラウザでそのまま使えて、OBSの配信画面にも出せる無料のあみだくじ。横線を足したり、1人ずつ開けたりできます。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/amida/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-tools.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="あみだくじ">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --code-bg: #1a0a14;
+      --code-text: #f3dbe5;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* ── Topnav ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    .topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* スマホで開いたときだけ出すお知らせ */
+    .pc-notice {
+      display: none;
+      background: var(--accent-soft);
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.6;
+      padding: 10px 16px;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .pc-notice {
+        display: block;
+      }
+    }
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    /* 下端をスカラップ（波）にして本文へつなぐ */
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 460px;
+      grid-template-areas: "settings side";
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings {
+      grid-area: settings;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .side {
+      grid-area: side;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: calc(100vh - 88px);
+      min-height: 560px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .kicker {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    /* platform switch */
+    .seg {
+      display: inline-flex;
+      padding: 3px;
+      gap: 3px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+
+    .seg button {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+      padding: 7px 18px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
+    .sc-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 0;
+    }
+
+    .sc-tabs button[aria-selected="true"] {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .seg button:hover {
+      color: var(--text);
+    }
+
+    .seg button[aria-checked="true"][data-platform="youtube"] {
+      background: #ff3b3b;
+      color: #fff;
+    }
+
+    .seg button[aria-checked="true"][data-platform="twitch"] {
+      background: #9147ff;
+      color: #fff;
+    }
+
+    [data-for][hidden],
+    details.sec[hidden] {
+      display: none;
+    }
+
+    .tw-out {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tw-out textarea {
+      width: 100%;
+      height: 52px;
+      resize: vertical;
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 11.5px;
+      color: var(--code-text);
+      background: var(--code-bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+      word-break: break-all;
+    }
+
+    /* presets */
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* テンプレートのブロック */
+    .preset-body {
+      padding: 14px 16px 16px;
+    }
+
+    .preset-count {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .chip-btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .chip-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: filter 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      border-color: var(--accent);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .btn-danger:hover {
+      border-color: #ff5a5a;
+      color: #ff8a8a;
+    }
+
+    .data-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    /* settings sections */
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 4px 20px;
+      padding: 12px 16px 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 0;
+      min-width: 0;
+    }
+
+    .field[hidden] {
+      display: none;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .field-val {
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 12px;
+      color: var(--accent-2);
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select,
+    input[type=text],
+    input[type=number],
+    input[type=password] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    select:focus,
+    input[type=text]:focus,
+    input[type=number]:focus,
+    input[type=password]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .color-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .color-row input[type=color] {
+      width: 40px;
+      height: 34px;
+      padding: 2px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .color-row input[type=text] {
+      font-family: ui-monospace, Consolas, monospace;
+      text-transform: lowercase;
+    }
+
+    /* toggle */
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle .sw {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--border-strong);
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .toggle .sw::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.15s;
+    }
+
+    .toggle input:checked+.sw {
+      background: var(--accent);
+    }
+
+    .toggle input:checked+.sw::after {
+      transform: translateX(18px);
+    }
+
+    .toggle input:focus-visible+.sw {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    /* preview */
+    .preview-panel {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .preview-tools {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .preview-tools select {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    /* テスト送信（プレビューの下。YouTube のチャット入力欄の位置） */
+    .test-bar {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 12px 10px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .test-tabs {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .test-label {
+      margin-right: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .test-tab {
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .test-tab:hover {
+      color: var(--text);
+    }
+
+    .test-tab[aria-selected="true"] {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .test-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-height: 26px;
+    }
+
+    .chip {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      line-height: 1.5;
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+    }
+
+    .test-free {
+      display: flex;
+      gap: 6px;
+    }
+
+    .test-free input {
+      flex: 1;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .test-free select {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    /* プレビューを大きく表示 */
+    body.preview-expanded {
+      overflow: hidden;
+    }
+
+    /* sticky の .side は重なり順が閉じるので、ヘッダー（z-index: 100）より手前に出す */
+    body.preview-expanded .side {
+      z-index: 400;
+    }
+
+    body.preview-expanded .preview-panel {
+      position: fixed;
+      inset: 24px;
+      z-index: 300;
+      box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.65);
+    }
+
+    .stage {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 240px;
+      overflow: hidden;
+    }
+
+    .stage iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: transparent;
+      color-scheme: normal;
+    }
+
+    .bg-checker {
+      background-color: #2a2a36;
+      background-image:
+        linear-gradient(45deg, #353544 25%, transparent 25%),
+        linear-gradient(-45deg, #353544 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #353544 75%),
+        linear-gradient(-45deg, transparent 75%, #353544 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    }
+
+    .bg-dark {
+      background: #111;
+    }
+
+    .bg-light {
+      background: #f2f2f2;
+    }
+
+    .bg-green {
+      background: #00b140;
+    }
+
+    .bg-game {
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255, 190, 90, 0.55), transparent 45%),
+        radial-gradient(circle at 70% 70%, rgba(80, 160, 255, 0.55), transparent 50%),
+        linear-gradient(160deg, #3b6d3a 0%, #7aa6c8 55%, #d9c7a0 100%);
+    }
+
+    /* output */
+    .output-panel {
+      flex: 0 0 auto;
+    }
+
+    .output-panel textarea {
+      display: block;
+      width: 100%;
+      height: 150px;
+      resize: vertical;
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: var(--code-text);
+      background: var(--code-bg);
+      border: 0;
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 0 0 14px 14px;
+    }
+
+    .output-panel textarea[hidden] {
+      display: none;
+    }
+
+    .output-panel textarea.react-out {
+      height: 90px;
+    }
+
+    .output-panel textarea:focus {
+      outline: none;
+    }
+
+    .out-meta {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .guide h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    code {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      word-break: break-all;
+    }
+
+    .url-tool {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .url-out {
+      display: flex;
+      gap: 8px;
+    }
+
+    .url-out input {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid #a03060;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      border-bottom: none;
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    @media (max-width: 1000px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "side" "settings";
+        padding: 40px 16px 40px;
+      }
+
+      .side {
+        position: static;
+        height: auto;
+        min-height: 0;
+      }
+
+      .stage {
+        height: 420px;
+        flex: none;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+      }
+
+      .guide {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      .topnav-back {
+        display: none;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .fields {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* ── あみだくじ用 ── */
+    /* ルーレット・トーナメント表メーカーと同じく、プレビューは設定の上に全幅で置く */
+    .am-top {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 24px 0;
+    }
+
+    .am-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: calc(100vh - 280px);
+      min-height: 300px;
+      overflow: hidden;
+    }
+
+    .am-stage iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: transparent;
+      color-scheme: normal;
+    }
+
+    .workspace {
+      padding-top: 24px;
+    }
+
+    .side {
+      position: static;
+      height: auto;
+      min-height: 0;
+    }
+
+    /* 大きく表示：プレビューを画面いっぱいにする（Esc で閉じる）。
+       .side はグリッドの子なので z-index が効き、共通の「.side を手前に出す」指定のままだとプレビューの上に重なる */
+    body.preview-expanded .side {
+      z-index: auto;
+    }
+
+    body.preview-expanded .am-top .preview-panel {
+      position: fixed;
+      inset: 24px;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.65);
+    }
+
+    body.preview-expanded .am-stage {
+      flex: 1 1 auto;
+      aspect-ratio: auto;
+      max-height: none;
+      min-height: 0;
+    }
+
+    .am-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 10px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .am-main {
+      font-size: 16px;
+      padding: 10px 22px;
+      border-radius: 999px;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      filter: none;
+    }
+
+    .am-status {
+      flex: 1;
+      min-width: 220px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .am-players {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 14px 12px;
+    }
+
+    .am-players:empty {
+      display: none;
+    }
+
+    .am-p {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-left: 5px solid var(--c);
+      border-radius: 8px;
+      padding: 5px 12px;
+      cursor: pointer;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .am-p:hover:not(:disabled) {
+      border-color: var(--c);
+      background: var(--accent-soft);
+    }
+
+    .am-p:disabled {
+      cursor: default;
+      color: var(--muted);
+    }
+
+    .am-p b {
+      color: var(--text);
+    }
+
+    .names-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    textarea.bulk {
+      width: 100%;
+      min-height: 200px;
+      resize: vertical;
+      font: inherit;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    textarea.bulk:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .items-body {
+      padding: 12px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sub-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--label);
+      margin-bottom: 6px;
+    }
+
+    .count-note.warn {
+      color: #ffc078;
+    }
+
+    .history {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 320px;
+      overflow-y: auto;
+      font-size: 13px;
+    }
+
+    .history li {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--surface-2);
+      border-left: 4px solid var(--c, transparent);
+    }
+
+    .history .nm {
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 45%;
+    }
+
+    .history .rs {
+      font-weight: 900;
+      color: var(--accent-2);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .history .wait {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .history-empty {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .url-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .url-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .obs-line {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .obs-state {
+      font-size: 13px;
+      font-weight: 700;
+      margin: 6px 0;
+    }
+
+    .obs-state.on {
+      color: #7ee0a1;
+    }
+
+    /* OBSのカスタムブラウザドック（?dock=1）：操作に要るものだけを出す */
+    body.dock .topnav,
+    body.dock .pc-notice,
+    body.dock .hero,
+    body.dock .guide,
+    body.dock .ad-wrap,
+    body.dock footer,
+    body.dock .no-dock {
+      display: none !important;
+    }
+
+    body.dock .workspace {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "side" "settings";
+      padding: 10px;
+      gap: 10px;
+    }
+
+    body.dock .am-top {
+      padding: 10px 10px 0;
+    }
+
+    body.dock .am-stage {
+      max-height: 50vh;
+      min-height: 0;
+    }
+
+    @media (max-width: 600px) {
+      .am-top {
+        padding: 32px 16px 0;
+      }
+
+      .names-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720"
+          height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">← トップに戻る</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <p class="pc-notice" role="note">PCでの利用がおすすめです（スマホでも使えますが、画面が狭く設定しにくいです）。</p>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>あみだくじ</h1>
+      <p>参加者と結果を入れるだけで、あみだくじを作れます。横線を足してから始めたり、結果を隠して1人ずつ開けたり、全員まとめて開けたり。ブラウザでそのまま使えるほか、OBSの配信画面にも出せます。順番決め・チーム分け・罰ゲームに。</p>
+    </div>
+  </header>
+
+  <div class="am-top">
+    <div class="panel preview-panel">
+      <div class="panel-head">
+        <span>プレビュー</span>
+        <div class="preview-tools">
+          <select id="stage-bg" aria-label="プレビュー背景">
+            <option value="checker">背景: 透過</option>
+            <option value="game">背景: ゲーム画面風</option>
+            <option value="dark">背景: 黒</option>
+            <option value="light">背景: 白</option>
+            <option value="green">背景: グリーンバック</option>
+          </select>
+          <button class="btn btn-sm" id="btn-mute" type="button" aria-pressed="false">🔊 プレビューの音</button>
+          <button class="btn btn-sm" id="btn-image" type="button" title="今のくじを 1920×1080 の PNG で保存します">🖼 画像で保存</button>
+          <button class="btn btn-sm" id="btn-expand" type="button" aria-pressed="false" title="プレビューを画面いっぱいに広げます（Esc で閉じる）">⛶ 大きく表示</button>
+          <button class="btn btn-sm no-dock" id="btn-tab" type="button" title="あみだくじだけを別のタブで開きます（画面共有など）">↗ 別タブで開く</button>
+        </div>
+      </div>
+      <div class="am-stage bg-checker" id="stage">
+        <iframe id="preview" title="あみだくじのプレビュー" allow="autoplay"></iframe>
+      </div>
+      <div class="am-bar">
+        <button class="btn btn-primary am-main" id="btn-main" type="button">🎲 くじを作る</button>
+        <button class="btn" id="btn-add" type="button">➕ 横線を1本足す</button>
+        <button class="btn" id="btn-restart" type="button">↺ 同じくじで最初から</button>
+        <button class="btn" id="btn-remake" type="button">🎲 作り直す</button>
+        <div class="am-status" id="am-status" role="status" aria-live="polite"></div>
+      </div>
+      <div class="am-players" id="am-players" aria-label="開ける人を選ぶ"></div>
+    </div>
+  </div>
+
+  <div class="workspace">
+
+    <!-- Settings column -->
+    <div class="settings" id="settings">
+      <div class="panel no-dock">
+        <div class="panel-body">
+          <div class="data-row" style="margin-top: 0;">
+            <button class="btn btn-sm" id="btn-save" type="button">💾 参加者と見た目をファイルに保存</button>
+            <button class="btn btn-sm" id="btn-load" type="button">📂 ファイルから復元</button>
+            <button class="btn btn-sm btn-danger" id="btn-reset" type="button">すべてリセット</button>
+            <input type="file" id="file-load" accept=".json,application/json" hidden>
+          </div>
+        </div>
+      </div>
+
+      <details class="sec" id="names-sec" open>
+        <summary><span class="sec-icon">📝</span>参加者と結果<span class="preset-count" id="names-count"></span></summary>
+        <div class="items-body">
+          <div class="field" style="padding:0">
+            <label class="field-label" for="a-title"><span>見出し（くじの上に出す文字。空欄でなし）</span></label>
+            <input type="text" id="a-title" maxlength="60" placeholder="例: 今日の順番決め">
+          </div>
+          <div class="names-grid">
+            <div>
+              <label class="sub-title" for="a-players" style="display:block">参加者（上に並ぶ名前。1行に1人・2〜20人）</label>
+              <textarea class="bulk" id="a-players" spellcheck="false" placeholder="Aさん&#10;Bさん&#10;Cさん"></textarea>
+            </div>
+            <div>
+              <label class="sub-title" for="a-prizes" style="display:block">結果（下に並ぶもの。1行に1つ）</label>
+              <textarea class="bulk" id="a-prizes" spellcheck="false" placeholder="当たり&#10;ハズレ&#10;ハズレ"></textarea>
+            </div>
+          </div>
+          <p class="field-note count-note" id="count-note" style="margin-top:-4px"></p>
+          <div>
+            <div class="sub-title">結果のサンプル（参加者の人数に合わせて入れます）</div>
+            <div class="preset-row" id="samples"></div>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec preset-sec" data-key="amida-presets">
+        <summary><span class="sec-icon">🎭</span>見た目のテンプレート<span class="preset-count"></span></summary>
+        <div class="preset-row preset-body" id="presets"></div>
+      </details>
+      <!-- sections are generated from SECTIONS below -->
+    </div>
+
+    <!-- Results + OBS column -->
+    <div class="side">
+
+      <div class="panel">
+        <div class="panel-head">
+          <span>結果</span>
+          <div class="preview-tools">
+            <button class="btn btn-sm" id="btn-copy-results" type="button" title="開いた結果を「名前 → 結果」の形でコピーします">📋 コピー</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <ol class="history" id="results"></ol>
+        </div>
+      </div>
+
+      <div class="panel no-dock">
+        <div class="panel-head"><span>OBSに入れる</span></div>
+        <div class="panel-body">
+          <div class="url-list">
+            <div class="url-item"><span>🪜 あみだくじ（ブラウザソース用）</span><button class="btn btn-sm btn-primary" type="button" data-copy="view">URLをコピー</button></div>
+            <div class="url-item"><span>🛠 操作パネル（カスタムブラウザドック用）</span><button class="btn btn-sm" type="button" data-copy="dock">URLをコピー</button></div>
+          </div>
+          <input type="text" id="copy-fallback" readonly hidden aria-label="コピーするURL">
+          <p class="field-note" style="margin-top:10px">「あみだくじ」はOBSの「ソース ＋ → ブラウザ」に貼り付けます（幅1920・高さ1080）。「操作パネル」はOBSのメニュー「ドック → カスタムブラウザドック」に貼り付けると、OBSの中でくじを作ったり開けたりできます。くわしくは下の「使い方」へ。</p>
+        </div>
+      </div>
+
+      <div class="panel no-dock">
+        <div class="panel-head"><span>OBS接続（Chromeから操作するとき）</span></div>
+        <div class="panel-body">
+          <p class="field-note" style="margin:0 0 10px">OBSの「ツール → WebSocketサーバー設定」で「WebSocketサーバーを有効にする」をオンにし、「接続情報を表示」のポートとパスワードを入れてください。同じPCのChromeで開けると、OBSのブラウザソースでも同じように開きます。ドックで操作するときは不要です。</p>
+          <div class="obs-line"><label for="obs-port">ポート</label><input type="text" id="obs-port" inputmode="numeric" placeholder="4455"></div>
+          <div class="obs-line"><label for="obs-password">パスワード</label><input type="password" id="obs-password" autocomplete="off" placeholder="認証なしなら空欄"></div>
+          <div class="obs-state" id="obs-state">● 未接続</div>
+          <div class="data-row" style="margin-top:0">
+            <button class="btn btn-sm btn-primary" id="obs-connect" type="button">🔌 接続</button>
+            <button class="btn btn-sm" id="obs-disconnect" type="button" style="display:none">切断</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <div class="panel">
+      <div class="panel-body">
+        <h2>🪜 あみだくじの流れ</h2>
+        <ol class="steps">
+          <li>左の「参加者と結果」に、上に並ぶ名前と、下に並ぶ結果を1行ずつ書きます（結果のサンプルも使えます）。</li>
+          <li><b>「🎲 くじを作る」</b> を押すと、横線が引かれます。結果は並びを混ぜて隠しておきます。</li>
+          <li>始める前に <b>「➕ 横線を1本足す」</b> を押したり、プレビューの <b>縦線と縦線の間をクリック</b> したりすると、横線を足せます。参加者やコメントの指示で足すと盛り上がります。</li>
+          <li>プレビューの <b>名前や結果の札をドラッグ</b> すると、2枚を入れ替えられます。結果の札は「？」で隠したまま入れ替わるので、配信で「どれにする？」と混ぜる演出にも使えます（開け始める前まで）。</li>
+          <li>プレビューの下の <b>名前</b>（またはプレビューの名前の札）を押すと、その人の線をたどって結果をめくります。<b>「🎉 全員まとめて開く」</b> なら、残りの人を順番に（または一斉に）開けます。</li>
+          <li>終わったら <b>「🖼 画像で保存」</b> で結果を画像にしたり、「結果」の <b>「📋 コピー」</b> でテキストにしたりできます。</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body">
+        <h2>🎥 OBSでの使い方</h2>
+        <ol class="steps">
+          <li>右の「OBSに入れる」で <b>あみだくじ</b> の「URLをコピー」を押し、OBSで <b>ソース ＋ → ブラウザ</b> を追加してURLに貼り付けます（幅 <code>1920</code>・高さ <code>1080</code>）。</li>
+          <li>同じく <b>操作パネル</b> の「URLをコピー」を押し、OBSのメニュー <b>ドック → カスタムブラウザドック</b> を開いて、ドック名（例: あみだくじ）とURLを入れて「適用」します。</li>
+          <li>ドックでくじを作ったり開けたりすると、配信画面のあみだくじも一緒に動きます。</li>
+          <li><b>Chromeで操作するとき</b>は、OBSの「ツール → WebSocketサーバー設定」でサーバーを有効にし、右の「OBS接続」にポートとパスワードを入れて「接続」を押します。</li>
+          <li>効果音を配信に乗せるときは、ブラウザソースのプロパティで <b>「オーディオをOBSで制御する」</b> にチェックを入れると、音量ミキサーで音量を調整できます。</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body">
+        <h2>💡 ヒント・注意点</h2>
+        <ul class="notes">
+          <li><b>公平さ</b>：「🪜 くじの作り方」の <b>結果の並びを混ぜる</b> がオンなら、くじを作るたびに結果の並びをランダムに混ぜます。横線をどう足しても、札をどう入れ替えても、だれがどれに当たるかは公平です。</li>
+          <li><b>横線を隠しておく</b> をオンにすると、自動で引いた横線に覆いをかけます（手で足した線だけ見えます）。紙のあみだくじのように、どこへ行くか分からないまま楽しめます。</li>
+          <li>横線を足したり札を入れ替えたりできるのは、だれかを開ける前までです。開け始めたあとに最初からやり直すときは <b>「↺ 同じくじで最初から」</b>、くじごと変えるときは <b>「🎲 作り直す」</b> を押します。</li>
+          <li>参加者の人数を変えると、くじは作り直しになります（名前や結果の文字を直すだけなら、そのままです）。</li>
+          <li>操作パネルでは <b>スペースキー</b> でも「くじを作る」「次の人を開ける」ができます。</li>
+          <li><b>OBSを使わないとき</b>は、プレビューの <b>「⛶ 大きく表示」</b> で画面いっぱいに広げて、画面共有や会場のモニターに映せます。<b>「↗ 別タブで開く」</b> ならあみだくじだけのタブを開けます（音は、そのタブを一度クリックすると鳴るようになります）。</li>
+          <li>OBSであみだくじのソースを選んで <b>「対話」</b> を開き、名前や縦線の間をクリックしたり、札をドラッグしたりしても操作できます。</li>
+          <li>参加者・結果・見た目は、このブラウザに自動で保存されます（OBSのドックとブラウザソースは同じ保存場所を使います）。別のPCに移すときは「ファイルに保存」を使ってください。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- AdSense -->
+  <div class="ad-wrap" style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      if (new URLSearchParams(location.search).get('dock') !== '1') (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929"
+            alt="どんまうんど" width="720" height="182"></a>
+        <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a
+            href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+      </div>
+      <span>
+        <a href="https://github.com/donnma777/tools" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- フォント一覧はチャットCSSジェネレーターと共通。chat-core.js / amida-core.js を変えたら v を上げる（view.html も） -->
+  <script src="../common/ask.js?v=20260929a"></script>
+  <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
+  <script src="amida-core.js?v=20260930b"></script>
+  <script>
+    (() => {
+      'use strict';
+      const C = window.ChatCore;
+      const K = window.AmidaCore;
+      const $ = id => document.getElementById(id);
+      const { DEFAULTS, sanitize, PALETTES } = K;
+      const dock = new URLSearchParams(location.search).get('dock') === '1';
+      if (dock) document.body.classList.add('dock');
+
+      // =====================================================
+      //  見た目の設定項目
+      // =====================================================
+      const SECTIONS = [
+        {
+          title: 'くじの作り方', icon: '🪜', fields: [
+            { k: 'rungs', l: '横線の多さ（縦線のすき間1つあたり）', t: 'range', min: 1, max: 8, step: 1, u: '本くらい', note: '「くじを作る」「作り直す」を押したときに使います' },
+            { k: 'shufflePrizes', l: '結果の並びを混ぜる', t: 'check', note: 'オンにすると、横線の引き方に関係なく公平になります（結果を隠すときはオンがおすすめ）' },
+            { k: 'hidePrizes', l: '結果を隠しておく（線が着いたらめくる）', t: 'check' },
+            { k: 'coverText', l: '隠している結果に出す文字', t: 'text', ph: '？', when: s => s.hidePrizes },
+            { k: 'hideRungs', l: '横線を隠しておく（手で足した線だけ見せる）', t: 'check' },
+            { k: 'hideColor', l: '横線を隠す覆いの色', t: 'color', when: s => s.hideRungs },
+            { k: 'clickAdd', l: '画面の縦線の間をクリックして横線を足せるようにする', t: 'check' },
+            { k: 'dragSwap', l: '名前・結果の札をドラッグで入れ替えられるようにする', t: 'check', note: '開け始める前まで使えます。結果の札は隠したまま入れ替わります' },
+          ]
+        },
+        {
+          title: '色・線', icon: '🎨', fields: [
+            { k: 'palette', l: 'たどる線の色（参加者ごと）', t: 'select', o: Object.entries(PALETTES).map(([v, p]) => [v, p.l]) },
+            { k: 'traceWidth', l: 'たどる線の太さ', t: 'range', min: 6, max: 30, step: 1, u: 'px' },
+            { k: 'lineColor', l: 'くじの線の色', t: 'color' },
+            { k: 'lineWidth', l: 'くじの線の太さ', t: 'range', min: 2, max: 16, step: 0.5, u: 'px' },
+            { k: 'panelOn', l: 'くじの後ろに板を敷く', t: 'check' },
+            { k: 'panelColor', l: '板の色', t: 'color', when: s => s.panelOn },
+            { k: 'panelAlpha', l: '板の不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.panelOn },
+            { k: 'nameBg', l: '名前の札の色', t: 'color' },
+            { k: 'nameColor', l: '名前の文字色', t: 'color' },
+            { k: 'prizeBg', l: '結果の札の色', t: 'color' },
+            { k: 'prizeColor', l: '結果の文字色', t: 'color' },
+            { k: 'coverBg', l: '隠している結果の札の色', t: 'color', when: s => s.hidePrizes },
+            { k: 'coverColor', l: '隠している結果の文字色', t: 'color', when: s => s.hidePrizes },
+          ]
+        },
+        {
+          title: '文字・見出し', icon: '🔤', fields: [
+            { k: 'font', l: 'フォント', t: 'select', o: C.FONTS.map(f => [f[0], f[1]]) },
+            { k: 'fontCustom', l: 'フォント名', t: 'text', ph: '例: メイリオ', when: s => s.font === '__custom' },
+            { k: 'weight', l: '文字の太さ', t: 'select', o: C.WEIGHTS },
+            { k: 'labelSize', l: '名前・結果の文字サイズ', t: 'range', min: 20, max: 72, step: 1, u: 'px', note: '長い名前は、札に収まるように自動で小さくなります' },
+            { k: 'titleSize', l: '見出しの文字サイズ', t: 'range', min: 24, max: 140, step: 2, u: 'px' },
+            { k: 'titleColor', l: '見出しの色', t: 'color' },
+            { k: 'titleEffect', l: '見出しの文字効果', t: 'select', o: [['none', 'なし'], ['outline', '縁取り'], ['shadow', '影'], ['glow', '発光（ネオン）']] },
+            { k: 'titleEffectColor', l: '縁取り・影の色', t: 'color', when: s => s.titleEffect !== 'none' },
+          ]
+        },
+        {
+          title: '結果の表示', icon: '🎉', fields: [
+            { k: 'resultOn', l: '線が着いたら結果を大きく出す', t: 'check', note: 'まとめて一斉に開いたときは出しません' },
+            { k: 'resultLabel', l: '結果の上の文字（空欄でなし）', t: 'text', ph: '🎉 結果', when: s => s.resultOn },
+            { k: 'resultSec', l: '結果を出しておく時間', t: 'range', min: 0, max: 20, step: 0.5, u: '秒', when: s => s.resultOn, note: '0 にすると、次に開けるまで出したままにします' },
+            { k: 'resultSize', l: '結果の文字サイズ', t: 'range', min: 32, max: 180, step: 2, u: 'px', when: s => s.resultOn },
+            { k: 'resultColor', l: '結果の文字色', t: 'color', when: s => s.resultOn },
+            { k: 'resultAccent', l: '枠と上の文字の色', t: 'color', when: s => s.resultOn },
+            { k: 'resultBg', l: '結果の背景色', t: 'color', when: s => s.resultOn },
+            { k: 'resultAlpha', l: '背景の不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.resultOn },
+          ]
+        },
+        {
+          title: '開き方・音', icon: '🎵', fields: [
+            { k: 'traceSec', l: '線をたどる時間（1人あたり）', t: 'range', min: 1, max: 12, step: 0.5, u: '秒' },
+            { k: 'openMode', l: 'まとめて開くとき', t: 'select', o: [['seq', '1人ずつ順番に'], ['all', '全員いっしょに']] },
+            { k: 'seqPause', l: '次の人までの間', t: 'range', min: 0, max: 5, step: 0.1, u: '秒', when: s => s.openMode === 'seq' },
+            { k: 'sound', l: '効果音を鳴らす', t: 'check' },
+            { k: 'volume', l: '音量', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.sound },
+          ]
+        },
+      ];
+
+      const PRESETS = [
+        ['ポップ', {}],
+        ['パステル', { palette: 'pastel', font: 'Mochiy Pop One', weight: '400', panelColor: '#fff5f8', panelAlpha: 0.9, lineColor: '#ff85a1', nameBg: '#ffffff', nameColor: '#ff5c8a', prizeBg: '#ffe066', prizeColor: '#6e3551', coverBg: '#ffb3c6', coverColor: '#ffffff', hideColor: '#ffc2d1', titleColor: '#ff85a1', titleEffectColor: '#ffffff', resultAccent: '#ff85a1' }],
+        ['ネオン', { palette: 'neon', font: 'Zen Kaku Gothic New', panelColor: '#140a24', panelAlpha: 0.85, lineColor: '#00e5ff', nameBg: '#1b1036', nameColor: '#00e5ff', prizeBg: '#ff2e88', prizeColor: '#ffffff', coverBg: '#2a1250', coverColor: '#ff2e88', hideColor: '#2a1250', titleEffect: 'glow', titleEffectColor: '#ff2e88', resultBg: '#140a24', resultAccent: '#00e5ff' }],
+        ['和風', { palette: 'wa', font: 'Shippori Mincho', weight: '800', panelColor: '#f5f0e1', panelAlpha: 0.95, lineColor: '#1b1410', nameBg: '#1b1410', nameColor: '#f5f0e1', prizeBg: '#b7282e', prizeColor: '#f5f0e1', coverBg: '#d9b777', coverColor: '#1b1410', hideColor: '#d9b777', titleColor: '#f5f0e1', titleEffect: 'shadow', titleEffectColor: '#1b1410', resultBg: '#1b1410', resultAccent: '#d9b777', resultLabel: '結果' }],
+        ['黒板', { palette: 'pastel', font: 'Yusei Magic', weight: '400', panelColor: '#1f3b2d', panelAlpha: 1, lineColor: '#f1f1e6', lineWidth: 5, nameBg: '#f1f1e6', nameColor: '#1f3b2d', prizeBg: '#ffe066', prizeColor: '#1f3b2d', coverBg: '#f1f1e6', coverColor: '#1f3b2d', hideColor: '#2f5a44', titleColor: '#f1f1e6', titleEffect: 'shadow', titleEffectColor: '#10251b', resultBg: '#1f3b2d', resultAccent: '#ffe066' }],
+        ['ビビッド', { palette: 'vivid', font: 'Dela Gothic One', weight: '400', panelColor: '#111111', panelAlpha: 0.85, lineColor: '#ffffff', nameBg: '#ffd43b', nameColor: '#111111', prizeBg: '#e03131', prizeColor: '#ffffff', coverBg: '#ffffff', coverColor: '#111111', hideColor: '#343a40', titleColor: '#ffd43b', resultAccent: '#ffd43b' }],
+      ];
+
+      const fill = (n, first, k, rest) => Array.from({ length: n }, (_, i) => (i < k ? first : rest));
+      const PRIZE_SAMPLES = [
+        ['当たり1つ', n => fill(n, '当たり', 1, 'ハズレ')],
+        ['当たり2つ', n => fill(n, '当たり', 2, 'ハズレ')],
+        ['順番（1番〜）', n => Array.from({ length: n }, (_, i) => `${i + 1}番`)],
+        ['罰ゲーム1つ', n => fill(n, '罰ゲーム', 1, 'セーフ')],
+        ['2チームに分ける', n => Array.from({ length: n }, (_, i) => (i % 2 ? 'Bチーム' : 'Aチーム'))],
+        ['役割', n => Array.from({ length: n }, (_, i) => ['リーダー', '司会', '買い出し', '片付け', '記録係', '応援'][i] || 'おやすみ')],
+      ];
+
+      // =====================================================
+      //  状態
+      // =====================================================
+      let { A, S } = K.loadStored();
+
+      const inputs = {};
+      function buildField(f) {
+        const wrap = document.createElement('div');
+        wrap.className = 'field';
+        const id = 'f-' + f.k;
+        let set;
+        if (f.t === 'check') {
+          wrap.innerHTML = `<label class="toggle" for="${id}"><span></span><input type="checkbox" id="${id}"><span class="sw"></span></label>`;
+          const el = wrap.querySelector('input');
+          el.addEventListener('change', () => update(f.k, el.checked));
+          set = v => { el.checked = v; };
+        } else if (f.t === 'range') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span><span class="field-val"></span></label>
+            <input type="range" id="${id}" min="${f.min}" max="${f.max}" step="${f.step}">`;
+          const el = wrap.querySelector('input'), val = wrap.querySelector('.field-val');
+          const show = v => { val.textContent = `${+(+v).toFixed(2)}${f.u}`; };
+          el.addEventListener('input', () => { show(el.value); update(f.k, parseFloat(el.value)); });
+          set = v => { el.value = v; show(v); };
+        } else if (f.t === 'select') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label><select id="${id}"></select>`;
+          const el = wrap.querySelector('select');
+          for (const [v, label] of f.o) el.add(new Option(label, v));
+          el.addEventListener('change', () => update(f.k, el.value));
+          set = v => { el.value = v; };
+        } else if (f.t === 'color') {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label>
+            <div class="color-row"><input type="color" id="${id}"><input type="text" maxlength="7" spellcheck="false"></div>`;
+          const [pick, hex] = wrap.querySelectorAll('input');
+          hex.setAttribute('aria-label', 'カラーコード');
+          pick.addEventListener('input', () => { hex.value = pick.value; update(f.k, pick.value); });
+          hex.addEventListener('input', () => {
+            let v = hex.value.trim();
+            if (!v.startsWith('#')) v = '#' + v;
+            if (/^#[0-9a-f]{6}$/i.test(v)) { pick.value = v.toLowerCase(); update(f.k, v.toLowerCase()); }
+          });
+          hex.addEventListener('blur', () => { hex.value = S[f.k]; });
+          set = v => { pick.value = v; hex.value = v; };
+        } else {
+          wrap.innerHTML = `<label class="field-label" for="${id}"><span></span></label><input type="text" id="${id}">`;
+          const el = wrap.querySelector('input');
+          el.placeholder = f.ph || '';
+          el.addEventListener('input', () => update(f.k, el.value));
+          set = v => { el.value = v; };
+        }
+        wrap.querySelector('label > span').textContent = f.l;
+        if (f.note) {
+          const n = document.createElement('div');
+          n.className = 'field-note';
+          n.textContent = f.note;
+          wrap.appendChild(n);
+        }
+        inputs[f.k] = { f, wrap, set };
+        return wrap;
+      }
+
+      function buildUI() {
+        for (const sec of SECTIONS) {
+          const det = document.createElement('details');
+          det.className = 'sec';
+          det.innerHTML = `<summary><span class="sec-icon">${sec.icon}</span>${sec.title}</summary>`;
+          const grid = document.createElement('div');
+          grid.className = 'fields';
+          for (const f of sec.fields) grid.appendChild(buildField(f));
+          det.appendChild(grid);
+          $('settings').appendChild(det);
+        }
+      }
+
+      const refreshVisibility = () => {
+        for (const k in inputs) {
+          const { f, wrap } = inputs[k];
+          wrap.hidden = f.when ? !f.when(S) : false;
+        }
+      };
+      function syncUI() {
+        for (const k in inputs) inputs[k].set(S[k]);
+        refreshVisibility();
+        $('a-title').value = A.title;
+        namesUi();
+        playUi();
+      }
+
+      let queued = false;
+      function update(k, v) {
+        S[k] = v;
+        refreshVisibility();
+        if (k === 'palette' || k === 'clickAdd' || k === 'dragSwap' || k === 'traceSec') playUi();
+        commitSoon();
+      }
+      function commitSoon() {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => { queued = false; commit(); });
+      }
+
+      // 保存して、プレビュー・OBSのドック／ブラウザソース・OBS接続に伝える
+      function commit(now) {
+        K.saveStored(A, S);
+        sendPreview();
+        if (now) obsPush(); else scheduleObsPush();
+      }
+
+      // =====================================================
+      //  確認：OBSのカスタムブラウザドックでは confirm() が出ないことがあるので、ページの中に出す（../common/ask.js）
+      // =====================================================
+      const ask = (msg, yes) => window.DonnmaAsk.ask(msg, { yes }).then(r => r === true);
+      const esc = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+      // =====================================================
+      //  参加者と結果
+      // =====================================================
+      function namesUi() {
+        // 入力中の欄は、中身が変わっていなければ書き換えない（カーソルが外れるので）
+        const same = (el, list) => K.parseLines(el.value).join('\n') === list.join('\n');
+        if (!same($('a-players'), A.players)) $('a-players').value = A.players.join('\n');
+        if (!same($('a-prizes'), A.prizes)) $('a-prizes').value = A.prizes.join('\n');
+        countUi();
+      }
+      function countUi() {
+        const n = A.players.length, m = A.prizes.length;
+        let note = `参加者 ${n}人・結果 ${m}個`, warn = false;
+        if (n < K.MIN_N) { note += '（参加者は2人以上入れてください）'; warn = true; }
+        else if (m < n) { note += `（結果が${n - m}個足りません。足りない分は「—」になります）`; warn = true; }
+        else if (m > n) { note += `（参加者より多い${m - n}個は使いません）`; warn = true; }
+        $('count-note').textContent = note;
+        $('count-note').classList.toggle('warn', warn);
+        $('names-count').textContent = `${n}人`;
+      }
+      $('a-title').addEventListener('input', e => { A.title = e.target.value.slice(0, 60); commitSoon(); });
+      $('a-players').addEventListener('input', e => {
+        const next = K.parseLines(e.target.value);
+        // 人数が変わったら、くじは作り直し（名前を直すだけなら、そのまま）
+        if (next.length !== A.players.length && A.board) {
+          A.board = null;
+          A.opens = [];
+          toast('人数が変わったので、くじを作り直してください');
+        }
+        A.players = next;
+        countUi(); playUi(); commitSoon();
+      });
+      $('a-prizes').addEventListener('input', e => {
+        A.prizes = K.parseLines(e.target.value);
+        countUi(); playUi(); commitSoon();
+      });
+      for (const [name, make] of PRIZE_SAMPLES) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip-btn';
+        b.textContent = name;
+        b.addEventListener('click', async () => {
+          if (A.prizes.some(x => x.trim()) && !await ask(`今の結果を「${name}」に入れ替えますか？`, '入れ替える')) return;
+          A.prizes = make(Math.max(K.MIN_N, A.players.length));
+          namesUi(); playUi(); commitSoon();
+          toast(`「${name}」を入れました`);
+        });
+        $('samples').appendChild(b);
+      }
+
+      // =====================================================
+      //  くじを作る・横線を足す・開ける
+      // =====================================================
+      function run(r) {
+        if (r.error) { toast(r.error); return false; }
+        A = r.A;
+        commit(true);
+        playUi();
+        return true;
+      }
+      async function doMake() {
+        if (A.opens.length && !await ask('新しいくじを作りますか？（今の結果は消えます）', '作る')) return;
+        run(K.makeBoard(A, S));
+      }
+      const doOpen = ps => run(K.open(A, S, ps));
+      $('btn-main').addEventListener('click', () => {
+        const ph = K.phase(A);
+        if (ph === 'setup' || ph === 'done') doMake();
+        else doOpen(K.unopened(A));
+      });
+      $('btn-add').addEventListener('click', () => run(K.addRandomRung(A)));
+      $('btn-remake').addEventListener('click', doMake);
+      $('btn-restart').addEventListener('click', async () => {
+        if (!await ask('同じくじで最初からやり直しますか？（開けた結果は閉じます）', 'やり直す')) return;
+        run({ A: { ...A, opens: [] } });
+      });
+      $('am-players').addEventListener('click', e => {
+        const b = e.target.closest('button[data-p]');
+        if (b && !b.disabled) doOpen([+b.dataset.p]);
+      });
+      // スペースキー：くじを作る／次の人を開ける（入力欄やボタンを操作しているときは除く）
+      addEventListener('keydown', e => {
+        if (e.code !== 'Space' || e.repeat || e.target.closest('input, textarea, select, button, summary')) return;
+        e.preventDefault();
+        const ph = K.phase(A);
+        if (ph === 'setup') doMake();
+        else if (ph === 'ready' || ph === 'open') doOpen(K.unopened(A).slice(0, 1));
+      });
+
+      // 開けた結果は、線をたどり終わってから出す（このページだけ先にネタバレしないように）
+      let playTimer = 0;
+      const arrived = e => Date.now() >= K.endOf(e, S);
+      function playUi() {
+        clearTimeout(playTimer);
+        const ph = K.phase(A);
+        const show = (id, on) => { $(id).style.display = on ? '' : 'none'; };
+        $('btn-main').textContent = { setup: '🎲 くじを作る', ready: '🎉 全員まとめて開く', open: '🎉 残りを全部開く', done: '🎲 新しいくじを作る' }[ph];
+        $('btn-main').disabled = ph === 'setup' && A.players.length < K.MIN_N;
+        show('btn-add', ph === 'ready');
+        show('btn-restart', ph === 'open' || ph === 'done');
+        show('btn-remake', ph === 'ready' || ph === 'open');
+        const left = K.unopened(A).length;
+        $('am-status').textContent = {
+          setup: A.players.length < K.MIN_N ? '参加者を2人以上入れてください' : '参加者と結果を入れたら「くじを作る」を押してください',
+          ready: '名前を押すと、その人の線をたどります' + (S.clickAdd ? '。縦線の間をクリックすると横線を足せます' : '') + (S.dragSwap ? '。札はドラッグで入れ替えられます' : ''),
+          open: `あと ${left}人。名前を押すと開けます`,
+          done: A.opens.every(arrived) ? '全員開きました！' : 'たどっています…',
+        }[ph];
+
+        const box = $('am-players');
+        box.innerHTML = A.board ? A.players.map((name, i) => {
+          const e = A.opens.find(o => o.p === i);
+          const res = e && arrived(e) ? ` → <b>${esc(K.resultOf(A, i) || '—')}</b>` : e ? ' …' : '';
+          return `<button class="am-p" type="button" data-p="${i}" style="--c:${K.pathColor(S, i)}" ${e ? 'disabled' : ''} title="${e ? '開けました' : 'この人を開ける'}">${esc(name)}${res}</button>`;
+        }).join('') : '';
+        resultsUi();
+        // たどり終わったら、もう一度出し直す
+        const next = A.opens.map(e => K.endOf(e, S)).filter(t => t > Date.now()).sort((a, b) => a - b)[0];
+        if (next) playTimer = setTimeout(playUi, next - Date.now() + 30);
+      }
+
+      function resultsUi() {
+        const list = A.opens.filter(arrived);
+        const wait = A.opens.length - list.length;
+        let html = list.map(e => `<li style="--c:${K.pathColor(S, e.p)}"><span class="nm">${esc(A.players[e.p])}</span>→<span class="rs">${esc(K.resultOf(A, e.p) || '—')}</span></li>`).join('');
+        if (wait) html += `<li><span class="wait">たどっています…（${wait}人）</span></li>`;
+        $('results').innerHTML = html || `<li class="history-empty" style="background:none">${A.board ? 'まだだれも開けていません' : 'くじを作ると、ここに結果が出ます'}</li>`;
+      }
+      $('btn-copy-results').addEventListener('click', async () => {
+        const list = A.opens.filter(arrived);
+        if (!list.length) { toast('まだ結果がありません'); return; }
+        const text = [A.title.trim(), ...list.map(e => `${A.players[e.p]} → ${K.resultOf(A, e.p) || '—'}`)].filter(Boolean).join('\n');
+        await copyText(text, $('copy-fallback'));
+        toast('結果をコピーしました');
+      });
+
+      // =====================================================
+      //  プレビュー（OBSに入れる view.html をそのまま使い、内容は postMessage で渡す）
+      // =====================================================
+      const frame = $('preview');
+      let frameReady = false;
+      // ドックではOBSのソースと音が重なるので、最初はプレビューの音を消しておく
+      let muted = dock;
+      function sendPreview() {
+        if (frameReady) frame.contentWindow.postMessage({ type: 'am-state', A, S: muted ? { ...S, sound: false } : S }, '*');
+      }
+      addEventListener('message', e => {
+        if (e.source !== frame.contentWindow || !e.data) return;
+        if (e.data.type === 'am-ready') { frameReady = true; sendPreview(); }
+        if (e.data.type === 'am-click' && e.data.hit) {
+          const h = e.data.hit;
+          if (h.kind === 'player') doOpen([h.p]);
+          else if (h.kind === 'gap') run(K.addRung(A, h.c, h.y));
+        }
+        // 札のドラッグで入れ替え（名前を入れ替えたら、参加者の欄も並べ直す）
+        if (e.data.type === 'am-swap' && run(K.swap(A, e.data.row, e.data.i, e.data.j))) namesUi();
+      });
+      frame.src = 'view.html?v=20260930b#preview=1';
+      $('stage-bg').addEventListener('change', e => { $('stage').className = 'am-stage bg-' + e.target.value; });
+      const muteUi = () => {
+        $('btn-mute').textContent = muted ? '🔇 プレビューの音' : '🔊 プレビューの音';
+        $('btn-mute').setAttribute('aria-pressed', String(muted));
+      };
+      $('btn-mute').addEventListener('click', () => { muted = !muted; muteUi(); sendPreview(); });
+      muteUi();
+
+      // 大きく表示（OBSを使わず、このページを画面共有したり、会場のモニターに映したりするとき）
+      function setExpanded(on) {
+        document.body.classList.toggle('preview-expanded', on);
+        $('btn-expand').textContent = on ? '✕ 閉じる' : '⛶ 大きく表示';
+        $('btn-expand').setAttribute('aria-pressed', String(on));
+      }
+      $('btn-expand').addEventListener('click', () => setExpanded(!document.body.classList.contains('preview-expanded')));
+      addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('preview-expanded')) setExpanded(false); });
+      // 別タブ：view.html をそのまま開く（このブラウザの保存場所を共有するので、ここで開けると一緒に動く）
+      $('btn-tab').addEventListener('click', () => {
+        const w = window.open(new URL('view.html#tab=1', location.href).href, 'donnma-amida-view');
+        toast(w ? '別タブで開きました。音は、そのタブを一度クリックすると鳴るようになります' : '新しいタブを開けませんでした。ブラウザでポップアップを許可してください');
+      });
+
+      // 画像で保存：表示ページと同じ描き方で、1920×1080 の PNG にする（板を敷かなければ背景は透明）
+      $('btn-image').addEventListener('click', async () => {
+        const cv = document.createElement('canvas');
+        cv.width = K.W;
+        cv.height = K.H;
+        await K.loadFont(S, A);
+        K.draw(cv.getContext('2d'), A, S);
+        cv.toBlob(blob => {
+          if (!blob) { toast('画像を作れませんでした'); return; }
+          downloadBlob('amida.png', blob);
+          toast('画像を保存しました');
+        }, 'image/png');
+      });
+
+      // 別の場所（OBSのドックや、ソースの「対話」でのクリック）で操作したら、読み直す
+      addEventListener('storage', e => {
+        if (e.key !== K.STORE_KEY) return;
+        ({ A, S } = K.loadStored());
+        syncUI();
+        sendPreview();
+        scheduleObsPush();
+      });
+
+      // =====================================================
+      //  ボタン類
+      // =====================================================
+      const toastEl = $('toast');
+      let toastTimer;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+      }
+      async function copyText(text, input) {
+        try { await navigator.clipboard.writeText(text); } catch (e) { input.value = text; input.hidden = false; input.select(); document.execCommand('copy'); }
+      }
+      function downloadBlob(name, blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+        const kind = b.dataset.copy;
+        const url = new URL({ view: 'view.html', dock: 'index.html?dock=1' }[kind], location.href).href;
+        await copyText(url, $('copy-fallback'));
+        toast({
+          view: 'コピーしました！OBSのブラウザソースに貼り付けてください（幅1920・高さ1080）',
+          dock: 'コピーしました！OBSのメニュー「ドック → カスタムブラウザドック」のURLに貼り付けてください',
+        }[kind]);
+      }));
+
+      for (const [name, p] of PRESETS) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip-btn';
+        b.textContent = name;
+        // くじの作り方・開き方・音・結果の時間はテンプレートで変えない
+        const keep = ['rungs', 'shufflePrizes', 'hidePrizes', 'hideRungs', 'clickAdd', 'dragSwap', 'coverText', 'labelSize', 'titleSize',
+          'traceSec', 'openMode', 'seqPause', 'sound', 'volume', 'resultOn', 'resultSec', 'resultSize'];
+        b.addEventListener('click', () => {
+          const next = { ...DEFAULTS, ...p };
+          for (const k of keep) next[k] = S[k];
+          S = sanitize(next);
+          syncUI(); commitSoon();
+          toast(`テンプレート「${name}」を適用しました`);
+        });
+        $('presets').appendChild(b);
+      }
+      document.querySelectorAll('.preset-sec').forEach(group => {
+        const key = 'donnma-amida-open-' + group.dataset.key;
+        group.querySelector('.preset-count').textContent = `${group.querySelectorAll('.chip-btn').length}種類`;
+        try { group.open = localStorage.getItem(key) !== '0'; } catch (e) { group.open = true; }
+        group.addEventListener('toggle', () => { try { localStorage.setItem(key, group.open ? '1' : '0'); } catch (e) { /* ignore */ } });
+      });
+
+      $('btn-save').addEventListener('click', () => {
+        const { title, players, prizes } = A;
+        const text = JSON.stringify({ tool: 'donnma-amida', version: 1, A: { title, players, prizes }, S }, null, 2);
+        downloadBlob('amida.json', new Blob([text], { type: 'application/json' }));
+      });
+      $('btn-load').addEventListener('click', () => $('file-load').click());
+      $('file-load').addEventListener('change', async e => {
+        const file = e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        try {
+          const data = JSON.parse(await file.text());
+          if (!data || (!data.A && !data.S)) throw new Error('bad');
+          // 読み込んだら、くじは作り直し
+          if (data.A) A = K.sanitizeA({ title: data.A.title, players: data.A.players, prizes: data.A.prizes });
+          if (data.S) S = sanitize(data.S);
+          syncUI(); commitSoon();
+          toast('参加者と見た目を復元しました');
+        } catch (err) {
+          toast('読み込めませんでした（ファイル形式を確認してください）');
+        }
+      });
+      $('btn-reset').addEventListener('click', async () => {
+        if (!await ask('参加者・結果・見た目をすべて初期値に戻しますか？', 'リセットする')) return;
+        A = K.sanitizeA(null); S = sanitize(null);
+        syncUI(); commitSoon();
+      });
+
+      // =====================================================
+      //  OBS接続（obs-websocket v5）：Chrome から操作するとき、内容を OBS のブラウザソースへ送る
+      //  obs-browser の emit_event で 'donnmaAmidaUpdate' を送り、view.html が受け取る
+      // =====================================================
+      const OBS_KEY = 'donnma-amida-obs-v1';
+      const obs = { ws: null, ready: false, nextId: 1, pending: new Map(), timer: 0 };
+      const loadObs = () => { try { return JSON.parse(localStorage.getItem(OBS_KEY) || 'null') || {}; } catch (e) { return {}; } };
+      function obsUi(text) {
+        $('obs-state').textContent = text || (obs.ready ? '● 接続中（開けるとOBSでも開きます）' : '● 未接続');
+        $('obs-state').classList.toggle('on', obs.ready);
+        // .btn の display 指定が hidden 属性より強いので、style で切り替える
+        $('obs-connect').style.display = obs.ready ? 'none' : '';
+        $('obs-disconnect').style.display = obs.ready ? '' : 'none';
+      }
+      async function authString(password, salt, challenge) {
+        const enc = new TextEncoder();
+        const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+        const secret = b64(await crypto.subtle.digest('SHA-256', enc.encode(password + salt)));
+        return b64(await crypto.subtle.digest('SHA-256', enc.encode(secret + challenge)));
+      }
+      function obsDisconnect() {
+        if (obs.ws) { const ws = obs.ws; obs.ws = null; obs.ready = false; ws.close(); }
+        obsUi();
+      }
+      function obsConnect(port, password) {
+        obsDisconnect();
+        return new Promise((resolve, reject) => {
+          let ws;
+          try { ws = new WebSocket(`ws://127.0.0.1:${port}`, 'obswebsocket.json'); } catch (e) { reject(new Error('接続先が正しくありません')); return; }
+          obs.ws = ws;
+          ws.onmessage = async (ev) => {
+            const msg = JSON.parse(ev.data);
+            if (msg.op === 0) {
+              const identify = { rpcVersion: 1, eventSubscriptions: 0 };
+              const auth = msg.d.authentication;
+              if (auth) {
+                if (!password) { reject(new Error('パスワードが必要です')); ws.close(); return; }
+                identify.authentication = await authString(password, auth.salt, auth.challenge);
+              }
+              ws.send(JSON.stringify({ op: 1, d: identify }));
+            } else if (msg.op === 2) {
+              obs.ready = true; obsUi(); resolve();
+            } else if (msg.op === 7) {
+              const p = obs.pending.get(msg.d.requestId);
+              if (!p) return;
+              obs.pending.delete(msg.d.requestId);
+              if (msg.d.requestStatus.result) p.resolve(); else p.reject(new Error(msg.d.requestStatus.comment || `エラー ${msg.d.requestStatus.code}`));
+            }
+          };
+          ws.onclose = (ev) => {
+            const was = obs.ready;
+            if (obs.ws === ws) { obs.ws = null; obs.ready = false; }
+            obs.pending.forEach(p => p.reject(new Error('切断されました')));
+            obs.pending.clear();
+            obsUi();
+            if (ev.code === 4009) reject(new Error('パスワードが違います'));
+            else if (!was) reject(new Error('OBSに接続できません（OBSが起動しているか、WebSocketサーバーが有効か確認してください）'));
+            else obsUi('● OBSとの接続が切れました');
+          };
+        });
+      }
+      function obsPush() {
+        if (!obs.ready) return;
+        clearTimeout(obs.timer);
+        const requestId = String(obs.nextId++);
+        obs.pending.set(requestId, { resolve() { }, reject(err) { obsUi('⚠️ 送れませんでした：' + err.message); } });
+        obs.ws.send(JSON.stringify({
+          op: 6, d: {
+            requestType: 'CallVendorRequest', requestId, requestData: {
+              vendorName: 'obs-browser', requestType: 'emit_event',
+              requestData: { event_name: 'donnmaAmidaUpdate', event_data: { A, S } },
+            }
+          }
+        }));
+      }
+      function scheduleObsPush() {
+        if (!obs.ready) return;
+        clearTimeout(obs.timer);
+        obs.timer = setTimeout(obsPush, 250);
+      }
+      async function connectFromUi(silent) {
+        const port = parseInt($('obs-port').value, 10) || 4455;
+        const password = $('obs-password').value;
+        obsUi('● 接続中…');
+        try {
+          await obsConnect(port, password);
+          try { localStorage.setItem(OBS_KEY, JSON.stringify({ port, password, auto: true })); } catch (e) { /* ignore */ }
+          obsPush();
+          if (!silent) toast('OBSに接続しました');
+        } catch (err) {
+          obsUi('⚠️ ' + err.message);
+        }
+      }
+      $('obs-connect').addEventListener('click', () => connectFromUi(false));
+      $('obs-disconnect').addEventListener('click', () => {
+        obsDisconnect();
+        try { localStorage.setItem(OBS_KEY, JSON.stringify({ ...loadObs(), auto: false })); } catch (e) { /* ignore */ }
+      });
+      {
+        const saved = loadObs();
+        $('obs-port').value = saved.port || 4455;
+        $('obs-password').value = saved.password || '';
+        // 前回つないでいたら自動で再接続（OBS のドックの中で開いているときはつながない）
+        if (saved.auto && !window.obsstudio && !dock) connectFromUi(true);
+      }
+
+      buildUI();
+      syncUI();
+    })();
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>あみだくじ</title>
+  <!-- OBSのブラウザソースで表示するページ（幅1920・高さ1080。ウィンドウの大きさに合わせて拡大・縮小する）。
+       くじと見た目は、編集ページがこのブラウザに保存したものを読む（OBS接続なら OBS へ送られてくる）。
+       OBSでソースを「対話」で開いて、名前をクリックすると開ける・縦線の間をクリックすると横線を足せる。
+       tab=1 は普通のブラウザのタブ向けに背景を暗くする -->
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; }
+    #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+    #cv { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+    #cv { touch-action: none; }
+    #cv.hot { cursor: pointer; }
+    #cv.grab { cursor: grab; }
+    #cv.grabbing { cursor: grabbing; }
+    .am-result {
+      position: absolute; left: 50%; top: 50%; width: max-content; max-width: 1400px; box-sizing: border-box;
+      padding: 26px 56px 32px; border-radius: 36px; text-align: center; pointer-events: none;
+      opacity: 0; transform: translate(-50%, -50%) scale(0.5);
+      transition: opacity 0.2s ease, transform 0.45s cubic-bezier(0.2, 1.6, 0.4, 1);
+    }
+    .am-result.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .am-result-label { font-size: 40px; line-height: 1.3; }
+    .am-result-label:empty { display: none; }
+    .am-result-name { line-height: 1.3; }
+    .am-result-text { line-height: 1.2; word-break: break-word; }
+    body.tab { background: #1a0a14; }
+  </style>
+  <style id="gen"></style>
+</head>
+
+<body>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div class="am-result" role="status"><div class="am-result-label"></div><div class="am-result-name"></div><div class="am-result-text"></div></div>
+  </div>
+
+  <script src="../chat-css-generator/chat-core.js?v=20260924g"></script>
+  <script src="amida-core.js?v=20260930b"></script>
+  <script>
+    (() => {
+      'use strict';
+      const K = window.AmidaCore;
+      const $ = s => document.querySelector(s);
+      const params = new URLSearchParams(location.hash.replace(/^#/, ''));
+      const preview = params.get('preview') === '1';
+      if (params.get('tab') === '1') document.body.classList.add('tab');
+      if (!preview) addEventListener('hashchange', () => location.reload());
+
+      let { A, S } = preview ? { A: K.sanitizeA(null), S: K.sanitize(null) } : K.loadStored();
+
+      // ---------------------------------------------------------------
+      //  大きさ：1920×1080 を、ウィンドウに収まるように拡大・縮小して真ん中に置く
+      // ---------------------------------------------------------------
+      const stage = $('#stage'), cv = $('#cv'), ctx = cv.getContext('2d');
+      let scale = 1, ox = 0, oy = 0, k = 1;
+      function fit() {
+        scale = Math.min(innerWidth / K.W, innerHeight / K.H) || 1;
+        ox = (innerWidth - K.W * scale) / 2;
+        oy = (innerHeight - K.H * scale) / 2;
+        stage.style.transform = `translate(${ox}px, ${oy}px) scale(${scale})`;
+        // canvas は表示される大きさの画素で描く（拡大してもぼやけないように）
+        k = scale * (devicePixelRatio || 1);
+        cv.width = Math.max(1, Math.round(K.W * k));
+        cv.height = Math.max(1, Math.round(K.H * k));
+        render();
+      }
+
+      // ---------------------------------------------------------------
+      //  演出の状態（開いたときにもうあったものは、演出なしで出来上がった絵にする）
+      // ---------------------------------------------------------------
+      const keyE = e => `${e.p}|${e.at}`, keyR = r => `${r.c}|${r.y}`;
+      const starts = new Map();     // 開け方 → 線をたどり始める時刻（performance.now 基準。-Infinity は演出なし）
+      const finished = new Set();
+      const corners = new Map();    // 開け方 → 通り過ぎた曲がり角の数（効果音用）
+      const rungT0 = new Map();     // 手で足した横線 → 伸び始めた時刻
+      let boardAt = 0, boardT0 = -Infinity;
+      let hover = null, drag = null;
+      // 入れ替わった札がすべる演出 { row, a, b, t0 }
+      let slides = [];
+      const SLIDE_MS = 450;
+
+      // 前の状態と比べて、札が2枚だけ入れ替わっていたら、すべる演出を流す
+      function detectSwap(prev, initial) {
+        if (initial || !prev) return;
+        const diff = (a, b) => {
+          if (!a || !b || a.length !== b.length) return null;
+          const d = a.map((v, i) => (v !== b[i] ? i : -1)).filter(i => i >= 0);
+          return d.length === 2 ? d : null;
+        };
+        const now = performance.now();
+        let d = diff(prev.players, A.players);
+        if (d) slides.push({ row: 'top', a: d[0], b: d[1], t0: now });
+        const pb = prev.board, nb = A.board;
+        d = pb && nb ? (pb.at === nb.at ? diff(pb.order, nb.order) : null) : !pb && !nb ? diff(prev.prizes, A.prizes) : null;
+        if (d) slides.push({ row: 'bottom', a: d[0], b: d[1], t0: now });
+        if (slides.length) swish();
+      }
+
+      function sync(initial) {
+        const b = A.board;
+        if (!b) { boardAt = 0; rungT0.clear(); }
+        else if (b.at !== boardAt) {
+          // くじを作り直したら、横線を左から順に伸ばす
+          boardAt = b.at;
+          rungT0.clear();
+          boardT0 = initial ? -Infinity : performance.now();
+          if (!initial) whoosh();
+        }
+        if (b) {
+          for (const r of b.rungs) {
+            if (!r.u || rungT0.has(keyR(r))) continue;
+            rungT0.set(keyR(r), initial ? -Infinity : performance.now());
+            if (!initial) pop();
+          }
+        }
+        const live = new Set(A.opens.map(keyE));
+        for (const key of [...starts.keys()]) {
+          if (!live.has(key)) { starts.delete(key); finished.delete(key); corners.delete(key); }
+        }
+        if (!A.opens.length) hideResult();
+        for (const e of A.opens) {
+          const key = keyE(e);
+          if (starts.has(key)) continue;
+          if (initial) { starts.set(key, -Infinity); finished.add(key); continue; }
+          // 届くのが遅れても、ほかの画面と同じ時刻にたどり終わるように
+          starts.set(key, performance.now() + (e.at + e.d - Date.now()));
+          corners.set(key, 0);
+          audio();
+        }
+      }
+
+      const POP_MS = 260, POP_STEP = 14;
+      const st = {
+        time(e) {
+          const s = starts.get(keyE(e));
+          if (s == null) return null;
+          if (s === -Infinity) return Infinity;
+          const t = (performance.now() - s) / 1000;
+          return t > 0 ? t : null;
+        },
+        pop(r, i) {
+          const t0 = r.u ? rungT0.get(keyR(r)) : boardT0 + i * POP_STEP;
+          if (t0 == null || t0 === -Infinity) return 1;
+          return (performance.now() - t0) / POP_MS;
+        },
+        get hover() { return hover; },
+        get drag() { return drag; },
+        slide(row, i) {
+          const s = slides.find(x => x.row === row && (x.a === i || x.b === i));
+          if (!s) return null;
+          const p = Math.min(1, (performance.now() - s.t0) / SLIDE_MS);
+          const e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+          const g = K.geom(A, S), other = i === s.a ? s.b : s.a;
+          // 片方は上を、もう片方は下を通って入れ替わる
+          return { dx: (g.x(other) - g.x(i)) * (1 - e), dy: (i === s.a ? -1 : 1) * Math.sin(Math.PI * e) * 36 };
+        },
+      };
+
+      function render() {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        ctx.setTransform(k, 0, 0, k, 0, 0);
+        K.draw(ctx, A, S, st);
+      }
+
+      // ---------------------------------------------------------------
+      //  音（WebAudio で鳴らす。OBSでは「オーディオをOBSで制御する」にすると音量を調整できる）
+      // ---------------------------------------------------------------
+      let ac = null, lastTick = 0, lastFan = 0;
+      function audio() {
+        if (!S.sound || S.volume <= 0) return null;
+        try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+        if (ac.state === 'suspended') ac.resume().catch(() => { });
+        return ac;
+      }
+      function tone(freq, start, len, vol, type) {
+        const a = ac, o = a.createOscillator(), g = a.createGain();
+        o.type = type; o.frequency.value = freq;
+        g.gain.setValueAtTime(0.0001, start);
+        g.gain.exponentialRampToValueAtTime(vol, start + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, start + len);
+        o.connect(g).connect(a.destination);
+        o.start(start); o.stop(start + len + 0.02);
+      }
+      function tick() {
+        const now = performance.now();
+        if (now - lastTick < 40 || !audio()) return;
+        lastTick = now;
+        tone(1300, ac.currentTime, 0.06, 0.2 * S.volume, 'triangle');
+      }
+      function pop() {
+        if (!audio()) return;
+        const t = ac.currentTime;
+        tone(660, t, 0.08, 0.2 * S.volume, 'sine');
+        tone(990, t + 0.05, 0.1, 0.18 * S.volume, 'sine');
+      }
+      function swish() {
+        if (!audio()) return;
+        const t = ac.currentTime;
+        tone(520, t, 0.07, 0.14 * S.volume, 'sine');
+        tone(780, t + 0.06, 0.08, 0.12 * S.volume, 'sine');
+      }
+      function whoosh() {
+        if (!audio()) return;
+        const t = ac.currentTime;
+        [392, 523.25, 659.25].forEach((f, i) => tone(f, t + i * 0.07, 0.12, 0.15 * S.volume, 'triangle'));
+      }
+      function fanfare() {
+        const now = performance.now();
+        if (now - lastFan < 300 || !audio()) return;   // 一斉に開いたときに重ならないように
+        lastFan = now;
+        const t = ac.currentTime + 0.02;
+        [523.25, 659.25, 783.99].forEach((f, i) => tone(f, t + i * 0.1, 0.18, 0.25 * S.volume, 'triangle'));
+        tone(1046.5, t + 0.3, 0.7, 0.3 * S.volume, 'triangle');
+        tone(1318.5, t + 0.3, 0.7, 0.12 * S.volume, 'sine');
+      }
+
+      // ---------------------------------------------------------------
+      //  結果の表示（一斉に開いたときは出さない）
+      // ---------------------------------------------------------------
+      let resultTimer = 0;
+      function showResult(e) {
+        if (!S.resultOn || e.m === 'all') return;
+        $('.am-result-label').textContent = S.resultLabel;
+        $('.am-result-name').textContent = A.players[e.p] || '';
+        $('.am-result-name').style.color = K.pathColor(S, e.p);
+        $('.am-result-text').textContent = K.resultOf(A, e.p) || '—';
+        $('.am-result').classList.add('show');
+        clearTimeout(resultTimer);
+        // 「0秒」なら次に開けるまで出したまま
+        if (S.resultSec > 0) resultTimer = setTimeout(hideResult, S.resultSec * 1000);
+      }
+      function hideResult() {
+        clearTimeout(resultTimer);
+        $('.am-result').classList.remove('show');
+      }
+
+      // ---------------------------------------------------------------
+      //  毎フレーム：演出が続いている間だけ描き直す
+      // ---------------------------------------------------------------
+      let raf = 0;
+      function loop() {
+        raf = 0;
+        const now = performance.now();
+        let busy = now - boardT0 < (A.board ? A.board.rungs.length : 0) * POP_STEP + POP_MS;
+        for (const t0 of rungT0.values()) if (now - t0 < POP_MS) busy = true;
+        slides = slides.filter(s => now - s.t0 < SLIDE_MS);
+        if (slides.length) busy = true;
+        for (const e of A.opens) {
+          const key = keyE(e), s = starts.get(key);
+          if (s == null || finished.has(key)) {
+            // めくる演出の間は描き続ける
+            if (s != null && s !== -Infinity && (now - s) / 1000 < S.traceSec + 0.4) busy = true;
+            continue;
+          }
+          busy = true;
+          const t = (now - s) / 1000;
+          if (t <= 0) continue;
+          if (corners.has(key)) {
+            // 曲がり角を通るたびに鳴らす
+            const kk = Math.min(1, t / S.traceSec);
+            const passed = K.tracePath(A, S, e.p).corners.filter(c => c <= kk).length;
+            if (passed > corners.get(key)) { corners.set(key, passed); tick(); }
+          }
+          if (t >= S.traceSec) {
+            finished.add(key);
+            fanfare();
+            showResult(e);
+          }
+        }
+        render();
+        if (busy) raf = requestAnimationFrame(loop);
+      }
+      const wake = () => { if (!raf) raf = requestAnimationFrame(loop); };
+
+      // ---------------------------------------------------------------
+      //  状態の受け取り
+      // ---------------------------------------------------------------
+      let cssKey = '', fontKey = '';
+      function apply(nextA, nextS, initial) {
+        const prev = A;
+        A = K.sanitizeA(nextA);
+        S = K.sanitize(nextS);
+        const css = K.generateCSS(S);
+        if (css !== cssKey) { $('#gen').textContent = css; cssKey = css; }
+        if (!S.resultOn) hideResult();
+        sync(initial);
+        detectSwap(prev, initial);
+        const fk = `${S.font}|${S.fontCustom}|${S.weight}|${A.title}|${A.players.join()}|${A.prizes.join()}|${S.coverText}`;
+        if (fk !== fontKey) { fontKey = fk; K.loadFont(S, A).then(render); }
+        hover = null;
+        wake();
+      }
+      document.fonts && document.fonts.addEventListener('loadingdone', () => render());
+
+      // マウス・タッチ：名前を押すと開ける、縦線の間を押すと横線を足せる、
+      //  名前・結果の札をドラッグすると入れ替えられる（OBSでソースを「対話」で開いたときや、別タブ）
+      const toBoard = e => {
+        const r = stage.getBoundingClientRect();
+        return [(e.clientX - r.left) / scale, (e.clientY - r.top) / scale];
+      };
+      function target(h) {
+        if (!h) return null;
+        if (h.kind === 'player') return A.board && !A.opens.some(o => o.p === h.p) ? h : null;
+        if (h.kind === 'gap') return S.clickAdd && !K.rungError(A, h.c, h.y) ? h : null;
+        return null;
+      }
+      const rowOf = h => (h.kind === 'player' ? 'top' : 'bottom');
+      const canDrag = h => !!h && (h.kind === 'player' || h.kind === 'prize') && S.dragSwap && !A.opens.length
+        && !(h.kind === 'prize' && !A.board && h.p >= A.prizes.length);
+      // 送り先：プレビューなら編集ページへ、それ以外はここで保存する（ドックの編集ページにも伝わる）
+      function act(msg, make) {
+        if (preview) { window.parent.postMessage(msg, '*'); return; }
+        const r = make();
+        if (r.error) return;
+        K.saveStored(r.A, S);
+        apply(r.A, S, false);
+      }
+      function setCursor(h) {
+        cv.classList.toggle('hot', !!target(h));
+        cv.classList.toggle('grab', !target(h) && canDrag(h));
+      }
+      cv.addEventListener('pointerdown', e => {
+        audio();   // ブラウザは、クリックしてからでないと音を出せない
+        const [x, y] = toBoard(e), h = K.hitTest(A, S, x, y);
+        if (!canDrag(h)) return;
+        drag = { row: rowOf(h), from: h.p, over: -1, x, y, sx: x, sy: y, moved: false };
+        try { cv.setPointerCapture(e.pointerId); } catch (err) { /* 指が離れていたら何もしない */ }
+      });
+      cv.addEventListener('pointermove', e => {
+        const [x, y] = toBoard(e), h = K.hitTest(A, S, x, y);
+        if (drag) {
+          if (!drag.moved && Math.hypot(x - drag.sx, y - drag.sy) < 8) return;
+          drag.moved = true;
+          drag.x = x;
+          drag.y = y;
+          // 同じ段のほかの札の上なら、そこへ落とせる（高さは少しずれていてもよい）
+          const g = K.geom(A, S), i = Math.round((x - g.x0) / g.colW - 0.5);
+          drag.over = i >= 0 && i < A.players.length && i !== drag.from && !K.swapError(A, drag.row, drag.from, i) ? i : -1;
+          cv.classList.add('grabbing');
+          render();
+          return;
+        }
+        const t = target(h);
+        setCursor(h);
+        if (JSON.stringify(t) === JSON.stringify(hover)) return;
+        hover = t;
+        render();
+      });
+      cv.addEventListener('pointerleave', () => { if (drag) return; hover = null; cv.classList.remove('hot', 'grab'); render(); });
+      cv.addEventListener('pointerup', e => {
+        const d = drag;
+        drag = null;
+        cv.classList.remove('grabbing');
+        if (d && d.moved) {
+          render();
+          if (d.over >= 0) act({ type: 'am-swap', row: d.row, i: d.from, j: d.over }, () => K.swap(A, d.row, d.from, d.over));
+          return;
+        }
+        // 動かさずに離したら、クリックと同じ
+        const h = target(K.hitTest(A, S, ...toBoard(e)));
+        if (!h) return;
+        act({ type: 'am-click', hit: h }, () => (h.kind === 'player' ? K.open(A, S, [h.p]) : K.addRung(A, h.c, h.y)));
+      });
+      cv.addEventListener('pointercancel', () => { drag = null; cv.classList.remove('grabbing'); render(); });
+
+      if (preview) {
+        // 編集ページのプレビュー：内容は親から受け取る
+        let first = true;
+        addEventListener('message', e => {
+          if (e.source !== window.parent || !e.data || e.data.type !== 'am-state') return;
+          apply(e.data.A, e.data.S, first);
+          first = false;
+        });
+        window.parent.postMessage({ type: 'am-ready' }, '*');
+      } else {
+        // 同じ場所で開いている編集ページ（OBSのカスタムブラウザドックなど）が保存したら、読み直す
+        addEventListener('storage', e => {
+          if (e.key !== K.STORE_KEY) return;
+          const d = K.loadStored();
+          apply(d.A, d.S, false);
+        });
+        // OBS接続：Chrome の編集ページから obs-websocket 経由で届く（届いた内容はこのブラウザにも保存しておく）
+        addEventListener('donnmaAmidaUpdate', e => {
+          const d = e.detail;
+          if (!d || !d.A) return;
+          K.saveStored(K.sanitizeA(d.A), K.sanitize(d.S));
+          apply(d.A, d.S, false);
+        });
+      }
+
+      let resizeTimer;
+      addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fit, 60); });
+      apply(A, S, true);
+      fit();
+    })();
+  </script>
+</body>
+
+</html>

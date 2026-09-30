@@ -19,4 +19,5 @@ YouTubeライブ・Twitchのチャット欄をOBSのブラウザソースで表�
 - `chat-core.js` のフォント一覧・文字効果は次のツールも読み込んでいます。変更したら、それぞれの `?v=` も上げてください。
   - `youtube-subscribers/`（`index.html`・`view.html`）
   - `tournament/`（`index.html`・`view.html`）
+  - `roulette/`・`amida/`（`index.html`・`view.html`）
   - `thumbnail/`（フォント一覧）

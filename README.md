@@ -19,6 +19,7 @@
 | 登録者数カウンター・目標ゲージ | [youtube-subscribers/](youtube-subscribers/README.md) | YouTubeの登録者数と目標ゲージをOBSに表示する |
 | トーナメント表メーカー | [tournament/](tournament/README.md) | 大会のトーナメント表・試合テロップ・選曲をOBSや画像で使う |
 | ルーレット | [roulette/](roulette/README.md) | OBSのドックやChromeから回せるルーレット |
+| あみだくじ | [amida/](amida/README.md) | 横線を足したり1人ずつ開けたりできるあみだくじ。OBSにも出せる |
 | サムネイルメーカー | [thumbnail/](thumbnail/README.md) | アイキャッチ・サムネイル・SNS共有画像を作る |
 | 背景透過ツール | [bg-remove/](bg-remove/README.md) | 画像の背景を色で抜いて透明にする |
 | 共通の部品 | [common/](common/README.md) | ページ内の確認・お知らせ（`ask.js`） |
@@ -28,7 +29,7 @@
 ## 開発の共通ルール
 
 - **`?v=` を上げる**：本番サーバーは画像・JS を長期間キャッシュします。JS を変更したら、読み込んでいる HTML の `?v=` を必ず上げてください（上げないと古い JS が配信されて動かなくなります）。どの HTML を直すかは各 README の「開発メモ」にあります。
-- **`chat-css-generator/chat-core.js` は共有部品**：フォント一覧・文字効果をチャットCSS・登録者数・トーナメント表・サムネイルが使っています。
+- **`chat-css-generator/chat-core.js` は共有部品**：フォント一覧・文字効果をチャットCSS・登録者数・トーナメント表・ルーレット・あみだくじ・サムネイルが使っています。
 - **`confirm()` / `alert()` を使わない**：OBSのドックでは出ないことがあるので、`common/ask.js` を使います。
 - **オーバーレイの共通部分は直接編集しない**：live-tool-local の `overlay/_shared/` から `build.py` で流し込んでいます。
 

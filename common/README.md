@@ -9,6 +9,6 @@ DonnmaAsk.ask(msg, { yes, no })  // はい → true／いいえ → false／Esc�
 DonnmaAsk.notice(msg)
 ```
 
-使っているツール：トーナメント表・ルーレット・チャットCSS・登録者数
+使っているツール：トーナメント表・ルーレット・あみだくじ・チャットCSS・登録者数
 
 配信オーバーレイは HTML 1ファイルで完結させるため、これを読み込まず、同じ仕組みを `overlayAsk()` / `overlayNotice()` として持っています（[overlay/README.md](../overlay/README.md)）。
