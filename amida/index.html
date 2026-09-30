@@ -1357,6 +1357,25 @@
         grid-template-columns: minmax(0, 1fr);
       }
     }
+    /* スマホ幅：結果の記録は設定の上、OBSに入れる・OBS接続は設定の下（OBSはPC向けなので、あとに回す） */
+    @media (max-width: 1000px) {
+      .workspace {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .side {
+        display: contents;
+      }
+
+      .settings {
+        order: 1;
+      }
+
+      .side .obs-panel {
+        order: 2;
+      }
+    }
   </style>
 </head>
 
@@ -1480,7 +1499,7 @@
         </div>
       </div>
 
-      <div class="panel no-dock">
+      <div class="panel no-dock obs-panel">
         <div class="panel-head"><span>OBSに入れる</span></div>
         <div class="panel-body">
           <div class="url-list">
@@ -1493,7 +1512,7 @@
         </div>
       </div>
 
-      <div class="panel no-dock">
+      <div class="panel no-dock obs-panel">
         <div class="panel-head"><span>OBS接続（Chromeから操作するとき）</span></div>
         <div class="panel-body">
           <p class="field-note" style="margin:0 0 10px">OBSの「ツール → WebSocketサーバー設定」で「WebSocketサーバーを有効にする」をオンにし、「接続情報を表示」のポートとパスワードを入れてください。同じPCのChromeで開けると、OBSのブラウザソースでも同じように開きます。ドックで操作するときは不要です。</p>
