@@ -32,6 +32,7 @@
 - **`chat-css-generator/chat-core.js` は共有部品**：フォント一覧・文字効果をチャットCSS・登録者数・トーナメント表・ルーレット・あみだくじ・サムネイルが使っています。
 - **`confirm()` / `alert()` を使わない**：OBSのドックでは出ないことがあるので、`common/ask.js` を使います。
 - **オーバーレイの共通部分は直接編集しない**：live-tool-local の `overlay/_shared/` から `build.py` で流し込んでいます。
+- **ヘッダー・フッターは `_shared/` で直す**：各ページの `<!-- shared:header -->`・`<!-- shared:footer -->` の間は `_shared/header.html`・`_shared/footer.html` から、`<style>` の中の `/* shared:header-footer */` の間は `_shared/header-footer.css` から流し込んでいます（全ページ同じ見た目）。直したら `python _shared/build.py` を実行してください（`--check` で書き換えが要るページだけを確認できます）。新しいページにも、ほかのページと同じ目印を置いてから実行します。目印に書ける設定は `_shared/build.py` の先頭にあります。
 
 ---
 
@@ -46,7 +47,7 @@
 
 - `gh-pages` ブランチは自動生成です。直接編集せず、`main` を更新してください（push のたびに上書きされます）。
 - GitHub Pages 用のコピーは、すべての HTML の `<head>` に `<meta name="robots" content="noindex">` を自動で追加しています。検索結果には本番（donnma.com）だけが出るようにするためです。
-- 本番・GitHub Pages とも、`.git/`・`.github/`・`CNAME`（本番のみ。GitHub Pages 専用）と、すべての階層の `README.md` を除外しています。
+- 本番・GitHub Pages とも、`.git/`・`.github/`・`_shared/`・`CNAME`（本番のみ。GitHub Pages 専用）と、すべての階層の `README.md` を除外しています。
 - 本番への rsync は `--delete` 付きです。リポジトリから削除・移動したファイルは、サーバーからも自動で消えます。
 - サーバーに手動で置いたファイル（`overlay/donnma/`）は、`deploy.yml` の `--filter='P ...'` で削除対象から外しています。サーバーに直接ファイルを置くときは、ここに追記してください。追記しないと、次のデプロイで消えます。
 - 新しいページを追加したら `sitemap.xml` にも追記してください（`robots.txt` から参照しています）。

@@ -76,7 +76,8 @@
       color: var(--accent);
     }
 
-    /* ── Topnav ── */
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
     .topnav {
       border-bottom: 1px solid var(--border);
       padding: 0 24px;
@@ -109,7 +110,7 @@
       transition: opacity 0.15s;
     }
 
-    .topnav-brand:hover {
+    a.topnav-brand:hover {
       opacity: 0.8;
     }
 
@@ -167,6 +168,79 @@
       background: var(--accent);
       flex-shrink: 0;
     }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid #a03060;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      border-bottom: none;
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      .topnav-back {
+        display: none;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+    /* /shared:header-footer */
 
     /* スマホで開いたときだけ出すお知らせ */
     .pc-notice {
@@ -973,58 +1047,6 @@
       padding-left: 18px;
     }
 
-    /* ── Footer ── */
-    footer {
-      background: var(--bg-deep);
-      border-top: 1px solid var(--border);
-      padding: 28px 24px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    footer a {
-      color: var(--muted);
-      text-decoration: none;
-      border-bottom: 1px solid #a03060;
-      transition: color 0.15s;
-    }
-
-    footer a:hover {
-      color: var(--accent);
-    }
-
-    .footer-brand {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    footer a.footer-logo {
-      border-bottom: none;
-      transition: opacity 0.15s;
-    }
-
-    footer a.footer-logo:hover {
-      opacity: 0.8;
-    }
-
-    .footer-logo img {
-      display: block;
-      height: 24px;
-      width: auto;
-    }
-
-    .footer-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
     @media (max-width: 1000px) {
       .workspace {
         grid-template-columns: minmax(0, 1fr);
@@ -1053,18 +1075,6 @@
     }
 
     @media (max-width: 600px) {
-      .topnav {
-        padding: 0 16px;
-      }
-
-      .topnav-back {
-        display: none;
-      }
-
-      .topnav-brand img {
-        height: 22px;
-      }
-
       .hero {
         padding: 32px 16px 40px;
       }
@@ -1077,11 +1087,6 @@
         grid-template-columns: minmax(0, 1fr);
       }
 
-      .footer-inner,
-      .footer-brand {
-        flex-direction: column;
-        text-align: center;
-      }
     }
   </style>
 </head>
@@ -1089,6 +1094,7 @@
 <body>
 
   <!-- Topnav -->
+  <!-- shared:header root="../" back -->
   <nav class="topnav">
     <div class="topnav-inner">
       <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
@@ -1101,6 +1107,7 @@
       </div>
     </div>
   </nav>
+  <!-- /shared:header -->
 
   <p class="pc-notice" role="note">このツールはPCのOBSで使う前提です。スマホでは正しく表示されません。</p>
 
@@ -1319,19 +1326,19 @@
   </div>
 
   <!-- Footer -->
+  <!-- shared:footer root="../" -->
   <footer>
     <div class="footer-inner">
       <div class="footer-brand">
-        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929"
-            alt="どんまうんど" width="720" height="182"></a>
-        <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a
-            href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <span>© 2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a> / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
       </div>
       <span>
         <a href="https://github.com/donnma777/tools" target="_blank" rel="noopener">GitHub</a>
       </span>
     </div>
   </footer>
+  <!-- /shared:footer -->
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 

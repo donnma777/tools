@@ -53,6 +53,7 @@ jobs:
             --exclude='.github/' \
             --exclude='CNAME' \
             --exclude='README.md' \
+            --exclude='/_shared/' \
             ./ ${{ secrets.XSERVER_USER }}@${{ secrets.XSERVER_HOST }}:${{ secrets.XSERVER_REMOTE_PATH }}/
 
       - name: Clean up SSH key
@@ -80,7 +81,7 @@ jobs:
           git config user.name "gh-pages-bot"
           git config user.email "actions@users.noreply.github.com"
           git rm -r --cached .github > /dev/null
-          rm -rf .github
+          rm -rf .github _shared
           # 各フォルダの README.md（開発メモ）も公開しない
           find . -path ./.git -prune -o -name README.md -type f -exec rm -f {} +
           git add -A
