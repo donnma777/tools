@@ -1125,7 +1125,12 @@
       min-height: 0;
     }
 
-    /* 大きく表示：プレビューを画面いっぱいにする（Esc で閉じる） */
+    /* 大きく表示：プレビューを画面いっぱいにする（Esc で閉じる）。
+       .side はグリッドの子なので z-index が効き、共通の「.side を手前に出す」指定のままだとプレビューの上に重なる */
+    body.preview-expanded .side {
+      z-index: auto;
+    }
+
     body.preview-expanded .rl-top .preview-panel {
       position: fixed;
       inset: 24px;
