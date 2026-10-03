@@ -99,10 +99,10 @@ footer {
   color: var(--muted);
 }
 
+/* リンクは下線なし。マウスを乗せるとピンクになる */
 footer a {
   color: var(--muted);
   text-decoration: none;
-  border-bottom: 1px solid #a03060;
   transition: color 0.15s;
 }
 
@@ -128,7 +128,6 @@ footer a:hover {
 }
 
 footer a.footer-logo {
-  border-bottom: none;
   transition: opacity 0.15s;
 }
 
@@ -156,10 +155,6 @@ footer a.footer-logo:hover {
   gap: 6px 18px;
   font-weight: 700;
   letter-spacing: 0.05em;
-}
-
-footer .footer-menu a {
-  border-bottom: none;
 }
 
 @media (max-width: 600px) {
