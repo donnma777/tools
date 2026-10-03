@@ -7,9 +7,9 @@
   <title>QRコードメーカー | どんまうんど-Tools</title>
   <link rel="icon" href="../favicon.ico">
   <meta name="description"
-    content="URL・Wi-Fi・連絡先・メールなどのQRコードをブラウザだけで作れる無料ツール。ドットや角の形、色・グラデーション、まん中のロゴを変えて、PNG・SVG・JPG で保存できます。入れた内容はどこにも送信しません。">
+    content="URL・Wi-Fi・連絡先・メールなどのQRコードをブラウザだけで作れる無料ツール。期限なし・登録なしで、作ったQRコードはずっと使えます。ドットや角の形、色・グラデーション、まん中のロゴを変えて、PNG・SVG・JPG で保存。QRコードの画像からの読み取りもできます。入れた内容はどこにも送信しません。">
   <meta property="og:title" content="QRコードメーカー | どんまうんど-Tools">
-  <meta property="og:description" content="URL・Wi-Fi・連絡先のQRコードを、形・色・ロゴを変えて作れる無料ツール。PNG・SVG で保存できます。">
+  <meta property="og:description" content="期限なし・登録なしで使える無料のQRコード作成・読み取りツール。形・色・ロゴを変えて PNG・SVG で保存できます。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://donnma.com/tool/qr/">
   <meta property="og:site_name" content="どんまうんど-Tools">
@@ -354,7 +354,7 @@
     .workspace {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 48px 24px 48px;
+      padding: 24px 24px 48px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
       grid-template-areas: "settings main";
@@ -442,6 +442,10 @@
 
     .btn[hidden] {
       display: none;
+    }
+
+    a.btn {
+      text-decoration: none;
     }
 
     .btn-primary {
@@ -847,6 +851,185 @@
       gap: 8px;
     }
 
+    /* ── 作る・読み取るの切り替え ── */
+    .mode-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 44px 24px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .mode-tabs {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+    }
+
+    .mode-tab {
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--label);
+      background: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 22px;
+      cursor: pointer;
+    }
+
+    .mode-tab:hover {
+      color: var(--text);
+    }
+
+    .mode-tab[aria-selected="true"] {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .workspace[hidden],
+    .reader[hidden] {
+      display: none;
+    }
+
+    /* ── 読み取る ── */
+    .reader {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 24px 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .read-in {
+      overflow: hidden;
+    }
+
+    .read-drop {
+      position: relative;
+      min-height: 360px;
+      padding: 16px;
+      background: #140810;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .read-drop.drop-on::after {
+      content: 'ここに落とすと読み取ります';
+      position: absolute;
+      inset: 8px;
+      display: grid;
+      place-items: center;
+      border: 3px dashed var(--accent);
+      border-radius: 12px;
+      background: rgba(20, 8, 16, 0.7);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .read-empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.9;
+    }
+
+    .read-empty .big {
+      font-size: 42px;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .read-empty .btn {
+      margin-top: 14px;
+    }
+
+    .read-empty[hidden],
+    #read-cv[hidden] {
+      display: none;
+    }
+
+    #read-cv {
+      display: block;
+      max-width: 100%;
+      max-height: 520px;
+      border-radius: 6px;
+    }
+
+    .read-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .read-kind {
+      margin-left: auto;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--on-accent);
+      background: var(--accent-2);
+      border-radius: 999px;
+      padding: 2px 10px;
+    }
+
+    .read-kind:empty {
+      display: none;
+    }
+
+    .read-out textarea {
+      min-height: 140px;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12.5px;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 6px 14px;
+      font-size: 13.5px;
+      margin-bottom: 10px;
+    }
+
+    .kv dt {
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .kv dd {
+      font-weight: 700;
+      word-break: break-all;
+    }
+
+    .read-host {
+      font-size: 12.5px;
+      color: var(--label);
+      margin: 8px 0 2px;
+      word-break: break-all;
+    }
+
+    .read-host b {
+      color: var(--text);
+    }
+
+    .read-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
     /* ── Guide ── */
     .guide {
       max-width: 1200px;
@@ -973,11 +1156,24 @@
       .workspace {
         grid-template-columns: minmax(0, 1fr);
         grid-template-areas: "main" "settings";
-        padding: 40px 16px 40px;
+        padding: 20px 16px 40px;
       }
 
       .main {
         position: static;
+      }
+
+      .mode-wrap {
+        padding: 36px 16px 0;
+      }
+
+      .reader {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 20px 16px 40px;
+      }
+
+      .read-drop {
+        min-height: 260px;
       }
 
       .guide {
@@ -1028,11 +1224,18 @@
   <header class="hero">
     <div class="hero-inner">
       <h1>QRコードメーカー</h1>
-      <p>URL・Wi-Fi・連絡先などのQRコードを作れます。ドットや角の形、色、まん中のロゴを変えて、PNG・SVG で保存できます。入れた内容はどこにも送信しません。</p>
+      <p>URL・Wi-Fi・連絡先などのQRコードを、期限なし・登録なしで作れます。ドットや角の形、色、まん中のロゴを変えて PNG・SVG で保存。画像からの読み取りもできます。入れた内容はどこにも送信しません。</p>
     </div>
   </header>
 
-  <div class="workspace">
+  <div class="mode-wrap">
+    <div class="mode-tabs" role="tablist" aria-label="作る・読み取る">
+      <button class="mode-tab" type="button" role="tab" data-mode="make" aria-selected="true">🔳 作る</button>
+      <button class="mode-tab" type="button" role="tab" data-mode="read" aria-selected="false">🔍 読み取る</button>
+    </div>
+  </div>
+
+  <div class="workspace" id="maker">
 
     <!-- 設定 -->
     <div class="settings">
@@ -1265,6 +1468,33 @@
     </div>
   </div>
 
+  <!-- 読み取る -->
+  <div class="reader" id="reader" hidden>
+    <div class="panel read-in">
+      <div class="read-drop" id="read-drop">
+        <div class="read-empty" id="read-empty">
+          <div class="big">🔍</div>
+          QRコードの画像をここにドロップするか、<br>コピーした画像を Ctrl+V で貼り付けます<br>
+          <button class="btn btn-primary" type="button" id="read-open">📁 画像を選ぶ</button>
+        </div>
+        <canvas id="read-cv" aria-label="読み取った画像" hidden></canvas>
+      </div>
+      <div class="read-foot">
+        <span class="field-note">スクリーンショットや写真から読めます。画像はどこにも送信しません</span>
+        <button class="btn btn-sm" type="button" id="read-open2" hidden>📁 別の画像</button>
+      </div>
+      <input type="file" id="read-file" accept="image/*" hidden>
+    </div>
+    <div class="panel read-out">
+      <div class="panel-body">
+        <div class="panel-title"><span class="sec-icon">📄</span>読み取った中身<span class="read-kind" id="read-kind"></span></div>
+        <div id="read-result">
+          <p class="field-note">画像を入れると、ここに中身が出ます</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Guide -->
   <section class="guide">
     <details class="sec">
@@ -1273,8 +1503,19 @@
         <ol class="steps">
           <li>「中身」で種類（URL・Wi-Fi・連絡先など）を選んで、入れたい内容を書きます。</li>
           <li>「形」「色」でドットや角の目の形、色を選びます。ロゴを入れたいときは「まん中のロゴ」で画像を選びます。</li>
-          <li>プレビューの下に「読み取りOK」と出ていれば読めます（対応しているブラウザだけ）。念のため、スマホのカメラでも読んでみてください。</li>
+          <li>プレビューの下に「読み取りOK」と出ていれば読めます。念のため、スマホのカメラでも読んでみてください。</li>
           <li>形式（PNG・SVG・JPG）と大きさを選んで <b>「⬇ 保存」</b>。<b>「📋 コピー」</b>でそのまま貼り付けることもできます。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">🔍</span>読み取り方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>上の <b>「🔍 読み取る」</b> を押します。</li>
+          <li>QRコードの画像をドロップするか、Ctrl+V で貼り付けるか、「📁 画像を選ぶ」で選びます。スクリーンショットや写真でも読めます。</li>
+          <li>中身が出たら、コピーしたり、URL なら開いたりできます。<b>「✏ この中身で作る」</b>で、同じ中身のQRコードを作り直すこともできます。</li>
+          <li>読めないときは、QRコードのところだけを大きく切り抜いてみてください。</li>
         </ol>
       </div>
     </details>
@@ -1282,12 +1523,16 @@
       <summary><span class="sec-icon">💡</span>ヒント・注意点</summary>
       <div class="panel-body">
         <ul class="notes">
+          <li><b>期限はありません。</b>中身をそのままQRコードに書き込むので、読み取るときにこのサイトを通りません。このサイトがなくなっても、ずっと使えます（読み取った回数なども記録しません）。</li>
+          <li>そのかわり、作ったあとで飛び先を変えることはできません。URL のページがなくなると、その先は開けません。変えたいときは作り直してください。</li>
           <li>入れた内容は、このブラウザの中だけで使います。サーバーには送信しません（Wi-Fi のパスワードはブラウザにも残しません）。</li>
           <li>ドットの色は暗く、背景は明るくしてください。逆にすると読めないアプリがあります。薄い色どうしも読みにくくなります。</li>
           <li>印刷するときは、1辺 2cm 以上がおすすめです。中身が長いほどドットが細かくなるので、大きめに。</li>
           <li>ロゴを大きくしたり、誤り訂正を低くしたりすると読めなくなります。保存したら、スマホで読めるか確かめてください。</li>
           <li>印刷物には SVG がおすすめです。拡大しても粗くなりません（ロゴの画像はそのままの細かさで入ります）。</li>
           <li>作ったQRコードは、商用でも自由に使えます。</li>
+          <li>読み取った URL は自動では開きません。知らないQRコードの URL は、開く前に飛び先をよく確かめてください。</li>
+          <li>読み取りには <a href="jsQR-LICENSE.txt" target="_blank" rel="noopener">jsQR</a>（Apache License 2.0）を使っています。</li>
           <li>QRコードは株式会社デンソーウェーブの登録商標です。</li>
         </ul>
       </div>
@@ -1694,7 +1939,50 @@
       }
       let lastMsgs = [];
 
-      // 読み取りテスト（BarcodeDetector があるブラウザだけ）
+      // =====================================================
+      //  読み取り（jsQR は使うときに読み込む）
+      // =====================================================
+      let jsqrP = null;
+      function loadJsQR() {
+        if (!jsqrP) {
+          jsqrP = new Promise((res, rej) => {
+            const s = document.createElement('script');
+            s.src = 'jsQR.min.js?v=20261004a';
+            s.onload = () => res(window.jsQR);
+            s.onerror = () => { jsqrP = null; rej(new Error('jsQR')); };
+            document.head.appendChild(s);
+          });
+        }
+        return jsqrP;
+      }
+      // 前処理を変えて何回か試す（そのまま → 半分に縮めて少しぼかす → 1/4 に縮める → 半分で強めにぼかす → ぼかす）。
+      // 丸いドットはそのままだと読めないことがあるが、縮めたりぼかしたりするとつながって読める
+      // （このページで作れる形・誤り訂正の組み合わせ 256 通りが、どれかで読めることを確かめた順番）
+      async function scan(src, w, h) {
+        const jsQR = await loadJsQR();
+        const base = Math.min(1, 1600 / Math.max(w, h));
+        for (const [k, filter] of [[1, 'none'], [0.5, 'blur(1px)'], [0.25, 'none'], [0.5, 'blur(3px)'], [1, 'blur(2px)']]) {
+          const s = base * k, cw = Math.round(w * s), ch = Math.round(h * s);
+          if (Math.min(cw, ch) < 60) continue;
+          const c = document.createElement('canvas');
+          c.width = cw; c.height = ch;
+          const x = c.getContext('2d', { willReadFrequently: true });
+          // 透明なところは白にする
+          x.fillStyle = '#fff';
+          x.fillRect(0, 0, cw, ch);
+          x.filter = filter;
+          x.drawImage(src, 0, 0, cw, ch);
+          x.filter = 'none';
+          const r = jsQR(x.getImageData(0, 0, cw, ch).data, cw, ch);
+          if (r) {
+            const L = r.location, p = q => ({ x: q.x / s, y: q.y / s });
+            return { text: r.data, corners: [p(L.topLeftCorner), p(L.topRightCorner), p(L.bottomRightCorner), p(L.bottomLeftCorner)] };
+          }
+        }
+        return null;
+      }
+
+      // 作ったQRコードを読んでみる（BarcodeDetector があればそちら、なければ jsQR）
       let detector = null, readTimer = 0, readSeq = 0;
       if ('BarcodeDetector' in window) {
         BarcodeDetector.getSupportedFormats().then(f => {
@@ -1702,27 +1990,214 @@
         }).catch(() => { });
       }
       function scheduleReadTest() {
-        if (!detector) return;
         clearTimeout(readTimer);
         const seq = ++readSeq;
         readTimer = setTimeout(async () => {
-          const c = document.createElement('canvas');
-          c.width = c.height = 600;
-          const x = c.getContext('2d');
-          // 透明なときは白の上に置いて読む
-          x.fillStyle = '#fff';
-          x.fillRect(0, 0, 600, 600);
-          x.drawImage($('cv'), 0, 0, 600, 600);
+          const cv = $('cv');
           let ok = false;
           try {
-            const r = await detector.detect(c);
-            ok = r.some(b => b.rawValue === text);
+            if (detector) {
+              const c = document.createElement('canvas');
+              c.width = c.height = 600;
+              const x = c.getContext('2d');
+              x.fillStyle = '#fff';
+              x.fillRect(0, 0, 600, 600);
+              x.drawImage(cv, 0, 0, 600, 600);
+              ok = (await detector.detect(c)).some(b => b.rawValue === text);
+            } else {
+              const r = await scan(cv, cv.width, cv.height);
+              ok = !!r && r.text === text;
+            }
           } catch (e) { return; }
           if (seq !== readSeq) return;
-          readMsg = ok ? ['ok', '✅ 読み取りOK（このブラウザで読めました）'] : ['ng', '⚠ このブラウザでは読み取れませんでした。形・色・ロゴを見直してください'];
+          readMsg = ok ? ['ok', '✅ 読み取りOK（このページで読めました）']
+            : detector ? ['ng', '⚠ このブラウザでは読み取れませんでした。形・色・ロゴを見直してください']
+              : ['warn', '⚠ このページの読み取りでは読めませんでした。形・色・ロゴを見直すか、スマホのカメラで確かめてください'];
           showMsgs(lastMsgs);
         }, 350);
       }
+
+      // ---- 読み取るページ
+      const readCv = $('read-cv');
+      async function readFile(file) {
+        if (!file || !/^image\//.test(file.type)) { toast('画像のファイルを選んでください'); return; }
+        const url = URL.createObjectURL(file);
+        const im = new Image();
+        im.onload = async () => {
+          URL.revokeObjectURL(url);
+          const w = im.naturalWidth, h = im.naturalHeight;
+          // 見せる画像（長い辺 1200px まで）
+          const k = Math.min(1, 1200 / Math.max(w, h));
+          readCv.width = Math.max(1, Math.round(w * k));
+          readCv.height = Math.max(1, Math.round(h * k));
+          const x = readCv.getContext('2d');
+          x.drawImage(im, 0, 0, readCv.width, readCv.height);
+          readCv.hidden = false;
+          $('read-empty').hidden = true;
+          $('read-open2').hidden = false;
+          showResult(null, true);
+          let r = null;
+          try { r = await scan(im, w, h); } catch (e) { toast('読み取りの準備ができませんでした。通信を確かめて、もう一度試してください'); showResult(null); return; }
+          if (r) {
+            // 見つけたところを枠で囲む
+            x.lineWidth = Math.max(3, readCv.width / 150);
+            x.strokeStyle = '#ff3d6e';
+            x.beginPath();
+            r.corners.forEach((q, i) => x[i ? 'lineTo' : 'moveTo'](q.x * k, q.y * k));
+            x.closePath();
+            x.stroke();
+          }
+          showResult(r);
+        };
+        im.onerror = () => { URL.revokeObjectURL(url); toast('この画像は開けませんでした'); };
+        im.src = url;
+      }
+
+      // WIFI:T:WPA;S:名前;P:パスワード;H:true;; を分ける（\ のあとの文字はそのまま）
+      function parseWifi(s) {
+        if (!/^WIFI:/i.test(s)) return null;
+        const o = {};
+        let key = '', val = '', inKey = true;
+        for (let i = 5; i < s.length; i++) {
+          const c = s[i];
+          if (c === '\\' && i + 1 < s.length) { if (inKey) key += s[++i]; else val += s[++i]; continue; }
+          if (inKey) {
+            if (c === ':') inKey = false;
+            else if (c !== ';') key += c;
+          } else if (c === ';') {
+            o[key.toUpperCase()] = val;
+            key = ''; val = ''; inKey = true;
+          } else val += c;
+        }
+        return o.S !== undefined ? o : null;
+      }
+      function kindOf(t) {
+        if (/^https?:\/\//i.test(t)) return 'URL';
+        if (/^WIFI:/i.test(t)) return 'Wi-Fi';
+        if (/^BEGIN:VCARD/i.test(t)) return '連絡先';
+        if (/^MECARD:/i.test(t)) return '連絡先';
+        if (/^mailto:/i.test(t)) return 'メール';
+        if (/^tel:/i.test(t)) return '電話';
+        if (/^SMSTO:/i.test(t)) return 'SMS';
+        return '文字';
+      }
+      const el = (tag, cls, txt) => {
+        const e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (txt != null) e.textContent = txt;
+        return e;
+      };
+      function showResult(r, busy) {
+        const box = $('read-result');
+        box.textContent = '';
+        $('read-kind').textContent = '';
+        if (busy) { box.appendChild(el('p', 'field-note', '読み取っています…')); return; }
+        if (!r) {
+          if (!readCv.hidden) box.appendChild(el('div', 'msg ng', 'QRコードが見つかりませんでした。QRコードのところだけを大きく切り抜くと読めることがあります'));
+          else box.appendChild(el('p', 'field-note', '画像を入れると、ここに中身が出ます'));
+          return;
+        }
+        const t = r.text, kind = kindOf(t);
+        $('read-kind').textContent = kind;
+        const wifi = parseWifi(t);
+        if (wifi) {
+          const dl = el('dl', 'kv');
+          [['ネットワーク名', wifi.S], ['パスワード', wifi.P || '（なし）'], ['暗号化', wifi.T || 'なし'], ['ステルス', wifi.H === 'true' ? 'はい' : 'いいえ']].forEach(([k, v]) => {
+            dl.appendChild(el('dt', '', k));
+            dl.appendChild(el('dd', '', v));
+          });
+          box.appendChild(dl);
+        }
+        const ta = el('textarea');
+        ta.readOnly = true;
+        ta.value = t;
+        ta.setAttribute('aria-label', '読み取った中身');
+        box.appendChild(ta);
+        let url = null;
+        if (kind === 'URL') {
+          try { url = new URL(t); } catch (e) { url = null; }
+          if (url) {
+            const host = el('p', 'read-host', '飛び先: ');
+            host.appendChild(el('b', '', url.hostname));
+            box.appendChild(host);
+            box.appendChild(el('p', 'field-note', '知らないQRコードのときは、飛び先が正しいか確かめてから開いてください'));
+          }
+        }
+        const acts = el('div', 'read-actions');
+        const copy = el('button', 'btn btn-sm', '📋 中身をコピー');
+        copy.type = 'button';
+        copy.addEventListener('click', async () => {
+          try { await navigator.clipboard.writeText(t); toast('コピーしました'); }
+          catch (e) { ta.select(); toast('コピーできませんでした。選んだ文字を Ctrl+C でコピーしてください'); }
+        });
+        acts.appendChild(copy);
+        if (url) {
+          const a = el('a', 'btn btn-sm', '↗ 開く');
+          a.href = url.href;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          acts.appendChild(a);
+        }
+        const remake = el('button', 'btn btn-sm', '✏ この中身で作る');
+        remake.type = 'button';
+        remake.addEventListener('click', () => {
+          if (wifi) {
+            S.type = 'wifi';
+            const auth = (wifi.T || '').toUpperCase();
+            S.wifi = { ssid: wifi.S, pass: wifi.P || '', auth: auth === 'WEP' ? 'WEP' : auth === 'NOPASS' || !auth ? 'nopass' : 'WPA', hidden: wifi.H === 'true' };
+          } else {
+            S.type = 'url';
+            S.text = t;
+          }
+          setMode('make');
+          syncUI();
+          changed();
+          window.scrollTo({ top: $('maker').getBoundingClientRect().top + window.scrollY - 140, behavior: 'smooth' });
+          toast('読み取った中身を入れました');
+        });
+        acts.appendChild(remake);
+        box.appendChild(acts);
+      }
+
+      $('read-open').addEventListener('click', e => { e.stopPropagation(); $('read-file').click(); });
+      $('read-open2').addEventListener('click', () => $('read-file').click());
+      $('read-file').addEventListener('change', e => { readFile(e.target.files[0]); e.target.value = ''; });
+      const drop = $('read-drop');
+      drop.addEventListener('click', () => $('read-file').click());
+      ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => {
+        if (![...e.dataTransfer.types].includes('Files')) return;
+        e.preventDefault();
+        drop.classList.add('drop-on');
+      }));
+      ['dragleave', 'drop'].forEach(t => drop.addEventListener(t, e => {
+        if (t === 'dragleave' && drop.contains(e.relatedTarget)) return;
+        drop.classList.remove('drop-on');
+      }));
+      drop.addEventListener('drop', e => {
+        e.preventDefault();
+        readFile(e.dataTransfer.files[0]);
+      });
+      // 貼り付けた画像は、読み取るページのときだけ読む
+      document.addEventListener('paste', e => {
+        if (mode !== 'read') return;
+        const item = [...(e.clipboardData ? e.clipboardData.items : [])].find(i => i.type.startsWith('image/'));
+        if (!item) return;
+        e.preventDefault();
+        readFile(item.getAsFile());
+      });
+
+      // ---- 作る・読み取るの切り替え（#read で読み取るページを開く）
+      let mode = 'make';
+      function setMode(m) {
+        mode = m;
+        document.querySelectorAll('.mode-tab').forEach(b => b.setAttribute('aria-selected', b.dataset.mode === m));
+        $('maker').hidden = m !== 'make';
+        $('reader').hidden = m !== 'read';
+        try { history.replaceState(null, '', m === 'read' ? '#read' : location.pathname + location.search); } catch (e) { /* ignore */ }
+        if (m === 'read') loadJsQR().catch(() => { });
+      }
+      document.querySelectorAll('.mode-tab').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+      if (location.hash === '#read') setMode('read');
 
       // =====================================================
       //  保存・コピー

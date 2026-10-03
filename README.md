@@ -30,7 +30,7 @@
 | あみだくじ | [amida/](amida/README.md) | 横線を足したり1人ずつ開けたりできるあみだくじ。OBSにも出せる |
 | サムネイルメーカー | [thumbnail/](thumbnail/README.md) | アイキャッチ・サムネイル・SNS共有画像を作る |
 | 背景透過ツール | [bg-remove/](bg-remove/README.md) | 画像の背景を色で抜いて透明にする |
-| QRコードメーカー | [qr/](qr/README.md) | URL・Wi-Fi・連絡先などのQRコードを、形・色・ロゴを変えて作る |
+| QRコードメーカー | [qr/](qr/README.md) | URL・Wi-Fi・連絡先などのQRコードを、形・色・ロゴを変えて作る（期限なし）。画像からの読み取りも |
 | 共通の部品 | [common/](common/README.md) | ページ内の確認・お知らせ（`ask.js`） |
 
 ---
