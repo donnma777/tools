@@ -376,6 +376,42 @@
       margin-left: 10px;
     }
 
+    /* ── 見出しへ飛ぶリンク ── */
+    .jump-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .jump-nav a {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      padding: 6px 16px;
+      border: 2px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .jump-nav a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* 上に貼りついたメニューに見出しが隠れないように */
+    .section-title[id] {
+      scroll-margin-top: 72px;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      html {
+        scroll-behavior: smooth;
+      }
+    }
+
     /* ── Banner row ── */
     .banner-row {
       display: grid;
@@ -408,16 +444,6 @@
       flex-wrap: wrap;
     }
 
-    .official-badge {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-      background: var(--accent-soft);
-      border-radius: 999px;
-      padding: 2px 12px;
-      white-space: nowrap;
-    }
 
     /* キャラの顔まわりを丸く切り抜いたアイコン（image/icon.webp） */
     .official-icon {
@@ -433,6 +459,26 @@
       font-size: 1.15rem;
       font-weight: 900;
       color: var(--text);
+    }
+
+    .official-name small {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    /* BOOTH のアイコン（買い物袋） */
+    .official-icon.is-shop {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .official-icon.is-shop svg {
+      width: 20px;
+      height: 20px;
     }
 
     .official-url {
@@ -662,7 +708,7 @@
         <img class="hero-logo" src="image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182">
         <span class="hero-sub">Tools</span>
       </h1>
-      <p>配信素材からWebツールまで、<br>自作したものを無料で公開しています。</p>
+      <p>配信素材からWebツールまで、<br>自作したものを公開しています。</p>
     </div>
   </header>
 
@@ -673,23 +719,30 @@
       <a class="official-banner" href="https://donnma.com/" target="_blank" rel="noopener">
         <div class="official-banner-left">
           <span class="official-icon" aria-hidden="true"></span>
-          <span class="official-name">どんまうんど-オフィシャルサイト</span>
+          <span class="official-name">どんまうんど - <small>オフィシャルサイト</small></span>
           <span class="official-url">donnma.com</span>
         </div>
         <span class="official-arrow">→</span>
       </a>
       <a class="official-banner" href="https://donnma.booth.pm/item_lists/nevT9GeV" target="_blank" rel="noopener">
         <div class="official-banner-left">
-          <span class="official-badge">BOOTH</span>
-          <span class="official-name">配信素材ショップ</span>
+          <span class="official-icon is-shop" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1 13H5z" /><path d="M9 7a3 3 0 0 1 6 0" /></svg></span>
+          <span class="official-name">BOOTH - <small>配信素材ショップ</small></span>
           <span class="official-url">donnma.booth.pm</span>
         </div>
         <span class="official-arrow">→</span>
       </a>
     </div>
 
+    <!-- 見出しへ飛ぶ -->
+    <nav class="jump-nav" aria-label="このページの見出し">
+      <a href="#streamers">配信の便利ツール</a>
+      <a href="#web-tools">だれでも使えるツール</a>
+      <a href="#plugins">インストールして使うもの</a>
+    </nav>
+
     <!-- Tools list -->
-    <h2 class="section-title">配信の便利ツール<small>For Streamers</small></h2>
+    <h2 class="section-title" id="streamers">配信の便利ツール<small>For Streamers</small></h2>
 
     <div class="tool-list">
 
@@ -709,7 +762,7 @@
           </div>
           <span class="kind-badge">配信向け</span>
         </div>
-        <div class="tool-desc">サイバーパンク、ゲーミング、和風などOBS用オーバーレイテーマを無料公開中。テーマ一覧・使い方は専用ページで確認できます。</div>
+        <div class="tool-desc">サイバーパンク、ゲーミング、和風などOBS用オーバーレイテーマを公開中。テーマ一覧・使い方は専用ページで確認できます。</div>
         <div class="card-actions">
           <a class="btn btn-primary" href="overlay/index.html">オーバーレイ一覧を見る →</a>
           <a class="btn btn-secondary" href="https://donnma.com/tools/live-tool-overlay/" target="_blank"
@@ -766,7 +819,7 @@
 
     </div>
 
-    <h2 class="section-title">だれでも使えるツール<small>Web Tools</small></h2>
+    <h2 class="section-title" id="web-tools">だれでも使えるツール<small>Web Tools</small></h2>
 
     <div class="tool-list">
 
@@ -893,7 +946,7 @@
 
     </div>
 
-    <h2 class="section-title">インストールして使うもの<small>Plugins &amp; Extensions</small></h2>
+    <h2 class="section-title" id="plugins">インストールして使うもの<small>Plugins &amp; Extensions</small></h2>
 
     <div class="tool-list">
 

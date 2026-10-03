@@ -439,21 +439,31 @@
       box-shadow: 0 0 0 2px var(--accent);
     }
 
-    .official-badge {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-      background: var(--accent-soft);
-      border-radius: 999px;
-      padding: 2px 12px;
-      white-space: nowrap;
-    }
 
     .official-name {
       font-size: 1.15rem;
       font-weight: 900;
       color: var(--text);
+    }
+
+    .official-name small {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    /* BOOTH のアイコン（買い物袋） */
+    .official-icon.is-shop {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .official-icon.is-shop svg {
+      width: 20px;
+      height: 20px;
     }
 
     .official-url {
@@ -793,15 +803,15 @@
       <a class="official-banner" href="https://donnma.com/" target="_blank" rel="noopener">
         <div class="official-banner-left">
           <span class="official-icon" aria-hidden="true"></span>
-          <span class="official-name">どんまうんど-オフィシャルサイト</span>
+          <span class="official-name">どんまうんど - <small>オフィシャルサイト</small></span>
           <span class="official-url">donnma.com</span>
         </div>
         <span class="official-arrow">→</span>
       </a>
       <a class="official-banner" href="https://donnma.booth.pm/item_lists/nevT9GeV" target="_blank" rel="noopener">
         <div class="official-banner-left">
-          <span class="official-badge">BOOTH</span>
-          <span class="official-name">配信素材ショップ</span>
+          <span class="official-icon is-shop" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1 13H5z" /><path d="M9 7a3 3 0 0 1 6 0" /></svg></span>
+          <span class="official-name">BOOTH - <small>配信素材ショップ</small></span>
           <span class="official-url">donnma.booth.pm</span>
         </div>
         <span class="official-arrow">→</span>
