@@ -2064,7 +2064,7 @@
         imgPos: 'left', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart',
         subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subBoxAlpha: 1, subArc: 0,
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
-        bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
+        bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, bandLayer: 'front', logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
         bgFit: 'cover', bgBright: 0, bgTile: 300,
         bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
@@ -2259,6 +2259,7 @@
             { k: 'bandPos', l: '帯の位置', t: 'select', o: [['bottom', '下'], ['top', '上']], when: s => s.logoMode === 'band' },
             { k: 'bandColor', l: '帯の色', t: 'color', when: s => s.logoMode === 'band' },
             { k: 'bandSize', l: '帯の太さ', t: 'range', min: 0.5, max: 2.5, step: 0.05, u: '倍', when: s => s.logoMode === 'band' },
+            { k: 'bandLayer', l: '帯の重なり', t: 'select', o: [['front', 'いちばん上（画像や文字を隠す）'], ['back', '背景のすぐ上（画像や文字を上に重ねられる）']], when: s => s.logoMode === 'band' },
             { k: 'logoPlate', l: 'ロゴの後ろに色を敷く', t: 'check', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' },
             { k: 'plateColor', l: 'ロゴの後ろの色', t: 'color', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
             { k: 'plateAlpha', l: 'ロゴの後ろの色の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
@@ -2592,19 +2593,32 @@
           if (cv === $('cv')) lastHit = hit;
           return;
         }
-        // 帯のぶんを除いた部分を描いて、帯と一緒に貼る
         const top = S.bandPos === 'top' ? band : 0;
-        const body = document.createElement('canvas');
-        const hit = drawContent(body, W, H - band);
-        cv.width = W; cv.height = H;
-        const c = cv.getContext('2d');
-        c.drawImage(body, 0, top);
-        c.fillStyle = S.bandColor;
-        c.fillRect(0, top ? 0 : H - band, W, band);
-        if (img.logo) {
-          const r = Math.min(W * 0.5 / img.logo.width, band * 0.56 * S.logoScale / img.logo.height);
-          const w = img.logo.width * r, h = img.logo.height * r;
-          c.drawImage(img.logo, W / 2 - w / 2, (top ? 0 : H - band) + band / 2 - h / 2, w, h);
+        // 帯とロゴ（canvas 全体の座標で描く）
+        const drawBand = c => {
+          c.save();
+          c.setTransform(1, 0, 0, 1, 0, 0);
+          c.fillStyle = S.bandColor;
+          c.fillRect(0, top ? 0 : H - band, W, band);
+          if (img.logo) {
+            const r = Math.min(W * 0.5 / img.logo.width, band * 0.56 * S.logoScale / img.logo.height);
+            const w = img.logo.width * r, h = img.logo.height * r;
+            c.drawImage(img.logo, W / 2 - w / 2, (top ? 0 : H - band) + band / 2 - h / 2, w, h);
+          }
+          c.restore();
+        };
+        let hit;
+        if (S.bandLayer === 'back') {
+          // 背景のすぐ上に帯を敷く。配置は帯を除いた部分で決めて、画像や文字は帯にはみ出しても描く
+          hit = drawContent(cv, W, H - band, { dy: top, fullH: H, underLayers: drawBand });
+        } else {
+          // 帯のぶんを除いた部分を描いて、帯と一緒に貼る（帯がいちばん上）
+          const body = document.createElement('canvas');
+          hit = drawContent(body, W, H - band);
+          cv.width = W; cv.height = H;
+          const c = cv.getContext('2d');
+          c.drawImage(body, 0, top);
+          drawBand(c);
         }
         if (cv === $('cv')) {
           const sh = r => r && { ...r, y: r.y + top };
@@ -2612,9 +2626,12 @@
         }
       }
 
-      function drawContent(cv, W, H) {
-        cv.width = W; cv.height = H;
+      // opt.fullH：canvas の本当の高さ（帯を背景のすぐ上に敷くとき）。opt.dy だけ下にずらして描き、
+      // 背景のあと・画像や文字の前に opt.underLayers(c) を呼ぶ
+      function drawContent(cv, W, H, opt = {}) {
+        cv.width = W; cv.height = opt.fullH || H;
         const c = cv.getContext('2d');
+        if (opt.dy) c.translate(0, opt.dy);
         const k = Math.min(W / 1200, H / 630);
         const stacked = W / H < 1.4;
         const side = S.imgPos === 'none' ? null : (img.side || sampleImg());
@@ -2911,6 +2928,7 @@
         };
         // 横いっぱいの帯は、画像などの後ろ（いちばん後ろ）に敷く。楕円・角丸はタイトルのすぐ後ろ
         const titleCenter = () => [titleRect.x + titleRect.w / 2, titleRect.y + titleRect.h / 2];
+        if (opt.underLayers) opt.underLayers(c);
         if (titleRect && S.titlePlate === 'band') rotAt(...titleCenter(), S.titleRot, titleShape);
         const drawTitle = () => {
           const body = () => { if (S.titlePlate !== 'band') titleShape(); drawText('body'); };
