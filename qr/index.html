@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRコードメーカー | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="URL・Wi-Fi・連絡先・メールなどのQRコードをブラウザだけで作れる無料ツール。ドットや角の形、色・グラデーション、まん中のロゴを変えて、PNG・SVG・JPG で保存できます。入れた内容はどこにも送信しません。">
+  <meta property="og:title" content="QRコードメーカー | どんまうんど-Tools">
+  <meta property="og:description" content="URL・Wi-Fi・連絡先のQRコードを、形・色・ロゴを変えて作れる無料ツール。PNG・SVG で保存できます。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/qr/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-tools.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="QRコードメーカー">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --code-bg: #1a0a14;
+      --code-text: #f3dbe5;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --ok: #7fd8a4;
+      --warn: #ffc46b;
+      --ng: #ff7a8a;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace：左に設定、右にQRコード ── */
+    .workspace {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
+      grid-template-areas: "settings main";
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings {
+      grid-area: settings;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .main {
+      grid-area: main;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+      flex: none;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: filter 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      border-color: var(--border-strong);
+    }
+
+    .btn[hidden] {
+      display: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* 選ぶボタン（中身の種類・形） */
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 6px;
+    }
+
+    .choice {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 8px 4px 6px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      line-height: 1.3;
+    }
+
+    .choice .ic {
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .choice svg {
+      width: 30px;
+      height: 30px;
+      display: block;
+    }
+
+    .choice:hover {
+      border-color: var(--accent);
+    }
+
+    .choice[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px 0;
+      min-width: 0;
+    }
+
+    .field[hidden],
+    .form[hidden] {
+      display: none;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .field-val {
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 12px;
+      color: var(--accent-2);
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select,
+    textarea,
+    input[type=text],
+    input[type=tel],
+    input[type=email],
+    input[type=url],
+    input[type=password] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 84px;
+      line-height: 1.5;
+    }
+
+    select:focus,
+    textarea:focus,
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .pass-wrap {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* 色 */
+    .color {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .color input[type=color] {
+      width: 40px;
+      height: 32px;
+      padding: 2px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      background: var(--surface-2);
+      cursor: pointer;
+      flex: none;
+    }
+
+    .color input[type=text] {
+      font-family: ui-monospace, Consolas, monospace;
+      width: 100px;
+      flex: none;
+    }
+
+    .color[aria-disabled="true"] {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+      cursor: pointer;
+      padding: 6px 0;
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle .sw {
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      position: relative;
+      flex: none;
+      transition: background 0.15s;
+    }
+
+    .toggle .sw::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .toggle input:checked+.sw {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .toggle input:checked+.sw::after {
+      transform: translateX(18px);
+      background: #fff;
+    }
+
+    .toggle input:focus-visible+.sw {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    .sub {
+      padding-left: 12px;
+      border-left: 2px solid var(--border-strong);
+      margin: 2px 0 6px;
+    }
+
+    .sub[hidden] {
+      display: none;
+    }
+
+    /* ロゴ */
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .logo-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      border: 1px solid var(--border-strong);
+      background: repeating-conic-gradient(#cfcfcf 0 25%, #ffffff 0 50%) 0 0 / 12px 12px;
+      object-fit: contain;
+      flex: none;
+    }
+
+    .logo-thumb[hidden] {
+      display: none;
+    }
+
+    /* ── QRコードのところ ── */
+    .main-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .main-head .info {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .stage {
+      position: relative;
+      padding: 24px;
+      background: #140810;
+      display: grid;
+      place-items: center;
+    }
+
+    .stage.drop-on::after {
+      content: 'ここに落とすとロゴにします';
+      position: absolute;
+      inset: 8px;
+      display: grid;
+      place-items: center;
+      border: 3px dashed var(--accent);
+      border-radius: 12px;
+      background: rgba(20, 8, 16, 0.7);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .qr-wrap {
+      width: min(100%, 400px);
+      aspect-ratio: 1;
+      line-height: 0;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    .qr-wrap.clear {
+      background: repeating-conic-gradient(#cfcfcf 0 25%, #ffffff 0 50%) 0 0 / 16px 16px;
+    }
+
+    #cv {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .qr-empty {
+      width: min(100%, 400px);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 24px;
+      border: 2px dashed var(--border-strong);
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.9;
+    }
+
+    .qr-empty[hidden],
+    .qr-wrap[hidden] {
+      display: none;
+    }
+
+    .status {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 14px 0;
+    }
+
+    .status:empty {
+      display: none;
+    }
+
+    .msg {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: var(--surface-2);
+      border-left: 3px solid var(--muted);
+    }
+
+    .msg.ok {
+      border-left-color: var(--ok);
+      color: var(--ok);
+    }
+
+    .msg.warn {
+      border-left-color: var(--warn);
+      color: var(--warn);
+    }
+
+    .msg.ng {
+      border-left-color: var(--ng);
+      color: var(--ng);
+    }
+
+    .save {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 14px 14px;
+    }
+
+    .save .row>input {
+      flex: 1 1 140px;
+    }
+
+    .save .row>select {
+      width: auto;
+      flex: 1 1 auto;
+    }
+
+    .save .btns {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 900px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "main" "settings";
+        padding: 40px 16px 40px;
+      }
+
+      .main {
+        position: static;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .stage {
+        padding: 16px;
+      }
+
+      .grid2 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>QRコードメーカー</h1>
+      <p>URL・Wi-Fi・連絡先などのQRコードを作れます。ドットや角の形、色、まん中のロゴを変えて、PNG・SVG で保存できます。入れた内容はどこにも送信しません。</p>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- 設定 -->
+    <div class="settings">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">📝</span>中身</div>
+          <div class="choices" role="group" aria-label="中身の種類" id="types">
+            <button class="choice" type="button" data-type="url"><span class="ic">🔗</span>URL・文字</button>
+            <button class="choice" type="button" data-type="wifi"><span class="ic">📶</span>Wi-Fi</button>
+            <button class="choice" type="button" data-type="vcard"><span class="ic">👤</span>連絡先</button>
+            <button class="choice" type="button" data-type="mail"><span class="ic">✉️</span>メール</button>
+            <button class="choice" type="button" data-type="tel"><span class="ic">📞</span>電話</button>
+            <button class="choice" type="button" data-type="sms"><span class="ic">💬</span>SMS</button>
+          </div>
+
+          <div class="form" data-form="url">
+            <div class="field">
+              <span class="field-label"><span>URL・文字</span><span class="field-val" id="url-len"></span></span>
+              <textarea data-k="text" rows="3" spellcheck="false" placeholder="https://example.com/"></textarea>
+              <span class="field-note">URL のほかに、ふつうの文章も入れられます（読み取ると文字が出ます）</span>
+            </div>
+          </div>
+
+          <div class="form" data-form="wifi" hidden>
+            <div class="field">
+              <span class="field-label"><span>ネットワーク名（SSID）</span></span>
+              <input type="text" data-k="wifi.ssid" spellcheck="false" autocomplete="off">
+            </div>
+            <div class="field">
+              <span class="field-label"><span>パスワード</span></span>
+              <div class="pass-wrap">
+                <input type="password" id="wifi-pass" data-k="wifi.pass" spellcheck="false" autocomplete="off">
+                <button class="btn btn-sm" type="button" id="pass-show" aria-pressed="false">表示</button>
+              </div>
+              <span class="field-note">パスワードはこのページを閉じると消えます（ブラウザにも残しません）</span>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <span class="field-label"><span>暗号化</span></span>
+                <select data-k="wifi.auth">
+                  <option value="WPA">WPA / WPA2 / WPA3</option>
+                  <option value="WEP">WEP</option>
+                  <option value="nopass">なし</option>
+                </select>
+              </div>
+              <div class="field" style="justify-content:flex-end">
+                <label class="toggle"><span>ステルス（SSID を隠している）</span><input type="checkbox" data-k="wifi.hidden"><span class="sw"></span></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form" data-form="vcard" hidden>
+            <div class="grid2">
+              <div class="field"><span class="field-label"><span>姓</span></span><input type="text" data-k="vc.last" autocomplete="off"></div>
+              <div class="field"><span class="field-label"><span>名</span></span><input type="text" data-k="vc.first" autocomplete="off"></div>
+              <div class="field"><span class="field-label"><span>せい（ふりがな）</span></span><input type="text" data-k="vc.lastKana" autocomplete="off"></div>
+              <div class="field"><span class="field-label"><span>めい（ふりがな）</span></span><input type="text" data-k="vc.firstKana" autocomplete="off"></div>
+              <div class="field"><span class="field-label"><span>会社・団体</span></span><input type="text" data-k="vc.org" autocomplete="off"></div>
+              <div class="field"><span class="field-label"><span>役職</span></span><input type="text" data-k="vc.title" autocomplete="off"></div>
+              <div class="field"><span class="field-label"><span>電話</span></span><input type="tel" data-k="vc.tel" autocomplete="off"></div>
+              <div class="field"><span class="field-label"><span>メール</span></span><input type="email" data-k="vc.email" autocomplete="off" spellcheck="false"></div>
+            </div>
+            <div class="field"><span class="field-label"><span>Webサイト・SNS</span></span><input type="url" data-k="vc.url" autocomplete="off" spellcheck="false" placeholder="https://"></div>
+            <div class="field"><span class="field-label"><span>住所</span></span><input type="text" data-k="vc.adr" autocomplete="off"></div>
+            <div class="field"><span class="field-label"><span>メモ</span></span><input type="text" data-k="vc.note" autocomplete="off"></div>
+            <span class="field-note">読み取ると、スマホの連絡先に追加できます。入れるほどQRコードが細かくなるので、名刺に載せるときは必要なものだけに</span>
+          </div>
+
+          <div class="form" data-form="mail" hidden>
+            <div class="field"><span class="field-label"><span>あて先</span></span><input type="email" data-k="mail.to" autocomplete="off" spellcheck="false"></div>
+            <div class="field"><span class="field-label"><span>件名</span></span><input type="text" data-k="mail.subject" autocomplete="off"></div>
+            <div class="field"><span class="field-label"><span>本文</span></span><textarea data-k="mail.body" rows="3"></textarea></div>
+          </div>
+
+          <div class="form" data-form="tel" hidden>
+            <div class="field"><span class="field-label"><span>電話番号</span></span><input type="tel" data-k="tel" autocomplete="off" placeholder="090-1234-5678"></div>
+            <span class="field-note">読み取ると、その番号に電話をかける画面が開きます</span>
+          </div>
+
+          <div class="form" data-form="sms" hidden>
+            <div class="field"><span class="field-label"><span>電話番号</span></span><input type="tel" data-k="sms.to" autocomplete="off"></div>
+            <div class="field"><span class="field-label"><span>メッセージ</span></span><textarea data-k="sms.body" rows="3"></textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🔳</span>形</div>
+          <div class="field">
+            <span class="field-label"><span>ドット</span></span>
+            <div class="choices" role="group" aria-label="ドットの形" data-pick="dot"></div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>角の目（外わく）</span></span>
+            <div class="choices" role="group" aria-label="角の目の外わくの形" data-pick="eye"></div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>角の目（中）</span></span>
+            <div class="choices" role="group" aria-label="角の目の中の形" data-pick="eyeIn"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🎨</span>色</div>
+          <div class="grid2">
+            <div class="field">
+              <span class="field-label"><span>ドットの色</span></span>
+              <div class="color" data-color="fg"></div>
+            </div>
+            <div class="field">
+              <span class="field-label"><span>背景の色</span></span>
+              <div class="color" data-color="bg"></div>
+            </div>
+          </div>
+          <label class="toggle"><span>背景を透明にする</span><input type="checkbox" data-k="transparent"><span class="sw"></span></label>
+          <label class="toggle"><span>グラデーションにする</span><input type="checkbox" data-k="grad"><span class="sw"></span></label>
+          <div class="sub" id="grad-sub">
+            <div class="grid2">
+              <div class="field">
+                <span class="field-label"><span>2つ目の色</span></span>
+                <div class="color" data-color="fg2"></div>
+              </div>
+              <div class="field">
+                <span class="field-label"><span>向き</span></span>
+                <select data-k="gradDir">
+                  <option value="d">ななめ（左上→右下）</option>
+                  <option value="h">横（左→右）</option>
+                  <option value="v">縦（上→下）</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <label class="toggle"><span>角の目の色を変える</span><input type="checkbox" data-k="eyeCustom"><span class="sw"></span></label>
+          <div class="sub" id="eye-sub">
+            <div class="grid2">
+              <div class="field">
+                <span class="field-label"><span>外わく</span></span>
+                <div class="color" data-color="eyeColor"></div>
+              </div>
+              <div class="field">
+                <span class="field-label"><span>中</span></span>
+                <div class="color" data-color="eyeInColor"></div>
+              </div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:6px">
+            <button class="btn btn-sm" type="button" id="swap-color">⇄ ドットと背景の色を入れ替える</button>
+            <button class="btn btn-sm" type="button" id="reset-color">黒と白に戻す</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🖼</span>まん中のロゴ</div>
+          <div class="logo-row">
+            <img class="logo-thumb" id="logo-thumb" alt="ロゴ" hidden>
+            <button class="btn btn-sm" type="button" id="logo-open">📁 画像を選ぶ</button>
+            <button class="btn btn-sm" type="button" id="logo-clear" hidden>外す</button>
+            <input type="file" id="logo-file" accept="image/*" hidden>
+          </div>
+          <div id="logo-sub" hidden>
+            <div class="field">
+              <span class="field-label"><span>大きさ</span><span class="field-val" id="logo-ratio-val"></span></span>
+              <input type="range" data-k="logoRatio" min="10" max="30" step="1">
+            </div>
+            <label class="toggle"><span>ロゴの下のドットを空ける</span><input type="checkbox" data-k="plate"><span class="sw"></span></label>
+            <span class="field-note">ロゴで隠れたところは、誤り訂正で読み取ります。ロゴを入れたら誤り訂正は「H」がおすすめです</span>
+          </div>
+          <span class="field-note" id="logo-note">アイコンやロゴの画像をまん中に置けます（プレビューにドロップでも入れられます）</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">⚙️</span>細かい設定</div>
+          <div class="field">
+            <span class="field-label"><span>誤り訂正のレベル</span></span>
+            <select data-k="ecl">
+              <option value="L">L（約7%）… いちばん粗いドットで作れる</option>
+              <option value="M">M（約15%）… ふつう</option>
+              <option value="Q">Q（約25%）… 汚れや折れに強い</option>
+              <option value="H">H（約30%）… ロゴを入れるとき</option>
+            </select>
+            <span class="field-note">高くするほど、汚れたり隠れたりしても読めますが、ドットが細かくなります</span>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>まわりの余白</span><span class="field-val" id="margin-val"></span></span>
+            <input type="range" data-k="margin" min="0" max="8" step="1">
+            <span class="field-note">規格では4マス分の余白が必要です。0 にするときは、貼る場所のまわりを空けてください</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QRコード -->
+    <div class="main">
+      <div class="main-head">
+        <span>プレビュー</span><span class="info" id="info"></span>
+      </div>
+      <div class="stage" id="stage">
+        <div class="qr-wrap" id="wrap"><canvas id="cv" width="800" height="800" aria-label="QRコード"></canvas></div>
+        <div class="qr-empty" id="empty" hidden>中身を入れると、ここにQRコードが出ます</div>
+      </div>
+      <div class="status" id="status"></div>
+      <div class="save">
+        <div class="row">
+          <input type="text" data-k="name" spellcheck="false" aria-label="ファイル名" placeholder="ファイル名">
+          <select data-k="fmt" aria-label="保存の形式">
+            <option value="png">PNG</option>
+            <option value="svg">SVG（拡大しても粗くならない）</option>
+            <option value="jpg">JPG</option>
+          </select>
+          <select data-k="px" aria-label="画像の大きさ" id="px">
+            <option value="256">256px</option>
+            <option value="512">512px</option>
+            <option value="1024">1024px</option>
+            <option value="2048">2048px</option>
+            <option value="4096">4096px（印刷向け）</option>
+          </select>
+        </div>
+        <div class="btns">
+          <button class="btn btn-primary" type="button" id="save-btn">⬇ 保存</button>
+          <button class="btn" type="button" id="copy-btn" title="PNG の画像としてコピーします">📋 コピー</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🔳</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>「中身」で種類（URL・Wi-Fi・連絡先など）を選んで、入れたい内容を書きます。</li>
+          <li>「形」「色」でドットや角の目の形、色を選びます。ロゴを入れたいときは「まん中のロゴ」で画像を選びます。</li>
+          <li>プレビューの下に「読み取りOK」と出ていれば読めます（対応しているブラウザだけ）。念のため、スマホのカメラでも読んでみてください。</li>
+          <li>形式（PNG・SVG・JPG）と大きさを選んで <b>「⬇ 保存」</b>。<b>「📋 コピー」</b>でそのまま貼り付けることもできます。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>ヒント・注意点</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>入れた内容は、このブラウザの中だけで使います。サーバーには送信しません（Wi-Fi のパスワードはブラウザにも残しません）。</li>
+          <li>ドットの色は暗く、背景は明るくしてください。逆にすると読めないアプリがあります。薄い色どうしも読みにくくなります。</li>
+          <li>印刷するときは、1辺 2cm 以上がおすすめです。中身が長いほどドットが細かくなるので、大きめに。</li>
+          <li>ロゴを大きくしたり、誤り訂正を低くしたりすると読めなくなります。保存したら、スマホで読めるか確かめてください。</li>
+          <li>印刷物には SVG がおすすめです。拡大しても粗くなりません（ロゴの画像はそのままの細かさで入ります）。</li>
+          <li>作ったQRコードは、商用でも自由に使えます。</li>
+          <li>QRコードは株式会社デンソーウェーブの登録商標です。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="qr-core.js?v=20261004a"></script>
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const toastEl = $('toast');
+      let toastTimer;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3200);
+      }
+
+      // =====================================================
+      //  設定（Wi-Fi のパスワードとロゴの画像は残さない）
+      // =====================================================
+      const KEY = 'donnma-qr-v1';
+      const DEF = {
+        type: 'url', text: 'https://donnma.com/tool/',
+        wifi: { ssid: '', pass: '', auth: 'WPA', hidden: false },
+        vc: { last: '', first: '', lastKana: '', firstKana: '', org: '', title: '', tel: '', email: '', url: '', adr: '', note: '' },
+        mail: { to: '', subject: '', body: '' }, tel: '', sms: { to: '', body: '' },
+        dot: 'square', eye: 'square', eyeIn: 'square',
+        fg: '#000000', bg: '#ffffff', transparent: false, grad: false, fg2: '#d14d72', gradDir: 'd',
+        eyeCustom: false, eyeColor: '#d14d72', eyeInColor: '#000000',
+        logoRatio: 22, plate: true, ecl: 'M', margin: 4,
+        name: 'qrcode', fmt: 'png', px: 1024,
+      };
+      const S = JSON.parse(JSON.stringify(DEF));
+      try {
+        const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+        if (saved && typeof saved === 'object') {
+          for (const k of Object.keys(DEF)) {
+            if (!(k in saved)) continue;
+            if (DEF[k] && typeof DEF[k] === 'object') Object.assign(S[k], saved[k]);
+            else if (typeof saved[k] === typeof DEF[k]) S[k] = saved[k];
+          }
+        }
+      } catch (e) { /* 読めなければ初期値 */ }
+      S.wifi.pass = '';
+      let saveTimer;
+      function persist() {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          try {
+            const c = JSON.parse(JSON.stringify(S));
+            c.wifi.pass = '';
+            localStorage.setItem(KEY, JSON.stringify(c));
+          } catch (e) { /* 保存できなくても使える */ }
+        }, 300);
+      }
+      const getK = k => k.split('.').reduce((o, p) => o[p], S);
+      const setK = (k, v) => {
+        const ps = k.split('.'), last = ps.pop();
+        ps.reduce((o, p) => o[p], S)[last] = v;
+      };
+
+      // =====================================================
+      //  中身の文字列
+      // =====================================================
+      const wifiEsc = s => s.replace(/([\\;,:"])/g, '\\$1');
+      const vcEsc = s => s.replace(/\\/g, '\\\\').replace(/([,;])/g, '\\$1').replace(/\r?\n/g, '\\n');
+      function content() {
+        const t = s => String(s || '').trim();
+        switch (S.type) {
+          case 'wifi': {
+            if (!t(S.wifi.ssid)) return '';
+            let s = `WIFI:T:${S.wifi.auth};S:${wifiEsc(t(S.wifi.ssid))};`;
+            if (S.wifi.auth !== 'nopass') s += `P:${wifiEsc(S.wifi.pass)};`;
+            if (S.wifi.hidden) s += 'H:true;';
+            return s + ';';
+          }
+          case 'vcard': {
+            const v = S.vc;
+            const last = t(v.last), first = t(v.first);
+            const fn = [last, first].filter(Boolean).join(' ') || t(v.org);
+            if (!fn && !t(v.tel) && !t(v.email)) return '';
+            const L = ['BEGIN:VCARD', 'VERSION:3.0', `N:${vcEsc(last)};${vcEsc(first)};;;`, `FN:${vcEsc(fn)}`];
+            if (t(v.lastKana)) L.push(`X-PHONETIC-LAST-NAME:${vcEsc(t(v.lastKana))}`);
+            if (t(v.firstKana)) L.push(`X-PHONETIC-FIRST-NAME:${vcEsc(t(v.firstKana))}`);
+            if (t(v.org)) L.push(`ORG:${vcEsc(t(v.org))}`);
+            if (t(v.title)) L.push(`TITLE:${vcEsc(t(v.title))}`);
+            if (t(v.tel)) L.push(`TEL;TYPE=CELL:${t(v.tel)}`);
+            if (t(v.email)) L.push(`EMAIL:${t(v.email)}`);
+            if (t(v.url)) L.push(`URL:${t(v.url)}`);
+            if (t(v.adr)) L.push(`ADR:;;${vcEsc(t(v.adr))};;;;`);
+            if (t(v.note)) L.push(`NOTE:${vcEsc(t(v.note))}`);
+            L.push('END:VCARD');
+            return L.join('\r\n');
+          }
+          case 'mail': {
+            const to = t(S.mail.to);
+            if (!to && !t(S.mail.subject) && !t(S.mail.body)) return '';
+            const q = [];
+            if (t(S.mail.subject)) q.push('subject=' + encodeURIComponent(t(S.mail.subject)));
+            if (t(S.mail.body)) q.push('body=' + encodeURIComponent(S.mail.body.trim()));
+            return 'mailto:' + to + (q.length ? '?' + q.join('&') : '');
+          }
+          case 'tel': {
+            const n = t(S.tel).replace(/[^\d+*#]/g, '');
+            return n ? 'tel:' + n : '';
+          }
+          case 'sms': {
+            const n = t(S.sms.to).replace(/[^\d+]/g, '');
+            if (!n) return '';
+            return `SMSTO:${n}:${S.sms.body.trim()}`;
+          }
+          default:
+            return String(S.text || '').trim();
+        }
+      }
+
+      // =====================================================
+      //  見た目の選択肢（小さな見本は qr-core の描き方をそのまま使う）
+      // =====================================================
+      const PICKS = {
+        dot: [['square', '四角'], ['rounded', '角丸'], ['dot', '丸'], ['smooth', 'つながる丸']],
+        eye: [['square', '四角'], ['rounded', '角丸'], ['circle', '丸'], ['leaf', '葉っぱ']],
+        eyeIn: [['square', '四角'], ['rounded', '角丸'], ['circle', '丸'], ['leaf', '葉っぱ']],
+      };
+      const sampleQr = QrCore.encode('donnma', 'L');
+      function sample(kind, val) {
+        const st = { margin: 0, fg: 'currentColor', dot: 'square', eye: 'square', eyeIn: 'square' };
+        st[kind] = val;
+        if (kind !== 'dot') { st.eye = kind === 'eye' ? val : 'square'; st.eyeIn = kind === 'eyeIn' ? val : 'square'; }
+        const s = QrCore.svg(sampleQr, st, 30);
+        // 目の見本は左上の角だけ、ドットの見本は右下の一部を拡大して見せる
+        const vb = kind === 'dot' ? '14 13 5 5' : '0 0 7 7';
+        return s.replace(/viewBox="[^"]*"/, `viewBox="${vb}"`);
+      }
+      document.querySelectorAll('[data-pick]').forEach(box => {
+        const kind = box.dataset.pick;
+        PICKS[kind].forEach(([v, label]) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.dataset.v = v;
+          b.innerHTML = sample(kind, v) + `<span>${label}</span>`;
+          b.addEventListener('click', () => { S[kind] = v; syncUI(); changed(); });
+          box.appendChild(b);
+        });
+      });
+
+      // 色の欄（カラーピッカー＋16進）
+      document.querySelectorAll('[data-color]').forEach(box => {
+        const k = box.dataset.color;
+        box.innerHTML = `<input type="color" aria-label="色"><input type="text" spellcheck="false" maxlength="7" aria-label="色のコード">`;
+        const [pick, txt] = box.querySelectorAll('input');
+        pick.addEventListener('input', () => { S[k] = pick.value; txt.value = pick.value; changed(); });
+        txt.addEventListener('change', () => {
+          let v = txt.value.trim();
+          if (/^[0-9a-f]{6}$/i.test(v)) v = '#' + v;
+          if (/^#[0-9a-f]{3}$/i.test(v)) v = '#' + [...v.slice(1)].map(c => c + c).join('');
+          if (/^#[0-9a-f]{6}$/i.test(v)) { S[k] = v.toLowerCase(); changed(); }
+          syncUI();
+        });
+      });
+
+      // ふつうの入力欄
+      document.querySelectorAll('[data-k]').forEach(el => {
+        const k = el.dataset.k;
+        const ev = el.tagName === 'SELECT' || el.type === 'checkbox' ? 'change' : 'input';
+        el.addEventListener(ev, () => {
+          let v = el.type === 'checkbox' ? el.checked : el.value;
+          if (el.type === 'range' || k === 'px') v = Number(v);
+          setK(k, v);
+          if (k === 'transparent' && v && S.fmt === 'jpg') toast('JPG は透明にできないので、白い背景で保存します');
+          if (k === 'fmt' && v === 'jpg' && S.transparent) toast('JPG は透明にできないので、白い背景で保存します');
+          syncUI();
+          changed();
+        });
+      });
+
+      document.querySelectorAll('#types .choice').forEach(b => {
+        b.addEventListener('click', () => { S.type = b.dataset.type; syncUI(); changed(); });
+      });
+
+      $('pass-show').addEventListener('click', () => {
+        const p = $('wifi-pass'), show = p.type === 'password';
+        p.type = show ? 'text' : 'password';
+        $('pass-show').textContent = show ? '隠す' : '表示';
+        $('pass-show').setAttribute('aria-pressed', show);
+      });
+      $('swap-color').addEventListener('click', () => {
+        [S.fg, S.bg] = [S.bg, S.fg];
+        syncUI(); changed();
+      });
+      $('reset-color').addEventListener('click', () => {
+        Object.assign(S, { fg: '#000000', bg: '#ffffff', transparent: false, grad: false, eyeCustom: false });
+        syncUI(); changed();
+      });
+
+      function syncUI() {
+        document.querySelectorAll('#types .choice').forEach(b => b.setAttribute('aria-pressed', b.dataset.type === S.type));
+        document.querySelectorAll('.form').forEach(f => { f.hidden = f.dataset.form !== S.type; });
+        document.querySelectorAll('[data-pick]').forEach(box => {
+          box.querySelectorAll('.choice').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === S[box.dataset.pick]));
+        });
+        document.querySelectorAll('[data-k]').forEach(el => {
+          const v = getK(el.dataset.k);
+          if (el.type === 'checkbox') el.checked = !!v;
+          else if (el !== document.activeElement || el.tagName === 'SELECT') el.value = v;
+        });
+        document.querySelectorAll('[data-color]').forEach(box => {
+          const [pick, txt] = box.querySelectorAll('input');
+          pick.value = S[box.dataset.color];
+          if (txt !== document.activeElement) txt.value = S[box.dataset.color];
+        });
+        document.querySelector('[data-color="bg"]').setAttribute('aria-disabled', S.transparent);
+        $('grad-sub').hidden = !S.grad;
+        $('eye-sub').hidden = !S.eyeCustom;
+        $('logo-ratio-val').textContent = S.logoRatio + '%';
+        $('margin-val').textContent = S.margin + 'マス';
+        const hasLogo = !!logo;
+        $('logo-sub').hidden = !hasLogo;
+        $('logo-clear').hidden = !hasLogo;
+        $('logo-thumb').hidden = !hasLogo;
+        $('logo-note').hidden = hasLogo;
+      }
+
+      // =====================================================
+      //  ロゴ（長い辺 512px までに縮めて持つ）
+      // =====================================================
+      let logo = null; // { img, src }
+      function loadLogo(file) {
+        if (!file || !/^image\//.test(file.type)) { toast('画像のファイルを選んでください'); return; }
+        const url = URL.createObjectURL(file);
+        const im = new Image();
+        im.onload = () => {
+          const k = Math.min(1, 512 / Math.max(im.naturalWidth, im.naturalHeight));
+          const c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(im.naturalWidth * k));
+          c.height = Math.max(1, Math.round(im.naturalHeight * k));
+          c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+          URL.revokeObjectURL(url);
+          const src = c.toDataURL('image/png');
+          const img = new Image();
+          img.onload = () => {
+            logo = { img, src };
+            $('logo-thumb').src = src;
+            if (S.ecl !== 'H') {
+              S.ecl = 'H';
+              toast('ロゴを入れたので、誤り訂正を H にしました');
+            }
+            syncUI(); changed();
+          };
+          img.src = src;
+        };
+        im.onerror = () => { URL.revokeObjectURL(url); toast('この画像は開けませんでした'); };
+        im.src = url;
+      }
+      $('logo-open').addEventListener('click', () => $('logo-file').click());
+      $('logo-file').addEventListener('change', e => { loadLogo(e.target.files[0]); e.target.value = ''; });
+      $('logo-clear').addEventListener('click', () => { logo = null; syncUI(); changed(); });
+      const stage = $('stage');
+      ['dragenter', 'dragover'].forEach(t => stage.addEventListener(t, e => {
+        if (![...e.dataTransfer.types].includes('Files')) return;
+        e.preventDefault();
+        stage.classList.add('drop-on');
+      }));
+      ['dragleave', 'drop'].forEach(t => stage.addEventListener(t, e => {
+        if (t === 'dragleave' && stage.contains(e.relatedTarget)) return;
+        stage.classList.remove('drop-on');
+      }));
+      stage.addEventListener('drop', e => {
+        e.preventDefault();
+        loadLogo(e.dataTransfer.files[0]);
+      });
+
+      // =====================================================
+      //  描く
+      // =====================================================
+      function style() {
+        return {
+          margin: S.margin, dot: S.dot, eye: S.eye, eyeIn: S.eyeIn,
+          fg: S.fg, bg: S.transparent ? '' : S.bg,
+          fg2: S.grad ? S.fg2 : '', gradDir: S.gradDir,
+          eyeColor: S.eyeCustom ? S.eyeColor : '', eyeInColor: S.eyeCustom ? S.eyeInColor : '',
+          logo: logo ? { img: logo.img, src: logo.src, ratio: S.logoRatio / 100, plate: S.plate } : null,
+        };
+      }
+
+      // 色の明るさ（WCAG の相対輝度）
+      function lum(hex) {
+        const c = [1, 3, 5].map(i => parseInt(hex.substr(i, 2), 16) / 255)
+          .map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+      }
+      const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+
+      // 誤り訂正で直せる割合の目安。ロゴで空けるのは、この6割までなら安心・8割をこえると危ない
+      const ECL_CAP = { L: 0.07, M: 0.15, Q: 0.25, H: 0.3 };
+
+      let qr = null, text = '';
+      function changed() {
+        persist();
+        render();
+      }
+
+      function render() {
+        text = content();
+        const len = new TextEncoder().encode(S.text || '').length;
+        $('url-len').textContent = len ? len + ' バイト' : '';
+        const msgs = [];
+        qr = null;
+        if (text) {
+          try { qr = QrCore.encode(text, S.ecl); }
+          catch (e) {
+            msgs.push(['ng', `長すぎて入りません（${e.bytes} バイト）。誤り訂正を下げるか、中身を短くしてください`]);
+          }
+        }
+        $('wrap').hidden = !qr;
+        $('empty').hidden = !!qr;
+        $('save-btn').disabled = $('copy-btn').disabled = !qr;
+        if (!qr) {
+          $('info').textContent = '';
+          if (!text) $('empty').textContent = S.type === 'wifi' ? 'ネットワーク名を入れると、ここにQRコードが出ます' : '中身を入れると、ここにQRコードが出ます';
+          else $('empty').textContent = '長すぎて入りません';
+          showMsgs(msgs);
+          return;
+        }
+        const st = style();
+        const cv = $('cv');
+        QrCore.draw(cv.getContext('2d'), qr, st, cv.width);
+        $('wrap').classList.toggle('clear', !st.bg);
+        $('info').textContent = `${qr.size}×${qr.size} マス・${qr.bytes} バイト`;
+
+        // 読みやすさ
+        const bgColor = st.bg || '#ffffff';
+        const fgs = [S.fg].concat(S.grad ? [S.fg2] : [], S.eyeCustom ? [S.eyeColor, S.eyeInColor] : []);
+        if (fgs.some(c => lum(c) > lum(bgColor))) {
+          msgs.push(['warn', 'ドットの色が背景より明るいところがあります。読めないアプリがあるので、ドットは暗い色がおすすめです']);
+        } else if (fgs.some(c => contrast(c, bgColor) < 3)) {
+          msgs.push(['warn', 'ドットと背景の色が近いので、読みにくいかもしれません']);
+        }
+        if (!st.bg) {
+          msgs.push(['', '背景が透明です。明るい色の上に置いてください']);
+        }
+        if (logo) {
+          const cov = QrCore.coverage(qr, st), cap = ECL_CAP[S.ecl];
+          if (!S.plate) msgs.push(['', 'ロゴの下のドットを残しています。ロゴに透明なところがないと、ドットが隠れます']);
+          if (cov > cap * 0.8) msgs.push(['ng', `ロゴが大きすぎて、読めないかもしれません。ロゴを小さくするか、誤り訂正を上げてください`]);
+          else if (cov > cap * 0.6) msgs.push(['warn', `ロゴが少し大きめです。スマホで読めるか確かめてください`]);
+        }
+        if (S.margin < 2) msgs.push(['', '余白が少ないので、貼るときはまわりを空けてください']);
+        showMsgs(msgs);
+        scheduleReadTest();
+      }
+
+      let readMsg = null;
+      function showMsgs(msgs) {
+        const box = $('status');
+        box.textContent = '';
+        const all = readMsg && qr ? [readMsg].concat(msgs) : msgs;
+        all.forEach(([cls, t]) => {
+          const d = document.createElement('div');
+          d.className = 'msg' + (cls ? ' ' + cls : '');
+          d.textContent = t;
+          box.appendChild(d);
+        });
+        lastMsgs = msgs;
+      }
+      let lastMsgs = [];
+
+      // 読み取りテスト（BarcodeDetector があるブラウザだけ）
+      let detector = null, readTimer = 0, readSeq = 0;
+      if ('BarcodeDetector' in window) {
+        BarcodeDetector.getSupportedFormats().then(f => {
+          if (f.includes('qr_code')) { detector = new BarcodeDetector({ formats: ['qr_code'] }); changed(); }
+        }).catch(() => { });
+      }
+      function scheduleReadTest() {
+        if (!detector) return;
+        clearTimeout(readTimer);
+        const seq = ++readSeq;
+        readTimer = setTimeout(async () => {
+          const c = document.createElement('canvas');
+          c.width = c.height = 600;
+          const x = c.getContext('2d');
+          // 透明なときは白の上に置いて読む
+          x.fillStyle = '#fff';
+          x.fillRect(0, 0, 600, 600);
+          x.drawImage($('cv'), 0, 0, 600, 600);
+          let ok = false;
+          try {
+            const r = await detector.detect(c);
+            ok = r.some(b => b.rawValue === text);
+          } catch (e) { return; }
+          if (seq !== readSeq) return;
+          readMsg = ok ? ['ok', '✅ 読み取りOK（このブラウザで読めました）'] : ['ng', '⚠ このブラウザでは読み取れませんでした。形・色・ロゴを見直してください'];
+          showMsgs(lastMsgs);
+        }, 350);
+      }
+
+      // =====================================================
+      //  保存・コピー
+      // =====================================================
+      function fileName(ext) {
+        const base = (S.name || '').trim().replace(/[\\/:*?"<>|]+/g, '_') || 'qrcode';
+        return base + '.' + ext;
+      }
+      function download(blob, name) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      }
+      function renderPx(px, jpg) {
+        const c = document.createElement('canvas');
+        c.width = c.height = px;
+        const st = style();
+        if (jpg && !st.bg) st.bg = '#ffffff';
+        QrCore.draw(c.getContext('2d'), qr, st, px);
+        return c;
+      }
+      const toBlob = (c, type, q) => new Promise(res => c.toBlob(res, type, q));
+
+      $('save-btn').addEventListener('click', async () => {
+        if (!qr) return;
+        if (S.fmt === 'svg') {
+          download(new Blob([QrCore.svg(qr, style(), S.px)], { type: 'image/svg+xml' }), fileName('svg'));
+        } else {
+          const jpg = S.fmt === 'jpg';
+          const blob = await toBlob(renderPx(S.px, jpg), jpg ? 'image/jpeg' : 'image/png', 0.95);
+          download(blob, fileName(jpg ? 'jpg' : 'png'));
+        }
+        toast('保存しました');
+      });
+
+      $('copy-btn').addEventListener('click', async () => {
+        if (!qr) return;
+        try {
+          const blob = await toBlob(renderPx(S.px, false), 'image/png');
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          toast('画像をコピーしました');
+        } catch (e) {
+          toast('このブラウザではコピーできませんでした。保存してください');
+        }
+      });
+
+      syncUI();
+      render();
+    })();
+  </script>
+</body>
+
+</html>
