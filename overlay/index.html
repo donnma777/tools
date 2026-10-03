@@ -446,10 +446,18 @@
       color: var(--text);
     }
 
-    .official-name small {
-      font-size: 0.75rem;
+    /* カードの .tool-tag と同じ「ピンクの小さい文字」を名前の上に */
+    .official-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .official-tag {
+      font-size: 11px;
       font-weight: 700;
-      color: var(--muted);
+      letter-spacing: 0.04em;
+      color: var(--accent);
     }
 
     /* BOOTH のアイコン（買い物袋） */
@@ -803,7 +811,7 @@
       <a class="official-banner" href="https://donnma.com/" target="_blank" rel="noopener">
         <div class="official-banner-left">
           <span class="official-icon" aria-hidden="true"></span>
-          <span class="official-name">どんまうんど - <small>オフィシャルサイト</small></span>
+          <span class="official-text"><span class="official-tag">オフィシャルサイト</span><span class="official-name">どんまうんど</span></span>
           <span class="official-url">donnma.com</span>
         </div>
         <span class="official-arrow">→</span>
@@ -811,7 +819,7 @@
       <a class="official-banner" href="https://donnma.booth.pm/item_lists/nevT9GeV" target="_blank" rel="noopener">
         <div class="official-banner-left">
           <span class="official-icon is-shop" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1 13H5z" /><path d="M9 7a3 3 0 0 1 6 0" /></svg></span>
-          <span class="official-name">BOOTH - <small>配信素材ショップ</small></span>
+          <span class="official-text"><span class="official-tag">配信素材ショップ</span><span class="official-name">BOOTH</span></span>
           <span class="official-url">donnma.booth.pm</span>
         </div>
         <span class="official-arrow">→</span>
