@@ -2700,7 +2700,7 @@
           return { bumps: [], rb: 0 };
         }
         // 辺ごとに半円を内向きに並べる（ふちの色の波が中身に食い込む）。レースは細かく
-        const rb = S.padShape === 'lace' ? Math.max(3, p * 0.24) : Math.max(4, p * 0.32);
+        const rb = S.padShape === 'lace' ? Math.max(6, p * 0.5) : Math.max(4, p * 0.32);
         const bumps = [];
         const edges = [[x, y, 1, 0, 0, 1, w], [x + w, y, 0, 1, -1, 0, h], [x + w, y + h, -1, 0, 0, -1, w], [x, y + h, 0, -1, 1, 0, h]];
         c.moveTo(x, y);
@@ -2727,33 +2727,44 @@
         const { bumps, rb } = padInnerPath(c, p, p, Wc - p * 2, Hc - p * 2, p);
         c.fillStyle = S.padColor;
         if (S.padShape === 'lace') {
-          // レースが重なっているように、内側へふんわりにじませる
-          const n = parseInt(S.padColor.slice(1), 16);
-          c.shadowColor = `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, 0.85)`;
-          c.shadowBlur = rb * 6;
+          // レース（ドイリー）：波ごとに、扇の形に並んだ穴を空ける（穴から下の背景が見える）
+          const at = (b, f, th) => {
+            // 波の真ん中から、内向き（中身の方）に f×半径、横に th だけ回したところ
+            const nx = -b.ox, ny = -b.oy, tx = -ny, ty = nx;
+            return [b.x + b.r * f * (Math.cos(th) * nx + Math.sin(th) * tx), b.y + b.r * f * (Math.cos(th) * ny + Math.sin(th) * ty)];
+          };
+          const hole = (x, y, r) => { c.moveTo(x + r, y); c.arc(x, y, r, 0, Math.PI * 2); };
+          for (const b of bumps) {
+            for (let i = 0; i < 6; i++) { const [x, y] = at(b, 0.66, (-62.5 + i * 25) * Math.PI / 180); hole(x, y, b.r * 0.1); }
+            for (let i = 0; i < 4; i++) { const [x, y] = at(b, 0.36, (-54 + i * 36) * Math.PI / 180); hole(x, y, b.r * 0.075); }
+          }
         }
         c.fill('evenodd');
-        c.shadowColor = 'transparent';
-        c.shadowBlur = 0;
         if (S.padShape === 'lace') {
-          const dot = (x, y, r) => { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); };
-          // 内側にもう1段、半透明のレース（二重のフリル）
-          const d = rb * 1.3, x = p, y = p, w = Wc - p * 2, h = Hc - p * 2;
+          // 波のふちに小さな粒（ピコット）
           c.beginPath();
-          c.rect(x, y, w, h);
-          const inner = padInnerPath(c, x + d, y + d, w - d * 2, h - d * 2, p);
-          c.globalAlpha = 0.5;
-          c.fill('evenodd');
-          c.globalAlpha = 1;
-          // 波の先の小さな粒（ピコット）でフリルに
-          for (const b of bumps) dot(b.x - b.ox * b.r * 1.18, b.y - b.oy * b.r * 1.18, b.r * 0.3);
-          // 穴：外の段は波ごとに1つ、ふちの中にもう1列。内の段は小さく
+          for (const b of bumps) {
+            const nx = -b.ox, ny = -b.oy, tx = -ny, ty = nx;
+            for (let i = 0; i < 9; i++) {
+              const th = (-80 + i * 20) * Math.PI / 180, f = 1.02, r = b.r * 0.12;
+              const x = b.x + b.r * f * (Math.cos(th) * nx + Math.sin(th) * tx), y = b.y + b.r * f * (Math.cos(th) * ny + Math.sin(th) * ty);
+              c.moveTo(x + r, y); c.arc(x, y, r, 0, Math.PI * 2);
+            }
+          }
+          c.fill();
+          // 穴の色を少し付ける（「点線・レースの穴の色」。透ける感じは残す）
+          c.beginPath();
+          for (const b of bumps) {
+            const nx = -b.ox, ny = -b.oy, tx = -ny, ty = nx;
+            for (let i = 0; i < 6; i++) {
+              const th = (-62.5 + i * 25) * Math.PI / 180, r = b.r * 0.1;
+              const x = b.x + b.r * 0.66 * (Math.cos(th) * nx + Math.sin(th) * tx), y = b.y + b.r * 0.66 * (Math.cos(th) * ny + Math.sin(th) * ty);
+              c.moveTo(x + r, y); c.arc(x, y, r, 0, Math.PI * 2);
+            }
+          }
           c.fillStyle = S.padAccent;
-          c.globalAlpha = 0.55;
-          for (const b of bumps) dot(b.x - b.ox * b.r * 0.15, b.y - b.oy * b.r * 0.15, b.r * 0.38);
-          if (p > rb * 3.2) for (const b of bumps) dot(b.x + b.ox * b.r * 1.75, b.y + b.oy * b.r * 1.75, b.r * 0.22);
-          c.globalAlpha = 0.35;
-          for (const b of inner.bumps) dot(b.x - b.ox * b.r * 0.1, b.y - b.oy * b.r * 0.1, b.r * 0.26);
+          c.globalAlpha = 0.25;
+          c.fill();
           c.globalAlpha = 1;
         }
         // 点線：ふちの真ん中あたり
@@ -2779,7 +2790,12 @@
         const c = cv.getContext('2d');
         // 余白があるときは、背景・帯（背景のすぐ上）・光などを内側の形の中だけに描く
         c.save();
-        if (p) { c.beginPath(); padInnerPath(c, p, p, cv.width - p * 2, cv.height - p * 2, p); c.clip(); }
+        if (p) {
+          c.beginPath();
+          if (S.padShape === 'lace') c.rect(p, p, cv.width - p * 2, cv.height - p * 2);
+          else padInnerPath(c, p, p, cv.width - p * 2, cv.height - p * 2, p);
+          c.clip();
+        }
         c.translate(p, p + (opt.dy || 0));
         const k = Math.min(W / 1200, H / 630);
         const stacked = W / H < 1.4;
