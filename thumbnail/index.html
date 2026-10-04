@@ -1304,11 +1304,19 @@
       margin: 0 auto;
     }
 
+    /* 見出しと閉じるボタンは、スクロールしても上に残す */
     .sns-head {
+      position: sticky;
+      top: -24px;
+      z-index: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      margin: -24px -16px 0;
+      padding: 14px 16px 12px;
+      background: rgba(10, 4, 8, 0.97);
+      border-bottom: 1px solid var(--border);
       font-weight: 900;
       color: var(--text);
     }
