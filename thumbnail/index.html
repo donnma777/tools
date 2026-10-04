@@ -1840,6 +1840,7 @@
       <div hidden>
         <div class="fields card-opts" id="title-opts"></div>
         <div class="fields card-opts" id="sub-opts"></div>
+        <div class="fields card-opts" id="frame-opts"></div>
         <div class="fields" id="main-text-fields">
           <div class="field field-full" id="title-field">
             <label class="field-label" for="f-title"><span>タイトル（Enter で改行・*〜* で囲むと強調）</span></label>
@@ -2068,14 +2069,14 @@
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
         bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, bandLayer: 'front', logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
-        padOn: false, padSize: 4, padColor: '#ffffff', padRound: 0, guideOn: false,
+        padOn: false, padSize: 4, padColor: '#ffffff', padRound: 0, padShape: 'square', padLine: false, padAccent: '#ff85a1', guideOn: false,
         bgFit: 'cover', bgBright: 0, bgTile: 300,
         bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
       };
       const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
       // order を extras に合わせる（なくなったものは外し、足りないものは上に足す。'@pic'・'@text'・'@sub' は必ず入れる）
       function fixOrder(st) {
-        const ids = new Set(['@pic', '@text', '@sub', ...st.extras.map(e => e.id)]);
+        const ids = new Set(['@pic', '@text', '@sub', ...st.extras.map(e => e.id), ...(st.padOn ? ['@frame'] : [])]);
         const seen = new Set();
         st.order = st.order.filter(v => ids.has(v) && !seen.has(v) && seen.add(v));
         if (!seen.has('@pic')) st.order.unshift('@pic');
@@ -2083,6 +2084,13 @@
         // サブタイトル（以前はタイトルと一緒だった）は、タイトルのすぐ前に
         if (!seen.has('@sub')) st.order.splice(st.order.indexOf('@text') + 1, 0, '@sub');
         for (const e of st.extras) if (!st.order.includes(e.id)) st.order.push(e.id);
+        // 余白（ふち）は、はじめはいちばん上（中身がふちにはみ出さない）
+        if (st.padOn && !seen.has('@frame')) st.order.push('@frame');
+      }
+      // 新しく足したものを重ねる：余白がいちばん上なら、そのすぐ下に（ふちにはみ出さないように）
+      function pushLayer(id) {
+        const i = S.order.indexOf('@frame');
+        if (i >= 0 && i === S.order.length - 1) S.order.splice(i, 0, id); else S.order.push(id);
       }
       // メインの画像の置き場所。left-bottom などは「左・下にそろえる」（キャラの全身など）
       const IMG_POS = [['left', '左・真ん中（文字は右）'], ['left-bottom', '左・下（文字は右）'], ['left-top', '左・上（文字は右）'],
@@ -2105,6 +2113,7 @@
         out.bgBright = Math.max(-80, Math.min(80, out.bgBright));
         out.padSize = Math.max(1, Math.min(15, out.padSize));
         out.padRound = Math.max(0, Math.min(10, out.padRound));
+        if (!['square', 'scallop', 'lace'].includes(out.padShape)) out.padShape = 'square';
         // 前の「縦の位置」を置き場所に入れ込む
         if (o.imgAnchor === 'bottom' && (out.imgPos === 'left' || out.imgPos === 'right')) out.imgPos += '-bottom';
         if (!['heart', 'star', 'bunny'].includes(out.sample)) out.sample = 'heart';
@@ -2288,10 +2297,13 @@
             { k: 'glow', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'check', when: s => s.bg !== 'none' },
             { k: 'frameOn', l: '内側に細い枠を付ける', t: 'check' },
             { k: 'frameColor', l: '枠の色', t: 'color', when: s => s.frameOn },
-            { k: 'padOn', l: 'まわりに余白（ふち）を付ける', t: 'check', note: '画像の大きさはそのままで、中身を内側に縮めます' },
-            { k: 'padSize', l: '余白の幅', t: 'range', min: 1, max: 15, step: 0.5, u: '%', when: s => s.padOn },
-            { k: 'padColor', l: '余白の色', t: 'color', when: s => s.padOn },
-            { k: 'padRound', l: '内側の角の丸み', t: 'range', min: 0, max: 10, step: 0.5, u: '%', when: s => s.padOn },
+            { k: 'padOn', l: 'まわりに余白（ふち）を付ける', t: 'check', note: '画像の大きさはそのままで、中身を内側に縮めます。幅や形は「文字と画像」の一覧の「余白（ふち）」で変えられます' },
+            { k: 'padSize', l: '余白の幅', t: 'range', min: 1, max: 15, step: 0.5, u: '%', home: 'frame' },
+            { k: 'padColor', l: '余白の色', t: 'color', home: 'frame' },
+            { k: 'padShape', l: '内側の形', t: 'select', o: [['square', '四角'], ['scallop', '波（スカラップ）'], ['lace', 'レース']], home: 'frame' },
+            { k: 'padRound', l: '内側の角の丸み', t: 'range', min: 0, max: 10, step: 0.5, u: '%', home: 'frame', when: s => s.padShape === 'square' },
+            { k: 'padLine', l: '点線を入れる', t: 'check', home: 'frame' },
+            { k: 'padAccent', l: s => s.padShape === 'lace' ? '点線・レースの穴の色' : '点線の色', t: 'color', home: 'frame', when: s => s.padLine || s.padShape === 'lace' },
           ]
         },
       ];
@@ -2426,6 +2438,7 @@
         for (const sec of SECTIONS) for (const f of sec.fields) {
           if (f.home === 'title') titleOpts.appendChild(inputs[f.k].wrap);
           if (f.home === 'sub') subOpts.appendChild(inputs[f.k].wrap);
+          if (f.home === 'frame') frameOpts.appendChild(inputs[f.k].wrap);
           if (f.home === 'none') hiddenBin.appendChild(inputs[f.k].wrap);
         }
         // メインの画像の置き方は、メインのカードの中に
@@ -2471,6 +2484,7 @@
         if (k === 'sample') setThumb();
         if (k === 'font') refreshWeights();
         if (k === 'imgPos') renderMain();
+        if (k === 'padOn') renderExtras();
         if ((k === 'subBox' || k === 'subArc') && subStrokeUi) subStrokeUi();
         redraw();
       }
@@ -2596,71 +2610,106 @@
       // プレビューでドラッグするための、画像・文字・追加の画像の場所（canvas の座標）
       let lastHit = { pic: null, text: null, sub: null, extras: [] };
       function draw(cv) {
-        const [W, H] = dims();
-        // まわりの余白：中身を内側の大きさで描いて、余白の色の上に貼る
-        const p = S.padOn ? Math.round(Math.min(W, H) * S.padSize / 100) : 0;
-        let hit;
-        if (!p) {
-          hit = drawDesign(cv, W, H);
-        } else {
-          const inner = document.createElement('canvas');
-          const ih = drawDesign(inner, W - p * 2, H - p * 2);
-          cv.width = W; cv.height = H;
-          const c = cv.getContext('2d');
-          c.fillStyle = S.padColor;
-          c.fillRect(0, 0, W, H);
-          c.save();
-          const r = Math.min(W, H) * S.padRound / 100;
-          if (r > 0) { c.beginPath(); c.roundRect(p, p, W - p * 2, H - p * 2, r); c.clip(); }
-          c.drawImage(inner, p, p);
-          c.restore();
-          const sh = q => q && { ...q, x: q.x + p, y: q.y + p };
-          hit = { pic: sh(ih.pic), text: sh(ih.text), sub: sh(ih.sub), extras: ih.extras.map(sh) };
-        }
-        if (cv === $('cv')) lastHit = hit;
-      }
-
-      // 中身（背景・帯・画像・文字）を W×H で描いて、ドラッグ用の場所を返す
-      function drawDesign(cv, W, H) {
+        const [W0, H0] = dims();
+        // まわりの余白：中身は内側の大きさ（W×H）で描く。ふちは重なりの順の「@frame」で描く
+        const p = S.padOn ? Math.round(Math.min(W0, H0) * S.padSize / 100) : 0;
+        if (S.padOn !== S.order.includes('@frame')) fixOrder(S);
+        const W = W0 - p * 2, H = H0 - p * 2;
         const band = S.logoMode === 'band' ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
-        if (!band) return drawContent(cv, W, H);
-        const top = S.bandPos === 'top' ? band : 0;
+        const top = band && S.bandPos === 'top' ? band : 0;
         // 帯とロゴ（canvas 全体の座標で描く）
         const drawBand = c => {
           c.save();
           c.setTransform(1, 0, 0, 1, 0, 0);
           c.fillStyle = S.bandColor;
-          c.fillRect(0, top ? 0 : H - band, W, band);
+          const y = p + (top ? 0 : H - band);
+          c.fillRect(p, y, W, band);
           if (img.logo) {
             const r = Math.min(W * 0.5 / img.logo.width, band * 0.56 * S.logoScale / img.logo.height);
             const w = img.logo.width * r, h = img.logo.height * r;
-            c.drawImage(img.logo, W / 2 - w / 2, (top ? 0 : H - band) + band / 2 - h / 2, w, h);
+            c.drawImage(img.logo, p + W / 2 - w / 2, y + band / 2 - h / 2, w, h);
           }
           c.restore();
         };
-        let hit;
-        if (S.bandLayer === 'back') {
-          // 背景のすぐ上に帯を敷く。配置は帯を除いた部分で決めて、画像や文字は帯にはみ出しても描く
-          hit = drawContent(cv, W, H - band, { dy: top, fullH: H, underLayers: drawBand });
-        } else {
-          // 帯のぶんを除いた部分を描いて、帯と一緒に貼る（帯がいちばん上）
-          const body = document.createElement('canvas');
-          hit = drawContent(body, W, H - band);
-          cv.width = W; cv.height = H;
-          const c = cv.getContext('2d');
-          c.drawImage(body, 0, top);
-          drawBand(c);
+        // 帯：「いちばん上」なら画像や文字のあと、「背景のすぐ上」なら背景のあとに描く。配置は帯を除いた部分で決める
+        const hit = drawContent(cv, W, H - band, {
+          pad: p, dy: top, fullH: H,
+          underLayers: band && S.bandLayer === 'back' ? drawBand : null,
+          overLayers: band && S.bandLayer !== 'back' ? drawBand : null,
+        });
+        if (cv === $('cv')) {
+          const sh = r => r && { ...r, x: r.x + p, y: r.y + p + top };
+          lastHit = { pic: sh(hit.pic), text: sh(hit.text), sub: sh(hit.sub), extras: hit.extras.map(sh) };
         }
-        const sh = r => r && { ...r, y: r.y + top };
-        return { pic: sh(hit.pic), text: sh(hit.text), sub: sh(hit.sub), extras: hit.extras.map(sh) };
+      }
+
+      // ふちの内側の形（canvas の座標）。波・レースのときは、波の真ん中と外向きの向きを返す
+      function padInnerPath(c, x, y, w, h, p) {
+        if (S.padShape === 'square') {
+          const r = Math.min(w + p * 2, h + p * 2) * S.padRound / 100;
+          if (r > 0) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h);
+          return { bumps: [], rb: 0 };
+        }
+        // 辺ごとに半円を内向きに並べる（ふちの色の波が中身に食い込む）
+        const rb = Math.max(4, p * 0.32);
+        const bumps = [];
+        const edges = [[x, y, 1, 0, 0, 1, w], [x + w, y, 0, 1, -1, 0, h], [x + w, y + h, -1, 0, 0, -1, w], [x, y + h, 0, -1, 1, 0, h]];
+        c.moveTo(x, y);
+        for (const [sx, sy, dx, dy, nx, ny, len] of edges) {
+          const n = Math.max(1, Math.round(len / (rb * 2))), r = len / n / 2;
+          const a0 = Math.atan2(-dy, -dx), a1 = Math.atan2(dy, dx);
+          // a0 から時計回りに回ると内向き（n）を通るか
+          const cw = Math.cos(a0 + Math.PI / 2) * nx + Math.sin(a0 + Math.PI / 2) * ny > 0;
+          for (let i = 0; i < n; i++) {
+            const cx = sx + dx * r * (2 * i + 1), cy = sy + dy * r * (2 * i + 1);
+            c.arc(cx, cy, r, a0, a1, !cw);
+            bumps.push({ x: cx, y: cy, ox: -nx, oy: -ny, r });
+          }
+        }
+        c.closePath();
+        return { bumps, rb };
+      }
+      // ふち（重なりの順の「@frame」）。これより下の画像や文字は、ふちに隠れてはみ出さない
+      function drawFrame(c, Wc, Hc, p) {
+        c.save();
+        c.setTransform(1, 0, 0, 1, 0, 0);
+        c.beginPath();
+        c.rect(0, 0, Wc, Hc);
+        const { bumps, rb } = padInnerPath(c, p, p, Wc - p * 2, Hc - p * 2, p);
+        c.fillStyle = S.padColor;
+        c.fill('evenodd');
+        c.fillStyle = S.padAccent;
+        // レース：波ごとに小さな穴
+        if (S.padShape === 'lace') for (const b of bumps) {
+          c.beginPath();
+          c.arc(b.x + b.ox * b.r * 0.15, b.y + b.oy * b.r * 0.15, b.r * 0.3, 0, Math.PI * 2);
+          c.fill();
+        }
+        // 点線：ふちの真ん中あたり
+        if (S.padLine) {
+          const lw = Math.max(1.5, Math.min(Wc, Hc) * 0.003);
+          const d = S.padShape === 'square' ? p * 0.45 : Math.max(lw * 2, (p - rb * (S.padShape === 'lace' ? 1.6 : 1.1)) / 2);
+          c.lineWidth = lw;
+          c.setLineDash([lw * 3, lw * 2.5]);
+          c.strokeStyle = S.padAccent;
+          c.beginPath();
+          const r = S.padShape === 'square' && S.padRound > 0 ? Math.min(Wc, Hc) * S.padRound / 100 + (p - d) : 0;
+          if (r > 0) c.roundRect(d, d, Wc - d * 2, Hc - d * 2, r); else c.rect(d, d, Wc - d * 2, Hc - d * 2);
+          c.stroke();
+        }
+        c.restore();
       }
 
       // opt.fullH：canvas の本当の高さ（帯を背景のすぐ上に敷くとき）。opt.dy だけ下にずらして描き、
       // 背景のあと・画像や文字の前に opt.underLayers(c) を呼ぶ
       function drawContent(cv, W, H, opt = {}) {
-        cv.width = W; cv.height = opt.fullH || H;
+        const p = opt.pad || 0;
+        cv.width = W + p * 2; cv.height = (opt.fullH || H) + p * 2;
         const c = cv.getContext('2d');
-        if (opt.dy) c.translate(0, opt.dy);
+        // 余白があるときは、背景・帯（背景のすぐ上）・光などを内側の形の中だけに描く
+        c.save();
+        if (p) { c.beginPath(); padInnerPath(c, p, p, cv.width - p * 2, cv.height - p * 2, p); c.clip(); }
+        c.translate(p, p + (opt.dy || 0));
         const k = Math.min(W / 1200, H / 630);
         const stacked = W / H < 1.4;
         const side = S.imgPos === 'none' ? null : (img.side || sampleImg());
@@ -2966,14 +3015,20 @@
           drawText('corner');
         };
 
-        // ---- 重なりの順に描く（下から）
+        // ---- 重なりの順に描く（下から）。ここからは切り抜かない（ふちより上のものは、ふちにはみ出す）
+        c.restore();
+        c.save();
+        c.translate(p, p + (opt.dy || 0));
         const byId = Object.fromEntries(S.extras.map(e => [e.id, e]));
         for (const id of S.order) {
-          if (id === '@pic') drawPic();
+          if (id === '@frame') { if (p) drawFrame(c, cv.width, cv.height, p); }
+          else if (id === '@pic') drawPic();
           else if (id === '@text') drawTitle();
           else if (id === '@sub') drawSub();
           else if (byId[id]) drawExtra(byId[id]);
         }
+        c.restore();
+        if (opt.overLayers) opt.overLayers(c);
         return { pic, text: titleRect, sub: subRect, extras };
       }
 
@@ -3536,7 +3591,7 @@
       const mainCard = $('main-card');
       // タイトル・サブタイトルの入力欄と設定（一覧を作り直しても、同じものを使い回す）
       const titleField = $('title-field'), subField = $('sub-field');
-      const titleOpts = $('title-opts'), subOpts = $('sub-opts');
+      const titleOpts = $('title-opts'), subOpts = $('sub-opts'), frameOpts = $('frame-opts');
       let subBars = null;
       function renderMain() {
         const has = !!img.side;
@@ -3916,6 +3971,18 @@
             list.appendChild(row);
             return;
           }
+          // 余白（ふち）：これより上の画像や文字は、ふちにはみ出して描く
+          if (id === '@frame') {
+            row.className = 'extra-item main-card';
+            row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="font-size:16px">▢</span><span class="nm">余白（ふち）</span>`
+              + orderBtns(rank, n) + `</div>`
+              + '<p class="field-note" style="margin:6px 0 8px">これより上にある画像や文字は、ふちの上にはみ出して描きます（キャラを枠から飛び出させるときに）</p>'
+              + '<div class="opts-slot"></div>';
+            row.querySelector('.opts-slot').appendChild(frameOpts);
+            hookRow(row, '@frame');
+            list.appendChild(row);
+            return;
+          }
           // サブタイトル
           if (id === '@sub') {
             row.className = 'extra-item main-card';
@@ -4050,7 +4117,7 @@
         const id = newId();
         const n = S.extras.length;
         S.extras.push({ id, type: 'text', text: 'テキスト', color: S.titleColor, box: 'none', boxColor: '#ff7fa0', boxAlpha: 1, strokeOn: true, strokeW: 11, strokeColor: '#ffffff', font: '@inherit', weight: '@inherit', align: 'center', arc: 0, hlColor: '#f0325a', hlScale: 1.15, x: 50, y: 18 + (n % 4) * 8, scale: 0.8, rot: 0 });
-        S.order.push(id);
+        pushLayer(id);
         renderExtras(); redraw();
         const inp = $('extra-list').querySelector(`[data-id="${id}"] .extra-text textarea`);
         if (inp) { inp.focus(); inp.select(); }
@@ -4080,7 +4147,7 @@
           // 前に足したものと重ならないように、少しずつずらして置く
           const n = S.extras.length;
           S.extras.push({ id, type: 'image', x: at ? at.x : 80 - (n % 4) * 8, y: at ? at.y : 22 + (n % 4) * 8, scale: 0.6, rot: 0 });
-          S.order.push(id);
+          pushLayer(id);
           movedId = id;
           renderExtras(); redraw();
           showAdded(id);
