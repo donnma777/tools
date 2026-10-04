@@ -3369,6 +3369,7 @@
         }
         // 背景を「なし（透明）」にしたときだけ、透明が分かるように市松模様を敷く
         $('ec-stage').classList.toggle('bg-checker', S.bg === 'none' || S.hidden.includes('@bg'));
+        setBgThumb();
         const [W, H] = dims();
         $('size-meta').textContent = `${W}×${H}`;
         mini.width = 160;
@@ -4157,15 +4158,26 @@
           row.className = 'extra-item main-card';
           const thumb = id === '@logo'
             ? '<button class="img-thumb thumb-pick logo-head-thumb" type="button" title="クリックでロゴを選ぶ" aria-label="ロゴを選ぶ"></button>'
-            : `<span class="img-thumb text-thumb" style="font-size:16px">${icon}</span>`;
+            : '<button class="img-thumb thumb-pick bg-head-thumb" type="button" title="クリックで背景画像を選ぶ" aria-label="背景画像を選ぶ"></button>';
           row.innerHTML = `<div class="extra-head">${thumb}<span class="nm">${name}</span></div>`
             + '<div class="opts-slot"></div>';
           row.querySelector('.opts-slot').appendChild(box);
           if (id === '@logo') row.querySelector('.logo-head-thumb').onclick = () => { select('@logo'); $('logo-file').click(); };
+          if (id === '@bg') row.querySelector('.bg-head-thumb').onclick = () => { select('@bg'); $('bg-file').click(); };
           hookRow(row, id);
           list.appendChild(row);
         }
         setLogoThumb();
+        setBgThumb();
+      }
+      // 一覧の「背景」のカードのアイコン（自分の画像のときはその画像、ほかは 🎨）
+      function setBgThumb() {
+        const h = document.querySelector('#extra-list .bg-head-thumb');
+        if (!h) return;
+        const url = S.bg === 'image' && img.bg ? `url("${img.bg.src}")` : '';
+        if (h.style.backgroundImage !== url) h.style.backgroundImage = url;
+        const t = url ? '' : '🎨';
+        if (h.textContent !== t) h.textContent = t;
       }
 
       // メインの画像 → 自由な画像
