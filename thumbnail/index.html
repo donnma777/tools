@@ -4240,20 +4240,10 @@
         e.target.value = '';
         if (f) addImage(f);
       });
-      // 画像を足す。at は置く場所（キャンバスの %）。まだメインの画像がなければメインにする
+      // 画像を足す。at は置く場所（キャンバスの %）。メインの画像は、メインの画像のカードの「画像を選ぶ」で選ぶ
       async function addImage(f, at) {
         try {
           const { url, im } = await readImage(f, 1600);
-          if (!img.side) {
-            img.side = im;
-            keep(IMG_KEY, url);
-            if (S.imgPos === 'none') S.imgPos = 'left';
-            movedId = '@pic';
-            syncUI(); setThumb(); renderExtras(); redraw();
-            showAdded('@pic');
-            toast('サンプルの代わりに、メインの画像にしました（文字がよけて置かれます）');
-            return;
-          }
           const id = newId();
           img.extras[id] = im;
           keep(EXTRA_KEY(id), url);
