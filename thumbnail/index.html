@@ -1187,7 +1187,7 @@
       box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
     }
 
-    /* スマホ：プレビューを画面の上に固定する（PC はもともと固定なので出さない） */
+    /* スマホ：プレビューを画面の上に展開しておく（PC はもともと画面に貼りつくので出さない） */
     .pin-btn {
       display: none;
       margin-left: 6px;
@@ -1214,16 +1214,16 @@
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
       }
 
-      /* 固定中は小さく：保存の行と下のバーは隠す */
+      /* 展開中は小さく：選んだものの大きさ・位置・回転のバーは出し、保存の行と案内の文は隠す */
       body.preview-pinned .ec-stage {
         padding: 6px;
       }
 
       body.preview-pinned #cv {
-        max-height: 30vh;
+        max-height: 26vh;
       }
 
-      body.preview-pinned .sel-panel,
+      body.preview-pinned .sel-panel.empty,
       body.preview-pinned .save-row {
         display: none;
       }
@@ -2008,7 +2008,7 @@
     <div class="side">
       <div class="panel preview-panel">
         <div class="panel-head">
-          <span>プレビュー <span class="out-meta" id="size-meta"></span> <button class="btn btn-sm pin-btn" type="button" id="btn-pin" aria-pressed="false" title="スクロールしても、プレビューを画面の上に出しておきます">📌 固定</button></span>
+          <span>プレビュー <span class="out-meta" id="size-meta"></span> <button class="btn btn-sm pin-btn" type="button" id="btn-pin" aria-pressed="false" title="スクロールしても、プレビューを画面の上に出しておきます">📌 展開する</button></span>
           <div class="undo-row">
             <div class="sel-head" id="sel-head" hidden>
               <span class="sel-name" id="sel-name"></span>
@@ -3394,12 +3394,12 @@
       //  プレビュー・保存
       // =====================================================
       const cv = $('cv'), mini = $('mini');
-      // スマホ：プレビューを画面の上に固定する・外す（このブラウザに覚えておく）
+      // スマホ：プレビューを画面の上に展開しておく・やめる（このブラウザに覚えておく）
       const PIN_KEY = 'donnma-eyecatch-pin';
       function setPin(on) {
         document.body.classList.toggle('preview-pinned', on);
         $('btn-pin').setAttribute('aria-pressed', String(on));
-        $('btn-pin').textContent = on ? '📌 固定を外す' : '📌 固定';
+        $('btn-pin').textContent = on ? '📌 展開をやめる' : '📌 展開する';
         try { on ? localStorage.setItem(PIN_KEY, '1') : localStorage.removeItem(PIN_KEY); } catch (e) { /* ignore */ }
       }
       $('btn-pin').addEventListener('click', () => setPin(!document.body.classList.contains('preview-pinned')));
