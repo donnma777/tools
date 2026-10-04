@@ -1539,6 +1539,47 @@
       font-size: 14px;
     }
 
+    .sns-ig {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    .sns-ig-ph {
+      aspect-ratio: 3 / 4;
+      background: #efefef;
+    }
+
+    .sns-icons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sns-icon-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sns-icon {
+      flex: none;
+      overflow: hidden;
+      border-radius: 50%;
+      background: #e1e8ed;
+    }
+
+    .sns-icon img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sns-icon-name {
+      font-weight: 700;
+    }
+
     /* 小さく見る：プレビューの左下に、一覧で出るくらいの大きさで重ねる */
     .mini-pop {
       position: absolute;
@@ -3751,6 +3792,11 @@
           ['YouTube', 'おすすめの一覧（小さく出る）', 'light',
             `<div class="sns-yt-row"><div class="sns-yt sns-yt-mini">${pic('16 / 9', 'sns-rounded')}${dur}</div><div><div class="sns-yt-title">${title}</div><div class="sns-small">チャンネル名</div></div></div>`],
           ['GitHub', 'リポジトリのカード（2:1 に切り抜き）', 'light', `<div class="sns-gh">${pic('2 / 1')}</div>`],
+          ['Instagram', 'プロフィールの一覧（3:4 に切り抜き）', 'light',
+            `<div class="sns-ig">${'<div class="sns-ig-ph"></div>'.repeat(4)}${pic('3 / 4')}${'<div class="sns-ig-ph"></div>'.repeat(4)}</div>`],
+          ['プロフィール画像', '丸く切り抜き（X・YouTube・Discord など）', 'light',
+            `<div class="sns-icons">${[96, 48, 32].map(n => `<div class="sns-icon-row"><div class="sns-icon" style="width:${n}px;height:${n}px"><img src="${url}" alt=""></div>`
+              + `<div><div class="sns-icon-name">名前</div><div class="sns-small">${n}px で表示したとき</div></div></div>`).join('')}</div>`],
         ];
         const box = document.createElement('div');
         box.className = 'sns-view';
