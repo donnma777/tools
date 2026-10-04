@@ -1289,12 +1289,24 @@
       color: var(--muted);
     }
 
+    /* 大きく見る・SNS での見え方を開いているあいだは、後ろの画面をスクロールさせない */
+    html.modal-open,
+    html.modal-open body {
+      overflow: hidden;
+    }
+
+    .big-view {
+      overscroll-behavior: contain;
+      touch-action: none;
+    }
+
     /* SNS での見え方 */
     .sns-view {
       position: fixed;
       inset: 0;
       z-index: 1000;
       overflow-y: auto;
+      overscroll-behavior: contain;
       background: rgba(10, 4, 8, 0.92);
       padding: 24px 16px 40px;
     }
@@ -1545,6 +1557,47 @@
     .sns-yt-row .sns-yt-title {
       margin-top: 0;
       font-size: 14px;
+    }
+
+    .sns-dark {
+      background: #0f0f0f;
+      color: #fff;
+    }
+
+    .sns-vert {
+      position: relative;
+      width: min(100%, 220px);
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 12px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .sns-vert-right {
+      position: absolute;
+      right: 8px;
+      bottom: 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 20px;
+      text-align: center;
+    }
+
+    .sns-vert-bottom {
+      position: absolute;
+      left: 10px;
+      right: 52px;
+      bottom: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .sns-vert-bottom > div {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
     }
 
     .sns-ig {
@@ -3770,8 +3823,9 @@
         };
         fit();
         addEventListener('resize', fit);
-        const close = () => { box.remove(); document.removeEventListener('keydown', onKey); removeEventListener('resize', fit); };
+        const close = () => { box.remove(); document.removeEventListener('keydown', onKey); removeEventListener('resize', fit); document.documentElement.classList.remove('modal-open'); };
         const onKey = e => { if (e.key === 'Escape') close(); };
+        document.documentElement.classList.add('modal-open');
         box.addEventListener('click', close);
         document.addEventListener('keydown', onKey);
         document.body.appendChild(box);
@@ -3785,6 +3839,9 @@
         const dom = 'example.com', desc = 'ここにページの説明文が入ります。説明文はサイトの設定によって変わります。';
         const pic = (ratio, cls = '') => `<div class="sns-pic ${cls}" style="aspect-ratio:${ratio}"><img src="${url}" alt=""></div>`;
         const dur = '<span class="sns-dur">12:34</span>';
+        // 縦長の動画：画面いっぱいに切り抜き、右にボタン、下に名前と説明が重なる
+        const vert = icons => `<div class="sns-vert">${pic('9 / 16')}<div class="sns-vert-right">${icons.map(i => `<span>${i}</span>`).join('')}</div>`
+          + `<div class="sns-vert-bottom"><b>@アカウント名</b><div>${title}</div></div></div>`;
         const cards = [
           ['X', 'リンクのカード（1.91:1 に切り抜き）', 'light',
             `<div class="sns-x">${pic('1.91 / 1')}<span class="sns-x-dom">${dom}</span></div><div class="sns-small">${dom} から</div>`],
@@ -3800,6 +3857,8 @@
           ['YouTube', 'おすすめの一覧（小さく出る）', 'light',
             `<div class="sns-yt-row"><div class="sns-yt sns-yt-mini">${pic('16 / 9', 'sns-rounded')}${dur}</div><div><div class="sns-yt-title">${title}</div><div class="sns-small">チャンネル名</div></div></div>`],
           ['GitHub', 'リポジトリのカード（2:1 に切り抜き）', 'light', `<div class="sns-gh">${pic('2 / 1')}</div>`],
+          ['YouTube ショート', '縦 9:16 に切り抜き（右と下にボタンや説明が重なる）', 'dark', vert(['👍', '👎', '💬', '↗', '🎵'])],
+          ['TikTok', '縦 9:16 に切り抜き（右と下にボタンや説明が重なる）', 'dark', vert(['👤', '♥', '💬', '🔖', '↗'])],
           ['Instagram', 'プロフィールの一覧（3:4 に切り抜き）', 'light',
             `<div class="sns-ig">${'<div class="sns-ig-ph"></div>'.repeat(4)}${pic('3 / 4')}${'<div class="sns-ig-ph"></div>'.repeat(4)}</div>`],
           ['プロフィール画像', '丸く切り抜き（X・YouTube・Discord など）', 'light',
@@ -3814,8 +3873,9 @@
           + '<p class="sns-note">各サービスの表示は、画面の大きさや仕様の変更で変わります。形と切れ方の目安として使ってください。タイトルはサムネイルメーカーのタイトル、URL と説明は仮のものです。</p>'
           + '<div class="sns-grid">' + cards.map(([name, what, tone, body]) =>
             `<section class="sns-card"><div class="sns-label"><b>${name}</b><span>${what}</span></div><div class="sns-tile sns-${tone}">${body}</div></section>`).join('') + '</div></div>';
-        const close = () => { box.remove(); document.removeEventListener('keydown', onKey); };
+        const close = () => { box.remove(); document.removeEventListener('keydown', onKey); document.documentElement.classList.remove('modal-open'); };
         const onKey = e => { if (e.key === 'Escape') close(); };
+        document.documentElement.classList.add('modal-open');
         box.addEventListener('click', e => { if (e.target === box || e.target.closest('[data-a="close"]')) close(); });
         document.addEventListener('keydown', onKey);
         document.body.appendChild(box);
