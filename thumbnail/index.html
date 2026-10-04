@@ -2519,23 +2519,25 @@
       // =====================================================
       //  設定
       // =====================================================
+      // 大きさの選択肢（面積の小さい順。「自由に入力」はいちばん下）
       const SIZES = {
-        yt: [1280, 720, 'アイキャッチ・YouTubeサムネ（1280×720）'],
-        ogp: [1200, 630, 'SNS共有・OGP（1200×630）'],
-        x: [1600, 900, 'X（旧Twitter）の投稿画像（1600×900）'],
-        gh: [1280, 640, 'GitHub の Social preview（1280×640）'],
-        sq: [1080, 1080, '正方形（1080×1080）'],
-        tall: [1080, 1920, '縦長・ストーリー（1080×1920）'],
-        ig34: [1080, 1440, 'Instagram のフィード・縦（1080×1440）'],
-        xhead: [1500, 500, 'X のヘッダー（1500×500）'],
-        ytbanner: [2560, 1440, 'YouTube のチャンネルバナー（2560×1440）'],
+        icon: [400, 400, 'プロフィール画像・アイコン（400×400）'],
         fbcover: [851, 315, 'Facebook のカバー写真（851×315）'],
+        xhead: [1500, 500, 'X のヘッダー（1500×500）'],
+        ogp: [1200, 630, 'SNS共有・OGP（1200×630）'],
+        gh: [1280, 640, 'GitHub の Social preview（1280×640）'],
+        yt: [1280, 720, 'アイキャッチ・YouTubeサムネ（1280×720）'],
+        sq: [1080, 1080, '正方形（1080×1080）'],
+        x: [1600, 900, 'X（旧Twitter）の投稿画像（1600×900）'],
+        ig34: [1080, 1440, 'Instagram のフィード・縦（1080×1440）'],
+        tall: [1080, 1920, 'YouTube ショート・TikTok・ストーリー（1080×1920）'],
+        ytbanner: [2560, 1440, 'YouTube のチャンネルバナー（2560×1440）'],
         linerich: [2500, 1686, 'LINE 公式アカウントのリッチメニュー（2500×1686）'],
         custom: [0, 0, '自由に入力'],
       };
       const DEFAULTS = {
         title: '*タイトル*を\n入力してね', sub: 'サブタイトル',
-        size: 'yt', customW: 1280, customH: 720,
+        size: 'ogp', customW: 1200, customH: 630,
         font: 'Zen Maru Gothic', fontCustom: '', weight: '900', userFonts: [],
         titleColor: '#ff7fa0', hlColor: '#f0325a', hlScale: 1.15, subColor: '#6e3551', shadow: true,
         titleFont: '@inherit', titleWeight: '@inherit', subFont: '@inherit', subWeight: '@inherit',
@@ -2589,7 +2591,7 @@
           else if (typeof d === 'boolean' && typeof v === 'boolean') out[k] = v;
           else if (typeof d === 'string' && typeof v === 'string' && (!COLOR_KEYS.includes(k) || /^#[0-9a-f]{6}$/i.test(v))) out[k] = v;
         }
-        if (!SIZES[out.size]) out.size = 'yt';
+        if (!SIZES[out.size]) out.size = 'ogp';
         // 前の「背景画像を暗くする」（0〜0.8）→ 明るさのマイナス
         if (o.bgBright === undefined && +o.bgDim > 0) out.bgBright = -Math.round(Math.min(0.8, +o.bgDim) * 100);
         out.bgBright = Math.max(-80, Math.min(80, out.bgBright));
@@ -3968,7 +3970,7 @@
           c.restore();
           return;
         }
-        const own = ['xhead', 'fbcover', 'ig34'].includes(S.size);
+        const own = ['xhead', 'fbcover', 'ig34', 'icon'].includes(S.size);
         // ほかのサイトで切られることがある線：16:9（YouTube・X）・1.91:1（SNS の共有）・2:1（GitHub）で真ん中を切り出したときに、全部に残る範囲
         // 縦長・正方形は、Instagram の一覧（3:4）
         let cw = W, ch = H;
@@ -3978,7 +3980,9 @@
         if (cw < W * 0.995 || ch < H * 0.995) box((W - cw) / 2, (H - ch) / 2, cw, ch, 'ほかのサイトで切られることがある線', 'rgba(240, 130, 0, 0.95)', null, 'tr');
         // 文字を置くと安心な範囲（まわり 5%）
         const m = Math.min(W, H) * 0.05;
-        box(m, m, W - m * 2, H - m * 2, '文字を置くと安心な範囲', 'rgba(0, 150, 230, 0.95)');
+        // アイコンは丸の内側に収まる四角、ほかはまわり 5% の内側
+        if (S.size === 'icon') { const q = Math.min(W, H) / Math.SQRT2 * 0.92; box((W - q) / 2, (H - q) / 2, q, q, '文字を置くと安心な範囲', BLUE); }
+        else box(m, m, W - m * 2, H - m * 2, '文字を置くと安心な範囲', BLUE);
         // 上に何かが重なる場所
         if (S.size === 'xhead') {
           // X のヘッダー：左下にプロフィール画像が重なる
@@ -3987,6 +3991,21 @@
           // Facebook のカバー写真：スマホでは左右が切れる
           const w = W * 0.66;
           box((W - w) / 2, 0, w, H, 'スマホで見える範囲', ORANGE, null, 'tr');
+        } else if (S.size === 'icon') {
+          // プロフィール画像：丸く切り抜かれるので、四隅は見えない
+          c.save();
+          c.beginPath();
+          c.rect(0, 0, W, H);
+          c.arc(W / 2, H / 2, Math.min(W, H) / 2, 0, Math.PI * 2);
+          c.fillStyle = RED_FILL;
+          c.fill('evenodd');
+          c.setLineDash([lw * 4, lw * 3]);
+          c.strokeStyle = RED;
+          c.beginPath();
+          c.arc(W / 2, H / 2, Math.min(W, H) / 2 - lw / 2, 0, Math.PI * 2);
+          c.stroke();
+          c.restore();
+          box(0, H, 0, 0, '丸く切り抜かれて見えない所', RED, null, 'bl');
         } else if (S.size === 'ig34') {
           // Instagram：正方形で出るところでは上下が切れる
           box(0, (H - W) / 2, W, W, '正方形で出るときに切られる線', ORANGE, null, 'br');
