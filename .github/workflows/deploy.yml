@@ -22,6 +22,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # SSH につながらないときの調べ用：GitHub のサーバーの IP アドレスと国（Xserver の国外 IP アクセス制限に当たっていないか）
+      - name: Show runner IP and country
+        continue-on-error: true
+        run: curl -s --max-time 10 https://ipinfo.io/json | grep -E '"(ip|country|region|org)"' || echo "IP を調べられませんでした"
+
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
