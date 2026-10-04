@@ -3942,10 +3942,14 @@
         on.checked = id === '@frame' ? S.padOn : !S.hidden.includes(id);
         row.classList.toggle('is-off', !on.checked);
         on.onchange = () => {
-          if (id === '@frame') { inputs.padOn.set(on.checked); update('padOn', on.checked); return; }
-          S.hidden = on.checked ? S.hidden.filter(v => v !== id) : [...S.hidden, id];
-          row.classList.toggle('is-off', !on.checked);
-          redraw();
+          if (id === '@frame') { inputs.padOn.set(on.checked); update('padOn', on.checked); }
+          else {
+            S.hidden = on.checked ? S.hidden.filter(v => v !== id) : [...S.hidden, id];
+            row.classList.toggle('is-off', !on.checked);
+            redraw();
+          }
+          // オンにしたら、そのカードを選んで設定を開く
+          if (on.checked) select(id);
         };
         row.classList.toggle('selected', id === selId);
         // カードの空いているところをクリックしても選べる
@@ -4005,8 +4009,7 @@
           // タイトル
           if (id === '@text') {
             row.className = 'extra-item main-card';
-            const t = S.title.replace(/\*/g, '').split('\n')[0] || '（タイトルなし）';
-            row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb">T</span><span class="nm">タイトル<small>（${esc(t.slice(0, 12))}…）</small></span>`
+            row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb">T</span><span class="nm">タイトル</span>`
               + orderBtns(rank, n) + `</div>`
               + '<div class="main-text-slot fields"></div>' + FONT_ROW
               + '<div class="extra-text sub-box-row title-shape-row"><select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option><option value="band">横いっぱいの帯</option></select>'
@@ -4509,8 +4512,6 @@
         S.title = e.target.value;
         refreshVisibility();
         if (titleHlUi) titleHlUi();
-        const nm = $('extra-list').querySelector('[data-id="@text"] .nm small');
-        if (nm) nm.textContent = `（${(S.title.replace(/\*/g, '').split('\n')[0] || '（タイトルなし）').slice(0, 12)}…）`;
         redraw();
       });
       $('f-sub').addEventListener('input', e => { S.sub = e.target.value; redraw(); });
