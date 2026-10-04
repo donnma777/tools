@@ -1868,6 +1868,7 @@
       <div hidden>
         <div class="fields card-opts" id="title-opts"></div>
         <div class="fields card-opts" id="sub-opts"></div>
+        <div class="fields card-opts" id="frame-opts"></div>
         <div class="fields" id="main-text-fields">
           <div class="field field-full" id="title-field">
             <label class="field-label" for="f-title"><span>タイトル（Enter で改行・*〜* で囲むと強調）</span></label>
@@ -2331,13 +2332,13 @@
           title: '枠と余白', icon: '🖼️', fields: [
             { k: 'frameOn', l: '内側に細い枠を付ける', t: 'check' },
             { k: 'frameColor', l: '枠の色', t: 'color', when: s => s.frameOn },
-            { k: 'padOn', l: 'まわりに余白（ふち）を付ける', t: 'check', note: '画像の大きさはそのままで、中身を内側に縮めます。「文字と画像を追加」の一覧で「余白（ふち）」より前に出した画像や文字は、ふちの上にはみ出して描きます' },
-            { k: 'padSize', l: '余白の幅', t: 'range', min: 1, max: 15, step: 0.5, u: '%', when: s => s.padOn },
-            { k: 'padColor', l: '余白の色', t: 'color', when: s => s.padOn },
-            { k: 'padShape', l: '内側の形', t: 'select', o: [['square', '四角'], ['scallop', '波（スカラップ）'], ['lace', 'レース']], when: s => s.padOn },
-            { k: 'padRound', l: '内側の角の丸み', t: 'range', min: 0, max: 10, step: 0.5, u: '%', when: s => s.padOn && s.padShape === 'square' },
-            { k: 'padLine', l: '点線を入れる', t: 'check', when: s => s.padOn },
-            { k: 'padAccent', l: s => s.padShape === 'lace' ? '点線・レースの穴の色' : '点線の色', t: 'color', when: s => s.padOn && (s.padLine || s.padShape === 'lace') },
+            { k: 'padOn', l: 'まわりに余白（ふち）を付ける', t: 'check', note: '画像の大きさはそのままで、中身を内側に縮めます。幅・色・形は「文字と画像を追加」の一覧で「余白（ふち）」を押すと開きます。それより前に出した画像や文字は、ふちの上にはみ出して描きます' },
+            { k: 'padSize', l: '余白の幅', t: 'range', min: 1, max: 15, step: 0.5, u: '%', home: 'frame' },
+            { k: 'padColor', l: '余白の色', t: 'color', home: 'frame' },
+            { k: 'padShape', l: '内側の形', t: 'select', o: [['square', '四角'], ['scallop', '波（スカラップ）'], ['lace', 'レース']], home: 'frame' },
+            { k: 'padRound', l: '内側の角の丸み', t: 'range', min: 0, max: 10, step: 0.5, u: '%', home: 'frame', when: s => s.padShape === 'square' },
+            { k: 'padLine', l: '点線を入れる', t: 'check', home: 'frame' },
+            { k: 'padAccent', l: s => s.padShape === 'lace' ? '点線・レースの穴の色' : '点線の色', t: 'color', home: 'frame', when: s => s.padLine || s.padShape === 'lace' },
           ]
         },
       ];
@@ -2472,6 +2473,7 @@
         for (const sec of SECTIONS) for (const f of sec.fields) {
           if (f.home === 'title') titleOpts.appendChild(inputs[f.k].wrap);
           if (f.home === 'sub') subOpts.appendChild(inputs[f.k].wrap);
+          if (f.home === 'frame') frameOpts.appendChild(inputs[f.k].wrap);
           if (f.home === 'none') hiddenBin.appendChild(inputs[f.k].wrap);
         }
         // メインの画像の置き方は、メインのカードの中に
@@ -3624,7 +3626,7 @@
       const mainCard = $('main-card');
       // タイトル・サブタイトルの入力欄と設定（一覧を作り直しても、同じものを使い回す）
       const titleField = $('title-field'), subField = $('sub-field');
-      const titleOpts = $('title-opts'), subOpts = $('sub-opts');
+      const titleOpts = $('title-opts'), subOpts = $('sub-opts'), frameOpts = $('frame-opts');
       let subBars = null;
       function renderMain() {
         const has = !!img.side;
@@ -3660,6 +3662,10 @@
         if (id === '@text') return {
           name: 'タイトル', get obj() { return S; }, reset() { S.textX = 0; S.textY = 0; S.titleRot = 0; },
           bars: [['textScale', '大きさ', 0.5, 1.3, 0.05, '倍'], ['textX', '左右', -50, 50, 1, '%'], ['textY', '上下', -50, 50, 1, '%'], ['titleRot', '回転', -180, 180, 1, '°']],
+        };
+        if (id === '@frame') return {
+          name: '余白（ふち）', get obj() { return S; }, reset() { S.padSize = 4; },
+          bars: [['padSize', '余白の幅', 1, 15, 0.5, '%']],
         };
         if (id === '@sub') return {
           name: 'サブタイトル', get obj() { return S; }, reset() { S.subX = 0; S.subY = 0; S.subRot = 0; },
@@ -4027,7 +4033,9 @@
             row.className = 'extra-item main-card';
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="font-size:16px">▢</span><span class="nm">余白（ふち）</span>`
               + orderBtns(rank, n) + `</div>`
-              + '<p class="field-note" style="margin:6px 0 0">これより前の画像や文字は、ふちの上にはみ出して描きます。幅や形は「枠と余白」で変えられます</p>';
+              + '<p class="field-note" style="margin:6px 0 8px">これより前の画像や文字は、ふちの上にはみ出して描きます</p>'
+              + '<div class="opts-slot"></div>';
+            row.querySelector('.opts-slot').appendChild(frameOpts);
             hookRow(row, '@frame');
             list.appendChild(row);
             return;
