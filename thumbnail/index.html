@@ -1969,7 +1969,7 @@
         <ol class="steps">
           <li>「🧩 文字と画像を追加」の <b>メインの文字</b> のカードに、タイトルを入れます。Enter で改行できます。</li>
           <li>「大きさ」で使う場所に合わせたサイズを選びます（ブログのアイキャッチ・YouTubeのサムネイルは <b>1280×720</b>、SNSの共有画像は <b>1200×630</b> がおすすめ）。</li>
-          <li>「文字と画像を追加」で自分のキャラや写真、好きな文字を足し、「ロゴ」で自分のロゴを選び、「背景」で柄・色・背景画像を選びます。文字や画像はプレビューでドラッグして動かせます。</li>
+          <li>「文字と画像を追加」で自分のキャラや写真、好きな文字を足し、「ロゴ」で自分のロゴを選び、「背景」で柄・色・背景画像を、「枠と余白」でまわりのふちを選びます。文字や画像はプレビューでドラッグして動かせます。</li>
           <li>よく使う見た目は「🎭 テンプレート」に名前を付けて保存しておくと、次からはタイトルと写真を変えるだけで作れます。同じデザインで何枚も作るときは「📦 まとめて作る」が便利です。</li>
           <li>プレビューの下で形式（JPG・PNG・WebP）を選んで <b>「⬇ 保存」</b> を押すと、画像がダウンロードされます。</li>
         </ol>
@@ -2294,6 +2294,10 @@
             { k: 'bgTile', l: '1枚の大きさ（横幅）', t: 'range', min: 40, max: 800, step: 10, u: 'px', when: s => s.bg === 'image' && s.bgFit === 'tile', note: '1280×720 のときの大きさ。ほかの大きさでは合わせて変わります' },
             { k: 'bgBright', l: '背景の明るさ', t: 'range', min: -80, max: 80, step: 5, u: '%', when: s => s.bg !== 'none', note: 'マイナスで暗く、プラスで明るく。写真の上に白い文字をのせるときは暗めに' },
             { k: 'glow', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'check', when: s => s.bg !== 'none' },
+          ]
+        },
+        {
+          title: '枠と余白', icon: '🖼️', fields: [
             { k: 'frameOn', l: '内側に細い枠を付ける', t: 'check' },
             { k: 'frameColor', l: '枠の色', t: 'color', when: s => s.frameOn },
             { k: 'padOn', l: 'まわりに余白（ふち）を付ける', t: 'check', note: '画像の大きさはそのままで、中身を内側に縮めます。「文字と画像を追加」の一覧で「余白（ふち）」より前に出した画像や文字は、ふちの上にはみ出して描きます' },
@@ -2429,9 +2433,9 @@
           if (sec.title === '大きさ') $('settings').insertBefore(det, $('settings').children[1]);
           else $('settings').appendChild(det);
         }
-        // 欄の並び（よく使う順）：テンプレート → 大きさ → 文字と画像を追加 → 文字の見た目 → ロゴ → 背景 → まとめて作る
+        // 欄の並び（よく使う順）：テンプレート → 大きさ → 文字と画像を追加 → 文字の見た目 → ロゴ → 背景 → 枠と余白 → まとめて作る
         const secOf = t => [...$('settings').querySelectorAll(':scope > details.sec')].find(d => d.querySelector('summary').textContent.includes(t));
-        for (const t of ['大きさ', '文字と画像を追加', '文字の見た目', 'ロゴ', '背景']) $('settings').appendChild(secOf(t));
+        for (const t of ['大きさ', '文字と画像を追加', '文字の見た目', 'ロゴ', '背景', '枠と余白']) $('settings').appendChild(secOf(t));
         $('settings').appendChild($('batch-sec'));
         // タイトル・サブタイトルの項目は、それぞれのカードの中に（一覧を作り直しても使い回す）
         for (const sec of SECTIONS) for (const f of sec.fields) {
@@ -3975,7 +3979,7 @@
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="font-size:16px">▢</span><span class="nm">余白（ふち）</span>`
               + orderBtns(rank, n) + `</div>`
               + '<div class="extra-stroke"><label class="toggle"><span>余白を付ける</span><input type="checkbox"><span class="sw"></span></label></div>'
-              + '<p class="field-note" style="margin:6px 0 0">これより前の画像や文字は、ふちの上にはみ出して描きます。幅や形は「背景」で変えられます</p>';
+              + '<p class="field-note" style="margin:6px 0 0">これより前の画像や文字は、ふちの上にはみ出して描きます。幅や形は「枠と余白」で変えられます</p>';
             const on = row.querySelector('.toggle input');
             on.checked = S.padOn;
             on.onchange = () => { inputs.padOn.set(on.checked); update('padOn', on.checked); };
