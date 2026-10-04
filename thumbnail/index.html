@@ -1187,21 +1187,15 @@
       box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
     }
 
-    /* スマホ：プレビューを画面の上に展開しておく（PC はもともと画面に貼りつくので出さない） */
-    .pin-btn {
+    /* スマホ：プレビューの欄を常に表示する（PC はもともと画面に貼りつくので出さない） */
+    .pin-toggle {
       display: none;
-      margin-left: 6px;
     }
 
     @media (max-width: 1000px) {
-      .pin-btn {
-        display: inline-flex;
-      }
-
-      .pin-btn[aria-pressed="true"] {
-        background: var(--accent);
-        color: var(--on-accent, #2a1020);
-        border-color: var(--accent);
+      .pin-toggle {
+        display: flex;
+        gap: 8px;
       }
 
       body.preview-pinned .side {
@@ -1214,17 +1208,41 @@
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
       }
 
-      /* 展開中は小さく：選んだものの大きさ・位置・回転のバーは出し、保存の行と案内の文は隠す */
+      /* 常に表示するときは、欄をまるごと出したまま絵だけ小さく（バー・大きく見る・保存も使える） */
       body.preview-pinned .ec-stage {
         padding: 6px;
       }
 
       body.preview-pinned #cv {
-        max-height: 26vh;
+        max-height: 28vh;
       }
 
-      body.preview-pinned .sel-panel.empty,
+      body.preview-pinned .sel-panel.empty {
+        display: none;
+      }
+
+      /* 下の設定が見える範囲を残すため、詰める（ファイル名の欄は隠し、保存の行は1行に） */
+      body.preview-pinned #cv {
+        max-height: 24vh;
+      }
+
+      body.preview-pinned .preview-panel .panel-head {
+        padding: 8px 12px;
+        row-gap: 6px;
+      }
+
+      body.preview-pinned .sel-panel {
+        padding-top: 6px;
+        padding-bottom: 6px;
+      }
+
       body.preview-pinned .save-row {
+        flex-wrap: nowrap;
+        padding-top: 8px;
+        padding-bottom: 8px;
+      }
+
+      body.preview-pinned #file-name {
         display: none;
       }
     }
@@ -2008,7 +2026,8 @@
     <div class="side">
       <div class="panel preview-panel">
         <div class="panel-head">
-          <span>プレビュー <span class="out-meta" id="size-meta"></span> <button class="btn btn-sm pin-btn" type="button" id="btn-pin" aria-pressed="false" title="スクロールしても、プレビューを画面の上に出しておきます">📌 展開する</button></span>
+          <span>プレビュー <span class="out-meta" id="size-meta"></span></span>
+          <label class="toggle pin-toggle" title="スクロールしても、プレビューの欄を画面の上に出しておきます"><span>常に表示</span><input type="checkbox" id="pin-on"><span class="sw"></span></label>
           <div class="undo-row">
             <div class="sel-head" id="sel-head" hidden>
               <span class="sel-name" id="sel-name"></span>
@@ -3394,15 +3413,14 @@
       //  プレビュー・保存
       // =====================================================
       const cv = $('cv'), mini = $('mini');
-      // スマホ：プレビューを画面の上に展開しておく・やめる（このブラウザに覚えておく）
+      // スマホ：プレビューの欄を常に表示する・しない（このブラウザに覚えておく）
       const PIN_KEY = 'donnma-eyecatch-pin';
       function setPin(on) {
         document.body.classList.toggle('preview-pinned', on);
-        $('btn-pin').setAttribute('aria-pressed', String(on));
-        $('btn-pin').textContent = on ? '📌 展開をやめる' : '📌 展開する';
+        $('pin-on').checked = on;
         try { on ? localStorage.setItem(PIN_KEY, '1') : localStorage.removeItem(PIN_KEY); } catch (e) { /* ignore */ }
       }
-      $('btn-pin').addEventListener('click', () => setPin(!document.body.classList.contains('preview-pinned')));
+      $('pin-on').addEventListener('change', () => setPin($('pin-on').checked));
       try { if (localStorage.getItem(PIN_KEY) === '1') setPin(true); } catch (e) { /* ignore */ }
       $('btn-mini').addEventListener('click', () => {
         const on = $('mini-pop').hidden;
