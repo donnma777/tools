@@ -1196,6 +1196,25 @@
       .pin-toggle {
         display: flex;
         gap: 8px;
+        position: fixed;
+        top: 64px;
+        right: 12px;
+        z-index: 70;
+        padding: 6px 8px 6px 12px;
+        background: var(--surface);
+        border: 1px solid var(--border-strong);
+        border-radius: 999px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+      }
+
+      /* 常に表示しているときは、スイッチがプレビューの見出しの1行目の右に来るので、そこをあけておく */
+      body.preview-pinned .preview-panel .panel-head > span:first-child {
+        flex-basis: 100%;
+        min-height: 30px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding-right: 150px;
       }
 
       body.preview-pinned .side {
@@ -2022,12 +2041,14 @@
       </details>
     </div>
 
+    <!-- スマホ：プレビューを常に表示するスイッチ（画面の右上にずっと出す） -->
+    <label class="toggle pin-toggle" title="スクロールしても、プレビューの欄を画面の上に出しておきます"><span>プレビュー</span><input type="checkbox" id="pin-on"><span class="sw"></span></label>
+
     <!-- Preview column -->
     <div class="side">
       <div class="panel preview-panel">
         <div class="panel-head">
           <span>プレビュー <span class="out-meta" id="size-meta"></span></span>
-          <label class="toggle pin-toggle" title="スクロールしても、プレビューの欄を画面の上に出しておきます"><span>常に表示</span><input type="checkbox" id="pin-on"><span class="sw"></span></label>
           <div class="undo-row">
             <div class="sel-head" id="sel-head" hidden>
               <span class="sel-name" id="sel-name"></span>
