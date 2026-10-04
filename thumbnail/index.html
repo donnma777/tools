@@ -2068,6 +2068,7 @@
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
         bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, bandLayer: 'front', logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
+        padOn: false, padSize: 4, padColor: '#ffffff', padRound: 0, guideOn: false,
         bgFit: 'cover', bgBright: 0, bgTile: 300,
         bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
       };
@@ -2102,6 +2103,8 @@
         // 前の「背景画像を暗くする」（0〜0.8）→ 明るさのマイナス
         if (o.bgBright === undefined && +o.bgDim > 0) out.bgBright = -Math.round(Math.min(0.8, +o.bgDim) * 100);
         out.bgBright = Math.max(-80, Math.min(80, out.bgBright));
+        out.padSize = Math.max(1, Math.min(15, out.padSize));
+        out.padRound = Math.max(0, Math.min(10, out.padRound));
         // 前の「縦の位置」を置き場所に入れ込む
         if (o.imgAnchor === 'bottom' && (out.imgPos === 'left' || out.imgPos === 'right')) out.imgPos += '-bottom';
         if (!['heart', 'star', 'bunny'].includes(out.sample)) out.sample = 'heart';
@@ -2204,6 +2207,7 @@
             { k: 'size', l: '使う場所', t: 'select', o: Object.entries(SIZES).map(([v, a]) => [v, a[2]]) },
             { k: 'customW', l: '幅（px）', t: 'number', min: 200, max: 4000, when: s => s.size === 'custom' },
             { k: 'customH', l: '高さ（px）', t: 'number', min: 200, max: 4000, when: s => s.size === 'custom' },
+            { k: 'guideOn', l: '切れやすい場所の目安を出す', t: 'check', note: 'プレビューにだけ出て、保存する画像には写りません。青：文字を置くと安心な範囲／オレンジ：ほかのサイトで切られることがある線／赤：再生時間などが重なる場所' },
           ]
         },
         {
@@ -2284,6 +2288,10 @@
             { k: 'glow', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'check', when: s => s.bg !== 'none' },
             { k: 'frameOn', l: '内側に細い枠を付ける', t: 'check' },
             { k: 'frameColor', l: '枠の色', t: 'color', when: s => s.frameOn },
+            { k: 'padOn', l: 'まわりに余白（ふち）を付ける', t: 'check', note: '画像の大きさはそのままで、中身を内側に縮めます' },
+            { k: 'padSize', l: '余白の幅', t: 'range', min: 1, max: 15, step: 0.5, u: '%', when: s => s.padOn },
+            { k: 'padColor', l: '余白の色', t: 'color', when: s => s.padOn },
+            { k: 'padRound', l: '内側の角の丸み', t: 'range', min: 0, max: 10, step: 0.5, u: '%', when: s => s.padOn },
           ]
         },
       ];
@@ -2589,12 +2597,33 @@
       let lastHit = { pic: null, text: null, sub: null, extras: [] };
       function draw(cv) {
         const [W, H] = dims();
-        const band = S.logoMode === 'band' ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
-        if (!band) {
-          const hit = drawContent(cv, W, H);
-          if (cv === $('cv')) lastHit = hit;
-          return;
+        // まわりの余白：中身を内側の大きさで描いて、余白の色の上に貼る
+        const p = S.padOn ? Math.round(Math.min(W, H) * S.padSize / 100) : 0;
+        let hit;
+        if (!p) {
+          hit = drawDesign(cv, W, H);
+        } else {
+          const inner = document.createElement('canvas');
+          const ih = drawDesign(inner, W - p * 2, H - p * 2);
+          cv.width = W; cv.height = H;
+          const c = cv.getContext('2d');
+          c.fillStyle = S.padColor;
+          c.fillRect(0, 0, W, H);
+          c.save();
+          const r = Math.min(W, H) * S.padRound / 100;
+          if (r > 0) { c.beginPath(); c.roundRect(p, p, W - p * 2, H - p * 2, r); c.clip(); }
+          c.drawImage(inner, p, p);
+          c.restore();
+          const sh = q => q && { ...q, x: q.x + p, y: q.y + p };
+          hit = { pic: sh(ih.pic), text: sh(ih.text), sub: sh(ih.sub), extras: ih.extras.map(sh) };
         }
+        if (cv === $('cv')) lastHit = hit;
+      }
+
+      // 中身（背景・帯・画像・文字）を W×H で描いて、ドラッグ用の場所を返す
+      function drawDesign(cv, W, H) {
+        const band = S.logoMode === 'band' ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
+        if (!band) return drawContent(cv, W, H);
         const top = S.bandPos === 'top' ? band : 0;
         // 帯とロゴ（canvas 全体の座標で描く）
         const drawBand = c => {
@@ -2622,10 +2651,8 @@
           c.drawImage(body, 0, top);
           drawBand(c);
         }
-        if (cv === $('cv')) {
-          const sh = r => r && { ...r, y: r.y + top };
-          lastHit = { pic: sh(hit.pic), text: sh(hit.text), sub: sh(hit.sub), extras: hit.extras.map(sh) };
-        }
+        const sh = r => r && { ...r, y: r.y + top };
+        return { pic: sh(hit.pic), text: sh(hit.text), sub: sh(hit.sub), extras: hit.extras.map(sh) };
       }
 
       // opt.fullH：canvas の本当の高さ（帯を背景のすぐ上に敷くとき）。opt.dy だけ下にずらして描き、
@@ -3249,7 +3276,53 @@
         const m = mini.getContext('2d');
         m.imageSmoothingQuality = 'high';
         m.drawImage(cv, 0, 0, mini.width, mini.height);
+        if (S.guideOn) drawGuide(cv.getContext('2d'), W, H);
         if (!nameTouched) $('file-name').value = defaultName();
+      }
+
+      // 切れやすい場所の目安（プレビューの canvas にだけ描く。保存は別の canvas に描き直すので写らない）
+      function drawGuide(c, W, H) {
+        const lw = Math.max(2, Math.min(W, H) / 300), fs = Math.max(14, Math.round(Math.min(W, H) * 0.026));
+        c.save();
+        c.lineWidth = lw;
+        c.font = `700 ${fs}px "Zen Maru Gothic", sans-serif`;
+        c.textBaseline = 'middle';
+        const box = (x, y, w, h, label, color, fill, labelAt = 'tl') => {
+          if (fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+          c.setLineDash([lw * 4, lw * 3]);
+          c.strokeStyle = color;
+          c.strokeRect(x, y, w, h);
+          if (!label) return;
+          const tw = c.measureText(label).width + fs * 0.8, th = fs * 1.5;
+          const lx = labelAt.includes('r') ? x + w - tw : x, ly = labelAt.includes('b') ? y + h - th : y;
+          c.setLineDash([]);
+          c.fillStyle = color;
+          c.fillRect(lx, ly, tw, th);
+          c.fillStyle = '#fff';
+          c.fillText(label, lx + fs * 0.4, ly + th / 2);
+        };
+        const RED = 'rgba(230, 40, 70, 0.95)', RED_FILL = 'rgba(230, 40, 70, 0.22)';
+        const ar = W / H;
+        // ほかのサイトで切られることがある線：16:9（YouTube・X）・1.91:1（SNS の共有）・2:1（GitHub）で真ん中を切り出したときに、全部に残る範囲
+        // 縦長・正方形は、Instagram の一覧（3:4）
+        let cw = W, ch = H;
+        for (const a of ar >= 1.2 ? [16 / 9, 1.91, 2] : ar > 0.75 ? [3 / 4] : []) {
+          if (a > ar) ch = Math.min(ch, W / a); else cw = Math.min(cw, H * a);
+        }
+        if (cw < W * 0.995 || ch < H * 0.995) box((W - cw) / 2, (H - ch) / 2, cw, ch, 'ほかのサイトで切られることがある線', 'rgba(240, 130, 0, 0.95)', null, 'tr');
+        // 文字を置くと安心な範囲（まわり 5%）
+        const m = Math.min(W, H) * 0.05;
+        box(m, m, W - m * 2, H - m * 2, '文字を置くと安心な範囲', 'rgba(0, 150, 230, 0.95)');
+        // 上に何かが重なる場所
+        if (S.size === 'yt') {
+          const w = W * 0.13, h = H * 0.1;
+          box(W - w - W * 0.015, H - h - H * 0.025, w, h, '再生時間', RED, RED_FILL, 'br');
+        } else if (ar < 0.7) {
+          // 縦長（ストーリー・ショート）：上と下は、アカウント名やボタンが重なる
+          box(0, 0, W, H * 0.13, '名前などが重なる', RED, RED_FILL);
+          box(0, H * 0.8, W, H * 0.2, 'ボタンや説明が重なる', RED, RED_FILL, 'bl');
+        }
+        c.restore();
       }
       $('file-name').addEventListener('input', () => { nameTouched = !!$('file-name').value.trim(); });
 
@@ -3420,7 +3493,9 @@
         const p = toCanvas(e);
         cv.style.cursor = drag || hitAt(p) ? 'move' : '';
         if (!drag) return;
-        const dx = (p.x - drag.p.x) / cv.width * 100, dy = (p.y - drag.p.y) / cv.height * 100;
+        // 位置は中身（余白の内側）の大きさに対する %
+        const pad = S.padOn ? Math.round(Math.min(cv.width, cv.height) * S.padSize / 100) * 2 : 0;
+        const dx = (p.x - drag.p.x) / (cv.width - pad) * 100, dy = (p.y - drag.p.y) / (cv.height - pad) * 100;
         const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
         if (drag.h.kind === 'pic') {
           S.imgX = clamp(drag.x + dx, -50, 50); S.imgY = clamp(drag.y + dy, -50, 50);
