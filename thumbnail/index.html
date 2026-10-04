@@ -1495,6 +1495,20 @@
       flex: 1;
       font-weight: 700;
       white-space: nowrap;
+      /* スイッチ・前へ・後ろへが1行に収まるように、名前が長ければ … */
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 表示する・しないのスイッチ（オフのカードは、見出し以外を薄くする） */
+    .head-toggle {
+      flex-shrink: 0;
+    }
+
+    .extra-item.is-off > :not(.extra-head),
+    .extra-item.is-off > .extra-head .nm {
+      opacity: 0.45;
     }
 
     .extra-head .img-thumb {
@@ -2068,7 +2082,7 @@
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
         bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, bandLayer: 'front', logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
-        padOn: false, padSize: 4, padColor: '#ffffff', padRound: 0, padShape: 'square', padLine: false, padAccent: '#ff85a1', guideOn: false,
+        hidden: [], padOn: false, padSize: 4, padColor: '#ffffff', padRound: 0, padShape: 'square', padLine: false, padAccent: '#ff85a1', guideOn: false,
         bgFit: 'cover', bgBright: 0, bgTile: 300,
         bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
       };
@@ -2085,6 +2099,8 @@
         for (const e of st.extras) if (!st.order.includes(e.id)) st.order.push(e.id);
         // 余白（ふち）は、はじめはいちばん上（中身がふちにはみ出さない）。余白がオフのときは何も描かない
         if (!seen.has('@frame')) st.order.push('@frame');
+        // 表示しないものの一覧から、なくなったものを外す
+        st.hidden = (st.hidden || []).filter(id => ids.has(id));
       }
       // 新しく足したものを重ねる：余白がいちばん上なら、そのすぐ下に（ふちにはみ出さないように）
       function pushLayer(id) {
@@ -2141,6 +2157,7 @@
         }) : [];
         // 重なりの順番。なければ、以前の「文字の後ろ」（behind）から作る
         out.order = Array.isArray(o.order) ? o.order.filter(v => typeof v === 'string') : null;
+        out.hidden = Array.isArray(o.hidden) ? o.hidden.filter(v => typeof v === 'string').slice(0, 40) : [];
         if (!out.order) {
           const src = Array.isArray(o.extras) ? o.extras : [];
           const ids = (b) => src.filter(e => e && !!e.behind === b).map(e => e.id);
@@ -2714,7 +2731,7 @@
         c.translate(p, p + (opt.dy || 0));
         const k = Math.min(W / 1200, H / 630);
         const stacked = W / H < 1.4;
-        const side = S.imgPos === 'none' ? null : (img.side || sampleImg());
+        const side = S.imgPos === 'none' || S.hidden.includes('@pic') ? null : (img.side || sampleImg());
         // 縦長・正方形で左右を選んだときは、下に置く
         const [hPos, vPos] = S.imgPos.split('-');
         const pos = side ? (stacked && (hPos === 'left' || hPos === 'right') ? 'bottom' : hPos) : 'none';
@@ -2766,10 +2783,10 @@
         // ---- 文字（とロゴ）：上から ロゴ → タイトル → サブタイトル を、帯の中で上下の真ん中にそろえる
         const logo = S.logoMode !== 'none' ? img.logo : null;
         const mode = logo && S.logoMode !== 'band' ? S.logoMode : 'none';
-        const lines = mode === 'replace' ? [] : S.title.replace(/\s+$/, '').split('\n');
+        const lines = mode === 'replace' || S.hidden.includes('@text') ? [] : S.title.replace(/\s+$/, '').split('\n');
         const aw = area.r - area.l, bh = band.b - band.t, mid = (area.l + area.r) / 2;
         const lh = 1.14, gap = 14 * k;
-        const sub = S.sub.trim();
+        const sub = S.hidden.includes('@sub') ? '' : S.sub.trim();
         let subFs = sub ? fit(c, [sub], (mode === 'replace' ? 84 : 60) * k * S.subScale, aw, subStroke0() * k * 2) : 0;
         let fs = lines.length ? fitTitle(c, lines, (stacked || !side || pos === 'center' ? 150 : 124) * k * S.textScale, aw) : 0;
         let lg = null;
@@ -3027,7 +3044,7 @@
           else if (id === '@pic') drawPic();
           else if (id === '@text') drawTitle();
           else if (id === '@sub') drawSub();
-          else if (byId[id]) drawExtra(byId[id]);
+          else if (byId[id] && !S.hidden.includes(id)) drawExtra(byId[id]);
         }
         c.restore();
         if (opt.overLayers) opt.overLayers(c);
@@ -3879,6 +3896,23 @@
       }
       function hookRow(row, id) {
         row.dataset.id = id;
+        let tg = row.querySelector(':scope > .extra-head > .head-toggle');
+        if (!tg) {
+          tg = document.createElement('label');
+          tg.className = 'toggle head-toggle';
+          tg.title = id === '@frame' ? '余白を付ける・付けない' : '表示する・しない';
+          tg.innerHTML = '<input type="checkbox" aria-label="' + tg.title + '"><span class="sw"></span>';
+          row.querySelector(':scope > .extra-head > .nm').after(tg);
+        }
+        const on = tg.querySelector('input');
+        on.checked = id === '@frame' ? S.padOn : !S.hidden.includes(id);
+        row.classList.toggle('is-off', !on.checked);
+        on.onchange = () => {
+          if (id === '@frame') { inputs.padOn.set(on.checked); update('padOn', on.checked); return; }
+          S.hidden = on.checked ? S.hidden.filter(v => v !== id) : [...S.hidden, id];
+          row.classList.toggle('is-off', !on.checked);
+          redraw();
+        };
         row.classList.toggle('selected', id === selId);
         // カードの空いているところをクリックしても選べる
         row.onclick = e => { if (!e.target.closest('input, textarea, select, button, label, .toggle')) select(id); };
@@ -3978,11 +4012,7 @@
             row.className = 'extra-item main-card';
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="font-size:16px">▢</span><span class="nm">余白（ふち）</span>`
               + orderBtns(rank, n) + `</div>`
-              + '<div class="extra-stroke"><label class="toggle"><span>余白を付ける</span><input type="checkbox"><span class="sw"></span></label></div>'
               + '<p class="field-note" style="margin:6px 0 0">これより前の画像や文字は、ふちの上にはみ出して描きます。幅や形は「枠と余白」で変えられます</p>';
-            const on = row.querySelector('.toggle input');
-            on.checked = S.padOn;
-            on.onchange = () => { inputs.padOn.set(on.checked); update('padOn', on.checked); };
             hookRow(row, '@frame');
             list.appendChild(row);
             return;
