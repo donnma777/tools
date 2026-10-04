@@ -2699,8 +2699,8 @@
           if (r > 0) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h);
           return { bumps: [], rb: 0 };
         }
-        // 辺ごとに半円を内向きに並べる（ふちの色の波が中身に食い込む）
-        const rb = Math.max(4, p * 0.32);
+        // 辺ごとに半円を内向きに並べる（ふちの色の波が中身に食い込む）。レースは細かく
+        const rb = S.padShape === 'lace' ? Math.max(3, p * 0.24) : Math.max(4, p * 0.32);
         const bumps = [];
         const edges = [[x, y, 1, 0, 0, 1, w], [x + w, y, 0, 1, -1, 0, h], [x + w, y + h, -1, 0, 0, -1, w], [x, y + h, 0, -1, 1, 0, h]];
         c.moveTo(x, y);
@@ -2726,13 +2726,35 @@
         c.rect(0, 0, Wc, Hc);
         const { bumps, rb } = padInnerPath(c, p, p, Wc - p * 2, Hc - p * 2, p);
         c.fillStyle = S.padColor;
+        if (S.padShape === 'lace') {
+          // レースが重なっているように、内側へふんわりにじませる
+          const n = parseInt(S.padColor.slice(1), 16);
+          c.shadowColor = `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, 0.85)`;
+          c.shadowBlur = rb * 6;
+        }
         c.fill('evenodd');
-        c.fillStyle = S.padAccent;
-        // レース：波ごとに小さな穴
-        if (S.padShape === 'lace') for (const b of bumps) {
+        c.shadowColor = 'transparent';
+        c.shadowBlur = 0;
+        if (S.padShape === 'lace') {
+          const dot = (x, y, r) => { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); };
+          // 内側にもう1段、半透明のレース（二重のフリル）
+          const d = rb * 1.3, x = p, y = p, w = Wc - p * 2, h = Hc - p * 2;
           c.beginPath();
-          c.arc(b.x + b.ox * b.r * 0.15, b.y + b.oy * b.r * 0.15, b.r * 0.3, 0, Math.PI * 2);
-          c.fill();
+          c.rect(x, y, w, h);
+          const inner = padInnerPath(c, x + d, y + d, w - d * 2, h - d * 2, p);
+          c.globalAlpha = 0.5;
+          c.fill('evenodd');
+          c.globalAlpha = 1;
+          // 波の先の小さな粒（ピコット）でフリルに
+          for (const b of bumps) dot(b.x - b.ox * b.r * 1.18, b.y - b.oy * b.r * 1.18, b.r * 0.3);
+          // 穴：外の段は波ごとに1つ、ふちの中にもう1列。内の段は小さく
+          c.fillStyle = S.padAccent;
+          c.globalAlpha = 0.55;
+          for (const b of bumps) dot(b.x - b.ox * b.r * 0.15, b.y - b.oy * b.r * 0.15, b.r * 0.38);
+          if (p > rb * 3.2) for (const b of bumps) dot(b.x + b.ox * b.r * 1.75, b.y + b.oy * b.r * 1.75, b.r * 0.22);
+          c.globalAlpha = 0.35;
+          for (const b of inner.bumps) dot(b.x - b.ox * b.r * 0.1, b.y - b.oy * b.r * 0.1, b.r * 0.26);
+          c.globalAlpha = 1;
         }
         // 点線：ふちの真ん中あたり
         if (S.padLine) {
