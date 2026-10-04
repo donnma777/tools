@@ -2787,10 +2787,10 @@
             { k: 'frameColor', l: '枠の色', t: 'color', when: s => s.frameOn },
             { k: 'padOn', l: 'まわりに余白（ふち）を付ける', t: 'check', home: 'none' },
             { k: 'padSize', l: '余白の幅', t: 'range', min: 1, max: 15, step: 0.5, u: '%', home: 'frame' },
-            { k: 'padT', l: '上に付ける', t: 'check', home: 'frame' },
-            { k: 'padB', l: '下に付ける', t: 'check', home: 'frame' },
-            { k: 'padL', l: '左に付ける', t: 'check', home: 'frame' },
-            { k: 'padR', l: '右に付ける', t: 'check', home: 'frame' },
+            { k: 'padT', l: '上に付ける', t: 'check', home: 'none' },
+            { k: 'padB', l: '下に付ける', t: 'check', home: 'none' },
+            { k: 'padL', l: '左に付ける', t: 'check', home: 'none' },
+            { k: 'padR', l: '右に付ける', t: 'check', home: 'none' },
             { k: 'padColor', l: '余白の色', t: 'color', home: 'frame' },
             { k: 'padShape', l: '内側の形', t: 'select', o: [['square', '四角'], ['scallop', '波（スカラップ）'], ['lace', 'レース']], home: 'frame' },
             { k: 'padRound', l: '内側の角の丸み', t: 'range', min: 0, max: 10, step: 0.5, u: '%', home: 'frame', when: s => s.padShape === 'square' },
@@ -2932,6 +2932,27 @@
           if (f.home === 'sub') subOpts.appendChild(inputs[f.k].wrap);
           if (f.home === 'frame') frameOpts.appendChild(inputs[f.k].wrap);
           if (f.home === 'none') hiddenBin.appendChild(inputs[f.k].wrap);
+        }
+        // 余白を付ける辺：上・下・左・右のボタンを1行に並べる（値は padT などのスイッチのまま）
+        {
+          const row = document.createElement('div');
+          row.className = 'field field-full';
+          row.innerHTML = '<span class="field-label"><span>付ける辺</span></span><div class="preset-row"></div>';
+          for (const [k, label] of [['padT', '上'], ['padB', '下'], ['padL', '左'], ['padR', '右']]) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'chip-btn';
+            b.textContent = label;
+            b.setAttribute('role', 'checkbox');
+            b.addEventListener('click', () => { inputs[k].set(!S[k]); update(k, !S[k]); });
+            row.querySelector('.preset-row').appendChild(b);
+            // 元に戻す・テンプレートの読み込みなどで値が変わったら、ボタンも合わせる
+            const set = inputs[k].set;
+            inputs[k].set = v => { set(v); b.setAttribute('aria-checked', String(!!v)); };
+            b.setAttribute('aria-checked', String(!!S[k]));
+          }
+          inputs.padSize.wrap.classList.add('field-full');
+          inputs.padSize.wrap.after(row);
         }
         // ロゴと背景の欄は、一覧の「ロゴ」「背景」のカードの中に（欄そのものはなくす）
         for (const [t, box] of [['ロゴ', logoOpts], ['背景', bgOpts]]) {
