@@ -1869,6 +1869,8 @@
         <div class="fields card-opts" id="title-opts"></div>
         <div class="fields card-opts" id="sub-opts"></div>
         <div class="fields card-opts" id="frame-opts"></div>
+        <div class="fields card-opts" id="logo-opts"></div>
+        <div class="fields card-opts" id="bg-opts"></div>
         <div class="fields" id="main-text-fields">
           <div class="field field-full" id="title-field">
             <label class="field-label" for="f-title"><span>タイトル（Enter で改行・*〜* で囲むと強調）</span></label>
@@ -1996,9 +1998,9 @@
       <summary><span class="sec-icon">🖌</span>使い方</summary>
       <div class="panel-body">
         <ol class="steps">
-          <li>「🧩 文字と画像を追加」の <b>メインの文字</b> のカードに、タイトルを入れます。Enter で改行できます。</li>
+          <li>「🧩 画像・文字・背景」の <b>タイトル</b> のカードに、タイトルを入れます。Enter で改行できます。</li>
           <li>「大きさ」で使う場所に合わせたサイズを選びます（ブログのアイキャッチ・YouTubeのサムネイルは <b>1280×720</b>、SNSの共有画像は <b>1200×630</b> がおすすめ）。</li>
-          <li>「文字と画像を追加」で自分のキャラや写真、好きな文字を足し、「ロゴ」で自分のロゴを選び、「背景」で柄・色・背景画像を選び、一覧の「余白（ふち）」でまわりにふちを付けます。文字や画像はプレビューでドラッグして動かせます。</li>
+          <li>「画像・文字・背景」で自分のキャラや写真、好きな文字を足します。一覧の「ロゴ」で自分のロゴを、「背景」で柄・色・背景画像を選び、「余白（ふち）」でまわりにふちを付けます。文字や画像はプレビューでドラッグして動かせます。</li>
           <li>よく使う見た目は「🎭 テンプレート」に名前を付けて保存しておくと、次からはタイトルと写真を変えるだけで作れます。同じデザインで何枚も作るときは「📦 まとめて作る」が便利です。</li>
           <li>プレビューの下で形式（JPG・PNG・WebP）を選んで <b>「⬇ 保存」</b> を押すと、画像がダウンロードされます。</li>
         </ol>
@@ -2115,7 +2117,7 @@
         // 余白（ふち）は、はじめはいちばん上（中身がふちにはみ出さない）。余白がオフのときは何も描かない
         if (!seen.has('@frame')) st.order.push('@frame');
         // 表示しないものの一覧から、なくなったものを外す
-        st.hidden = (st.hidden || []).filter(id => ids.has(id));
+        st.hidden = (st.hidden || []).filter(id => ids.has(id) || id === '@logo' || id === '@bg');
       }
       // 新しく足したものを重ねる：余白がいちばん上なら、そのすぐ下に（ふちにはみ出さないように）
       function pushLayer(id) {
@@ -2287,7 +2289,7 @@
           ]
         },
         {
-          title: '文字と画像を追加', icon: '🧩', open: true, fields: [
+          title: '画像・文字・背景', icon: '🧩', open: true, fields: [
             {
               k: 'imgPos', l: '位置', t: 'select', o: IMG_POS, note: '大きさが縦長・正方形のときは、左・右を選んでも画像は文字の下に置きます'
             },
@@ -2453,7 +2455,7 @@
           grid.className = 'fields';
           // ロゴの欄は、先頭にロゴのアップロードを置く
           if (sec.title === 'ロゴ') grid.appendChild($('logo-upload'));
-          if (sec.title === '文字と画像を追加') { grid.appendChild($('extra-upload')); grid.appendChild($('main-opts')); }
+          if (sec.title === '画像・文字・背景') { grid.appendChild($('extra-upload')); grid.appendChild($('main-opts')); }
           for (const f of sec.fields) grid.appendChild(buildField(f));
           if (sec.title === '文字の見た目') grid.appendChild($('ufont-field'));
           det.appendChild(grid);
@@ -2461,9 +2463,9 @@
           if (sec.title === '大きさ') $('settings').insertBefore(det, $('settings').children[1]);
           else $('settings').appendChild(det);
         }
-        // 欄の並び（よく使う順）：テンプレート → 大きさ → 文字と画像を追加 → 文字の見た目 → ロゴ → 背景 → まとめて作る
-        const secOf = t => [...$('settings').querySelectorAll(':scope > details.sec')].find(d => d.querySelector('summary').textContent.includes(t));
-        for (const t of ['大きさ', '文字と画像を追加', '文字の見た目', 'ロゴ', '背景']) $('settings').appendChild(secOf(t));
+        // 欄の並び（よく使う順）：テンプレート → 大きさ → 画像・文字・背景 → 文字の見た目 → まとめて作る
+        const secOf = t => [...$('settings').querySelectorAll(':scope > details.sec')].find(d => d.querySelector('summary').lastChild.textContent.trim() === t);
+        for (const t of ['大きさ', '画像・文字・背景', '文字の見た目']) $('settings').appendChild(secOf(t));
         $('settings').appendChild($('batch-sec'));
         // タイトル・サブタイトルの項目は、それぞれのカードの中に（一覧を作り直しても使い回す）
         for (const sec of SECTIONS) for (const f of sec.fields) {
@@ -2471,6 +2473,12 @@
           if (f.home === 'sub') subOpts.appendChild(inputs[f.k].wrap);
           if (f.home === 'frame') frameOpts.appendChild(inputs[f.k].wrap);
           if (f.home === 'none') hiddenBin.appendChild(inputs[f.k].wrap);
+        }
+        // ロゴと背景の欄は、一覧の「ロゴ」「背景」のカードの中に（欄そのものはなくす）
+        for (const [t, box] of [['ロゴ', logoOpts], ['背景', bgOpts]]) {
+          const d = secOf(t);
+          box.append(...d.querySelector(':scope > .fields').children);
+          d.remove();
         }
         // メインの画像の置き方は、メインのカードの中に
         $('main-opts').append(inputs.imgPos.wrap, inputs.sample.wrap);
@@ -2646,7 +2654,7 @@
         const p = S.padOn ? Math.round(Math.min(W0, H0) * S.padSize / 100) : 0;
         if (!S.order.includes('@frame')) fixOrder(S);
         const W = W0 - p * 2, H = H0 - p * 2;
-        const band = S.logoMode === 'band' ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
+        const band = S.logoMode === 'band' && !S.hidden.includes('@logo') ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
         const top = band && S.bandPos === 'top' ? band : 0;
         // 帯とロゴ（canvas 全体の座標で描く）
         const drawBand = c => {
@@ -2749,7 +2757,7 @@
         const pos = side ? (stacked && (hPos === 'left' || hPos === 'right') ? 'bottom' : hPos) : 'none';
 
         // ---- 背景（と内側の細い枠）
-        drawBackground(c, W, H, k);
+        if (!S.hidden.includes('@bg')) drawBackground(c, W, H, k);
         if (S.frameOn) {
           const m = Math.min(W, H) * 0.045;
           c.save();
@@ -2786,14 +2794,14 @@
           pic = { x: W / 2 - w / 2, y: H / 2 - h / 2, w, h };
         }
         if (pic) { pic.x += S.imgX / 100 * W; pic.y += S.imgY / 100 * H; }
-        if (S.glow && S.bg !== 'none') {
+        if (S.glow && S.bg !== 'none' && !S.hidden.includes('@bg')) {
           const all = pic && pos !== 'center' ? { l: Math.min(area.l, pic.x), r: Math.max(area.r, pic.x + pic.w) } : area;
           glow(c, (all.l + all.r) / 2, H / 2, (all.r - all.l) * 0.62, H * 0.62);
         }
         brighten(c, W, H);
 
         // ---- 文字（とロゴ）：上から ロゴ → タイトル → サブタイトル を、帯の中で上下の真ん中にそろえる
-        const logo = S.logoMode !== 'none' ? img.logo : null;
+        const logo = S.logoMode !== 'none' && !S.hidden.includes('@logo') ? img.logo : null;
         const mode = logo && S.logoMode !== 'band' ? S.logoMode : 'none';
         const lines = mode === 'replace' || S.hidden.includes('@text') ? [] : S.title.replace(/\s+$/, '').split('\n');
         const aw = area.r - area.l, bh = band.b - band.t, mid = (area.l + area.r) / 2;
@@ -3065,7 +3073,7 @@
 
       // 背景の明るさ：背景（と、まわりを明るくする分）の上に黒か白を重ねる
       function brighten(c, W, H) {
-        if (S.bg === 'none' || !S.bgBright) return;
+        if (S.bg === 'none' || S.hidden.includes('@bg') || !S.bgBright) return;
         c.save();
         c.fillStyle = S.bgBright < 0 ? '#000' : '#fff';
         c.globalAlpha = Math.abs(S.bgBright) / 100;
@@ -3354,7 +3362,7 @@
           c.restore();
         }
         // 背景を「なし（透明）」にしたときだけ、透明が分かるように市松模様を敷く
-        $('ec-stage').classList.toggle('bg-checker', S.bg === 'none');
+        $('ec-stage').classList.toggle('bg-checker', S.bg === 'none' || S.hidden.includes('@bg'));
         const [W, H] = dims();
         $('size-meta').textContent = `${W}×${H}`;
         mini.width = 160;
@@ -3623,6 +3631,7 @@
       // タイトル・サブタイトルの入力欄と設定（一覧を作り直しても、同じものを使い回す）
       const titleField = $('title-field'), subField = $('sub-field');
       const titleOpts = $('title-opts'), subOpts = $('sub-opts'), frameOpts = $('frame-opts');
+      const logoOpts = $('logo-opts'), bgOpts = $('bg-opts');
       let subBars = null;
       function renderMain() {
         const has = !!img.side;
@@ -3658,6 +3667,14 @@
         if (id === '@text') return {
           name: 'タイトル', get obj() { return S; }, reset() { S.textX = 0; S.textY = 0; S.titleRot = 0; },
           bars: [['textScale', '大きさ', 0.5, 1.3, 0.05, '倍'], ['textX', '左右', -50, 50, 1, '%'], ['textY', '上下', -50, 50, 1, '%'], ['titleRot', '回転', -180, 180, 1, '°']],
+        };
+        if (id === '@logo') return {
+          name: 'ロゴ', get obj() { return S; }, reset() { S.logoScale = 1; },
+          bars: [['logoScale', 'ロゴの大きさ', 0.3, 1.6, 0.05, '倍']],
+        };
+        if (id === '@bg') return {
+          name: '背景', get obj() { return S; }, reset() { S.bgBright = 0; },
+          bars: [['bgBright', '背景の明るさ', -80, 80, 5, '%']],
         };
         if (id === '@frame') return {
           name: '余白（ふち）', get obj() { return S; }, reset() { S.padSize = 4; },
@@ -3721,8 +3738,9 @@
         const ck = selColorKey();
         $('sel-color').hidden = !ck;
         if (ck && document.activeElement !== $('sel-color')) $('sel-color').value = ck.obj[ck.key];
+        // ロゴ・背景は重なりの順に入っていない（場所が決まっている）ので、どちらも押せない
         const i = S.order.indexOf(selId);
-        $('sel-up').disabled = i === S.order.length - 1;
+        $('sel-up').disabled = i < 0 || i === S.order.length - 1;
         $('sel-down').disabled = i <= 0;
       }
       function select(id) {
@@ -3933,8 +3951,9 @@
         // カードの空いているところをクリックしても選べる
         row.onclick = e => { if (!e.target.closest('input, textarea, select, button, label, .toggle')) select(id); };
         if (id === movedId) row.classList.add('moved');
-        row.querySelector('[data-a="up"]').onclick = () => moveLayer(id, 1);
-        row.querySelector('[data-a="down"]').onclick = () => moveLayer(id, -1);
+        const up = row.querySelector('[data-a="up"]'), down = row.querySelector('[data-a="down"]');
+        if (up) up.onclick = () => moveLayer(id, 1);
+        if (down) down.onclick = () => moveLayer(id, -1);
         row.onmouseenter = () => { hoverId = id; render(); };
         row.onmouseleave = () => { if (hoverId === id) { hoverId = null; render(); } };
       }
@@ -4119,6 +4138,15 @@
           hookRow(row, ex.id);
           list.appendChild(row);
         });
+        for (const [id, icon, name, box] of [['@logo', '🏷️', 'ロゴ', logoOpts], ['@bg', '🎨', '背景', bgOpts]]) {
+          const row = document.createElement('div');
+          row.className = 'extra-item main-card';
+          row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="font-size:16px">${icon}</span><span class="nm">${name}</span></div>`
+            + '<div class="opts-slot"></div>';
+          row.querySelector('.opts-slot').appendChild(box);
+          hookRow(row, id);
+          list.appendChild(row);
+        }
       }
 
       // メインの画像 → 自由な画像
