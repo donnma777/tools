@@ -1187,6 +1187,48 @@
       box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
     }
 
+    /* スマホ：プレビューを画面の上に固定する（PC はもともと固定なので出さない） */
+    .pin-btn {
+      display: none;
+      margin-left: 6px;
+    }
+
+    @media (max-width: 1000px) {
+      .pin-btn {
+        display: inline-flex;
+      }
+
+      .pin-btn[aria-pressed="true"] {
+        background: var(--accent);
+        color: var(--on-accent, #2a1020);
+        border-color: var(--accent);
+      }
+
+      body.preview-pinned .side {
+        position: sticky;
+        top: 56px;
+        z-index: 60;
+      }
+
+      body.preview-pinned .preview-panel {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+      }
+
+      /* 固定中は小さく：保存の行と下のバーは隠す */
+      body.preview-pinned .ec-stage {
+        padding: 6px;
+      }
+
+      body.preview-pinned #cv {
+        max-height: 30vh;
+      }
+
+      body.preview-pinned .sel-panel,
+      body.preview-pinned .save-row {
+        display: none;
+      }
+    }
+
     /* 大きく見る */
     .big-view {
       position: fixed;
@@ -1514,8 +1556,8 @@
       flex: 1;
       font-weight: 700;
       white-space: nowrap;
-      /* スイッチ・前へ・後ろへが1行に収まるように、名前が長ければ … */
-      min-width: 0;
+      /* スイッチ・前へ・後ろへが1行に収まるように、名前が長ければ …（狭すぎるときはボタンを次の行へ） */
+      min-width: 5em;
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -1966,7 +2008,7 @@
     <div class="side">
       <div class="panel preview-panel">
         <div class="panel-head">
-          <span>プレビュー <span class="out-meta" id="size-meta"></span></span>
+          <span>プレビュー <span class="out-meta" id="size-meta"></span> <button class="btn btn-sm pin-btn" type="button" id="btn-pin" aria-pressed="false" title="スクロールしても、プレビューを画面の上に出しておきます">📌 固定</button></span>
           <div class="undo-row">
             <div class="sel-head" id="sel-head" hidden>
               <span class="sel-name" id="sel-name"></span>
@@ -3352,6 +3394,16 @@
       //  プレビュー・保存
       // =====================================================
       const cv = $('cv'), mini = $('mini');
+      // スマホ：プレビューを画面の上に固定する・外す（このブラウザに覚えておく）
+      const PIN_KEY = 'donnma-eyecatch-pin';
+      function setPin(on) {
+        document.body.classList.toggle('preview-pinned', on);
+        $('btn-pin').setAttribute('aria-pressed', String(on));
+        $('btn-pin').textContent = on ? '📌 固定を外す' : '📌 固定';
+        try { on ? localStorage.setItem(PIN_KEY, '1') : localStorage.removeItem(PIN_KEY); } catch (e) { /* ignore */ }
+      }
+      $('btn-pin').addEventListener('click', () => setPin(!document.body.classList.contains('preview-pinned')));
+      try { if (localStorage.getItem(PIN_KEY) === '1') setPin(true); } catch (e) { /* ignore */ }
       $('btn-mini').addEventListener('click', () => {
         const on = $('mini-pop').hidden;
         $('mini-pop').hidden = !on;
