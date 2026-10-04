@@ -1840,7 +1840,6 @@
       <div hidden>
         <div class="fields card-opts" id="title-opts"></div>
         <div class="fields card-opts" id="sub-opts"></div>
-        <div class="fields card-opts" id="frame-opts"></div>
         <div class="fields" id="main-text-fields">
           <div class="field field-full" id="title-field">
             <label class="field-label" for="f-title"><span>タイトル（Enter で改行・*〜* で囲むと強調）</span></label>
@@ -2076,7 +2075,7 @@
       const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
       // order を extras に合わせる（なくなったものは外し、足りないものは上に足す。'@pic'・'@text'・'@sub' は必ず入れる）
       function fixOrder(st) {
-        const ids = new Set(['@pic', '@text', '@sub', ...st.extras.map(e => e.id), ...(st.padOn ? ['@frame'] : [])]);
+        const ids = new Set(['@pic', '@text', '@sub', '@frame', ...st.extras.map(e => e.id)]);
         const seen = new Set();
         st.order = st.order.filter(v => ids.has(v) && !seen.has(v) && seen.add(v));
         if (!seen.has('@pic')) st.order.unshift('@pic');
@@ -2084,8 +2083,8 @@
         // サブタイトル（以前はタイトルと一緒だった）は、タイトルのすぐ前に
         if (!seen.has('@sub')) st.order.splice(st.order.indexOf('@text') + 1, 0, '@sub');
         for (const e of st.extras) if (!st.order.includes(e.id)) st.order.push(e.id);
-        // 余白（ふち）は、はじめはいちばん上（中身がふちにはみ出さない）
-        if (st.padOn && !seen.has('@frame')) st.order.push('@frame');
+        // 余白（ふち）は、はじめはいちばん上（中身がふちにはみ出さない）。余白がオフのときは何も描かない
+        if (!seen.has('@frame')) st.order.push('@frame');
       }
       // 新しく足したものを重ねる：余白がいちばん上なら、そのすぐ下に（ふちにはみ出さないように）
       function pushLayer(id) {
@@ -2297,13 +2296,13 @@
             { k: 'glow', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'check', when: s => s.bg !== 'none' },
             { k: 'frameOn', l: '内側に細い枠を付ける', t: 'check' },
             { k: 'frameColor', l: '枠の色', t: 'color', when: s => s.frameOn },
-            { k: 'padOn', l: 'まわりに余白（ふち）を付ける', t: 'check', note: '画像の大きさはそのままで、中身を内側に縮めます。幅や形は「文字と画像」の一覧の「余白（ふち）」で変えられます' },
-            { k: 'padSize', l: '余白の幅', t: 'range', min: 1, max: 15, step: 0.5, u: '%', home: 'frame' },
-            { k: 'padColor', l: '余白の色', t: 'color', home: 'frame' },
-            { k: 'padShape', l: '内側の形', t: 'select', o: [['square', '四角'], ['scallop', '波（スカラップ）'], ['lace', 'レース']], home: 'frame' },
-            { k: 'padRound', l: '内側の角の丸み', t: 'range', min: 0, max: 10, step: 0.5, u: '%', home: 'frame', when: s => s.padShape === 'square' },
-            { k: 'padLine', l: '点線を入れる', t: 'check', home: 'frame' },
-            { k: 'padAccent', l: s => s.padShape === 'lace' ? '点線・レースの穴の色' : '点線の色', t: 'color', home: 'frame', when: s => s.padLine || s.padShape === 'lace' },
+            { k: 'padOn', l: 'まわりに余白（ふち）を付ける', t: 'check', note: '画像の大きさはそのままで、中身を内側に縮めます。「文字と画像を追加」の一覧で「余白（ふち）」より前に出した画像や文字は、ふちの上にはみ出して描きます' },
+            { k: 'padSize', l: '余白の幅', t: 'range', min: 1, max: 15, step: 0.5, u: '%', when: s => s.padOn },
+            { k: 'padColor', l: '余白の色', t: 'color', when: s => s.padOn },
+            { k: 'padShape', l: '内側の形', t: 'select', o: [['square', '四角'], ['scallop', '波（スカラップ）'], ['lace', 'レース']], when: s => s.padOn },
+            { k: 'padRound', l: '内側の角の丸み', t: 'range', min: 0, max: 10, step: 0.5, u: '%', when: s => s.padOn && s.padShape === 'square' },
+            { k: 'padLine', l: '点線を入れる', t: 'check', when: s => s.padOn },
+            { k: 'padAccent', l: s => s.padShape === 'lace' ? '点線・レースの穴の色' : '点線の色', t: 'color', when: s => s.padOn && (s.padLine || s.padShape === 'lace') },
           ]
         },
       ];
@@ -2438,7 +2437,6 @@
         for (const sec of SECTIONS) for (const f of sec.fields) {
           if (f.home === 'title') titleOpts.appendChild(inputs[f.k].wrap);
           if (f.home === 'sub') subOpts.appendChild(inputs[f.k].wrap);
-          if (f.home === 'frame') frameOpts.appendChild(inputs[f.k].wrap);
           if (f.home === 'none') hiddenBin.appendChild(inputs[f.k].wrap);
         }
         // メインの画像の置き方は、メインのカードの中に
@@ -2613,7 +2611,7 @@
         const [W0, H0] = dims();
         // まわりの余白：中身は内側の大きさ（W×H）で描く。ふちは重なりの順の「@frame」で描く
         const p = S.padOn ? Math.round(Math.min(W0, H0) * S.padSize / 100) : 0;
-        if (S.padOn !== S.order.includes('@frame')) fixOrder(S);
+        if (!S.order.includes('@frame')) fixOrder(S);
         const W = W0 - p * 2, H = H0 - p * 2;
         const band = S.logoMode === 'band' ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
         const top = band && S.bandPos === 'top' ? band : 0;
@@ -3591,7 +3589,7 @@
       const mainCard = $('main-card');
       // タイトル・サブタイトルの入力欄と設定（一覧を作り直しても、同じものを使い回す）
       const titleField = $('title-field'), subField = $('sub-field');
-      const titleOpts = $('title-opts'), subOpts = $('sub-opts'), frameOpts = $('frame-opts');
+      const titleOpts = $('title-opts'), subOpts = $('sub-opts');
       let subBars = null;
       function renderMain() {
         const has = !!img.side;
@@ -3976,9 +3974,11 @@
             row.className = 'extra-item main-card';
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="font-size:16px">▢</span><span class="nm">余白（ふち）</span>`
               + orderBtns(rank, n) + `</div>`
-              + '<p class="field-note" style="margin:6px 0 8px">これより上にある画像や文字は、ふちの上にはみ出して描きます（キャラを枠から飛び出させるときに）</p>'
-              + '<div class="opts-slot"></div>';
-            row.querySelector('.opts-slot').appendChild(frameOpts);
+              + '<div class="extra-stroke"><label class="toggle"><span>余白を付ける</span><input type="checkbox"><span class="sw"></span></label></div>'
+              + '<p class="field-note" style="margin:6px 0 0">これより前の画像や文字は、ふちの上にはみ出して描きます。幅や形は「背景」で変えられます</p>';
+            const on = row.querySelector('.toggle input');
+            on.checked = S.padOn;
+            on.onchange = () => { inputs.padOn.set(on.checked); update('padOn', on.checked); };
             hookRow(row, '@frame');
             list.appendChild(row);
             return;
