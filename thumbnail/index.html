@@ -1289,6 +1289,256 @@
       color: var(--muted);
     }
 
+    /* SNS での見え方 */
+    .sns-view {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      overflow-y: auto;
+      background: rgba(10, 4, 8, 0.92);
+      padding: 24px 16px 40px;
+    }
+
+    .sns-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .sns-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .sns-note {
+      margin: 8px 0 18px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .sns-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+
+    .sns-label {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      align-items: baseline;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sns-label b {
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    /* カードの中は、各サービスの見た目に寄せる（文字の色はサイトの配色に合わせない） */
+    .sns-tile {
+      border-radius: 12px;
+      padding: 14px;
+      font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .sns-light {
+      background: #ffffff;
+      color: #0f1419;
+    }
+
+    .sns-linechat {
+      background: #7494c0;
+    }
+
+    .sns-discord {
+      background: #313338;
+      color: #dbdee1;
+    }
+
+    .sns-pic {
+      position: relative;
+      overflow: hidden;
+      background: #e1e8ed;
+    }
+
+    .sns-pic img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sns-small {
+      margin-top: 4px;
+      font-size: 12.5px;
+      color: #536471;
+    }
+
+    .sns-x,
+    .sns-round,
+    .sns-gh {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid #cfd9de;
+    }
+
+    .sns-gh {
+      border-radius: 6px;
+      border-color: #d0d7de;
+    }
+
+    .sns-x-dom {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      padding: 0 5px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.77);
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .sns-fb {
+      border: 1px solid #dadde1;
+    }
+
+    .sns-fb-body {
+      padding: 10px 12px;
+      background: #f0f2f5;
+    }
+
+    .sns-fb-dom {
+      font-size: 12px;
+      color: #65676b;
+    }
+
+    .sns-fb-title {
+      margin-top: 3px;
+      font-weight: 700;
+      font-size: 16px;
+      color: #050505;
+    }
+
+    .sns-fb-desc,
+    .sns-line-title,
+    .sns-yt-title {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+
+    .sns-fb-desc {
+      margin-top: 3px;
+      font-size: 14px;
+      color: #65676b;
+      -webkit-line-clamp: 1;
+    }
+
+    .sns-line {
+      width: min(100%, 240px);
+      overflow: hidden;
+      border-radius: 16px;
+      background: #fff;
+      color: #111;
+    }
+
+    .sns-line-body {
+      padding: 8px 12px 10px;
+    }
+
+    .sns-line-title {
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .sns-dc {
+      max-width: 432px;
+      padding: 10px 14px 14px 12px;
+      border-left: 4px solid #ff85a1;
+      border-radius: 4px;
+      background: #2b2d31;
+    }
+
+    .sns-dc-site {
+      font-size: 12px;
+      color: #dbdee1;
+    }
+
+    .sns-dc-title {
+      margin-top: 6px;
+      font-weight: 700;
+      color: #00a8fc;
+    }
+
+    .sns-dc-desc {
+      margin-top: 6px;
+      font-size: 13.5px;
+    }
+
+    .sns-dc-img {
+      display: block;
+      max-width: 100%;
+      margin-top: 12px;
+      border-radius: 4px;
+    }
+
+    .sns-yt {
+      position: relative;
+    }
+
+    .sns-rounded {
+      border-radius: 12px;
+    }
+
+    .sns-dur {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      padding: 1px 4px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .sns-yt-title {
+      margin-top: 8px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .sns-yt-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .sns-yt-mini {
+      flex: 0 0 168px;
+    }
+
+    .sns-yt-mini .sns-rounded {
+      border-radius: 8px;
+    }
+
+    .sns-yt-row .sns-yt-title {
+      margin-top: 0;
+      font-size: 14px;
+    }
+
     /* 小さく見る：プレビューの左下に、一覧で出るくらいの大きさで重ねる */
     .mini-pop {
       position: absolute;
@@ -2074,6 +2324,7 @@
         <div class="save-row">
           <button class="btn view-btn" type="button" id="btn-big" aria-label="大きく見る" title="画面いっぱいに大きく表示します（保存される画像と同じ見た目）">⛶<span class="lbl"> 大きく見る</span></button>
           <button class="btn view-btn" type="button" id="btn-mini" aria-pressed="false" aria-label="小さく見る" title="一覧などで小さく表示されたときの見え方を確かめます">🔍<span class="lbl"> 小さく見る</span></button>
+          <button class="btn view-btn" type="button" id="btn-sns" aria-label="SNS での見え方" title="X・Facebook・LINE・Discord・YouTube などでの見え方の目安を並べます">📱<span class="lbl"> SNS での見え方</span></button>
           <input type="text" id="file-name" spellcheck="false" aria-label="ファイル名">
           <select id="save-type" aria-label="保存の形式" title="JPG：軽い／PNG：透明を残せる／WebP：いちばん軽く、透明も残せる">
             <option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option>
@@ -2173,6 +2424,11 @@
         gh: [1280, 640, 'GitHub の Social preview（1280×640）'],
         sq: [1080, 1080, '正方形（1080×1080）'],
         tall: [1080, 1920, '縦長・ストーリー（1080×1920）'],
+        ig34: [1080, 1440, 'Instagram のフィード・縦（1080×1440）'],
+        xhead: [1500, 500, 'X のヘッダー（1500×500）'],
+        ytbanner: [2560, 1440, 'YouTube のチャンネルバナー（2560×1440）'],
+        fbcover: [851, 315, 'Facebook のカバー写真（851×315）'],
+        linerich: [2500, 1686, 'LINE 公式アカウントのリッチメニュー（2500×1686）'],
         custom: [0, 0, '自由に入力'],
       };
       const DEFAULTS = {
@@ -2341,7 +2597,7 @@
             { k: 'size', l: '使う場所', t: 'select', o: Object.entries(SIZES).map(([v, a]) => [v, a[2]]) },
             { k: 'customW', l: '幅（px）', t: 'number', min: 200, max: 4000, when: s => s.size === 'custom' },
             { k: 'customH', l: '高さ（px）', t: 'number', min: 200, max: 4000, when: s => s.size === 'custom' },
-            { k: 'guideOn', l: '切れやすい場所の目安を出す', t: 'check', note: 'プレビューにだけ出て、保存する画像には写りません。青：文字を置くと安心な範囲／オレンジ：ほかのサイトで切られることがある線／赤：再生時間などが重なる場所' },
+            { k: 'guideOn', l: '切れやすい場所の目安を出す', t: 'check', note: 'プレビューにだけ出て、保存する画像には写りません。青：文字を置くと安心な範囲／オレンジ：切られることがある線・区切り／赤：プロフィール画像や再生時間などが重なる場所' },
           ]
         },
         {
@@ -3471,6 +3727,46 @@
         document.addEventListener('keydown', onKey);
         document.body.appendChild(box);
       });
+      // SNS での見え方：保存される画像を、各サービス風のカードに並べる（形と切れ方の目安。ブラウザの中だけで作る）
+      $('btn-sns').addEventListener('click', () => {
+        const out = document.createElement('canvas');
+        draw(out);
+        const url = out.toDataURL('image/jpeg', 0.9);
+        const title = esc(S.title.replace(/\*/g, '').replace(/\s*\n\s*/g, ' ').trim() || 'ページのタイトル');
+        const dom = 'example.com', desc = 'ここにページの説明文が入ります。説明文はサイトの設定によって変わります。';
+        const pic = (ratio, cls = '') => `<div class="sns-pic ${cls}" style="aspect-ratio:${ratio}"><img src="${url}" alt=""></div>`;
+        const dur = '<span class="sns-dur">12:34</span>';
+        const cards = [
+          ['X', 'リンクのカード（1.91:1 に切り抜き）', 'light',
+            `<div class="sns-x">${pic('1.91 / 1')}<span class="sns-x-dom">${dom}</span></div><div class="sns-small">${dom} から</div>`],
+          ['X', '画像の投稿（16:9 に切り抜き）', 'light', `<div class="sns-round">${pic('16 / 9')}</div>`],
+          ['Facebook', 'リンクのカード（1.91:1 に切り抜き）', 'light',
+            `<div class="sns-fb">${pic('1.91 / 1')}<div class="sns-fb-body"><div class="sns-fb-dom">${dom.toUpperCase()}</div><div class="sns-fb-title">${title}</div><div class="sns-fb-desc">${desc}</div></div></div>`],
+          ['LINE', 'トークに貼ったリンク（小さく出る）', 'linechat',
+            `<div class="sns-line">${pic('1.91 / 1')}<div class="sns-line-body"><div class="sns-line-title">${title}</div><div class="sns-small">${dom}</div></div></div>`],
+          ['Discord', 'リンクの埋め込み（画像は元の形のまま）', 'discord',
+            `<div class="sns-dc"><div class="sns-dc-site">${dom}</div><div class="sns-dc-title">${title}</div><div class="sns-dc-desc">${desc}</div><img class="sns-dc-img" src="${url}" alt=""></div>`],
+          ['YouTube', '動画のサムネイル（16:9。右下に再生時間）', 'light',
+            `<div class="sns-yt">${pic('16 / 9', 'sns-rounded')}${dur}</div><div class="sns-yt-title">${title}</div><div class="sns-small">チャンネル名・1万 回視聴</div>`],
+          ['YouTube', 'おすすめの一覧（小さく出る）', 'light',
+            `<div class="sns-yt-row"><div class="sns-yt sns-yt-mini">${pic('16 / 9', 'sns-rounded')}${dur}</div><div><div class="sns-yt-title">${title}</div><div class="sns-small">チャンネル名</div></div></div>`],
+          ['GitHub', 'リポジトリのカード（2:1 に切り抜き）', 'light', `<div class="sns-gh">${pic('2 / 1')}</div>`],
+        ];
+        const box = document.createElement('div');
+        box.className = 'sns-view';
+        box.setAttribute('role', 'dialog');
+        box.setAttribute('aria-label', 'SNS での見え方');
+        box.innerHTML = `<div class="sns-inner"><div class="sns-head"><span>📱 SNS での見え方（目安）</span><button class="btn btn-sm" type="button" data-a="close">✕ 閉じる</button></div>`
+          + '<p class="sns-note">各サービスの表示は、画面の大きさや仕様の変更で変わります。形と切れ方の目安として使ってください。タイトルはサムネイルメーカーのタイトル、URL と説明は仮のものです。</p>'
+          + '<div class="sns-grid">' + cards.map(([name, what, tone, body]) =>
+            `<section class="sns-card"><div class="sns-label"><b>${name}</b><span>${what}</span></div><div class="sns-tile sns-${tone}">${body}</div></section>`).join('') + '</div></div>';
+        const close = () => { box.remove(); document.removeEventListener('keydown', onKey); };
+        const onKey = e => { if (e.key === 'Escape') close(); };
+        box.addEventListener('click', e => { if (e.target === box || e.target.closest('[data-a="close"]')) close(); });
+        document.addEventListener('keydown', onKey);
+        document.body.appendChild(box);
+        box.querySelector('[data-a="close"]').focus();
+      });
       let nameTouched = false;
       const defaultName = () => {
         const t = S.title.replace(/\*/g, '').split('\n').join('').trim().slice(0, 30) || 'image';
@@ -3536,11 +3832,33 @@
           c.fillText(label, lx + fs * 0.4, ly + th / 2);
         };
         const RED = 'rgba(230, 40, 70, 0.95)', RED_FILL = 'rgba(230, 40, 70, 0.22)';
+        const BLUE = 'rgba(0, 150, 230, 0.95)', ORANGE = 'rgba(240, 130, 0, 0.95)';
         const ar = W / H;
+        // YouTube のチャンネルバナー：PC で見えるのは真ん中の横長の帯、どの端末でも見えるのはさらにその真ん中だけ
+        if (S.size === 'ytbanner') {
+          const bh = H * 423 / 1440, sw = W * 1546 / 2560;
+          box(0, (H - bh) / 2, W, bh, 'PC で見える範囲', ORANGE, null, 'tr');
+          box((W - sw) / 2, (H - bh) / 2, sw, bh, 'どの端末でも見える範囲（文字やロゴはここに）', BLUE);
+          c.restore();
+          return;
+        }
+        // LINE のリッチメニュー：ボタンの区切り（6分割の例）
+        if (S.size === 'linerich') {
+          c.setLineDash([lw * 4, lw * 3]);
+          c.strokeStyle = ORANGE;
+          c.beginPath();
+          for (const x of [W / 3, W * 2 / 3]) { c.moveTo(x, 0); c.lineTo(x, H); }
+          c.moveTo(0, H / 2); c.lineTo(W, H / 2);
+          c.stroke();
+          box(0, 0, W, H, 'ボタンの区切り（6分割の例。ボタンごとに中身を置く）', ORANGE);
+          c.restore();
+          return;
+        }
+        const own = ['xhead', 'fbcover', 'ig34'].includes(S.size);
         // ほかのサイトで切られることがある線：16:9（YouTube・X）・1.91:1（SNS の共有）・2:1（GitHub）で真ん中を切り出したときに、全部に残る範囲
         // 縦長・正方形は、Instagram の一覧（3:4）
         let cw = W, ch = H;
-        for (const a of ar >= 1.2 ? [16 / 9, 1.91, 2] : ar > 0.75 ? [3 / 4] : []) {
+        for (const a of own ? [] : ar >= 1.2 ? [16 / 9, 1.91, 2] : ar > 0.75 ? [3 / 4] : []) {
           if (a > ar) ch = Math.min(ch, W / a); else cw = Math.min(cw, H * a);
         }
         if (cw < W * 0.995 || ch < H * 0.995) box((W - cw) / 2, (H - ch) / 2, cw, ch, 'ほかのサイトで切られることがある線', 'rgba(240, 130, 0, 0.95)', null, 'tr');
@@ -3548,6 +3866,17 @@
         const m = Math.min(W, H) * 0.05;
         box(m, m, W - m * 2, H - m * 2, '文字を置くと安心な範囲', 'rgba(0, 150, 230, 0.95)');
         // 上に何かが重なる場所
+        if (S.size === 'xhead') {
+          // X のヘッダー：左下にプロフィール画像が重なる
+          box(W * 0.025, H * 0.66, W * 0.22, H * 0.34, 'プロフィール画像', RED, RED_FILL, 'bl');
+        } else if (S.size === 'fbcover') {
+          // Facebook のカバー写真：スマホでは左右が切れる
+          const w = W * 0.66;
+          box((W - w) / 2, 0, w, H, 'スマホで見える範囲', ORANGE, null, 'tr');
+        } else if (S.size === 'ig34') {
+          // Instagram：正方形で出るところでは上下が切れる
+          box(0, (H - W) / 2, W, W, '正方形で出るときに切られる線', ORANGE, null, 'br');
+        }
         if (S.size === 'yt') {
           const w = W * 0.13, h = H * 0.1;
           box(W - w - W * 0.015, H - h - H * 0.025, w, h, '再生時間', RED, RED_FILL, 'br');
