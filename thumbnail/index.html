@@ -1335,6 +1335,11 @@
       cursor: pointer;
     }
 
+    /* タイトルの書き方の案内は、選んだときだけ */
+    #extra-list > .extra-item:not(.selected) .title-hint {
+      display: none;
+    }
+
     /* メインの画像のカードの中に入れた「置き方」 */
     #main-card > .main-opts {
       margin-top: 8px;
@@ -1878,12 +1883,11 @@
         <div class="fields card-opts" id="bg-opts"></div>
         <div class="fields" id="main-text-fields">
           <div class="field field-full" id="title-field">
-            <label class="field-label" for="f-title"><span>タイトル（Enter で改行・*〜* で囲むと強調）</span></label>
-            <textarea class="title-in" id="f-title" spellcheck="false"></textarea>
+            <textarea class="title-in" id="f-title" spellcheck="false" aria-label="タイトル"></textarea>
+            <div class="field-note title-hint">Enter で改行・*〜* で囲むと強調</div>
           </div>
           <div class="field field-full" id="sub-field">
-            <label class="field-label" for="f-sub"><span>サブタイトル（小さい文字。空欄でなし）</span></label>
-            <input type="text" id="f-sub" spellcheck="false" placeholder="例: 初心者向けにやさしく解説">
+            <input type="text" id="f-sub" spellcheck="false" placeholder="例: 初心者向けにやさしく解説" aria-label="サブタイトル">
           </div>
         </div>
       </div>
