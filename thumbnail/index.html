@@ -1597,6 +1597,11 @@
       border-radius: 10px;
     }
 
+    .main-opts > .main-pick {
+      grid-column: 1 / -1;
+      margin: 2px 0 6px;
+    }
+
     .main-opts > .field-label {
       grid-column: 1 / -1;
       padding-top: 4px;
@@ -1906,6 +1911,7 @@
           </div>
           <div class="field field-full main-opts" id="main-opts">
             <span class="field-label"><span>メインの画像の置き方</span></span>
+            <div class="main-pick"><button class="btn btn-sm" type="button" id="img-pick">📁 画像を選ぶ</button></div>
           </div>
           <div class="field field-full" id="extra-upload">
             <div class="add-row">
@@ -3472,6 +3478,7 @@
         $('img-thumb').style.backgroundImage = `url("${(img.side || sampleImg()).src}")`;
       }
       $('img-thumb').addEventListener('click', () => $('img-file').click());
+      $('img-pick').addEventListener('click', () => $('img-file').click());
       // 画像の選択：「画像を選ぶ」はファイルを開く。選んだ画像があるときにサンプルを選ぶと、確かめてから外す
       async function pickSample(v) {
         renderMain();
@@ -3527,7 +3534,11 @@
       // ---- ロゴ
       const LOGO_KEY = 'donnma-eyecatch-logo-v1';
       function setLogoThumb() {
-        $('logo-thumb').style.backgroundImage = img.logo ? `url("${img.logo.src}")` : '';
+        const bg = img.logo ? `url("${img.logo.src}")` : '';
+        $('logo-thumb').style.backgroundImage = bg;
+        // 一覧の「ロゴ」のカードのアイコン（ロゴがなければ 🏷️）
+        const h = document.querySelector('#extra-list .logo-head-thumb');
+        if (h) { h.style.backgroundImage = bg; h.textContent = img.logo ? '' : '🏷️'; }
       }
       $('logo-pick').addEventListener('click', () => $('logo-file').click());
       $('logo-thumb').addEventListener('click', () => $('logo-file').click());
@@ -4144,12 +4155,17 @@
         for (const [id, icon, name, box] of [['@logo', '🏷️', 'ロゴ', logoOpts], ['@bg', '🎨', '背景', bgOpts]]) {
           const row = document.createElement('div');
           row.className = 'extra-item main-card';
-          row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb" style="font-size:16px">${icon}</span><span class="nm">${name}</span></div>`
+          const thumb = id === '@logo'
+            ? '<button class="img-thumb thumb-pick logo-head-thumb" type="button" title="クリックでロゴを選ぶ" aria-label="ロゴを選ぶ"></button>'
+            : `<span class="img-thumb text-thumb" style="font-size:16px">${icon}</span>`;
+          row.innerHTML = `<div class="extra-head">${thumb}<span class="nm">${name}</span></div>`
             + '<div class="opts-slot"></div>';
           row.querySelector('.opts-slot').appendChild(box);
+          if (id === '@logo') row.querySelector('.logo-head-thumb').onclick = () => { select('@logo'); $('logo-file').click(); };
           hookRow(row, id);
           list.appendChild(row);
         }
+        setLogoThumb();
       }
 
       // メインの画像 → 自由な画像
