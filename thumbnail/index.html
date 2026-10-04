@@ -1326,6 +1326,20 @@
       box-shadow: 0 0 0 1px var(--accent);
     }
 
+    /* 一覧は、選んだカードだけ設定を開く（ほかは見出しの行と、文字を入れる欄だけ） */
+    #extra-list > .extra-item:not(.selected) > :not(.extra-head):not(.main-text-slot):not(.extra-text:has(> textarea)) {
+      display: none;
+    }
+
+    #extra-list > .extra-item:not(.selected) {
+      cursor: pointer;
+    }
+
+    /* メインの画像のカードの中に入れた「置き方」 */
+    #main-card > .main-opts {
+      margin-top: 8px;
+    }
+
     @media (max-width: 700px) {
       .sel-bars {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1896,7 +1910,7 @@
               <button class="btn btn-primary" type="button" id="extra-add">＋ 画像を追加</button>
               <input type="file" id="extra-file" accept="image/*" hidden>
             </div>
-            <span class="field-label"><span>重なりの順（上ほど前）</span></span>
+            <span class="field-label"><span>重なりの順（上ほど前）・カードを押すと設定が開きます</span></span>
             <div class="row-list" id="extra-list"></div>
           </div>
         </div>
@@ -3958,6 +3972,7 @@
           // メインの画像
           if (id === '@pic') {
             list.appendChild(mainCard);
+            mainCard.appendChild($('main-opts'));
             $('main-order').innerHTML = orderBtns(rank, n);
             mainCard.classList.remove('moved');
             hookRow(mainCard, '@pic');
@@ -4153,6 +4168,7 @@
         S.extras.push({ id, type: 'text', text: 'テキスト', color: S.titleColor, box: 'none', boxColor: '#ff7fa0', boxAlpha: 1, strokeOn: true, strokeW: 11, strokeColor: '#ffffff', font: '@inherit', weight: '@inherit', align: 'center', arc: 0, hlColor: '#f0325a', hlScale: 1.15, x: 50, y: 18 + (n % 4) * 8, scale: 0.8, rot: 0 });
         pushLayer(id);
         renderExtras(); redraw();
+        select(id);   // 足したものは選んで、設定を開く
         const inp = $('extra-list').querySelector(`[data-id="${id}"] .extra-text textarea`);
         if (inp) { inp.focus(); inp.select(); }
       });
@@ -4184,6 +4200,7 @@
           pushLayer(id);
           movedId = id;
           renderExtras(); redraw();
+          select(id);   // 足したものは選んで、設定を開く
           showAdded(id);
         } catch (err) { toast(err.message); }
       }
