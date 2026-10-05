@@ -17,7 +17,7 @@ URL を入れると、そのページの OGP・X のカードのタグを読ん�
 
 ## `api/ogp.php`
 
-`?url=…&ua=default|discord|x|facebook|line|slack|bluesky|mastodon|misskey|linkedin|telegram|whatsapp|imessage|teams|pinterest|reddit`（各サービスの取りに来るときの名乗り。Threads・Instagram は facebook と同じ）
+`?url=…&ua=default|discord|x|facebook|line|slack|bluesky|mastodon|misskey|linkedin|telegram|whatsapp|imessage|teams|pinterest|reddit`（各サービスの取りに来るときの名乗り。ページも画像もこの名乗りで取りに行く。Threads・Instagram は facebook と同じ）。画面では、default 以外を選ぶとそのサービスの見え方・切り抜き・関係するチェックだけを出す
 
 - **よそのサーバーへの踏み台にしない**ための決まり：
   - http / https、ポート 80・443 だけ。ユーザー名入りの URL は不可

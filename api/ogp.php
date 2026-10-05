@@ -293,10 +293,10 @@ $headEnd = stripos($html, '</head>');
 
 // ---- 画像を確かめる（og:image と twitter:image）
 
-function ogp_image_info(string $src): array
+function ogp_image_info(string $src, string $ua): array
 {
 	$chain = [];
-	$r = ogp_fetch($src, OGP_UAS['default'], OGP_MAX_IMAGE, $chain);
+	$r = ogp_fetch($src, $ua, OGP_MAX_IMAGE, $chain);
 	if (isset($r['error'])) return ['url' => $src, 'error' => $r['error']];
 	$info = ['url' => $r['url'], 'status' => $r['status'], 'type' => $r['headers']['content-type'] ?? '',
 		'bytes' => $r['over'] ? null : strlen($r['body']), 'over' => $r['over'], 'time' => $r['time']];
@@ -374,7 +374,7 @@ foreach (['og:image', 'twitter:image'] as $k) {
 	if (! $m || $m['value'] === '') continue;
 	$abs = ogp_abs($m['value'], $page['url']);
 	if (isset($images[$abs])) { $images[$abs]['for'][] = $k; continue; }
-	$images[$abs] = ogp_image_info($abs) + ['for' => [$k], 'raw' => $m['value'], 'robotsBlocked' => ogp_robots_blocked($abs)];
+	$images[$abs] = ogp_image_info($abs, OGP_UAS[$uaKey]) + ['for' => [$k], 'raw' => $m['value'], 'robotsBlocked' => ogp_robots_blocked($abs)];
 }
 
 ogp_out([

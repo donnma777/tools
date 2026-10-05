@@ -1526,7 +1526,7 @@
       <div class="ask">
         <input type="text" id="url" inputmode="url" placeholder="https://example.com/page/" aria-label="調べる URL" spellcheck="false">
         <select id="ua" aria-label="どのサービスとして見に行くか">
-          <option value="default">ふつうに見る</option>
+          <option value="default">標準（全部のサービス）</option>
           <option value="discord">Discord として</option>
           <option value="x">X として</option>
           <option value="facebook">Facebook・Threads として</option>
@@ -1565,6 +1565,7 @@
       <section class="panel panel-body" style="margin-top:16px">
         <div class="panel-title"><span class="sec-icon">📱</span>貼ったときの見え方（目安）</div>
         <p class="field-note" style="margin:-4px 0 12px">各サービスの表示は、画面の大きさや仕様の変更で変わります。形と切れ方の目安として使ってください。各サービスが前に取ったものを覚えているときは、ここと違って見えることがあります。</p>
+        <p class="field-note" id="sns-only" style="margin:-4px 0 12px" hidden></p>
         <div class="sns-grid" id="sns"></div>
       </section>
 
@@ -1675,6 +1676,14 @@
       const $ = id => document.getElementById(id);
       // 調べ役（PHP）は donnma.com にだけある。tools.donnma.com（GitHub Pages）からも、そちらを呼ぶ
       const API = location.hostname === 'tools.donnma.com' ? 'https://donnma.com/tool/api/ogp.php' : '../api/ogp.php';
+
+      // 「◯◯として」で選んだときに見せるサービス（見え方の名前）
+      const SVC = {
+        x: ['X'], discord: ['Discord'], facebook: ['Facebook', 'Threads'], line: ['LINE'], slack: ['Slack'],
+        bluesky: ['Bluesky'], mastodon: ['Mastodon'], misskey: ['Misskey'], linkedin: ['LinkedIn'], telegram: ['Telegram'],
+        whatsapp: ['WhatsApp'], imessage: ['iMessage'], teams: ['Microsoft Teams'], pinterest: ['Pinterest'], reddit: ['Reddit'],
+      };
+      const uaName = k => { const o = [...$('ua').options].find(o => o.value === k); return o ? o.textContent : k; };
 
       const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
       const kb = n => n == null ? '—' : n < 1024 ? n + ' B' : n < 1024 * 1024 ? (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' KB' : (n / 1024 / 1024).toFixed(1) + ' MB';
@@ -1800,7 +1809,10 @@
           `<div class="sns-pin">${ogImg ? `<img src="${esc(imgUrl(ogImg))}" alt="" referrerpolicy="no-referrer">` : '<div class="sns-noimg">画像なし（ピンにできません）</div>'}<div class="sns-card-title clamp2" style="margin-top:6px">${esc(title)}</div></div>`]);
         cards.push(['Reddit', 'リンクの投稿', 'light',
           `<div class="sns-rd-title clamp2">${esc(title)}</div><div class="sns-rd">${anyImg ? pic(anyImg, '1.91 / 1') : '<div class="sns-card-body">🔗</div>'}<span class="sns-x-dom">${esc(dom)}</span></div>`]);
-        $('sns').innerHTML = cards.map(([name, what, tone, body]) =>
+        const only = SVC[d.ua] || null;
+        $('sns-only').hidden = !only;
+        $('sns-only').textContent = only ? `「${uaName(d.ua)}」で調べたので、${only.join('・')} だけを出しています。全部見るときは「標準」で調べてください。` : '';
+        $('sns').innerHTML = cards.filter(([name]) => !only || only.includes(name)).map(([name, what, tone, body]) =>
           `<section><div class="sns-label"><b>${name}</b><span>${what}</span></div><div class="sns-tile sns-${tone}">${body}</div></section>`).join('');
 
         // 画像：サービスごとの切り抜き方（真ん中で切り抜く）
@@ -1810,7 +1822,8 @@
           ['3 / 2', '3 : 2', 'はてなブックマーク'],
           [null, 'そのまま', 'Discord・Slack・Telegram・Pinterest'],
         ];
-        const crops = i => `<div class="crops">${CROPS.map(([r, name, who]) =>
+        const cropShown = only ? CROPS.filter(c => only.some(n => c[2].includes(n.replace('Microsoft ', '')))) : CROPS;
+        const crops = i => `<div class="crops">${cropShown.map(([r, name, who]) =>
           `<figure class="crop"><div class="crop-frame"${r ? ` style="aspect-ratio:${r}"` : ''}><img src="${esc(i.url)}" alt="" referrerpolicy="no-referrer"${r ? '' : ' style="height:auto;object-fit:contain"'}></div><figcaption><b>${name}</b>${who}</figcaption></figure>`).join('')}</div>`;
         $('images').innerHTML = d.images.length ? d.images.map(i => {
           const fact = (k, val) => `<div class="fact"><b>${k}</b><span>${val}</span></div>`;
@@ -1837,7 +1850,7 @@
         fact('&lt;title&gt;', esc(d.title || '（なし）'));
         fact('canonical', d.canonical ? esc(d.canonical) + (d.canonicalFrom === 'header' ? '（返事のヘッダーの Link で）' : '') : '（なし）');
         if (d.robots) fact('X-Robots-Tag', esc(d.robots));
-        fact('見に行った名乗り', esc($('ua').selectedOptions[0].textContent));
+        fact('見に行った名乗り', esc(uaName(d.ua)));
         $('facts').innerHTML = f.join('');
 
         // タグ：大事なものは決まった順に、ないものも「なし」で出す。そのあとに、そのほかに見つかったもの
@@ -1885,13 +1898,19 @@
       // ---- チェック
       function diagnose(d, tag, v, img) {
         const out = [];
+        const only = SVC[d.ua] || null;
+        // robots.txt で止められているサービスのうち、今見ているもの
+        const blockedFor = list => (list || []).filter(n => !only || only.includes(n));
+        const xCard = !only || d.ua === 'x' || d.ua === 'discord';
+        const crops = !only || !['discord', 'slack', 'telegram', 'pinterest'].includes(d.ua);
         const add = (level, title, how = '') => out.push({ level, title, how });
         const code = s => `<code>${esc(s)}</code>`;
 
         // ページそのもの
         if (d.status !== 200) add('ng', `ページの返事が ${d.status} です`, '200 以外だと、多くのサービスは OGP を読みません。URL が正しいか、ログインが要るページでないかを確かめてください。');
         else add('ok', 'ページを読めました（200）');
-        if ((d.robotsBlocked || []).length) add('ng', `robots.txt で止められていて、${d.robotsBlocked.join('・')} ではカードが出ません`, `X・Slack・LinkedIn は robots.txt を守るので、このページを読みに来ません。robots.txt の ${code('Disallow')} を見直してください。`);
+        const pageBlocked = blockedFor(d.robotsBlocked);
+        if (pageBlocked.length) add('ng', `robots.txt で止められていて、${pageBlocked.join('・')} ではカードが出ません`, `X・Slack・LinkedIn は robots.txt を守るので、このページを読みに来ません。robots.txt の ${code('Disallow')} を見直してください。`);
         if (d.chain.length > 1) add('info', `${d.chain.length - 1} 回転送されました`, '転送のあとのページの OGP が使われます。貼る URL は、転送のあとの URL にするのが確実です。');
         if (!/html/i.test(d.type || '')) add('warn', `ページの種類が HTML ではありません（${esc(d.type || '不明')}）`);
 
@@ -1924,7 +1943,8 @@
 
         // X のカード
         const card = (v('twitter:card') || '').toLowerCase();
-        if (!card) add('warn', 'twitter:card がありません', `X で大きな画像のカードにするには、${code('<meta name="twitter:card" content="summary_large_image">')} を足してください。`);
+        if (!xCard) { /* X・Discord 以外は twitter:card を見ない */ }
+        else if (!card) add('warn', 'twitter:card がありません', `X で大きな画像のカードにするには、${code('<meta name="twitter:card" content="summary_large_image">')} を足してください。`);
         else if (card === 'summary') add('info', 'X では小さいカード（summary）で出ます', `大きな画像で出したいときは ${code('summary_large_image')} にしてください。`);
         else add('ok', `twitter:card は ${esc(card)} です`);
 
@@ -1935,9 +1955,10 @@
           const where = i.for.join('・');
           if (!/^https?:\/\//i.test(i.raw)) add('warn', `${where} が「${esc(i.raw)}」のように、https:// から始まっていません`, 'このツールは補って読みましたが、そのままでは読めないサービスがあります。https:// から始まる URL で書いてください。');
           else if (/^http:\/\//i.test(i.raw)) add('warn', `${where} の URL が http:// です`, 'https:// でないと出ないサービスがあります。');
-          if ((i.robotsBlocked || []).length) {
+          const imgBlocked = blockedFor(i.robotsBlocked);
+          if (imgBlocked.length) {
             let path = i.url; try { const u = new URL(i.url); path = u.pathname + u.search; } catch { /* そのまま */ }
-            add('ng', `${where} の画像が robots.txt で止められていて、${i.robotsBlocked.join('・')} では画像が出ません`, `X・Slack・LinkedIn は、画像も robots.txt を見てから読みます。止められていると、X では画像なしの小さいカードになります。robots.txt に、たとえば ${code('Allow: ' + path.replace(/\?.*$/, '') + (path.includes('?') ? '?…' : ''))} のように、画像を読んでよい行を足してください。`);
+            add('ng', `${where} の画像が robots.txt で止められていて、${imgBlocked.join('・')} では画像が出ません`, `X・Slack・LinkedIn は、画像も robots.txt を見てから読みます。止められていると、X では画像なしの小さいカードになります。robots.txt に、たとえば ${code('Allow: ' + path.replace(/\?.*$/, '') + (path.includes('?') ? '?…' : ''))} のように、画像を読んでよい行を足してください。`);
           }
           if (i.error) { add('ng', `${where} の画像を読めませんでした`, esc(i.error)); continue; }
           if (i.status !== 200) { add('ng', `${where} の画像の返事が ${i.status} です`, '画像の URL が正しいか、画像に誰でもアクセスできるかを確かめてください。'); continue; }
@@ -1950,7 +1971,7 @@
             const r = i.width / i.height;
             if (i.width < 200 || i.height < 200) add('ng', `${where} の画像が小さすぎます（${i.width} × ${i.height}）`, '200 × 200 px より小さいと、出ないサービスがあります。1200 × 630 px がおすすめです。');
             else if (i.width < 600) add('warn', `${where} の画像が小さめです（${i.width} × ${i.height}）`, '大きなカードにするには、横 1200 px くらいがおすすめです。');
-            if (Math.abs(r - 1.91) > 0.25 && card !== 'summary') add('info', `${where} の画像の形が 1.91:1 ではありません（${r.toFixed(2)}:1）`, 'X や Facebook では、上下か左右が切り抜かれます。「見え方」で切れ方を確かめてください。');
+            if (crops && Math.abs(r - 1.91) > 0.25 && card !== 'summary') add('info', `${where} の画像の形が 1.91:1 ではありません（${r.toFixed(2)}:1）`, 'X や Facebook では、上下か左右が切り抜かれます。「見え方」で切れ方を確かめてください。');
             if (!/svg/i.test(mime) && i.width >= 200 && i.height >= 200 && i.bytes <= 1024 * 1024) add('ok', `${where} の画像は ${i.width} × ${i.height}・${kb(i.bytes)} です`);
           }
         }
