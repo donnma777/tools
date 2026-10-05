@@ -32,6 +32,7 @@
 | 背景透過ツール | [bg-remove/](bg-remove/README.md) | 画像の背景を色で抜いて透明にする |
 | QRコードメーカー | [qr/](qr/README.md) | URL・Wi-Fi・連絡先などのQRコードを、形・色・ロゴを変えて作る（期限なし）。画像からの読み取りも |
 | 名刺メーカー | [meishi/](meishi/README.md) | 名前・SNS・QRコードの名刺を作り、A4・10面 PDF や印刷所向けの PDF・PNG で保存（`qr/qr-core.js` を使う） |
+| PSD レイヤー書き出し | [psd/](psd/README.md) | PSD を開いて、レイヤーの表示を切り替えたり、レイヤー・フォルダを PNG／ZIP で書き出したりする（ag-psd を使う） |
 | 画像の圧縮・変換 | [image-compress/](image-compress/README.md) | 画像を軽く・JPEG/PNG/WebP に変換する（まとめて・○KB 以下・見比べ・ZIP。送信しない） |
 | OGPチェッカー | [ogp-checker/](ogp-checker/README.md) | URL を入れて、SNS に貼ったときの見え方と OGP の問題を調べる（調べ役は `api/ogp.php`） |
 | robots.txt チェッカー | [robots-checker/](robots-checker/README.md) | Google・AI・X・AdSense などがページを読めるかを robots.txt から判定（調べ役は `api/robots.php`） |
