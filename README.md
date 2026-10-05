@@ -25,7 +25,7 @@
 | 配信オーバーレイ | [overlay/](overlay/README.md) | OBSのブラウザソースで使うオーバーレイのテーマ集（1920×1080） |
 | チャットCSSジェネレーター | [chat-css-generator/](chat-css-generator/README.md) | YouTube / Twitch のチャット欄の見た目をOBSのカスタムCSSで作る |
 | 登録者数カウンター・目標ゲージ | [youtube-subscribers/](youtube-subscribers/README.md) | YouTubeの登録者数と目標ゲージをOBSに表示する |
-| 配信用の時計・経過時間 | [clock/](clock/README.md) | OBS のブラウザソースで使う時計・もう1つの時刻・配信／録画の経過時間（設定は URL に入れる） |
+| 時計・経過時間 | [clock/](clock/README.md) | OBS のブラウザソースで使う時計・もう1つの時刻・配信／録画の経過時間（設定は URL に入れる） |
 | トーナメント表メーカー | [tournament/](tournament/README.md) | 大会のトーナメント表・試合テロップ・選曲をOBSや画像で使う |
 | ルーレット | [roulette/](roulette/README.md) | OBSのドックやChromeから回せるルーレット |
 | あみだくじ | [amida/](amida/README.md) | 横線を足したり1人ずつ開けたりできるあみだくじ。OBSにも出せる |
