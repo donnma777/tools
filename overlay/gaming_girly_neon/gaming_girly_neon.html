@@ -1996,34 +1996,43 @@
             white-space: nowrap;
         }
 
-        /* ---- ストップウォッチの「配信と連動」の切り替え（ふだんは隠し、マウスを乗せたときだけ出す。OBS の画面には出ない） */
-        .sw-part .sw-link {
-            font: inherit;
-            font-size: 11px;
-            line-height: 1.4;
-            padding: 2px 8px;
-            margin-left: 4px;
-            border: 1px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
-            background: color-mix(in srgb, var(--color-accent) 12%, transparent);
-            color: inherit;
-            border-radius: 999px;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.15s;
-            white-space: nowrap;
-        }
-
-        .sw-part:hover .sw-link,
-        .sw-part .sw-link:focus-visible {
-            opacity: 1;
-        }
-
-        /* 連動しているときは、開始・リセットは使わないので隠す */
-        .sw-part[data-sw-link="stream"] .sw-btn-start,
-        .sw-part[data-sw-link="stream"] .sw-btn-reset,
-        .sw-part[data-sw-link="record"] .sw-btn-start,
-        .sw-part[data-sw-link="record"] .sw-btn-reset {
+        /* ---- ストップウォッチ：画面には時間だけ（開始・停止・リセット・連動は ≡ メニューと、時間を押す） */
+        .sw-part .sw-controls {
             display: none;
+        }
+
+        .sw-part .sw-time {
+            cursor: pointer;
+        }
+
+        .sw-part .sw-status {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            line-height: 1.2;
+            margin-top: 6px;
+            text-align: center;
+            opacity: 0.65;
+        }
+
+        .sw-part .sw-status:empty {
+            display: none;
+        }
+
+        /* 連動して数えているとき：テーマの色で、点を点滅させる */
+        .sw-part .sw-status.on {
+            opacity: 1;
+            color: var(--color-accent);
+        }
+
+        .sw-part .sw-status.on::first-letter {
+            animation: sw-blink 1.6s ease-in-out infinite;
+        }
+
+        @keyframes sw-blink {
+            50% {
+                opacity: 0.25;
+            }
         }
         /* shared-css:end */
     </style>
@@ -3757,6 +3766,7 @@
             </div>
             <div class="hover-menu-sep"></div>
             <button class="hover-menu-btn" data-action="close">✕ 閉じる</button>`;
+            if (typeof overlaySwMenu === 'function' && el.querySelector('.sw-time')) overlaySwMenu(menu, el); // ストップウォッチの項目（共通機能）
             const tcSubPanel = menu.querySelector('.hover-menu-tc');
             const tcInput = menu.querySelector('.hover-menu-tc-input');
             const fcSubPanel = menu.querySelector('.hover-menu-fc');
@@ -4916,16 +4926,17 @@
             }
         }
 
-        /* ---- ストップウォッチ（全テーマ共通。各テーマの addStopwatch は見た目を作って overlaySwSetup を呼ぶだけ）
+        /* ---- ストップウォッチ（全テーマ共通。各テーマの addStopwatch は見た目を作って overlaySwSetup を呼ぶだけ。
+         *  ≡ メニューには addHoverMenu から overlaySwMenu を呼んで「開始・停止／リセット／連動」を足す）
+         *  画面には時間だけを出す（ボタンは出さない）。時間を押しても開始・停止できる。
          *  状態はパーツの data-* に持つので、自動保存・プリセット・OBS への反映で読み込み直しても続きから動く。
          *    data-sw-run    '1' なら数えている
          *    data-sw-start  数え始めた時刻（ms。止めていた間のぶんは進めてある）
          *    data-sw-acc    止めているときの経過（ms）
          *    data-sw-link   '' 手動 / 'stream' 配信と連動 / 'record' 録画と連動
-         *    data-sw-labels 開始ボタンの文字「開始|停止」（テーマごと）
          *  連動は OBS のブラウザソースが知らせる開始・停止（window.obsstudio）で数える。始めた時刻は localStorage に
          *  覚えるので、ソースを読み込み直しても続きから。Chrome で編集しているときは数えない */
-        const SW_LINK_LABEL = { '': '連動なし', stream: '● 配信と連動', record: '● 録画と連動' };
+        const SW_LINK_NAME = { '': 'なし', stream: '配信', record: '録画' };
         const SW_LINK_NEXT = { '': 'stream', stream: 'record', record: '' };
         const SW_OBS_KEY = OVERLAY_KEY + 'SwStart-';
         const swObsOn = { stream: false, record: false };
@@ -4939,17 +4950,25 @@
         }
         const swElapsed = (box) => box.dataset.swRun === '1' ? Date.now() - (+box.dataset.swStart || Date.now()) : (+box.dataset.swAcc || 0);
         function swRender(box) {
+            const on = box.dataset.swRun === '1';
+            const link = box.dataset.swLink || '';
             const t = box.querySelector('.sw-time');
             if (t) t.textContent = swFormat(swElapsed(box));
-            const [startLabel, stopLabel] = (box.dataset.swLabels || 'START|STOP').split('|');
-            const b = box.querySelector('.sw-btn-start');
-            if (b) {
-                const on = box.dataset.swRun === '1';
-                b.textContent = on ? (stopLabel || 'STOP') : (startLabel || 'START');
-                b.classList.toggle('running', on);
+            // 時間の下の小さな文字（連動しているときだけ）
+            const st = box.querySelector('.sw-status');
+            if (st) {
+                st.textContent = !link ? '' : on ? (link === 'stream' ? '● 配信中' : '● 録画中') : (link === 'stream' ? '配信と連動' : '録画と連動');
+                st.classList.toggle('on', !!link && on);
             }
-            const lk = box.querySelector('.sw-link');
-            if (lk) lk.textContent = SW_LINK_LABEL[box.dataset.swLink || ''] || SW_LINK_LABEL[''];
+            box.classList.toggle('sw-running', on);
+            // ≡ メニュー
+            const m = box._swMenu;
+            if (m && m.isConnected) {
+                const go = m.querySelector('[data-sw="go"]'), rs = m.querySelector('[data-sw="reset"]'), lk = m.querySelector('[data-sw="link"]');
+                if (go) { go.textContent = on ? '⏸ 停止' : '▶ 開始'; go.style.display = link ? 'none' : ''; }
+                if (rs) rs.style.display = link ? 'none' : '';
+                if (lk) lk.textContent = '🔗 連動：' + SW_LINK_NAME[link];
+            }
         }
         function swStart(box, from) {
             box.dataset.swStart = String(from ?? (Date.now() - (+box.dataset.swAcc || 0)));
@@ -4968,25 +4987,57 @@
             delete box.dataset.swStart;
             swRender(box);
         }
-        // 新しく作ったもの・古い保存から読み込んだものに、印と「連動」の切り替えボタンを付ける
+        function swToggle(box) {
+            if (box.dataset.swLink) return; // 連動しているときは、OBS の配信・録画に合わせる
+            box.dataset.swRun === '1' ? swStop(box) : swStart(box);
+        }
+        function swCycleLink(box) {
+            box.dataset.swLink = SW_LINK_NEXT[box.dataset.swLink || ''];
+            swReset(box);
+            swSyncObs();
+        }
+        // 新しく作ったもの・古い保存から読み込んだものを、今の形に整える
         function overlaySwSetup(box) {
             if (!box) return;
             box.classList.add('sw-part');
-            if (!box.dataset.swLabels) {
-                const b = box.querySelector('.sw-btn-start');
-                // 古い保存には停止の文字がないので、開始の文字から決める（テーマの文字と同じ）
-                const st = b && !b.classList.contains('running') ? b.textContent.trim() : 'START';
-                box.dataset.swLabels = st + '|' + ({ '開始': '停止', '▶ 開始': '⏸ 停止' }[st] || 'STOP');
+            box.querySelectorAll('.sw-link').forEach(n => n.remove()); // 前の版の「連動」ボタン
+            const t = box.querySelector('.sw-time');
+            if (t && !box.querySelector('.sw-status')) {
+                const st = document.createElement('div');
+                st.className = 'sw-status';
+                t.insertAdjacentElement('afterend', st);
             }
-            const ctl = box.querySelector('.sw-controls');
-            if (ctl && !ctl.querySelector('.sw-link')) {
-                const lk = document.createElement('button');
-                lk.type = 'button';
-                lk.className = 'sw-link';
-                lk.title = '押すたびに「連動なし → 配信と連動 → 録画と連動」と切り替わります。連動は OBS の中で数えます';
-                ctl.appendChild(lk);
-            }
+            if (t) t.title = '押すと開始・停止（≡ メニューでリセット・配信と連動）';
             swRender(box);
+        }
+        // ≡ メニューに足す（各テーマの addHoverMenu から呼ぶ。テーマの最初の処理の途中で呼ばれても動くよう、少し後で足す）
+        function overlaySwMenu(menu, box) {
+            queueMicrotask(() => {
+                if (menu.querySelector('[data-sw]')) return;
+                const mk = (sw, text) => {
+                    const b = document.createElement('button');
+                    b.className = 'hover-menu-btn';
+                    b.dataset.sw = sw;
+                    b.textContent = text;
+                    b.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        overlaySwSetup(box);
+                        if (sw === 'go') swToggle(box);
+                        else if (sw === 'reset') swReset(box);
+                        else swCycleLink(box);
+                        clearTimeout(autoSaveTimer);
+                        autoSaveTimer = setTimeout(autoSave, 800);
+                    });
+                    return b;
+                };
+                const sep = document.createElement('div');
+                sep.className = 'hover-menu-sep';
+                const lk = mk('link', '🔗 連動：なし');
+                lk.title = '押すたびに「なし → 配信 → 録画」と切り替わります。連動すると、OBS で配信・録画を始めたときに自動で数え、止めると 0 に戻ります';
+                menu.prepend(mk('go', '▶ 開始'), mk('reset', '↺ リセット'), lk, sep);
+                box._swMenu = menu;
+                swRender(box);
+            });
         }
         const swLinked = (kind) => Array.from(captureArea.querySelectorAll('.sw-part')).filter(b => b.dataset.swLink === kind);
         // OBS の配信・録画が始まった（fresh）／もう動いている（覚えている時刻から）
@@ -5021,20 +5072,14 @@
             };
             swRaf = requestAnimationFrame(step);
         }
+        // 時間を押して開始・停止。前の版のボタン（隠してある）が押されたときも同じように動かす
         document.addEventListener('click', (e) => {
-            const btn = e.target.closest('.sw-btn-start, .sw-btn-reset, .sw-link');
-            const box = btn && btn.closest('.box');
-            if (!box || !captureArea.contains(box)) return;
+            const hit = e.target.closest('.sw-time, .sw-btn-start, .sw-btn-reset');
+            const box = hit && hit.closest('.box');
+            if (!box || !captureArea.contains(box) || !box.querySelector('.sw-time')) return;
             overlaySwSetup(box);
-            if (btn.classList.contains('sw-link')) {
-                box.dataset.swLink = SW_LINK_NEXT[box.dataset.swLink || ''];
-                swReset(box);
-                swSyncObs();
-            } else if (box.dataset.swLink) {
-                return; // 連動しているときは、開始・リセットは使わない（ボタンも隠れている）
-            } else if (btn.classList.contains('sw-btn-reset')) swReset(box);
-            else if (box.dataset.swRun === '1') swStop(box);
-            else swStart(box);
+            if (hit.classList.contains('sw-btn-reset')) swReset(box);
+            else swToggle(box);
         });
         // 画面を読み込み直した（自動保存・プリセット・OBS への反映）ら、ストップウォッチを整えて動かし直す
         function swRefreshAll() {
