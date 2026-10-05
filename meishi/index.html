@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>名刺メーカー | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="名前・SNS・QRコードを入れるだけで名刺を作れる無料ツール。配信者・イベント・交流会向け。4つのレイアウト、色・フォント・写真を選んで、家で印刷できる A4・10面の PDF や、印刷所向けの塗り足し付き PDF・PNG で保存。画像はどこにも送信しません。">
+  <link rel="canonical" href="https://donnma.com/tool/meishi/">
+  <meta property="og:title" content="名刺メーカー | どんまうんど-Tools">
+  <meta property="og:description" content="名前・SNS・QRコードを入れるだけで名刺を作れる無料ツール。A4・10面 PDF や印刷所向けの PDF で保存。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/meishi/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-meishi.jpg?v=20261005a">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="名刺メーカー">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <meta name="twitter:image:alt" content="名刺メーカー">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@400;700&family=Kiwi+Maru:wght@400;500&family=Dela+Gothic+One&family=Yusei+Magic&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --warn: #ffc46b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace：左に設定、右に名刺 ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+      display: grid;
+      grid-template-columns: 380px minmax(0, 1fr);
+      grid-template-areas: "settings main";
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings {
+      grid-area: settings;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .main {
+      grid-area: main;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      min-width: 0;
+      max-height: calc(100vh - 88px);
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+      flex: none;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: filter 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      border-color: var(--border-strong);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 7px 0;
+      min-width: 0;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .field-val {
+      font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+      font-size: 12px;
+      color: var(--accent-2);
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0 10px;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select,
+    input[type=text],
+    textarea {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 54px;
+      line-height: 1.5;
+    }
+
+    select:focus,
+    input[type=text]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    input[type=color] {
+      width: 100%;
+      height: 32px;
+      padding: 2px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      background: var(--surface-2);
+      cursor: pointer;
+    }
+
+    .seg {
+      display: flex;
+      gap: 6px;
+    }
+
+    .seg button {
+      flex: 1 1 0;
+      min-width: 0;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 7px 4px;
+      cursor: pointer;
+      line-height: 1.3;
+    }
+
+    .seg button:hover {
+      border-color: var(--accent);
+    }
+
+    .seg button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    /* レイアウトの見本 */
+    .layouts {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .layouts button {
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 6px 4px 5px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .layouts button svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 3px;
+    }
+
+    .layouts button[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+      color: var(--accent-2);
+    }
+
+    .themes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .theme {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid var(--border-strong);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .theme span {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 50%;
+      height: 50%;
+      border-top-left-radius: 100%;
+    }
+
+    .theme[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+      cursor: pointer;
+      padding: 6px 0;
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle .sw {
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      position: relative;
+      flex: none;
+      transition: background 0.15s;
+    }
+
+    .toggle .sw::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .toggle input:checked+.sw {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .toggle input:checked+.sw::after {
+      transform: translateX(18px);
+      background: #fff;
+    }
+
+    .toggle input:focus-visible+.sw {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    /* SNS・連絡先の行 */
+    .sns-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sns-row {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr) 30px;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .sns-row .lab {
+      grid-column: 1 / -1;
+    }
+
+    .icon-btn {
+      font: inherit;
+      font-size: 13px;
+      line-height: 1;
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .icon-btn:hover {
+      border-color: var(--accent);
+    }
+
+    /* 画像を選ぶところ */
+    .img-pick {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .img-pick .thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: var(--surface-2) center / cover no-repeat;
+      border: 1px dashed var(--border-strong);
+      flex: none;
+    }
+
+    .img-pick .sp {
+      flex: 1;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    /* ── 名刺の見え方 ── */
+    .main-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .main-head .info {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .main-head .sp {
+      flex: 1;
+    }
+
+    .main-head .toggle {
+      padding: 0;
+      font-size: 12px;
+    }
+
+    .stage {
+      flex: 1;
+      overflow: auto;
+      background: #140810;
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: flex-start;
+      justify-content: center;
+      min-height: 0;
+    }
+
+    .card-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      flex: 1 1 320px;
+      max-width: 560px;
+      min-width: 0;
+    }
+
+    .stage.portrait .card-view {
+      flex: 0 1 300px;
+    }
+
+    .card-view canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .warns {
+      font-size: 12px;
+      color: var(--warn);
+      padding: 0 14px;
+    }
+
+    .warns:not(:empty) {
+      padding: 8px 14px 0;
+    }
+
+    .save-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .save-row select {
+      flex: 1 1 260px;
+      width: auto;
+    }
+
+    .save-note {
+      flex: 1 1 100%;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b,
+    .notes b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1000px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "main" "settings";
+        padding: 40px 16px 40px;
+      }
+
+      .main {
+        position: static;
+        max-height: none;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .stage {
+        padding: 14px;
+        gap: 14px;
+      }
+
+      .sns-row {
+        grid-template-columns: 96px minmax(0, 1fr) 30px;
+      }
+
+      .save-row .btn {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>名刺メーカー</h1>
+      <p>名前・SNS・QRコードを入れるだけで名刺を作れます。配信者のイベントや交流会に。家で印刷できる A4・10面の PDF や、印刷所に出せる PDF・PNG で保存できます。画像はどこにも送信しません。</p>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- 設定 -->
+    <div class="settings">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">✏️</span>名刺に入れること</div>
+          <div class="field">
+            <span class="field-label"><span>名前</span></span>
+            <input type="text" id="f-name" spellcheck="false">
+          </div>
+          <div class="two">
+            <div class="field">
+              <span class="field-label"><span>読み・英字</span></span>
+              <input type="text" id="f-kana" spellcheck="false">
+            </div>
+            <div class="field">
+              <span class="field-label"><span>肩書き・活動</span></span>
+              <input type="text" id="f-title" spellcheck="false">
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>ひとこと</span><span class="field-note">2行まで</span></span>
+            <textarea id="f-message" rows="2" spellcheck="false" placeholder="例：音ゲーとゲーセンが好きです！"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🔗</span>SNS・連絡先</div>
+          <div class="sns-rows" id="sns-rows"></div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn btn-sm" type="button" id="sns-add">＋ 行を足す</button>
+            <span class="field-note">5行まで。ID は「@」から、Web は URL で</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🔳</span>QRコード</div>
+          <div class="field">
+            <span class="field-label"><span>QRコードの飛び先</span></span>
+            <select id="qr-src"></select>
+            <input type="text" id="qr-custom" placeholder="https://…" spellcheck="false" hidden>
+            <span class="field-note" id="qr-note"></span>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>QRコードの横の文字</span></span>
+            <input type="text" id="qr-label" spellcheck="false" placeholder="例：X はこちら">
+          </div>
+          <label class="toggle"><span>表にも QRコードを入れる</span><input type="checkbox" id="qr-front"><span class="sw"></span></label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🎨</span>デザイン</div>
+          <div class="field">
+            <span class="field-label"><span>向き</span></span>
+            <div class="seg" id="orient">
+              <button type="button" data-v="h">横（91×55mm）</button>
+              <button type="button" data-v="v">縦（55×91mm）</button>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>レイアウト</span></span>
+            <div class="layouts" id="layouts"></div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>色</span></span>
+            <div class="themes" id="themes"></div>
+            <div class="two" style="margin-top:6px">
+              <label class="field" style="padding:0"><span class="field-note">背景</span><input type="color" id="c-bg"></label>
+              <label class="field" style="padding:0"><span class="field-note">背景 2（グラデーション）</span><input type="color" id="c-bg2"></label>
+              <label class="field" style="padding:4px 0 0"><span class="field-note">文字</span><input type="color" id="c-text"></label>
+              <label class="field" style="padding:4px 0 0"><span class="field-note">アクセント</span><input type="color" id="c-accent"></label>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>背景</span></span>
+            <div class="seg" id="bg-style">
+              <button type="button" data-v="solid">単色</button>
+              <button type="button" data-v="grad">グラデ</button>
+              <button type="button" data-v="dots">水玉</button>
+              <button type="button" data-v="image">画像</button>
+            </div>
+          </div>
+          <div class="field" id="bg-img-field">
+            <div class="img-pick"><span class="thumb" id="bg-thumb"></span><span class="sp">背景の画像</span><button class="btn btn-sm" type="button" data-pick="bg">選ぶ</button><button class="btn btn-sm" type="button" data-clear="bg">消す</button></div>
+            <span class="field-label" style="margin-top:4px"><span>画像を薄くする</span><span class="field-val" id="dim-val"></span></span>
+            <input type="range" id="dim" min="0" max="90" step="5">
+          </div>
+          <div class="field">
+            <span class="field-label"><span>フォント</span></span>
+            <select id="font"></select>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>名前の大きさ</span><span class="field-val" id="ns-val"></span></span>
+            <input type="range" id="ns" min="70" max="130" step="5">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🖼️</span>写真・アイコン</div>
+          <div class="img-pick"><span class="thumb" id="avatar-thumb"></span><span class="sp">写真・アイコン</span><button class="btn btn-sm" type="button" data-pick="avatar">選ぶ</button><button class="btn btn-sm" type="button" data-clear="avatar">消す</button></div>
+          <div class="field">
+            <span class="field-label"><span>形</span></span>
+            <div class="seg" id="avatar-shape">
+              <button type="button" data-v="circle">丸</button>
+              <button type="button" data-v="rounded">角丸</button>
+              <button type="button" data-v="square">四角</button>
+            </div>
+            <span class="field-note">「写真を左」のレイアウトでは、形に関係なく左いっぱいに入ります</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🔄</span>裏</div>
+          <div class="seg" id="back">
+            <button type="button" data-v="qr">QRを大きく</button>
+            <button type="button" data-v="name">名前だけ</button>
+            <button type="button" data-v="image">画像</button>
+            <button type="button" data-v="none">なし</button>
+          </div>
+          <div class="field" id="back-img-field">
+            <div class="img-pick"><span class="thumb" id="back-thumb"></span><span class="sp">裏の画像（91×55mm の形に切り抜きます）</span><button class="btn btn-sm" type="button" data-pick="back">選ぶ</button><button class="btn btn-sm" type="button" data-clear="back">消す</button></div>
+          </div>
+        </div>
+      </div>
+      <input type="file" id="file" accept="image/*" hidden>
+    </div>
+
+    <!-- 名刺 -->
+    <div class="main" id="main">
+      <div class="main-head">
+        <span>名刺</span><span class="info" id="info"></span>
+        <span class="sp"></span>
+        <label class="toggle" title="印刷でずれても切れないよう、文字はこの内側に入れます"><span>安全な範囲</span><input type="checkbox" id="guides" checked><span class="sw"></span></label>
+      </div>
+      <div class="stage" id="stage">
+        <div class="card-view"><canvas id="cv-front" aria-label="名刺の表"></canvas><span>表</span></div>
+        <div class="card-view" id="back-view"><canvas id="cv-back" aria-label="名刺の裏"></canvas><span>裏</span></div>
+      </div>
+      <div class="warns" id="warns"></div>
+      <div class="save-row">
+        <select id="save-type" aria-label="保存のしかた">
+          <option value="a4">家で印刷：A4・10面 PDF（名刺用の紙）</option>
+          <option value="a4marks">家で印刷：A4・10面 PDF（トンボ付き・ふつうの紙）</option>
+          <option value="shop">印刷所に出す：PDF（塗り足し 3mm）</option>
+          <option value="png">画像：PNG（表・裏。350dpi）</option>
+          <option value="pngb">画像：PNG（塗り足し 3mm 付き）</option>
+        </select>
+        <button class="btn btn-primary" type="button" id="save">⬇ 保存</button>
+        <span class="save-note" id="save-note"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🔍</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>左で<b>名前・SNS</b>などを入れます。QRコードは、SNS の行から選ぶか、好きな URL を入れられます。</li>
+          <li><b>デザイン</b>で向き・レイアウト・色・フォントを選び、必要なら写真や背景の画像を入れます。</li>
+          <li>右の名刺を見て、点線（<b>安全な範囲</b>）から文字がはみ出していないか確かめます。</li>
+          <li>保存のしかたを選んで <b>「⬇ 保存」</b>。入れた内容は、このブラウザに自動で覚えておきます。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">🖨️</span>印刷のしかた</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li><b>家で印刷</b>：A4・10面の名刺用紙（エーワン・コクヨなどの「マルチカード」「名刺用紙」、上下 11mm・左右 14mm の余白のもの）に合わせてあります。</li>
+          <li>印刷するときは、大きさを<b>「実際のサイズ」「100%」</b>にしてください。「ページに合わせる」だとずれます。</li>
+          <li><b>両面</b>にするときは、1ページ目（表）を印刷したあと、紙を裏返して 2ページ目（裏）を印刷します。プリンターの両面印刷なら「長辺とじ」で。</li>
+          <li><b>トンボ付き</b>は、ふつうの紙に印刷して、まわりの線に合わせてカッターで切る用です。</li>
+          <li><b>印刷所</b>に出すときは「塗り足し 3mm」の PDF か PNG を使ってください。まわり 3mm は切り落とされるので、背景だけがはみ出すようにしてあります。</li>
+        </ul>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>ヒント・注意点</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>QRコードは、作ったあとにスマホで読めるか確かめてください。背景の画像の上でも読めるよう、白い台を付けています。</li>
+          <li>QRコードは中身をそのまま入れているので、期限はありません。そのかわり、あとから飛び先は変えられません。</li>
+          <li>写真・画像はブラウザの中だけで使い、どこにも送信しません。大きい画像は、覚えておくときに小さくします。</li>
+          <li>名前が長いときは、入るように自動で小さくなります。文字が小さすぎると印刷で読みにくいので、ひとことや SNS は少なめがおすすめです。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1400px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../qr/qr-core.js?v=20261004a"></script>
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2400); };
+      const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+      // ---- 決まりごと
+      const CARD = { w: 91, h: 55 };    // 日本の名刺（mm）
+      const BLEED = 3;                  // 塗り足し
+      const SAFE = 3;                   // 文字を入れない、まわりの幅
+      const DPI = 350;
+      const PXMM = DPI / 25.4;
+
+      const SNS = {
+        x: { label: 'X', url: v => 'https://x.com/' + v.replace(/^@/, '') },
+        youtube: { label: 'YouTube', url: v => 'https://www.youtube.com/' + (v.startsWith('@') ? v : '@' + v) },
+        twitch: { label: 'Twitch', url: v => 'https://www.twitch.tv/' + v.replace(/^@/, '') },
+        instagram: { label: 'Instagram', url: v => 'https://www.instagram.com/' + v.replace(/^@/, '') },
+        tiktok: { label: 'TikTok', url: v => 'https://www.tiktok.com/@' + v.replace(/^@/, '') },
+        bluesky: { label: 'Bluesky', url: v => 'https://bsky.app/profile/' + v.replace(/^@/, '') },
+        niconico: { label: 'ニコニコ', url: null },
+        discord: { label: 'Discord', url: null },
+        web: { label: 'Web', url: v => (/^https?:\/\//i.test(v) ? v : 'https://' + v) },
+        mail: { label: 'Mail', url: v => 'mailto:' + v },
+        other: { label: '', url: null },
+      };
+
+      const FONTS = {
+        zen: { label: 'Zen Maru Gothic（丸ゴシック）', name: ['Zen Maru Gothic', 900], body: ['Zen Maru Gothic', 500], bold: 700 },
+        mplus: { label: 'M PLUS Rounded 1c（丸ゴシック）', name: ['M PLUS Rounded 1c', 800], body: ['M PLUS Rounded 1c', 400], bold: 700 },
+        noto: { label: 'Noto Sans JP（ゴシック）', name: ['Noto Sans JP', 900], body: ['Noto Sans JP', 400], bold: 700 },
+        serif: { label: 'Noto Serif JP（明朝）', name: ['Noto Serif JP', 700], body: ['Noto Serif JP', 400], bold: 700 },
+        kiwi: { label: 'Kiwi Maru（やわらかい）', name: ['Kiwi Maru', 500], body: ['Kiwi Maru', 400], bold: 500 },
+        dela: { label: 'Dela Gothic One（極太）', name: ['Dela Gothic One', 400], body: ['M PLUS Rounded 1c', 400], bold: 700 },
+        yusei: { label: 'Yusei Magic（手書き風）', name: ['Yusei Magic', 400], body: ['Yusei Magic', 400], bold: 400 },
+      };
+
+      const THEMES = {
+        pink: { bg: '#fff5f8', bg2: '#ffe0ea', text: '#3a2430', accent: '#ff6f96' },
+        cream: { bg: '#fbf6e9', bg2: '#f3e3c3', text: '#4a3b28', accent: '#d9822b' },
+        sky: { bg: '#f2f8ff', bg2: '#d9eaff', text: '#1f2d3d', accent: '#3d8bff' },
+        mint: { bg: '#f1fbf6', bg2: '#d3f2e3', text: '#1e3a2f', accent: '#23a77a' },
+        lavender: { bg: '#f7f3ff', bg2: '#e4dafc', text: '#2e2448', accent: '#8a63d2' },
+        mono: { bg: '#ffffff', bg2: '#e9e9e9', text: '#111111', accent: '#111111' },
+        dark: { bg: '#1b1c22', bg2: '#33283a', text: '#f2f2f5', accent: '#ff85a1' },
+        plum: { bg: '#2e1224', bg2: '#4a1d38', text: '#f6e9ef', accent: '#ff85a1' },
+      };
+
+      const LAYOUTS = {
+        simple: 'シンプル',
+        center: 'まんなか',
+        photo: '写真を左',
+        band: '上に帯',
+      };
+
+      // ---- 設定（このブラウザに覚えておく）
+      const STORE = 'donnma-meishi';
+      const IMG_KEY = k => 'donnma-meishi-img-' + k;
+      const DEF = {
+        name: '名前 なまえ', kana: 'NAMAE', title: '肩書き・活動', message: '',
+        sns: [{ type: 'x', value: '@your_id', label: '' }, { type: 'youtube', value: '@your_channel', label: '' }, { type: 'web', value: 'example.com', label: '' }],
+        qrSrc: 'sns:0', qrCustom: '', qrLabel: 'X はこちら', qrFront: true,
+        orient: 'h', layout: 'simple', theme: 'pink', ...THEMES.pink,
+        bgStyle: 'solid', dim: 55, font: 'zen', ns: 100, avatarShape: 'circle', back: 'qr', guides: true, saveType: 'a4',
+      };
+      let S = { ...DEF };
+      try { S = { ...DEF, ...JSON.parse(localStorage.getItem(STORE) || '{}') }; } catch (e) { /* 初めの設定 */ }
+      if (!Array.isArray(S.sns)) S.sns = DEF.sns;
+      const store = () => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) { /* ignore */ } };
+
+      const img = { avatar: null, bg: null, back: null };
+      const imgSrc = { avatar: null, bg: null, back: null };
+
+      // ---- 色
+      const hex2rgb = h => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+      const rgba = (h, a) => { const [r, g, b] = hex2rgb(h); return `rgba(${r},${g},${b},${a})`; };
+      const lum = h => { const [r, g, b] = hex2rgb(h).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+      const onColor = h => lum(h) > 0.45 ? '#111111' : '#ffffff';
+
+      // ---- 描く（mm で考えて、k 倍した px で描く）
+      function cardSize() { return S.orient === 'v' ? { W: CARD.h, H: CARD.w } : { W: CARD.w, H: CARD.h }; }
+
+      function makePainter(ctx, k) {
+        const u = v => v * k;
+        const F = FONTS[S.font] || FONTS.zen;
+        const P = {
+          k, u, ctx,
+          font(size, kind = 'body', weight) {
+            const [fam, w] = kind === 'name' ? F.name : F.body;
+            const wt = weight === 'bold' ? (kind === 'name' ? w : F.bold) : (weight || w);
+            ctx.font = `${wt} ${u(size)}px "${fam}", "Zen Maru Gothic", sans-serif`;
+          },
+          // 1行。maxW に入らなければ、min まで小さくする。使った大きさを返す
+          text(str, x, y, o = {}) {
+            if (!str) return 0;
+            let size = o.size;
+            const min = o.min || size * 0.55;
+            P.font(size, o.kind, o.weight);
+            if (o.maxW) {
+              while (size > min && ctx.measureText(str).width > u(o.maxW)) { size *= 0.95; P.font(size, o.kind, o.weight); }
+            }
+            ctx.fillStyle = o.color || S.text;
+            ctx.textAlign = o.align || 'left';
+            ctx.textBaseline = 'alphabetic';
+            if (o.maxW && ctx.measureText(str).width > u(o.maxW)) {
+              // それでも入らなければ「…」
+              let s = str;
+              while (s.length > 1 && ctx.measureText(s + '…').width > u(o.maxW)) s = s.slice(0, -1);
+              str = s + '…';
+            }
+            ctx.fillText(str, u(x), u(y));
+            return size;
+          },
+          width(str, size, kind, weight) { P.font(size, kind, weight); return ctx.measureText(str).width / k; },
+          // 文字で折り返す（行頭に来てはいけない文字は前の行へ）
+          wrap(str, maxW, size, maxLines) {
+            P.font(size);
+            const out = [];
+            for (const para of String(str || '').split(/\n/)) {
+              let line = '';
+              for (const ch of para) {
+                if (ctx.measureText(line + ch).width > u(maxW) && line && !/^[、。，．・ー」』）！？!?,.)]$/.test(ch)) { out.push(line); line = ch; }
+                else line += ch;
+              }
+              out.push(line);
+            }
+            const lines = out.filter((l, i) => l || i < out.length - 1);
+            if (lines.length > maxLines) { lines.length = maxLines; lines[maxLines - 1] = lines[maxLines - 1].replace(/.$/, '…'); }
+            return lines;
+          },
+          rrect(x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.roundRect ? ctx.roundRect(u(x), u(y), u(w), u(h), u(r)) : ctx.rect(u(x), u(y), u(w), u(h));
+          },
+          cover(im, x, y, w, h) {
+            const s = Math.max(w / im.width, h / im.height);
+            const sw = w / s, sh = h / s;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(im, (im.width - sw) / 2, (im.height - sh) / 2, sw, sh, u(x), u(y), u(w), u(h));
+          },
+          avatar(x, y, size, shape = S.avatarShape, ring) {
+            if (!img.avatar) return false;
+            ctx.save();
+            if (ring) { ctx.fillStyle = ring; shapePath(x - 0.7, y - 0.7, size + 1.4, shape); ctx.fill(); }
+            shapePath(x, y, size, shape);
+            ctx.clip();
+            P.cover(img.avatar, x, y, size, size);
+            ctx.restore();
+            return true;
+          },
+        };
+        function shapePath(x, y, s, shape) {
+          if (shape === 'circle') { ctx.beginPath(); ctx.arc(u(x + s / 2), u(y + s / 2), u(s / 2), 0, Math.PI * 2); }
+          else if (shape === 'rounded') P.rrect(x, y, s, s, s * 0.2);
+          else { ctx.beginPath(); ctx.rect(u(x), u(y), u(s), u(s)); }
+        }
+        return P;
+      }
+
+      // QRコードの飛び先
+      function qrUrl() {
+        if (S.qrSrc === 'none') return '';
+        if (S.qrSrc === 'custom') return S.qrCustom.trim();
+        const r = S.sns[+S.qrSrc.split(':')[1]];
+        if (!r || !r.value.trim()) return '';
+        const t = SNS[r.type];
+        if (/^https?:\/\//i.test(r.value.trim())) return r.value.trim();
+        return t && t.url ? t.url(r.value.trim()) : '';
+      }
+
+      // 白い台の上に QRコード。size は台も入れた大きさ（mm）
+      function drawQr(P, x, y, size) {
+        const url = qrUrl();
+        if (!url) return false;
+        let qr;
+        try { qr = QrCore.encode(url, 'M'); } catch (e) { return false; }
+        const { ctx, u } = P;
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        P.rrect(x, y, size, size, size * 0.08);
+        ctx.fill();
+        const px = Math.max(16, Math.round(u(size)));
+        const c = document.createElement('canvas'); c.width = c.height = px;
+        const fg = lum(S.text) < 0.2 ? S.text : '#111111';
+        QrCore.draw(c.getContext('2d'), qr, { margin: 3, dot: 'square', eye: 'square', eyeIn: 'square', fg, bg: '' }, px);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(c, u(x), u(y), u(size), u(size));
+        ctx.restore();
+        return true;
+      }
+
+      function drawBackground(P, side, W, H, b) {
+        const { ctx, u } = P;
+        const x = -b, y = -b, w = W + b * 2, h = H + b * 2;
+        if (side === 'back' && S.back === 'name') { ctx.fillStyle = S.accent; ctx.fillRect(u(x), u(y), u(w), u(h)); return; }
+        if (side === 'back' && S.back === 'image' && img.back) { P.cover(img.back, x, y, w, h); return; }
+        if (S.bgStyle === 'grad') {
+          const g = ctx.createLinearGradient(u(x), u(y), u(x + w), u(y + h));
+          g.addColorStop(0, S.bg); g.addColorStop(1, S.bg2);
+          ctx.fillStyle = g;
+        } else ctx.fillStyle = S.bg;
+        ctx.fillRect(u(x), u(y), u(w), u(h));
+        if (S.bgStyle === 'dots') {
+          ctx.fillStyle = rgba(S.accent, 0.13);
+          const gap = 5;
+          for (let yy = y, r = 0; yy < y + h + gap; yy += gap * 0.866, r++) {
+            for (let xx = x + (r % 2 ? gap / 2 : 0); xx < x + w + gap; xx += gap) {
+              ctx.beginPath(); ctx.arc(u(xx), u(yy), u(0.75), 0, Math.PI * 2); ctx.fill();
+            }
+          }
+        }
+        if (S.bgStyle === 'image' && img.bg) {
+          P.cover(img.bg, x, y, w, h);
+          if (S.dim > 0) { ctx.fillStyle = rgba(S.bg, S.dim / 100); ctx.fillRect(u(x), u(y), u(w), u(h)); }
+        }
+      }
+
+      // SNS の行：色の付いた小さな札 + ID。札の幅はそろえる
+      const snsRows = () => S.sns.filter(r => r.value.trim()).map(r => ({ label: r.type === 'other' ? (r.label.trim() || '　') : SNS[r.type].label, value: r.value.trim().replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '') }));
+      function drawSns(P, rows, x, yLast, maxW, o = {}) {
+        if (!rows.length) return;
+        const size = o.size || 2.35, rowH = o.rowH || 3.6;
+        const badgeSize = size * 0.78;
+        const labW = Math.max(...rows.map(r => P.width(r.label, badgeSize, 'body', 'bold'))) + 1.6;
+        // まんなかに置くときも、行の頭はそろえる（いちばん長い行で、かたまりごと真ん中に）
+        let bx = x;
+        if (o.align === 'center') {
+          const widest = Math.max(...rows.map(r => Math.min(P.width(r.value, size), maxW - labW - 1.2)));
+          bx = x - (labW + 1.2 + widest) / 2;
+        }
+        rows.forEach((r, i) => {
+          const y = yLast - (rows.length - 1 - i) * rowH;
+          P.ctx.fillStyle = S.accent;
+          P.rrect(bx, y - size * 0.92, labW, size * 1.22, 0.6);
+          P.ctx.fill();
+          P.text(r.label, bx + labW / 2, y - size * 0.1, { size: badgeSize, weight: 'bold', color: onColor(S.accent), align: 'center', maxW: labW - 0.6 });
+          P.text(r.value, bx + labW + 1.2, y, { size, maxW: maxW - labW - 1.2, min: size * 0.7 });
+        });
+      }
+
+      function drawFront(P, W, H) {
+        const pad = SAFE + 2;
+        const ns = S.ns / 100;
+        const rows = snsRows();
+        const muted = rgba(S.text, 0.68);
+        const hasQr = S.qrFront && !!qrUrl();
+        const L = S.layout;
+        const warn = [];
+
+        if (S.orient === 'v') return drawFrontV(P, W, H, rows, hasQr);
+
+        if (L === 'photo') {
+          const iw = W * 0.36;
+          if (img.avatar) P.cover(img.avatar, -BLEED, -BLEED, iw + BLEED, H + BLEED * 2);
+          else { P.ctx.fillStyle = S.accent; P.ctx.fillRect(P.u(-BLEED), P.u(-BLEED), P.u(iw + BLEED), P.u(H + BLEED * 2)); }
+          const x0 = iw + 4, w = W - x0 - pad, qrS = 13;
+          P.text(S.title, x0, pad + 3, { size: 2.4, color: S.accent, weight: 'bold', maxW: w });
+          P.text(S.name, x0, pad + 12.5, { size: 6.2 * ns, kind: 'name', maxW: w });
+          P.text(S.kana, x0, pad + 16.6, { size: 2.3, color: muted, maxW: w });
+          const snsTop = H - pad - (rows.length ? (rows.length - 1) * 3.4 + 2.4 : 0) - 1.5;
+          if (S.message) {
+            const lines = P.wrap(S.message, w, 2.15, Math.max(0, Math.min(2, Math.floor((snsTop - (pad + 21)) / 3) + 1)));
+            lines.forEach((l, i) => P.text(l, x0, pad + 21 + i * 3, { size: 2.15 }));
+          }
+          drawSns(P, rows, x0, H - pad - 0.4, w - (hasQr ? qrS + 2 : 0), { size: 2.2, rowH: 3.4 });
+          if (hasQr) drawQr(P, W - pad - qrS + 1.5, H - pad - qrS + 1.5, qrS);
+          return warn;
+        }
+
+        if (L === 'band') {
+          const bandH = 13;
+          P.ctx.fillStyle = S.accent;
+          P.ctx.fillRect(P.u(-BLEED), P.u(-BLEED), P.u(W + BLEED * 2), P.u(bandH + BLEED));
+          const av = img.avatar ? 17 : 0;
+          P.text(S.title, pad, bandH / 2 + 1.6, { size: 3, weight: 'bold', color: onColor(S.accent), maxW: W - pad * 2 - av - 2 });
+          if (img.avatar) P.avatar(W - pad - av, bandH - av / 2, av, S.avatarShape, S.bg);
+          const qrS = 16;
+          P.text(S.name, pad, bandH + 11, { size: 7 * ns, kind: 'name', maxW: W - pad * 2 - av - 2 });
+          P.text(S.kana, pad, bandH + 15.5, { size: 2.5, color: muted, maxW: W - pad * 2 - av });
+          const snsTop = H - pad - (rows.length ? (rows.length - 1) * 3.5 + 2.4 : 0) - 1.5;
+          if (S.message) {
+            const lines = P.wrap(S.message, W - pad * 2 - (hasQr ? qrS + 3 : 0), 2.2, Math.max(0, Math.min(2, Math.floor((snsTop - (bandH + 19.5)) / 3.1) + 1)));
+            lines.forEach((l, i) => P.text(l, pad, bandH + 19.5 + i * 3.1, { size: 2.2 }));
+          }
+          drawSns(P, rows, pad, H - pad - 0.4, W - pad * 2 - (hasQr ? qrS + 3 : 0));
+          if (hasQr) qrWithLabel(P, W - pad - qrS + 1.5, H - pad - qrS + 1.5, qrS);
+          return warn;
+        }
+
+        if (L === 'center') {
+          const qrS = 13;
+          const cx = hasQr ? pad + (W - pad * 2 - qrS - 2) / 2 : W / 2;
+          const maxW = hasQr ? W - pad * 2 - qrS - 3 : W - pad * 2;
+          let y = pad;
+          if (img.avatar) { P.avatar(W / 2 - 7, y - 1, 14); y += 14.5; }
+          P.text(S.title, W / 2, y + 2.6, { size: 2.4, color: S.accent, weight: 'bold', align: 'center', maxW: W - pad * 2 });
+          y += img.avatar ? 3.2 : 6;
+          const nameSize = (img.avatar ? 5.8 : 7.5) * ns;
+          P.text(S.name, W / 2, y + nameSize * 0.95, { size: nameSize, kind: 'name', align: 'center', maxW: W - pad * 2 });
+          y += nameSize * 0.95 + 3.4;
+          P.text(S.kana, W / 2, y, { size: 2.3, color: muted, align: 'center', maxW: W - pad * 2 });
+          if (S.message && !img.avatar) {
+            const lines = P.wrap(S.message, W - pad * 2, 2.15, 1);
+            lines.forEach(l => P.text(l, W / 2, y + 3.6, { size: 2.15, align: 'center' }));
+          }
+          drawSns(P, rows, cx, H - pad - 0.4, maxW, { align: 'center', size: 2.2, rowH: 3.3 });
+          if (hasQr) drawQr(P, W - pad - qrS + 1.5, H - pad - qrS + 1.5, qrS);
+          return warn;
+        }
+
+        // simple
+        const qrS = 16;
+        const av = img.avatar ? 15 : 0;
+        P.text(S.title, pad, pad + 2.8, { size: 2.6, color: S.accent, weight: 'bold', maxW: W - pad * 2 - av - 2 });
+        if (img.avatar) P.avatar(W - pad - av + 1, pad - 1, av);
+        P.text(S.name, pad, pad + 14, { size: 7.2 * ns, kind: 'name', maxW: W - pad * 2 - av - 2 });
+        P.text(S.kana, pad, pad + 18.6, { size: 2.5, color: muted, maxW: W - pad * 2 - av });
+        const snsTop = H - pad - (rows.length ? (rows.length - 1) * 3.6 + 2.4 : 0) - 1.5;
+        if (S.message) {
+          const lines = P.wrap(S.message, W - pad * 2 - (hasQr ? qrS + 3 : 0), 2.25, Math.max(0, Math.min(2, Math.floor((snsTop - (pad + 23.2)) / 3.2) + 1)));
+          lines.forEach((l, i) => P.text(l, pad, pad + 23.2 + i * 3.2, { size: 2.25 }));
+        }
+        drawSns(P, rows, pad, H - pad - 0.4, W - pad * 2 - (hasQr ? qrS + 3 : 0));
+        if (hasQr) qrWithLabel(P, W - pad - qrS + 1.5, H - pad - qrS + 1.5, qrS);
+        return warn;
+      }
+
+      // QRコードと、その上の小さな文字
+      function qrWithLabel(P, x, y, s) {
+        if (!drawQr(P, x, y, s)) return;
+        if (S.qrLabel) P.text(S.qrLabel, x + s / 2, y - 1, { size: 1.9, align: 'center', color: rgba(S.text, 0.75), maxW: s + 4, weight: 'bold' });
+      }
+
+      // 縦の名刺：上から順に積む
+      function drawFrontV(P, W, H, rows, hasQr) {
+        const pad = SAFE + 2;
+        const ns = S.ns / 100;
+        const muted = rgba(S.text, 0.68);
+        const L = S.layout;
+        let y;
+        if (L === 'photo') {
+          const ih = H * 0.4;
+          if (img.avatar) P.cover(img.avatar, -BLEED, -BLEED, W + BLEED * 2, ih + BLEED);
+          else { P.ctx.fillStyle = S.accent; P.ctx.fillRect(P.u(-BLEED), P.u(-BLEED), P.u(W + BLEED * 2), P.u(ih + BLEED)); }
+          y = ih + 4;
+          P.text(S.title, W / 2, y + 2.4, { size: 2.3, color: S.accent, weight: 'bold', align: 'center', maxW: W - pad * 2 });
+          y += 4;
+        } else if (L === 'band') {
+          const bandH = 12;
+          P.ctx.fillStyle = S.accent;
+          P.ctx.fillRect(P.u(-BLEED), P.u(-BLEED), P.u(W + BLEED * 2), P.u(bandH + BLEED));
+          P.text(S.title, W / 2, bandH / 2 + 1.3, { size: 2.6, weight: 'bold', color: onColor(S.accent), align: 'center', maxW: W - pad * 2 });
+          y = bandH + 3;
+          if (img.avatar) { P.avatar(W / 2 - 9, bandH - 4, 18, S.avatarShape, S.bg); y = bandH + 16; }
+        } else {
+          y = pad;
+          if (img.avatar) { P.avatar(W / 2 - 10, y, 20); y += 22; }
+          P.text(S.title, W / 2, y + 2.4, { size: 2.3, color: S.accent, weight: 'bold', align: 'center', maxW: W - pad * 2 });
+          y += 4;
+        }
+        const nameSize = 6.4 * ns;
+        P.text(S.name, W / 2, y + nameSize * 0.95, { size: nameSize, kind: 'name', align: 'center', maxW: W - pad * 2 });
+        y += nameSize * 0.95 + 3.6;
+        P.text(S.kana, W / 2, y, { size: 2.3, color: muted, align: 'center', maxW: W - pad * 2 });
+        y += 4;
+        const qrS = 16;
+        const bottom = H - pad - (hasQr ? qrS + 2.5 : 0);
+        const snsTop = bottom - (rows.length ? (rows.length - 1) * 3.4 + 2.4 : 0);
+        if (S.message) {
+          const n = Math.max(0, Math.min(2, Math.floor((snsTop - 2 - y) / 3) + 1));
+          P.wrap(S.message, W - pad * 2, 2.1, n).forEach((l, i) => P.text(l, W / 2, y + i * 3, { size: 2.1, align: 'center' }));
+        }
+        drawSns(P, rows, W / 2, bottom - 0.4, W - pad * 2, { align: 'center', size: 2.15, rowH: 3.4 });
+        if (hasQr) drawQr(P, W / 2 - qrS / 2, H - pad - qrS + 1.5, qrS);
+        return [];
+      }
+
+      function drawBack(P, W, H) {
+        const pad = SAFE + 2;
+        if (S.back === 'qr') {
+          const s = Math.min(W, H) * 0.5;
+          const ok = drawQr(P, W / 2 - s / 2, H / 2 - s / 2 - 3, s);
+          if (!ok) { P.text('QRコードの飛び先がありません', W / 2, H / 2, { size: 2.6, align: 'center', color: rgba(S.text, 0.6) }); return; }
+          P.text(S.qrLabel, W / 2, H / 2 + s / 2 + 1.2, { size: 2.6, align: 'center', weight: 'bold', maxW: W - pad * 2 });
+          P.text(S.name, W / 2, H - pad, { size: 2.2, align: 'center', color: rgba(S.text, 0.7), maxW: W - pad * 2 });
+        } else if (S.back === 'name') {
+          const c = onColor(S.accent);
+          P.text(S.name, W / 2, H / 2 + 2, { size: 7.5 * S.ns / 100, kind: 'name', align: 'center', color: c, maxW: W - pad * 2 });
+          P.text(S.title, W / 2, H / 2 + 7.5, { size: 2.6, align: 'center', color: c, maxW: W - pad * 2 });
+        } else if (S.back === 'image' && !img.back) {
+          P.text('裏の画像を選んでください', W / 2, H / 2, { size: 2.6, align: 'center', color: rgba(S.text, 0.6) });
+        }
+      }
+
+      // side を k（px/mm）で描いた canvas。bleed は塗り足し（mm）
+      function renderSide(side, k, bleed, guides) {
+        const { W, H } = cardSize();
+        const c = document.createElement('canvas');
+        c.width = Math.round((W + bleed * 2) * k); c.height = Math.round((H + bleed * 2) * k);
+        drawSideTo(c, side, k, bleed, guides);
+        return c;
+      }
+      function drawSideTo(c, side, k, bleed, guides) {
+        const { W, H } = cardSize();
+        const ctx = c.getContext('2d');
+        ctx.save();
+        ctx.clearRect(0, 0, c.width, c.height);
+        ctx.translate(bleed * k, bleed * k);
+        const P = makePainter(ctx, k);
+        drawBackground(P, side, W, H, bleed);
+        if (side === 'front') drawFront(P, W, H); else drawBack(P, W, H);
+        if (guides) {
+          ctx.strokeStyle = 'rgba(255, 60, 120, 0.85)';
+          ctx.lineWidth = Math.max(1, k * 0.15);
+          ctx.setLineDash([k * 1, k * 0.8]);
+          ctx.strokeRect(SAFE * k, SAFE * k, (W - SAFE * 2) * k, (H - SAFE * 2) * k);
+        }
+        ctx.restore();
+      }
+
+      // ---- 見え方
+      const allText = () => [S.name, S.kana, S.title, S.message, S.qrLabel, ...S.sns.map(r => r.value + r.label), ...Object.values(SNS).map(s => s.label), 'QRコードの飛び先がありません裏の画像を選んでください…'].join('');
+      async function fontsReady() {
+        const F = FONTS[S.font] || FONTS.zen;
+        const t = allText();
+        try {
+          await Promise.all([
+            document.fonts.load(`${F.name[1]} 40px "${F.name[0]}"`, t),
+            document.fonts.load(`${F.body[1]} 40px "${F.body[0]}"`, t),
+            document.fonts.load(`${F.bold} 40px "${F.body[0]}"`, t),
+          ]);
+        } catch (e) { /* 読めなくても描く */ }
+      }
+
+      let drawSeq = 0;
+      async function redraw() {
+        const my = ++drawSeq;
+        await fontsReady();
+        if (my !== drawSeq) return;
+        const { W, H } = cardSize();
+        const view = $('stage').querySelector('.card-view');
+        const cssW = Math.min(560, Math.max(200, view.clientWidth || 400));
+        const k = cssW * (window.devicePixelRatio || 1) / W;
+        for (const side of ['front', 'back']) {
+          const c = $('cv-' + side);
+          c.width = Math.round(W * k); c.height = Math.round(H * k);
+          if (side === 'back' && S.back === 'none') continue;
+          drawSideTo(c, side, k, 0, S.guides);
+        }
+        $('back-view').hidden = S.back === 'none';
+        $('stage').classList.toggle('portrait', S.orient === 'v');
+        $('info').textContent = `${W}×${H}mm`;
+        checkWarns();
+      }
+      let rTimer;
+      const schedule = () => { clearTimeout(rTimer); rTimer = setTimeout(redraw, 40); };
+
+      function checkWarns() {
+        const w = [];
+        const url = qrUrl();
+        if ((S.qrFront || S.back === 'qr') && S.qrSrc !== 'none' && !url) w.push('QRコードの飛び先がありません（SNS の行に ID を入れるか、URL を入れてください）');
+        if (url) { try { QrCore.encode(url, 'M'); } catch (e) { w.push('QRコードの飛び先が長すぎます'); } }
+        if (S.qrSrc !== 'none' && url && S.qrSrc.startsWith('sns:')) {
+          const r = S.sns[+S.qrSrc.split(':')[1]];
+          if (r && !/^https?:/i.test(r.value) && !SNS[r.type].url) w.push(`${SNS[r.type].label} の ID からは URL を作れません。URL を入れてください`);
+        }
+        $('warns').textContent = w.map(s => '⚠ ' + s).join('　');
+      }
+
+      // ---- 入力の画面
+      function buildStatic() {
+        $('layouts').innerHTML = Object.entries(LAYOUTS).map(([k, name]) => `<button type="button" data-v="${k}" aria-pressed="false">${layoutIcon(k)}${name}</button>`).join('');
+        $('themes').innerHTML = Object.entries(THEMES).map(([k, t]) => `<button class="theme" type="button" data-v="${k}" aria-pressed="false" title="${k}" style="background:${t.bg}"><span style="background:${t.accent}"></span></button>`).join('');
+        $('font').innerHTML = Object.entries(FONTS).map(([k, f]) => `<option value="${k}">${esc(f.label)}</option>`).join('');
+      }
+      function layoutIcon(k) {
+        const a = '#ff85a1', t = '#6e3551', b = '#fff5f8';
+        const r = (x, y, w, h, c, rx = 0.6) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${c}"/>`;
+        let s = r(0, 0, 91, 55, b, 2);
+        if (k === 'simple') s += r(6, 7, 22, 3, a) + r(6, 15, 45, 7, t) + r(6, 25, 20, 3, t) + r(6, 40, 30, 3, t) + r(6, 46, 30, 3, t) + r(68, 34, 16, 16, t, 1);
+        if (k === 'center') s += `<circle cx="45.5" cy="13" r="7" fill="${a}"/>` + r(25, 24, 41, 7, t) + r(33, 34, 25, 3, t) + r(28, 42, 35, 3, t) + r(28, 47, 35, 3, t);
+        if (k === 'photo') s += r(0, 0, 33, 55, a, 0) + r(37, 8, 20, 3, a) + r(37, 15, 45, 7, t) + r(37, 40, 28, 3, t) + r(37, 46, 28, 3, t) + r(71, 37, 13, 13, t, 1);
+        if (k === 'band') s += r(0, 0, 91, 13, a, 0) + `<circle cx="75" cy="13" r="8" fill="${t}"/>` + r(6, 19, 45, 7, t) + r(6, 40, 30, 3, t) + r(6, 46, 30, 3, t) + r(68, 34, 16, 16, t, 1);
+        return `<svg viewBox="0 0 91 55" aria-hidden="true">${s}</svg>`;
+      }
+
+      function renderSnsRows() {
+        const opts = Object.entries(SNS).map(([k, v]) => `<option value="${k}">${k === 'other' ? 'そのほか' : esc(v.label)}</option>`).join('');
+        $('sns-rows').innerHTML = S.sns.map((r, i) => `<div class="sns-row" data-i="${i}">
+          <select data-k="type" aria-label="種類">${opts}</select>
+          <input type="text" data-k="value" value="${esc(r.value)}" placeholder="${r.type === 'web' ? 'example.com' : r.type === 'mail' ? 'you@example.com' : '@your_id'}" spellcheck="false" aria-label="ID・URL">
+          <button class="icon-btn" type="button" data-del aria-label="この行を消す">✕</button>
+          ${r.type === 'other' ? `<input class="lab" type="text" data-k="label" value="${esc(r.label)}" placeholder="札に出す文字（例：Booth）" spellcheck="false" aria-label="札の文字">` : ''}
+        </div>`).join('');
+        [...$('sns-rows').querySelectorAll('select')].forEach((s, i) => { s.value = S.sns[i].type; });
+        $('sns-add').disabled = S.sns.length >= 5;
+        renderQrSrc();
+      }
+
+      function renderQrSrc() {
+        const opts = S.sns.map((r, i) => r.value.trim() ? `<option value="sns:${i}">${esc((r.type === 'other' ? r.label || 'そのほか' : SNS[r.type].label) + '：' + r.value.trim())}</option>` : '').join('');
+        $('qr-src').innerHTML = opts + '<option value="custom">URL を入れる</option><option value="none">QRコードなし</option>';
+        if (![...$('qr-src').options].some(o => o.value === S.qrSrc)) S.qrSrc = $('qr-src').options[0].value;
+        $('qr-src').value = S.qrSrc;
+        $('qr-custom').hidden = S.qrSrc !== 'custom';
+        const url = qrUrl();
+        $('qr-note').textContent = url ? '飛び先：' + url : '';
+      }
+
+      function syncUI() {
+        $('f-name').value = S.name; $('f-kana').value = S.kana; $('f-title').value = S.title; $('f-message').value = S.message;
+        $('qr-custom').value = S.qrCustom; $('qr-label').value = S.qrLabel; $('qr-front').checked = S.qrFront;
+        for (const [id, key] of [['orient', 'orient'], ['layouts', 'layout'], ['themes', 'theme'], ['bg-style', 'bgStyle'], ['avatar-shape', 'avatarShape'], ['back', 'back']]) {
+          for (const b of $(id).querySelectorAll('[data-v]')) b.setAttribute('aria-pressed', String(b.dataset.v === S[key]));
+        }
+        $('c-bg').value = S.bg; $('c-bg2').value = S.bg2; $('c-text').value = S.text; $('c-accent').value = S.accent;
+        $('dim').value = S.dim; $('dim-val').textContent = S.dim + '%';
+        $('font').value = S.font;
+        $('ns').value = S.ns; $('ns-val').textContent = S.ns + '%';
+        $('guides').checked = S.guides;
+        $('save-type').value = S.saveType;
+        $('bg-img-field').hidden = S.bgStyle !== 'image';
+        $('back-img-field').hidden = S.back !== 'image';
+        $('back-img-field').querySelector('.sp').textContent = `裏の画像（${cardSize().W}×${cardSize().H}mm の形に切り抜きます）`;
+        for (const k of ['avatar', 'bg', 'back']) $(k + '-thumb').style.backgroundImage = imgSrc[k] ? `url("${imgSrc[k]}")` : '';
+        renderSnsRows();
+        saveNote();
+      }
+
+      function saveNote() {
+        $('save-note').textContent = {
+          a4: '1ページ目が表、2ページ目が裏です。印刷は「実際のサイズ」「100%」で。',
+          a4marks: 'ふつうの紙に印刷して、まわりのトンボ（線）に合わせて切ります。',
+          shop: `仕上がり ${cardSize().W}×${cardSize().H}mm に、まわり 3mm の塗り足しを付けた PDF です。1ページ目が表、2ページ目が裏です。`,
+          png: `${DPI}dpi の PNG を表・裏の2枚で保存します。`,
+          pngb: `まわり 3mm の塗り足しを付けた ${DPI}dpi の PNG を、表・裏の2枚で保存します。`,
+        }[S.saveType];
+      }
+
+      const changed = () => { store(); schedule(); };
+
+      // 入力
+      for (const [id, key] of [['f-name', 'name'], ['f-kana', 'kana'], ['f-title', 'title'], ['f-message', 'message'], ['qr-custom', 'qrCustom'], ['qr-label', 'qrLabel']]) {
+        $(id).addEventListener('input', () => { S[key] = $(id).value; if (key === 'qrCustom') renderQrSrc(); changed(); });
+      }
+      $('qr-front').addEventListener('change', () => { S.qrFront = $('qr-front').checked; changed(); });
+      $('qr-src').addEventListener('change', () => { S.qrSrc = $('qr-src').value; renderQrSrc(); changed(); });
+      $('guides').addEventListener('change', () => { S.guides = $('guides').checked; changed(); });
+      $('save-type').addEventListener('change', () => { S.saveType = $('save-type').value; saveNote(); store(); });
+      for (const [id, key] of [['orient', 'orient'], ['layouts', 'layout'], ['bg-style', 'bgStyle'], ['avatar-shape', 'avatarShape'], ['back', 'back']]) {
+        $(id).addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; S[key] = b.dataset.v; syncUI(); changed(); });
+      }
+      $('themes').addEventListener('click', e => {
+        const b = e.target.closest('[data-v]'); if (!b) return;
+        S.theme = b.dataset.v; Object.assign(S, THEMES[S.theme]); syncUI(); changed();
+      });
+      for (const [id, key] of [['c-bg', 'bg'], ['c-bg2', 'bg2'], ['c-text', 'text'], ['c-accent', 'accent']]) {
+        $(id).addEventListener('input', () => { S[key] = $(id).value; S.theme = ''; for (const b of $('themes').children) b.setAttribute('aria-pressed', 'false'); changed(); });
+      }
+      $('dim').addEventListener('input', () => { S.dim = +$('dim').value; $('dim-val').textContent = S.dim + '%'; changed(); });
+      $('ns').addEventListener('input', () => { S.ns = +$('ns').value; $('ns-val').textContent = S.ns + '%'; changed(); });
+      $('font').addEventListener('change', () => { S.font = $('font').value; changed(); });
+
+      // SNS の行
+      $('sns-rows').addEventListener('input', e => {
+        const row = e.target.closest('.sns-row'); if (!row) return;
+        const r = S.sns[+row.dataset.i], k = e.target.dataset.k;
+        if (k === 'value' || k === 'label') { r[k] = e.target.value; renderQrSrc(); changed(); }
+      });
+      $('sns-rows').addEventListener('change', e => {
+        const row = e.target.closest('.sns-row'); if (!row || e.target.dataset.k !== 'type') return;
+        S.sns[+row.dataset.i].type = e.target.value;
+        renderSnsRows(); changed();
+      });
+      $('sns-rows').addEventListener('click', e => {
+        const b = e.target.closest('[data-del]'); if (!b) return;
+        const i = +b.closest('.sns-row').dataset.i;
+        S.sns.splice(i, 1);
+        // QR の飛び先の番号をずらす
+        if (S.qrSrc.startsWith('sns:')) { const n = +S.qrSrc.split(':')[1]; if (n === i) S.qrSrc = 'sns:0'; else if (n > i) S.qrSrc = 'sns:' + (n - 1); }
+        renderSnsRows(); changed();
+      });
+      $('sns-add').addEventListener('click', () => {
+        if (S.sns.length >= 5) return;
+        S.sns.push({ type: 'instagram', value: '', label: '' });
+        renderSnsRows(); changed();
+        const ins = $('sns-rows').querySelectorAll('input[data-k=value]'); ins[ins.length - 1].focus();
+      });
+
+      // ---- 画像（小さくしてから、このブラウザに覚えておく）
+      let pickFor = null;
+      document.addEventListener('click', e => {
+        const p = e.target.closest('[data-pick]'); if (p) { pickFor = p.dataset.pick; $('file').click(); return; }
+        const c = e.target.closest('[data-clear]');
+        if (c) { const k = c.dataset.clear; img[k] = null; imgSrc[k] = null; try { localStorage.removeItem(IMG_KEY(k)); } catch (er) { /* ignore */ } syncUI(); changed(); }
+      });
+      $('file').addEventListener('change', async e => {
+        const f = e.target.files[0]; e.target.value = '';
+        if (!f || !pickFor) return;
+        try { await setImage(pickFor, f); } catch (er) { toast('画像を開けませんでした'); }
+      });
+      async function setImage(k, file) {
+        const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+        const max = k === 'avatar' ? 1000 : 1600;
+        const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
+        const x = c.getContext('2d'); x.imageSmoothingQuality = 'high';
+        x.drawImage(bmp, 0, 0, c.width, c.height);
+        const url = c.toDataURL(/png|webp|gif/i.test(file.type) ? 'image/png' : 'image/jpeg', 0.92);
+        await useImage(k, url);
+        try { localStorage.setItem(IMG_KEY(k), url); } catch (er) { toast('画像が大きいので、このブラウザには覚えておけません（開いている間は使えます）'); }
+        if (k === 'bg' && S.bgStyle !== 'image') S.bgStyle = 'image';
+        if (k === 'back') S.back = 'image';
+        syncUI(); changed();
+      }
+      function useImage(k, url) {
+        return new Promise(res => {
+          const im = new Image();
+          im.onload = () => { img[k] = im; imgSrc[k] = url; res(); };
+          im.onerror = () => res();
+          im.src = url;
+        });
+      }
+
+      // ---- 保存
+      const download = (blob, name) => {
+        const a = document.createElement('a'); const url = URL.createObjectURL(blob);
+        a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+      };
+      const fileBase = () => 'meishi-' + (S.name.trim().replace(/[\\/:*?"<>|\s]+/g, '') || 'card').slice(0, 20);
+      const sides = () => S.back === 'none' ? ['front'] : ['front', 'back'];
+
+      $('save').addEventListener('click', async () => {
+        const b = $('save'); b.disabled = true; const label = b.textContent; b.textContent = '作っています…';
+        try {
+          await fontsReady();
+          const t = S.saveType;
+          if (t === 'png' || t === 'pngb') {
+            for (const side of sides()) {
+              const c = renderSide(side, PXMM, t === 'pngb' ? BLEED : 0, false);
+              const blob = await withDpi(await new Promise(r => c.toBlob(r, 'image/png')), DPI);
+              download(blob,`${fileBase()}-${side === 'front' ? 'omote' : 'ura'}.png`);
+              await new Promise(r => setTimeout(r, 400));
+            }
+          } else if (t === 'shop') {
+            const { W, H } = cardSize();
+            const pages = [];
+            for (const side of sides()) {
+              const c = renderSide(side, PXMM, BLEED, false);
+              pages.push({ w: W + BLEED * 2, h: H + BLEED * 2, trim: BLEED, items: [{ img: await pdfImage(c), x: 0, y: 0, w: W + BLEED * 2, h: H + BLEED * 2 }] });
+            }
+            download(await makePdf(pages), `${fileBase()}-print.pdf`);
+          } else {
+            download(await makeA4(t === 'a4marks'), `${fileBase()}-a4.pdf`);
+          }
+        } catch (e) { console.error(e); toast('保存できませんでした'); }
+        b.disabled = false; b.textContent = label;
+      });
+
+      // PNG に解像度（pHYs）を書き込む。印刷所のソフトが 350dpi として扱えるように
+      const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+      const crc32 = d => { let c = 0xffffffff; for (let i = 0; i < d.length; i++) c = CRC[(c ^ d[i]) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+      async function withDpi(blob, dpi) {
+        const src = new Uint8Array(await blob.arrayBuffer());
+        const ppm = Math.round(dpi / 0.0254);
+        const chunk = new Uint8Array(21);
+        const v = new DataView(chunk.buffer);
+        v.setUint32(0, 9);
+        chunk.set([0x70, 0x48, 0x59, 0x73], 4); // pHYs
+        v.setUint32(8, ppm); v.setUint32(12, ppm); chunk[16] = 1;
+        v.setUint32(17, crc32(chunk.subarray(4, 17)));
+        const at = 33; // 署名 8 + IHDR 25 のあと
+        return new Blob([src.subarray(0, at), chunk, src.subarray(at)], { type: 'image/png' });
+      }
+
+      // A4・10面（2列×5段。上下 11mm・左右 14mm）。縦の名刺は回して入れる
+      async function makeA4(marks) {
+        const cols = 2, rowsN = 5, cw = CARD.w, ch = CARD.h, left = 14, top = 11;
+        const pages = [];
+        for (const side of sides()) {
+          let c = renderSide(side, PXMM, 0, false);
+          if (S.orient === 'v') c = rotate(c, side === 'front' ? -1 : 1);
+          const im = await pdfImage(c);
+          const items = [];
+          for (let r = 0; r < rowsN; r++) for (let q = 0; q < cols; q++) items.push({ img: im, x: left + q * cw, y: top + r * ch, w: cw, h: ch });
+          const lines = [];
+          if (marks) {
+            const xs = [left, left + cw, left + cw * 2], ys = Array.from({ length: rowsN + 1 }, (_, i) => top + i * ch);
+            for (const x of xs) { lines.push([x, top - 8, x, top - 2]); lines.push([x, top + rowsN * ch + 2, x, top + rowsN * ch + 8]); }
+            for (const y of ys) { lines.push([left - 8, y, left - 2, y]); lines.push([left + cols * cw + 2, y, left + cols * cw + 8, y]); }
+          }
+          pages.push({ w: 210, h: 297, items, lines });
+        }
+        return makePdf(pages);
+      }
+      function rotate(c, dir) {
+        const o = document.createElement('canvas'); o.width = c.height; o.height = c.width;
+        const x = o.getContext('2d');
+        x.translate(o.width / 2, o.height / 2); x.rotate(dir * Math.PI / 2); x.drawImage(c, -c.width / 2, -c.height / 2);
+        return o;
+      }
+
+      // ---- PDF（画像を置くだけの小さな PDF。画像は Flate で、使えなければ JPEG）
+      async function pdfImage(c) {
+        const w = c.width, h = c.height;
+        const d = c.getContext('2d').getImageData(0, 0, w, h).data;
+        if (typeof CompressionStream === 'function') {
+          const rgb = new Uint8Array(w * h * 3);
+          for (let i = 0, j = 0; i < d.length; i += 4, j += 3) {
+            // 透明なところは白
+            const a = d[i + 3] / 255;
+            rgb[j] = d[i] * a + 255 * (1 - a); rgb[j + 1] = d[i + 1] * a + 255 * (1 - a); rgb[j + 2] = d[i + 2] * a + 255 * (1 - a);
+          }
+          const buf = await new Response(new Blob([rgb]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer();
+          return { w, h, data: new Uint8Array(buf), filter: 'FlateDecode' };
+        }
+        const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.95));
+        return { w, h, data: new Uint8Array(await blob.arrayBuffer()), filter: 'DCTDecode' };
+      }
+
+      async function makePdf(pages) {
+        const enc = new TextEncoder();
+        const chunks = []; let size = 0; const offsets = [];
+        const push = x => { const b = typeof x === 'string' ? enc.encode(x) : x; chunks.push(b); size += b.length; };
+        const pt = mm => +(mm * 72 / 25.4).toFixed(3);
+        // 画像は同じものを1つにまとめる
+        const imgs = [];
+        for (const p of pages) for (const it of p.items) if (!imgs.includes(it.img)) imgs.push(it.img);
+        const nImg = imgs.length;
+        const imgObj = i => 3 + i;
+        const pageObj = i => 3 + nImg + i * 2;
+        const total = 2 + nImg + pages.length * 2;
+        const obj = (n, body) => { offsets[n] = size; push(`${n} 0 obj\n`); if (typeof body === 'function') body(); else push(body); push('\nendobj\n'); };
+        push('%PDF-1.4\n%âãÏÓ\n');
+        obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+        obj(2, `<< /Type /Pages /Count ${pages.length} /Kids [${pages.map((_, i) => pageObj(i) + ' 0 R').join(' ')}] >>`);
+        imgs.forEach((im, i) => obj(imgObj(i), () => {
+          push(`<< /Type /XObject /Subtype /Image /Width ${im.w} /Height ${im.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /${im.filter} /Length ${im.data.length} >>\nstream\n`);
+          push(im.data); push('\nendstream');
+        }));
+        pages.forEach((p, i) => {
+          const W = pt(p.w), H = pt(p.h);
+          let s = '';
+          for (const it of p.items) {
+            const n = imgs.indexOf(it.img);
+            s += `q ${pt(it.w)} 0 0 ${pt(it.h)} ${pt(it.x)} ${+(H - pt(it.y + it.h)).toFixed(3)} cm /I${n} Do Q\n`;
+          }
+          if (p.lines && p.lines.length) {
+            s += '0 0 0 RG 0.3 w\n';
+            for (const [x1, y1, x2, y2] of p.lines) s += `${pt(x1)} ${+(H - pt(y1)).toFixed(3)} m ${pt(x2)} ${+(H - pt(y2)).toFixed(3)} l S\n`;
+          }
+          const trim = p.trim ? ` /TrimBox [${pt(p.trim)} ${pt(p.trim)} ${+(W - pt(p.trim)).toFixed(3)} ${+(H - pt(p.trim)).toFixed(3)}] /BleedBox [0 0 ${W} ${H}]` : '';
+          const xo = imgs.map((_, n) => `/I${n} ${imgObj(n)} 0 R`).join(' ');
+          obj(pageObj(i), `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}]${trim} /Resources << /XObject << ${xo} >> >> /Contents ${pageObj(i) + 1} 0 R >>`);
+          const sb = enc.encode(s);
+          obj(pageObj(i) + 1, () => { push(`<< /Length ${sb.length} >>\nstream\n`); push(sb); push('\nendstream'); });
+        });
+        const xref = size;
+        let x = `xref\n0 ${total + 1}\n0000000000 65535 f \n`;
+        for (let n = 1; n <= total; n++) x += String(offsets[n]).padStart(10, '0') + ' 00000 n \n';
+        push(x + `trailer\n<< /Size ${total + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+        return new Blob(chunks, { type: 'application/pdf' });
+      }
+
+      // ---- はじめ
+      buildStatic();
+      (async () => {
+        for (const k of ['avatar', 'bg', 'back']) {
+          let url = null;
+          try { url = localStorage.getItem(IMG_KEY(k)); } catch (e) { /* ignore */ }
+          if (url) await useImage(k, url);
+        }
+        syncUI();
+        redraw();
+      })();
+      window.addEventListener('resize', schedule);
+    })();
+  </script>
+</body>
+
+</html>
