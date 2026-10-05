@@ -664,6 +664,205 @@
       margin-right: 3px;
     }
 
+    /* タブ（レイヤー／表情差分） */
+    .tabs {
+      padding: 6px 10px 0;
+      gap: 4px;
+      align-items: flex-end;
+    }
+
+    .tab {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      background: none;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      padding: 6px 10px 8px;
+      cursor: pointer;
+    }
+
+    .tab[aria-selected="true"] {
+      color: var(--text);
+      border-bottom-color: var(--accent);
+    }
+
+    .tabs .info {
+      padding-bottom: 8px;
+    }
+
+    .pane {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* 表情差分 */
+    .diff-body {
+      flex: 1;
+      overflow: auto;
+      padding: 12px 14px 14px;
+    }
+
+    .diff-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--accent-2);
+      margin: 14px 0 6px;
+    }
+
+    .diff-title:first-of-type {
+      margin-top: 8px;
+    }
+
+    .diff-folders {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      max-height: 180px;
+      overflow: auto;
+      background: var(--bg-deep);
+      border-radius: 8px;
+      padding: 6px 8px;
+    }
+
+    .chk {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      cursor: pointer;
+      padding: 2px 0;
+      min-width: 0;
+    }
+
+    .chk input {
+      accent-color: var(--accent);
+      flex: none;
+    }
+
+    .chk .path {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .chk .nm {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .star {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--on-accent);
+      background: var(--accent-2);
+      border-radius: 4px;
+      padding: 1px 5px;
+      flex: none;
+    }
+
+    .axis {
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+
+    .axis-name {
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      gap: 6px;
+      align-items: baseline;
+    }
+
+    .axis-name small {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .opts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .opt {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font: inherit;
+      font-size: 12px;
+      color: var(--label);
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 3px 10px 3px 4px;
+      cursor: pointer;
+      max-width: 100%;
+    }
+
+    .opt img {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      object-fit: contain;
+      background: repeating-conic-gradient(#cfcfcf 0 25%, #ffffff 0 50%) 0 0 / 6px 6px;
+      flex: none;
+    }
+
+    .opt .nm {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .opt[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--text);
+    }
+
+    .opt.out {
+      opacity: 0.45;
+      text-decoration: line-through;
+    }
+
+    .opt input {
+      accent-color: var(--accent);
+      margin: 0;
+    }
+
+    .seg {
+      display: flex;
+      gap: 6px;
+    }
+
+    .seg button {
+      flex: 1 1 0;
+      min-width: 0;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 7px 4px;
+      cursor: pointer;
+    }
+
+    .seg button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
     /* ── 見え方 ── */
     .stage {
       position: relative;
@@ -998,9 +1197,12 @@
 
     <!-- レイヤー -->
     <div class="layers-panel">
-      <div class="head">
-        <span>レイヤー</span><span class="info" id="layer-info"></span>
+      <div class="head tabs" role="tablist">
+        <button type="button" class="tab" role="tab" data-tab="layers" aria-selected="true">レイヤー</button>
+        <button type="button" class="tab" role="tab" data-tab="diff" aria-selected="false">表情差分</button>
+        <span class="sp"></span><span class="info" id="layer-info"></span>
       </div>
+      <div class="pane" id="pane-layers">
       <div class="tree-tools">
         <button class="btn btn-sm" type="button" id="sel-all" disabled>全部選ぶ</button>
         <button class="btn btn-sm" type="button" id="sel-none" disabled>選ぶのをやめる</button>
@@ -1010,6 +1212,24 @@
         <div class="tree-empty">PSD を開くと、ここにレイヤーが出ます</div>
       </div>
       <p class="field-note" style="padding:8px 12px;border-top:1px solid var(--border)">行を押すと選びます（Ctrl・Shift で何個でも。スマホは押すたびに選ぶ・やめる）。👁 で表示を切り替えます。Alt を押しながら 👁 で、そのレイヤーだけを表示。</p>
+      </div>
+      <div class="pane" id="pane-diff" hidden>
+        <div class="diff-body">
+          <p class="field-note">目・口など、切り替えるパーツが入ったフォルダを選ぶと、中のレイヤーを1つずつ表示した差分をまとめて書き出せます。</p>
+          <div class="diff-title">1. 切り替えるフォルダ</div>
+          <div class="diff-folders" id="diff-folders"><p class="field-note">PSD を開くと、フォルダが出ます</p></div>
+          <div class="diff-title">2. 中身（押すと見え方が変わります）</div>
+          <div id="diff-axes"><p class="field-note">上でフォルダを選んでください</p></div>
+          <div class="diff-title">3. 書き出す</div>
+          <div class="seg" id="diff-mode">
+            <button type="button" data-v="all" aria-pressed="true">全部の組み合わせ</button>
+            <button type="button" data-v="one" aria-pressed="false">1つずつ変える</button>
+          </div>
+          <p class="field-note" id="diff-mode-note" style="margin-top:6px"></p>
+          <label class="toggle" style="margin-top:8px" title="余白を切るとき、全部の画像を同じ大きさ・同じ位置で切ります"><span>位置をそろえる（全部同じ大きさで切る）</span><input type="checkbox" id="diff-align" checked><span class="sw"></span></label>
+          <button class="btn btn-primary" type="button" id="diff-save" style="width:100%;margin-top:10px" disabled>📦 差分をまとめて ZIP</button>
+        </div>
+      </div>
     </div>
 
     <!-- 見え方 -->
@@ -1057,6 +1277,7 @@
           <li><b>「🖼 見えている状態を保存」</b>で、今の見た目を1枚の PNG にします。立ち絵の差分づくりに。</li>
           <li>行を押して選び、<b>「⬇ 選んだレイヤーを保存」</b>で、1枚ずつ PNG にします（2つ以上なら ZIP）。フォルダを選ぶと、中を重ねた1枚になります。</li>
           <li><b>「📦 全部のレイヤーを ZIP」</b>で、全部のレイヤーをフォルダ分けしたまま ZIP にします。</li>
+          <li><b>表情差分</b>のタブで、目・口などのフォルダを選ぶと、中のレイヤーを切り替えた差分（全部の組み合わせ、または1つずつ）をまとめて ZIP にできます。「位置をそろえる」で、全部同じ大きさ・同じ位置で切るので、PNGTuber やアニメーションでずれません。</li>
         </ol>
       </div>
     </details>
@@ -1210,6 +1431,8 @@
         fitView();
         renderTree();
         checkNotice();
+        axes = [];
+        renderDiff();
       }
 
       // ---- レイヤーの一覧
@@ -1279,7 +1502,7 @@
         if (e.target.closest('[data-eye]')) {
           if (e.altKey) solo(n);
           else n.layer.hidden = !n.layer.hidden;
-          renderTree(); render(); return;
+          renderTree(); render(); renderDiff(); return;
         }
         // 選ぶ
         if (e.shiftKey && lastClicked) {
@@ -1312,7 +1535,7 @@
 
       $('sel-all').addEventListener('click', () => { selected = new Set(nodes.map(n => n.id)); renderTree(); syncButtons(); });
       $('sel-none').addEventListener('click', () => { selected = new Set(); renderTree(); syncButtons(); });
-      $('reset-vis').addEventListener('click', () => { for (const n of nodes) n.layer.hidden = !initialVis.get(n.layer); renderTree(); render(); });
+      $('reset-vis').addEventListener('click', () => { for (const n of nodes) n.layer.hidden = !initialVis.get(n.layer); renderTree(); render(); renderDiff(); });
 
       // ---- 重ねる
       const mk = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, w); c.height = Math.max(1, h); return c; };
@@ -1450,7 +1673,8 @@
 
       // ---- 保存
       // 透明なまわりを切る
-      function trim(c) {
+      // 透明でないところの範囲。全部透明なら null
+      function bboxOf(c) {
         const x = c.getContext('2d', { willReadFrequently: true });
         const { width: w, height: h } = c;
         const d = x.getImageData(0, 0, w, h).data;
@@ -1460,10 +1684,16 @@
             if (d[i]) { if (y < t) t = y; if (y > b) b = y; if (xx < l) l = xx; if (xx > r) r = xx; }
           }
         }
-        if (b < 0) return null; // 全部透明
-        const o = mk(r - l + 1, b - t + 1);
-        o.getContext('2d').drawImage(c, -l, -t);
+        return b < 0 ? null : { l, t, r, b };
+      }
+      function crop(c, bb) {
+        const o = mk(bb.r - bb.l + 1, bb.b - bb.t + 1);
+        o.getContext('2d').drawImage(c, -bb.l, -bb.t);
         return o;
+      }
+      function trim(c) {
+        const bb = bboxOf(c);
+        return bb ? crop(c, bb) : null;
       }
       const toPng = c => new Promise(r => c.toBlob(r, 'image/png'));
       const safe = s => (String(s || '').replace(/[\\/:*?"<>|\x00-\x1f]/g, '_').trim() || 'layer').slice(0, 80);
@@ -1531,6 +1761,131 @@
       $('save-all').addEventListener('click', () => busy($('save-all'), async () => {
         await exportNodes(nodes.filter(n => !n.isGroup && !n.layer.adjustment), `${safe(fileName)}-all.zip`);
       }));
+
+      // ---- 表情差分
+      // axes：切り替えるフォルダ { node, out: 書き出さない中身の id の Set }
+      let axes = [];
+      let diffMode = 'all';
+      const MAX_COMBOS = 500;
+      const kids = n => nodes.filter(m => m.parent === n);
+      const folders = () => nodes.filter(n => n.isGroup && kids(n).length >= 2);
+      // 中身が2つ以上で、見えているのが1つだけのフォルダは「候補」
+      const suggested = n => kids(n).filter(k => !k.layer.hidden).length === 1;
+      const chosen = ax => kids(ax.node).find(k => !k.layer.hidden) || null;
+      const pathText = n => { const a = []; let p = n.parent; while (p) { a.unshift(p.layer.name); p = p.parent; } return a.join(' / '); };
+
+      function renderDiff() {
+        if (!psd) return;
+        const fs = folders();
+        $('diff-folders').innerHTML = fs.length ? fs.map(n => `<label class="chk"><input type="checkbox" data-folder="${n.id}"${axes.some(a => a.node === n) ? ' checked' : ''}>
+          <span class="nm">${pathText(n) ? `<span class="path">${esc(pathText(n))} / </span>` : ''}${esc(n.layer.name)}</span>${suggested(n) ? '<span class="star" title="中身の1つだけが見えているフォルダです">候補</span>' : ''}</label>`).join('')
+          : '<p class="field-note">中身が2つ以上あるフォルダがありません</p>';
+        $('diff-axes').innerHTML = axes.length ? axes.map((ax, i) => {
+          const cur = chosen(ax);
+          return `<div class="axis" data-axis="${i}"><div class="axis-name">${esc(ax.node.layer.name)}<small>${kids(ax.node).length - ax.out.size} / ${kids(ax.node).length} を書き出す</small></div><div class="opts">${kids(ax.node).map(k => {
+            const t = k.isGroup ? '' : thumb(k.layer);
+            return `<span class="opt${ax.out.has(k.id) ? ' out' : ''}" role="button" tabindex="0" data-opt="${k.id}" aria-pressed="${k === cur}" title="押すとこれを表示。チェックを外すと書き出しに入れません">
+              <input type="checkbox" data-inc="${k.id}"${ax.out.has(k.id) ? '' : ' checked'} aria-label="書き出しに入れる">${t ? `<img src="${t}" alt="">` : k.isGroup ? '📁' : ''}<span class="nm">${esc(k.layer.name || '（名前なし）')}</span></span>`;
+          }).join('')}</div></div>`;
+        }).join('') : '<p class="field-note">上でフォルダを選んでください</p>';
+        const n = combos().length;
+        $('diff-mode-note').textContent = !axes.length ? '' : diffMode === 'all'
+          ? `選んだ中身の、すべての組み合わせを書き出します（${n} 枚${n > MAX_COMBOS ? `。多すぎるので ${MAX_COMBOS} 枚までにしてください` : ''}）。`
+          : `ほかは今の見え方のまま、1つのフォルダだけを変えた絵を書き出します（${n} 枚）。`;
+        $('diff-save').disabled = !n || n > MAX_COMBOS;
+        $('diff-save').textContent = n ? `📦 差分 ${n} 枚をまとめて ZIP` : '📦 差分をまとめて ZIP';
+      }
+
+      // 書き出す組み合わせ：[{ picks: [[axis, 中身の node], …], name }]
+      function combos() {
+        const lists = axes.map(ax => ({ ax, opts: kids(ax.node).filter(k => !ax.out.has(k.id)) })).filter(x => x.opts.length);
+        if (!lists.length) return [];
+        if (diffMode === 'one') return lists.flatMap(({ ax, opts }) => opts.map(o => ({ picks: [[ax, o]], name: `${ax.node.layer.name}_${o.layer.name}` })));
+        let out = [[]];
+        for (const { ax, opts } of lists) {
+          if (out.length * opts.length > MAX_COMBOS * 4) return new Array(out.length * opts.length); // 数だけ
+          out = out.flatMap(pre => opts.map(o => [...pre, [ax, o]]));
+        }
+        return out.map(picks => ({ picks, name: picks.map(([, o]) => o.layer.name).join('_') }));
+      }
+
+      function choose(ax, k) {
+        ax.node.layer.hidden = false;
+        for (const m of kids(ax.node)) m.layer.hidden = m !== k;
+      }
+
+      $('diff-folders').addEventListener('change', e => {
+        const id = +e.target.dataset.folder; if (!id) return;
+        const n = byId.get(id);
+        if (e.target.checked) {
+          axes.push({ node: n, out: new Set() });
+          // 中身が全部見えている・全部隠れているときは、いちばん上を表示にしておく
+          if (!suggested(n)) { choose(axes[axes.length - 1], kids(n)[0]); renderTree(); render(); }
+        } else axes = axes.filter(a => a.node !== n);
+        renderDiff();
+      });
+      $('diff-axes').addEventListener('click', e => {
+        const axEl = e.target.closest('[data-axis]'); if (!axEl) return;
+        const ax = axes[+axEl.dataset.axis];
+        const inc = e.target.closest('[data-inc]');
+        if (inc) { const id = +inc.dataset.inc; inc.checked ? ax.out.delete(id) : ax.out.add(id); renderDiff(); return; }
+        const opt = e.target.closest('[data-opt]'); if (!opt) return;
+        choose(ax, byId.get(+opt.dataset.opt));
+        renderTree(); render(); renderDiff();
+      });
+      $('diff-axes').addEventListener('keydown', e => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-opt]')) { e.preventDefault(); e.target.click(); }
+      });
+      $('diff-mode').addEventListener('click', e => {
+        const b = e.target.closest('[data-v]'); if (!b) return;
+        diffMode = b.dataset.v;
+        for (const x of $('diff-mode').children) x.setAttribute('aria-pressed', String(x === b));
+        renderDiff();
+      });
+      for (const t of document.querySelectorAll('.tab')) t.addEventListener('click', () => {
+        for (const x of document.querySelectorAll('.tab')) x.setAttribute('aria-selected', String(x === t));
+        $('pane-layers').hidden = t.dataset.tab !== 'layers';
+        $('pane-diff').hidden = t.dataset.tab !== 'diff';
+        if (t.dataset.tab === 'diff') renderDiff();
+      });
+
+      $('diff-save').addEventListener('click', async () => {
+        const list = combos();
+        if (!list.length || list.length > MAX_COMBOS) return;
+        const btn = $('diff-save'); btn.disabled = true;
+        const saved = nodes.map(n => n.layer.hidden);
+        const W = psd.width, H = psd.height;
+        const doTrim = $('trim').checked, align = $('diff-align').checked;
+        // 組み合わせごとに、見え方を変えて重ねる（PSD の完成画像は使わない：全部の差分で重ね方をそろえる）
+        const draw = c => { saved.forEach((h, i) => { nodes[i].layer.hidden = h; }); for (const [ax, o] of c.picks) choose(ax, o); return composite(psd.children || [], W, H, false); };
+        const tick = (i, step) => new Promise(r => { btn.textContent = `${step} ${i} / ${list.length}`; setTimeout(r, 0); });
+        try {
+          let union = null;
+          if (doTrim && align) {
+            for (let i = 0; i < list.length; i++) {
+              await tick(i + 1, '大きさを調べています…');
+              const bb = bboxOf(draw(list[i]));
+              if (bb) union = union ? { l: Math.min(union.l, bb.l), t: Math.min(union.t, bb.t), r: Math.max(union.r, bb.r), b: Math.max(union.b, bb.b) } : bb;
+            }
+          }
+          const files = []; const used = new Set();
+          const digits = String(list.length).length;
+          for (let i = 0; i < list.length; i++) {
+            await tick(i + 1, '作っています…');
+            let c = draw(list[i]);
+            if (doTrim) { const bb = align ? union : bboxOf(c); if (bb) c = crop(c, bb); }
+            let name = `${String(i + 1).padStart(digits, '0')}_${safe(list[i].name)}`;
+            let k = 2, full = name; while (used.has(full.toLowerCase())) full = `${name}_${k++}`;
+            used.add(full.toLowerCase());
+            files.push({ name: full + '.png', data: new Uint8Array(await (await toPng(c)).arrayBuffer()) });
+          }
+          download(makeZip(files), `${safe(fileName)}-差分.zip`);
+          const fx = nodes.some(n => n.layer.effects && hasEffects(n.layer.effects));
+          toast(`差分 ${files.length} 枚を保存しました${fx ? '（レイヤー効果は入っていません）' : ''}`);
+        } catch (e) { console.error(e); toast('保存できませんでした（大きすぎるかもしれません）'); }
+        saved.forEach((h, i) => { nodes[i].layer.hidden = h; });
+        renderTree(); render(); renderDiff();
+      });
 
       // ---- ZIP（圧縮しないで入れるだけ。名前は UTF-8）
       const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
