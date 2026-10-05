@@ -7,9 +7,9 @@
   <title>OGPチェッカー | どんまうんど-Tools</title>
   <link rel="icon" href="../favicon.ico">
   <meta name="description"
-    content="URL を入れるだけで、X・Discord・LINE・Bluesky・Threads・Misskey など 11 のサービスに貼ったときの見え方（OGP・X のカード）を確かめられる無料ツール。画像の大きさ・重さ、タグの抜け、ページが重くて読まれない問題などを調べて、直し方も案内します。">
+    content="URL を入れるだけで、OGP の画像・タイトル・説明や、ページの情報を調べられる無料ツール。X・LINE・Discord・Bluesky・はてなブックマークなど 19 のサービスに貼ったときの見え方も確かめられて、問題があれば直し方も案内します。">
   <meta property="og:title" content="OGPチェッカー | どんまうんど-Tools">
-  <meta property="og:description" content="URL を入れるだけで、X・Discord・LINE・Bluesky などに貼ったときの見え方と、OGP の問題・直し方が分かる無料ツール。">
+  <meta property="og:description" content="URL を入れるだけで、OGP の画像やページの情報を調べられる無料ツール。X・LINE・Discord などに貼ったときの見え方も確かめられます。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://donnma.com/tool/ogp-checker/">
   <meta property="og:site_name" content="どんまうんど-Tools">
@@ -1030,6 +1030,158 @@
       border-radius: 6px;
     }
 
+    .sns-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .sns-row>div:first-child {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sns-thumb {
+      flex: none;
+      width: 96px;
+      border-radius: 4px;
+      object-fit: cover;
+    }
+
+    .sns-hb-title {
+      font-weight: 700;
+      font-size: 15px;
+      color: #2c6ebd;
+    }
+
+    .sns-hb-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .sns-hb-meta img {
+      width: 14px;
+      height: 14px;
+    }
+
+    .sns-hb-users {
+      color: #ff4166;
+      font-weight: 700;
+    }
+
+    .sns-cw {
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .sns-cw-title {
+      font-weight: 700;
+      color: #3a77b6;
+    }
+
+    .sns-teams {
+      background: #f5f5f5;
+      color: #242424;
+    }
+
+    .sns-tm {
+      display: flex;
+      overflow: hidden;
+      border-radius: 6px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+    }
+
+    .sns-tm .sns-pic {
+      width: 112px;
+      flex: none;
+      align-self: stretch;
+      min-height: 90px;
+    }
+
+    .sns-gc {
+      overflow: hidden;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      background: #fff;
+      color: #202124;
+    }
+
+    .sns-wa {
+      background: #efeae2;
+    }
+
+    .sns-wa-bubble {
+      max-width: 330px;
+      margin-left: auto;
+      padding: 4px 4px 6px;
+      border-radius: 8px;
+      background: #d9fdd3;
+      color: #111b21;
+    }
+
+    .sns-wa-pre {
+      overflow: hidden;
+      border-radius: 6px;
+      background: rgba(11, 20, 26, 0.05);
+    }
+
+    .sns-wa-link {
+      padding: 6px 6px 0;
+      color: #027eb5;
+      font-size: 13.5px;
+      word-break: break-all;
+    }
+
+    .sns-im {
+      width: min(100%, 280px);
+      margin-left: auto;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #e9e9eb;
+      color: #000;
+    }
+
+    .sns-im-body {
+      padding: 8px 12px 10px;
+    }
+
+    .sns-pin {
+      width: min(100%, 236px);
+    }
+
+    .sns-pin img {
+      display: block;
+      width: 100%;
+      border-radius: 16px;
+    }
+
+    .sns-pin .sns-noimg {
+      height: 160px;
+      border-radius: 16px;
+      background: #e9e9e9;
+    }
+
+    .sns-rd-title {
+      font-weight: 600;
+      font-size: 17px;
+      color: #0f1a1c;
+    }
+
+    .sns-rd {
+      position: relative;
+      margin-top: 8px;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid #e5ebee;
+    }
+
     .sns-none {
       color: #8899a6;
       font-size: 13px;
@@ -1298,7 +1450,7 @@
   <header class="hero">
     <div class="hero-inner">
       <h1>OGPチェッカー</h1>
-      <p>URL を入れるだけで、X・Discord・LINE・Bluesky・Threads・Misskey など 11 のサービスに貼ったときの見え方を確かめられます。画像の大きさ・重さ、タグの抜け、ページが重くて読まれない問題などを調べて、直し方も案内します。</p>
+      <p>URL を入れるだけで、OGP の画像やページの情報を調べられます。X・LINE・Discord など、いろいろなサービスに貼ったときの見え方も確かめられて、問題があれば直し方も案内します。</p>
     </div>
   </header>
 
@@ -1318,6 +1470,11 @@
           <option value="misskey">Misskey として</option>
           <option value="linkedin">LinkedIn として</option>
           <option value="telegram">Telegram として</option>
+          <option value="whatsapp">WhatsApp として</option>
+          <option value="imessage">iMessage として</option>
+          <option value="teams">Teams として</option>
+          <option value="pinterest">Pinterest として</option>
+          <option value="reddit">Reddit として</option>
         </select>
         <button class="btn btn-primary" type="submit" id="go">🔍 調べる</button>
       </div>
@@ -1377,7 +1534,7 @@
         <ol class="steps">
           <li>調べたいページの URL を入れて <b>「🔍 調べる」</b> を押します。</li>
           <li><b>チェック</b>に、問題と直し方が出ます。❌ は表示されない・崩れる原因になりやすいもの、⚠ は直したほうがよいものです。</li>
-          <li><b>貼ったときの見え方</b>で、X・Discord・LINE・Facebook・Bluesky・Threads・Slack・Mastodon・Misskey・LinkedIn・Telegram でどう出るかの目安を見られます。</li>
+          <li><b>貼ったときの見え方</b>で、X・LINE・Discord・はてなブックマーク・Teams など 19 のサービスでどう出るかの目安を見られます。</li>
           <li>特定のサービスだけ出ないときは、右の選択で <b>「Discord として」</b> などを選んで調べ直してください。</li>
           <li><b>「🔗 この結果の URL をコピー」</b>で、同じ調べ方のリンクを人に送れます。</li>
         </ol>
@@ -1554,6 +1711,23 @@
           `<div class="sns-card" style="border-radius:8px">${ogImg ? pic(ogImg, '1.91 / 1') : ''}<div class="sns-card-body"><div class="sns-li-title clamp2">${esc(title)}</div><div class="sns-small">${esc(dom)}</div></div></div>`]);
         cards.push(['Telegram', 'リンクのプレビュー', 'tg',
           `<div class="sns-tg-bubble"><div class="sns-tg-link">${esc(d.input)}</div><div class="sns-tg-pre"><div class="sns-tg-site">${esc(site)}</div><div class="sns-tg-title">${esc(title)}</div>${desc ? `<div class="clamp2" style="-webkit-line-clamp:3">${esc(desc)}</div>` : ''}${anyImg ? `<img class="sns-tg-img" src="${esc(imgUrl(anyImg))}" alt="" referrerpolicy="no-referrer">` : ''}</div></div>`]);
+        const thumb = (src, style) => `<img class="sns-thumb" style="${style}" src="${esc(imgUrl(src))}" alt="" referrerpolicy="no-referrer">`;
+        cards.push(['はてなブックマーク', 'エントリーの一覧', 'light',
+          `<div class="sns-row"><div><div class="sns-hb-title clamp2">${esc(title)}</div><div class="sns-hb-meta"><span class="sns-hb-users">○ users</span>${icon}<span>${esc(dom)}</span></div>${desc ? `<div class="sns-small clamp2">${esc(desc)}</div>` : ''}</div>${anyImg ? thumb(anyImg, 'aspect-ratio:3/2') : ''}</div>`]);
+        cards.push(['Chatwork', 'メッセージのプレビュー', 'light',
+          `<div class="sns-cw"><div class="sns-row"><div><div class="sns-cw-title clamp2">${esc(title)}</div>${desc ? `<div class="sns-small clamp2">${esc(desc)}</div>` : ''}</div>${anyImg ? thumb(anyImg, 'width:80px;aspect-ratio:1') : ''}</div></div>`]);
+        cards.push(['Microsoft Teams', 'リンクのプレビュー', 'teams',
+          `<div class="sns-tm">${anyImg ? pic(anyImg, 'auto') : ''}<div class="sns-card-body" style="min-width:0"><div class="sns-card-title clamp2">${esc(title)}</div>${desc ? `<div class="sns-small clamp2">${esc(desc)}</div>` : ''}<div class="sns-small">${esc(dom)}</div></div></div>`]);
+        cards.push(['Google Chat', 'リンクのプレビュー', 'light',
+          `<div class="sns-gc">${anyImg ? pic(anyImg, '1.91 / 1') : ''}<div class="sns-card-body"><div class="sns-card-title clamp2">${esc(title)}</div><div class="sns-small">${esc(dom)}</div></div></div>`]);
+        cards.push(['WhatsApp', 'トークに貼ったとき', 'wa',
+          `<div class="sns-wa-bubble"><div class="sns-wa-pre">${anyImg ? pic(anyImg, '1.91 / 1') : ''}<div class="sns-card-body"><div class="sns-card-title clamp2">${esc(title)}</div>${desc ? `<div class="sns-small clamp2" style="color:#667781">${esc(desc)}</div>` : ''}<div class="sns-small" style="color:#667781">${esc(dom)}</div></div></div><div class="sns-wa-link">${esc(d.input)}</div></div>`]);
+        cards.push(['iMessage', 'メッセージに貼ったとき', 'light',
+          `<div class="sns-im">${anyImg ? pic(anyImg, '1.91 / 1') : ''}<div class="sns-im-body"><div class="sns-card-title clamp2">${esc(title)}</div><div class="sns-small" style="color:#8a8a8e">${esc(dom)}</div></div></div>`]);
+        cards.push(['Pinterest', 'ピン（画像は切り抜かれない）', 'light',
+          `<div class="sns-pin">${ogImg ? `<img src="${esc(imgUrl(ogImg))}" alt="" referrerpolicy="no-referrer">` : '<div class="sns-noimg">画像なし（ピンにできません）</div>'}<div class="sns-card-title clamp2" style="margin-top:6px">${esc(title)}</div></div>`]);
+        cards.push(['Reddit', 'リンクの投稿', 'light',
+          `<div class="sns-rd-title clamp2">${esc(title)}</div><div class="sns-rd">${anyImg ? pic(anyImg, '1.91 / 1') : '<div class="sns-card-body">🔗</div>'}<span class="sns-x-dom">${esc(dom)}</span></div>`]);
         $('sns').innerHTML = cards.map(([name, what, tone, body]) =>
           `<section><div class="sns-label"><b>${name}</b><span>${what}</span></div><div class="sns-tile sns-${tone}">${body}</div></section>`).join('');
 

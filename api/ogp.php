@@ -37,6 +37,11 @@ const OGP_UAS = [
 	'misskey'  => 'Mozilla/5.0 (compatible; SummalyBot/5.1.0; +https://github.com/misskey-dev/summaly/blob/master/README.md)',
 	'linkedin' => 'LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)',
 	'telegram' => 'TelegramBot (like TwitterBot)',
+	'whatsapp' => 'WhatsApp/2.24.20.89 A',
+	'imessage' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15 facebookexternalhit/1.1 Facebot Twitterbot/1.0',
+	'teams'    => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) SkypeUriPreview Preview/0.5 skype-url-preview@microsoft.com',
+	'pinterest' => 'Mozilla/5.0 (compatible; Pinterestbot/1.0; +http://www.pinterest.com/bot.html)',
+	'reddit'   => 'Mozilla/5.0 (compatible; redditbot/1.0; +http://www.reddit.com/feedback)',
 ];
 
 // ---- 返事

@@ -1,6 +1,6 @@
 # OGPチェッカー
 
-URL を入れると、そのページの OGP・X のカードのタグを読んで、X・Discord・LINE・Facebook・Bluesky・Threads・Slack・Mastodon・Misskey・LinkedIn・Telegram に貼ったときの見え方の目安と、問題・直し方を出すツールです。
+URL を入れると、そのページの OGP・X のカードのタグを読んで、X・Discord・LINE・Facebook・Bluesky・Threads・Slack・Mastodon・Misskey・LinkedIn・Telegram・はてなブックマーク・Chatwork・Teams・Google Chat・WhatsApp・iMessage・Pinterest・Reddit に貼ったときの見え方の目安と、問題・直し方を出すツールです。
 
 ブラウザからはほかのサイトのページを読めない（CORS）ので、ページと画像は donnma.com に置いた `../api/ogp.php` が代わりに取りに行きます。
 
@@ -17,7 +17,7 @@ URL を入れると、そのページの OGP・X のカードのタグを読ん�
 
 ## `api/ogp.php`
 
-`?url=…&ua=default|discord|x|facebook|line|slack|bluesky|mastodon|misskey|linkedin|telegram`（各サービスの取りに来るときの名乗り。Threads・Instagram は facebook と同じ）
+`?url=…&ua=default|discord|x|facebook|line|slack|bluesky|mastodon|misskey|linkedin|telegram|whatsapp|imessage|teams|pinterest|reddit`（各サービスの取りに来るときの名乗り。Threads・Instagram は facebook と同じ）
 
 - **よそのサーバーへの踏み台にしない**ための決まり：
   - http / https、ポート 80・443 だけ。ユーザー名入りの URL は不可
