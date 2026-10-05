@@ -308,13 +308,73 @@ function ogp_image_info(string $src): array
 	return $info;
 }
 
+// ---- robots.txt：X・Slack・LinkedIn は、ページだけでなく画像も robots.txt で止められていると読まない
+//（Discord・Facebook・LINE などは見ない）。止められているサービスの名前を返す
+const OGP_ROBOTS_BOTS = ['X' => 'twitterbot', 'Slack' => 'slackbot', 'LinkedIn' => 'linkedinbot'];
+
+function ogp_robots_blocked(string $url): array
+{
+	static $cache = [];
+	$p = parse_url($url);
+	if (empty($p['host'])) return [];
+	$origin = strtolower($p['scheme'] ?? 'https') . '://' . strtolower($p['host']) . (isset($p['port']) ? ':' . $p['port'] : '');
+	if (! isset($cache[$origin])) {
+		$chain = [];
+		$r = ogp_fetch($origin . '/robots.txt', OGP_UAS['default'], 512 * 1024, $chain);
+		$cache[$origin] = (! isset($r['error']) && $r['status'] === 200) ? ogp_robots_parse($r['body']) : [];
+	}
+	$path = ($p['path'] ?? '/') . (isset($p['query']) ? '?' . $p['query'] : '');
+	$out = [];
+	foreach (OGP_ROBOTS_BOTS as $name => $bot) {
+		if (! ogp_robots_allowed($cache[$origin], $bot, $path)) $out[] = $name;
+	}
+	return $out;
+}
+
+// User-agent ごとの [Allow/Disallow, パス] の一覧にする
+function ogp_robots_parse(string $txt): array
+{
+	$groups = []; $agents = []; $inRules = false;
+	foreach (preg_split('/\R/', $txt) as $line) {
+		$line = trim(preg_replace('/#.*/', '', $line));
+		if (! preg_match('/^([\w-]+)\s*:\s*(.*)$/', $line, $m)) continue;
+		$k = strtolower($m[1]); $v = trim($m[2]);
+		if ($k === 'user-agent') {
+			if ($inRules) { $agents = []; $inRules = false; }
+			$agents[] = strtolower($v);
+			foreach ($agents as $a) $groups[$a] = $groups[$a] ?? [];
+		} elseif ($k === 'allow' || $k === 'disallow') {
+			$inRules = true;
+			foreach ($agents as $a) $groups[$a][] = [$k === 'allow', $v];
+		}
+	}
+	return $groups;
+}
+
+// いちばん長く当てはまるルールに従う（同じ長さなら Allow）。名前の合う組がなければ * の組
+function ogp_robots_allowed(array $groups, string $bot, string $path): bool
+{
+	$rules = null;
+	foreach ($groups as $a => $r) if ($a !== '*' && $a !== '' && strpos($bot, $a) !== false) { $rules = $r; break; }
+	$rules = $rules ?? ($groups['*'] ?? []);
+	$best = -1; $allow = true;
+	foreach ($rules as [$isAllow, $pat]) {
+		if ($pat === '') continue;
+		$re = '#^' . str_replace(['\*', '\$'], ['.*', '$'], preg_quote($pat, '#')) . '#';
+		if (! preg_match($re, $path)) continue;
+		$len = strlen($pat);
+		if ($len > $best || ($len === $best && $isAllow)) { $best = $len; $allow = $isAllow; }
+	}
+	return $allow;
+}
+
 $images = [];
 foreach (['og:image', 'twitter:image'] as $k) {
 	$m = $first($k) ?? ($k === 'twitter:image' ? $first('twitter:image:src') : null);
 	if (! $m || $m['value'] === '') continue;
 	$abs = ogp_abs($m['value'], $page['url']);
 	if (isset($images[$abs])) { $images[$abs]['for'][] = $k; continue; }
-	$images[$abs] = ogp_image_info($abs) + ['for' => [$k], 'raw' => $m['value']];
+	$images[$abs] = ogp_image_info($abs) + ['for' => [$k], 'raw' => $m['value'], 'robotsBlocked' => ogp_robots_blocked($abs)];
 }
 
 ogp_out([
@@ -331,6 +391,7 @@ ogp_out([
 	'type'      => $ctype,
 	'encoding'  => $page['headers']['content-encoding'] ?? null,
 	'robots'    => $page['headers']['x-robots-tag'] ?? null,
+	'robotsBlocked' => ogp_robots_blocked($page['url']),
 	'headEnd'   => $headEnd === false ? null : $headEnd,
 	'title'     => $title,
 	'canonical' => $canonical,

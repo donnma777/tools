@@ -1709,9 +1709,13 @@
         const pic = (src, ratio) => `<div class="sns-pic" style="aspect-ratio:${ratio}">${src ? `<img src="${esc(imgUrl(src))}" alt="" referrerpolicy="no-referrer">` : '<div class="sns-noimg">画像なし</div>'}</div>`;
         const dom = domainOf(d.url);
         const cards = [];
-        if (card === 'summary' || !xImg) {
-          cards.push(['X', card === 'summary' ? '小さいカード（twitter:card = summary）' : '画像がないので小さいカード', 'light',
-            `<div class="sns-xs">${pic(xImg, '1 / 1')}<div class="sns-xs-body"><div class="sns-small">${esc(dom)}</div><div class="t clamp2">${esc(xTitle)}</div></div></div>`]);
+        const xBlocked = (d.robotsBlocked || []).includes('X');
+        const xImgBlocked = !!xImg && ((img(xImg) || {}).robotsBlocked || []).includes('X');
+        if (xBlocked) {
+          cards.push(['X', 'robots.txt で止められていて、カードが出ない', 'light', `<div class="sns-none">${esc(d.url)}</div>`]);
+        } else if (card === 'summary' || !xImg || xImgBlocked) {
+          cards.push(['X', xImgBlocked ? '画像が robots.txt で止められていて、画像なしの小さいカード' : card === 'summary' ? '小さいカード（twitter:card = summary）' : '画像がないので小さいカード', 'light',
+            `<div class="sns-xs">${pic(xImgBlocked ? null : xImg, '1 / 1')}<div class="sns-xs-body"><div class="sns-small">${esc(dom)}</div><div class="t clamp2">${esc(xTitle)}</div></div></div>`]);
         } else {
           cards.push(['X', card ? '大きいカード（1.91:1 に切り抜き）' : 'twitter:card がないので、大きく出ないことがある', 'light',
             `<div class="sns-x">${pic(xImg, '1.91 / 1')}<span class="sns-x-dom">${esc(xTitle)}</span></div><div class="sns-small">${esc(dom)} から</div>`]);
@@ -1838,6 +1842,7 @@
         // ページそのもの
         if (d.status !== 200) add('ng', `ページの返事が ${d.status} です`, '200 以外だと、多くのサービスは OGP を読みません。URL が正しいか、ログインが要るページでないかを確かめてください。');
         else add('ok', 'ページを読めました（200）');
+        if ((d.robotsBlocked || []).length) add('ng', `robots.txt で止められていて、${d.robotsBlocked.join('・')} ではカードが出ません`, `X・Slack・LinkedIn は robots.txt を守るので、このページを読みに来ません。robots.txt の ${code('Disallow')} を見直してください。`);
         if (d.chain.length > 1) add('info', `${d.chain.length - 1} 回転送されました`, '転送のあとのページの OGP が使われます。貼る URL は、転送のあとの URL にするのが確実です。');
         if (!/html/i.test(d.type || '')) add('warn', `ページの種類が HTML ではありません（${esc(d.type || '不明')}）`);
 
@@ -1881,6 +1886,10 @@
           const where = i.for.join('・');
           if (!/^https?:\/\//i.test(i.raw)) add('warn', `${where} が「${esc(i.raw)}」のように、https:// から始まっていません`, 'このツールは補って読みましたが、そのままでは読めないサービスがあります。https:// から始まる URL で書いてください。');
           else if (/^http:\/\//i.test(i.raw)) add('warn', `${where} の URL が http:// です`, 'https:// でないと出ないサービスがあります。');
+          if ((i.robotsBlocked || []).length) {
+            let path = i.url; try { const u = new URL(i.url); path = u.pathname + u.search; } catch { /* そのまま */ }
+            add('ng', `${where} の画像が robots.txt で止められていて、${i.robotsBlocked.join('・')} では画像が出ません`, `X・Slack・LinkedIn は、画像も robots.txt を見てから読みます。止められていると、X では画像なしの小さいカードになります。robots.txt に、たとえば ${code('Allow: ' + path.replace(/\?.*$/, '') + (path.includes('?') ? '?…' : ''))} のように、画像を読んでよい行を足してください。`);
+          }
           if (i.error) { add('ng', `${where} の画像を読めませんでした`, esc(i.error)); continue; }
           if (i.status !== 200) { add('ng', `${where} の画像の返事が ${i.status} です`, '画像の URL が正しいか、画像に誰でもアクセスできるかを確かめてください。'); continue; }
           const mime = i.mime || i.type || '';
