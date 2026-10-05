@@ -90,6 +90,8 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git rm -r --cached .github > /dev/null
           rm -rf .github _shared
+          # api/ は PHP なので GitHub Pages では動かない（tools.donnma.com からは donnma.com/tool/api/ を呼ぶ）
+          rm -rf api
           # 各フォルダの README.md（開発メモ）も公開しない
           find . -path ./.git -prune -o -name README.md -type f -exec rm -f {} +
           git add -A

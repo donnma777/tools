@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OGPチェッカー | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="URL を入れるだけで、X・Discord・Facebook・LINE・Slack に貼ったときの見え方（OGP・X のカード）を確かめられる無料ツール。画像の大きさ・重さ、タグの抜け、ページが重くて読まれない問題などを調べて、直し方も案内します。">
+  <meta property="og:title" content="OGPチェッカー | どんまうんど-Tools">
+  <meta property="og:description" content="URL を入れるだけで、X・Discord・LINE などに貼ったときの見え方と、OGP の問題・直し方が分かる無料ツール。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/ogp-checker/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-ogp-checker.jpg?v=20261005a">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="OGPチェッカー">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --ok: #7fd8a4;
+      --warn: #ffc46b;
+      --ng: #ff7a8a;
+      --info: #8ec5ff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── 入力 ── */
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 44px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+      flex: none;
+    }
+
+    .ask {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
+    }
+
+    .ask input,
+    .ask select {
+      font: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 9px 12px;
+      min-width: 0;
+    }
+
+    .ask input:focus,
+    .ask select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .ask-note {
+      margin-top: 8px;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+      font-size: 14px;
+      padding: 9px 20px;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .field-note {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .status-line {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      padding: 10px;
+    }
+
+    .status-line.err {
+      color: var(--ng);
+      font-weight: 700;
+    }
+
+    .spin {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border-strong);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: -2px;
+      margin-right: 6px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── まとめ ── */
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 16px;
+    }
+
+    .summary-url {
+      font-size: 13px;
+      word-break: break-all;
+      flex: 1 1 300px;
+      min-width: 0;
+    }
+
+    .summary-url small {
+      display: block;
+      color: var(--muted);
+      font-size: 11.5px;
+    }
+
+    .counts {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .count {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+    }
+
+    .count.ng {
+      color: var(--ng);
+    }
+
+    .count.warn {
+      color: var(--warn);
+    }
+
+    .count.ok {
+      color: var(--ok);
+    }
+
+    /* ── チェックの一覧 ── */
+    .checks {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .check {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 4px 8px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--surface-2);
+      border-left: 4px solid var(--border-strong);
+      font-size: 13.5px;
+    }
+
+    .check.ng {
+      border-left-color: var(--ng);
+    }
+
+    .check.warn {
+      border-left-color: var(--warn);
+    }
+
+    .check.ok {
+      border-left-color: var(--ok);
+    }
+
+    .check.info {
+      border-left-color: var(--info);
+    }
+
+    .check-mark {
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .check-title {
+      font-weight: 700;
+    }
+
+    .check-how {
+      grid-column: 2;
+      font-size: 12.5px;
+      color: var(--label);
+    }
+
+    .check-how code,
+    .tags code {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      background: var(--bg-deep);
+      padding: 1px 5px;
+      border-radius: 4px;
+      word-break: break-all;
+    }
+
+    /* ── SNS での見え方（サムネイルメーカーと同じ見た目） ── */
+    .sns-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+
+    .sns-label {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      align-items: baseline;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sns-label b {
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    /* カードの中は、各サービスの見た目に寄せる（文字の色はサイトの配色に合わせない） */
+    .sns-tile {
+      border-radius: 12px;
+      padding: 14px;
+      font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+      font-size: 14px;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .sns-light {
+      background: #ffffff;
+      color: #0f1419;
+    }
+
+    .sns-linechat {
+      background: #7494c0;
+    }
+
+    .sns-discord {
+      background: #313338;
+      color: #dbdee1;
+    }
+
+    .sns-slack {
+      background: #ffffff;
+      color: #1d1c1d;
+    }
+
+    .sns-pic {
+      position: relative;
+      overflow: hidden;
+      background: #e1e8ed;
+    }
+
+    .sns-pic img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sns-noimg {
+      display: grid;
+      place-items: center;
+      height: 100%;
+      font-size: 12px;
+      color: #8899a6;
+    }
+
+    .sns-small {
+      margin-top: 4px;
+      font-size: 12.5px;
+      color: #536471;
+    }
+
+    .sns-x {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid #cfd9de;
+    }
+
+    .sns-x-dom {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      padding: 0 5px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.77);
+      color: #fff;
+      font-size: 13px;
+      max-width: calc(100% - 24px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sns-xs {
+      display: flex;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid #cfd9de;
+    }
+
+    .sns-xs .sns-pic {
+      width: 130px;
+      flex: none;
+      aspect-ratio: 1;
+      border-right: 1px solid #cfd9de;
+    }
+
+    .sns-xs-body {
+      padding: 10px 12px;
+      min-width: 0;
+      align-self: center;
+    }
+
+    .sns-xs-body .t {
+      color: #0f1419;
+    }
+
+    .sns-fb {
+      border: 1px solid #dadde1;
+    }
+
+    .sns-fb-body {
+      padding: 10px 12px;
+      background: #f0f2f5;
+    }
+
+    .sns-fb-dom {
+      font-size: 12px;
+      color: #65676b;
+    }
+
+    .sns-fb-title {
+      margin-top: 3px;
+      font-weight: 700;
+      font-size: 16px;
+      color: #050505;
+    }
+
+    .clamp2,
+    .sns-fb-desc,
+    .sns-line-title {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+
+    .sns-fb-desc {
+      margin-top: 3px;
+      font-size: 14px;
+      color: #65676b;
+      -webkit-line-clamp: 1;
+    }
+
+    .sns-line {
+      width: min(100%, 240px);
+      overflow: hidden;
+      border-radius: 16px;
+      background: #fff;
+      color: #111;
+    }
+
+    .sns-line-body {
+      padding: 8px 12px 10px;
+    }
+
+    .sns-line-title {
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .sns-dc {
+      max-width: 432px;
+      padding: 10px 14px 14px 12px;
+      border-left: 4px solid #1e1f22;
+      border-radius: 4px;
+      background: #2b2d31;
+    }
+
+    .sns-dc-site {
+      font-size: 12px;
+      color: #dbdee1;
+    }
+
+    .sns-dc-title {
+      margin-top: 6px;
+      font-weight: 700;
+      color: #00a8fc;
+    }
+
+    .sns-dc-desc {
+      margin-top: 6px;
+      font-size: 13.5px;
+    }
+
+    .sns-dc-img {
+      display: block;
+      max-width: 100%;
+      max-height: 300px;
+      margin-top: 12px;
+      border-radius: 4px;
+    }
+
+    .sns-sl {
+      border-left: 4px solid #dddddd;
+      padding: 2px 0 2px 12px;
+    }
+
+    .sns-sl-site {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .sns-sl-site img {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+    }
+
+    .sns-sl-title {
+      margin-top: 2px;
+      font-weight: 700;
+      color: #1264a3;
+    }
+
+    .sns-sl-desc {
+      margin-top: 2px;
+      font-size: 14px;
+    }
+
+    .sns-sl-img {
+      display: block;
+      max-width: 360px;
+      width: 100%;
+      margin-top: 8px;
+      border-radius: 8px;
+    }
+
+    .sns-none {
+      color: #8899a6;
+      font-size: 13px;
+    }
+
+    /* ── タグの一覧・ページの情報 ── */
+    .tags {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .tags th,
+    .tags td {
+      text-align: left;
+      vertical-align: top;
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tags th {
+      color: var(--muted);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .tags td.key {
+      white-space: nowrap;
+      font-family: ui-monospace, Consolas, monospace;
+      color: var(--accent-2);
+    }
+
+    .tags td.val {
+      word-break: break-all;
+    }
+
+    .tags td.pos {
+      white-space: nowrap;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .tags tr.dup td {
+      opacity: 0.55;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+      gap: 8px;
+    }
+
+    .fact {
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13px;
+      min-width: 0;
+    }
+
+    .fact b {
+      display: block;
+      font-size: 11.5px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .fact span {
+      word-break: break-all;
+    }
+
+    .img-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .img-row img {
+      width: 180px;
+      max-width: 100%;
+      border-radius: 8px;
+      background: var(--bg-deep);
+    }
+
+    .img-row .facts {
+      flex: 1 1 280px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 8px 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 720px) {
+      .wrap {
+        padding: 36px 16px 16px;
+      }
+
+      .ask {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .ask input {
+        grid-column: 1 / -1;
+      }
+
+      .guide {
+        padding: 8px 16px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .tags td.key {
+        white-space: normal;
+        word-break: break-all;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>OGPチェッカー</h1>
+      <p>URL を入れるだけで、X・Discord・Facebook・LINE・Slack に貼ったときの見え方を確かめられます。画像の大きさ・重さ、タグの抜け、ページが重くて読まれない問題などを調べて、直し方も案内します。</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <form class="panel panel-body" id="form" autocomplete="off">
+      <div class="ask">
+        <input type="text" id="url" inputmode="url" placeholder="https://example.com/page/" aria-label="調べる URL" spellcheck="false">
+        <select id="ua" aria-label="どのサービスとして見に行くか">
+          <option value="default">ふつうに見る</option>
+          <option value="discord">Discord として</option>
+          <option value="x">X として</option>
+          <option value="facebook">Facebook として</option>
+          <option value="line">LINE として</option>
+          <option value="slack">Slack として</option>
+        </select>
+        <button class="btn btn-primary" type="submit" id="go">🔍 調べる</button>
+      </div>
+      <p class="field-note ask-note">サイトによっては、見に来た相手（Discord・X など）によって返すページを変えています。うまく出ないサービスがあるときは、そのサービスとして調べてみてください。</p>
+    </form>
+
+    <p class="status-line" id="status" hidden></p>
+
+    <div id="result" hidden>
+      <div class="panel panel-body summary">
+        <div class="summary-url" id="sum-url"></div>
+        <div class="counts" id="sum-counts"></div>
+        <button class="btn btn-sm" type="button" id="share">🔗 この結果の URL をコピー</button>
+      </div>
+
+      <section class="panel panel-body" style="margin-top:16px">
+        <div class="panel-title"><span class="sec-icon">🩺</span>チェック</div>
+        <ul class="checks" id="checks"></ul>
+      </section>
+
+      <section class="panel panel-body" style="margin-top:16px">
+        <div class="panel-title"><span class="sec-icon">📱</span>貼ったときの見え方（目安）</div>
+        <p class="field-note" style="margin:-4px 0 12px">各サービスの表示は、画面の大きさや仕様の変更で変わります。形と切れ方の目安として使ってください。各サービスが前に取ったものを覚えているときは、ここと違って見えることがあります。</p>
+        <div class="sns-grid" id="sns"></div>
+      </section>
+
+      <section class="panel panel-body" style="margin-top:16px">
+        <div class="panel-title"><span class="sec-icon">🖼️</span>画像</div>
+        <div id="images"></div>
+      </section>
+
+      <section class="panel panel-body" style="margin-top:16px">
+        <div class="panel-title"><span class="sec-icon">📄</span>ページの情報</div>
+        <div class="facts" id="facts"></div>
+      </section>
+
+      <section class="panel panel-body" style="margin-top:16px">
+        <div class="panel-title"><span class="sec-icon">🏷️</span>見つかったタグ</div>
+        <div class="table-scroll">
+          <table class="tags">
+            <thead>
+              <tr><th>名前</th><th>中身</th><th>位置</th></tr>
+            </thead>
+            <tbody id="tags"></tbody>
+          </table>
+        </div>
+        <p class="field-note" style="margin-top:8px">「位置」は、ページの頭から何 KB 目にあるか（ほどいたあとの大きさ）です。OGP・X のカード・説明のタグだけを出しています。</p>
+      </section>
+    </div>
+  </main>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🔍</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>調べたいページの URL を入れて <b>「🔍 調べる」</b> を押します。</li>
+          <li><b>チェック</b>に、問題と直し方が出ます。❌ は表示されない・崩れる原因になりやすいもの、⚠ は直したほうがよいものです。</li>
+          <li><b>貼ったときの見え方</b>で、X・Discord・Facebook・LINE・Slack でどう出るかの目安を見られます。</li>
+          <li>特定のサービスだけ出ないときは、右の選択で <b>「Discord として」</b> などを選んで調べ直してください。</li>
+          <li><b>「🔗 この結果の URL をコピー」</b>で、同じ調べ方のリンクを人に送れます。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">🛠️</span>直したのに変わらないとき</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>各サービスは、一度取った OGP をしばらく覚えています。直したあとは、URL の後ろに <b>?a=1</b> のような、意味のない文字を付けて貼ると、取り直してくれます。</li>
+          <li>Facebook は <a href="https://developers.facebook.com/tools/debug/" target="_blank" rel="noopener">シェアデバッガー</a> で「もう一度スクレイピング」すると、すぐ新しくなります。</li>
+          <li>画像を同じ名前で差し替えたときは、画像の URL の後ろに <b>?v=2</b> などを付けて、別のファイルとして読ませてください。</li>
+          <li>WordPress などで、CSS をページの中にまとめて書き込む「高速化」の設定を使っていると、ページの頭が重くなって、OGP まで読まれないことがあります。チェックの「タグの位置」を見てください。</li>
+        </ul>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>ヒント・注意点</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>入れた URL のページは、このサイトのサーバー（donnma.com）が代わりに取りに行きます。ブラウザから直接ほかのサイトを読むことはできないためです。調べた URL や結果は保存しません。</li>
+          <li>ログインしないと見られないページや、社内ネットワークなど外から見えないページは調べられません。</li>
+          <li>ページは 3MB、画像は 10MB まで読みます。待つのは1回 10 秒までです。</li>
+          <li>短い時間に続けて使うと、少し待つように言われることがあります。</li>
+          <li>見え方は、各サービスの今の表示を真似た目安です。実際の表示とは少し違うことがあります。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      // 調べ役（PHP）は donnma.com にだけある。tools.donnma.com（GitHub Pages）からも、そちらを呼ぶ
+      const API = location.hostname === 'tools.donnma.com' ? 'https://donnma.com/tool/api/ogp.php' : '../api/ogp.php';
+
+      const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const kb = n => n == null ? '—' : n < 1024 ? n + ' B' : n < 1024 * 1024 ? (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' KB' : (n / 1024 / 1024).toFixed(1) + ' MB';
+      const sec = t => t == null ? '—' : t < 1 ? Math.round(t * 1000) + ' ms' : t.toFixed(2) + ' 秒';
+      const domainOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; } };
+      const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2000); };
+
+      // ---- 調べる
+      let busy = false;
+      async function run(url, ua) {
+        if (busy) return;
+        url = url.trim();
+        if (!url) { $('url').focus(); return; }
+        busy = true; $('go').disabled = true;
+        $('result').hidden = true;
+        const st = $('status'); st.hidden = false; st.className = 'status-line';
+        st.innerHTML = '<span class="spin"></span>調べています…（ページと画像を取りに行っています）';
+        const q = new URLSearchParams({ url, ua });
+        history.replaceState(null, '', '?' + q);
+        try {
+          const res = await fetch(API + '?' + q, { cache: 'no-store' });
+          let d;
+          try { d = await res.json(); } catch { throw new Error('調べ役から正しい返事がありませんでした（' + res.status + '）'); }
+          if (!d.ok) throw new Error(d.error || '調べられませんでした');
+          st.hidden = true;
+          show(d);
+        } catch (e) {
+          st.className = 'status-line err';
+          st.textContent = '⚠ ' + (e.message === 'Failed to fetch' ? '調べ役（donnma.com）につながりませんでした。少し待ってからもう一度ためしてください' : e.message);
+        } finally {
+          busy = false; $('go').disabled = false;
+        }
+      }
+
+      $('form').addEventListener('submit', e => { e.preventDefault(); run($('url').value, $('ua').value); });
+      $('share').addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(location.href); toast('URL をコピーしました'); } catch { toast('コピーできませんでした'); }
+      });
+
+      // ---- 結果を見せる
+      function show(d) {
+        // タグを名前で引けるように（同じ名前が何個もあるときは、最初のもの）
+        const tag = {};
+        for (const m of d.metas) if (!(m.key in tag)) tag[m.key] = m;
+        const v = k => tag[k] ? tag[k].value : null;
+        const img = src => d.images.find(i => i.raw === src || i.url === src) || null;
+        const ogImg = v('og:image'), twImg = v('twitter:image') || v('twitter:image:src');
+
+        // 各サービスが使う中身（なければ代わりに使うもの）
+        const title = v('og:title') || d.title || '';
+        const desc = v('og:description') || v('description') || '';
+        const site = v('og:site_name') || domainOf(d.url);
+        const card = (v('twitter:card') || '').toLowerCase();
+        const xTitle = v('twitter:title') || title;
+        const xImg = twImg || ogImg;
+        const imgUrl = s => { const i = s && img(s); return i ? i.url : s; };
+
+        // まとめ
+        const checks = diagnose(d, tag, v, img);
+        const n = t => checks.filter(c => c.level === t).length;
+        $('sum-url').innerHTML = `<b>${esc(title || '（タイトルなし）')}</b><small>${esc(d.url)}${d.url !== d.input ? '（転送のあと）' : ''}</small>`;
+        $('sum-counts').innerHTML = [['ng', '❌', n('ng')], ['warn', '⚠', n('warn')], ['ok', '✅', n('ok')]]
+          .map(([c, m, k]) => `<span class="count ${c}">${m} ${k}</span>`).join('');
+
+        // チェック（悪いものから）
+        const order = { ng: 0, warn: 1, info: 2, ok: 3 };
+        const mark = { ng: '❌', warn: '⚠️', info: 'ℹ️', ok: '✅' };
+        $('checks').innerHTML = checks.sort((a, b) => order[a.level] - order[b.level])
+          .map(c => `<li class="check ${c.level}"><span class="check-mark">${mark[c.level]}</span><span class="check-title">${c.title}</span>${c.how ? `<span class="check-how">${c.how}</span>` : ''}</li>`).join('');
+
+        // 見え方
+        const pic = (src, ratio) => `<div class="sns-pic" style="aspect-ratio:${ratio}">${src ? `<img src="${esc(imgUrl(src))}" alt="" referrerpolicy="no-referrer">` : '<div class="sns-noimg">画像なし</div>'}</div>`;
+        const dom = domainOf(d.url);
+        const cards = [];
+        if (card === 'summary' || !xImg) {
+          cards.push(['X', card === 'summary' ? '小さいカード（twitter:card = summary）' : '画像がないので小さいカード', 'light',
+            `<div class="sns-xs">${pic(xImg, '1 / 1')}<div class="sns-xs-body"><div class="sns-small">${esc(dom)}</div><div class="t clamp2">${esc(xTitle)}</div></div></div>`]);
+        } else {
+          cards.push(['X', card ? '大きいカード（1.91:1 に切り抜き）' : 'twitter:card がないので、大きく出ないことがある', 'light',
+            `<div class="sns-x">${pic(xImg, '1.91 / 1')}<span class="sns-x-dom">${esc(xTitle)}</span></div><div class="sns-small">${esc(dom)} から</div>`]);
+        }
+        cards.push(['Discord', 'リンクの埋め込み', 'discord',
+          `<div class="sns-dc" style="border-left-color:${esc(v('theme-color') || '#1e1f22')}"><div class="sns-dc-site">${esc(v('og:site_name') || '')}</div><div class="sns-dc-title">${esc(title)}</div>${desc ? `<div class="sns-dc-desc clamp2" style="-webkit-line-clamp:3">${esc(desc)}</div>` : ''}${ogImg || twImg ? `<img class="sns-dc-img" src="${esc(imgUrl(ogImg || twImg))}" alt="" referrerpolicy="no-referrer">` : ''}</div>`]);
+        cards.push(['Facebook', 'シェアしたときのカード', 'light',
+          `<div class="sns-fb">${pic(ogImg, '1.91 / 1')}<div class="sns-fb-body"><div class="sns-fb-dom">${esc(dom.toUpperCase())}</div><div class="sns-fb-title">${esc(title)}</div><div class="sns-fb-desc">${esc(desc)}</div></div></div>`]);
+        cards.push(['LINE', 'トークに貼ったとき', 'linechat',
+          `<div class="sns-line">${pic(ogImg, '1.91 / 1')}<div class="sns-line-body"><div class="sns-line-title">${esc(title)}</div><div class="sns-small">${esc(dom)}</div></div></div>`]);
+        cards.push(['Slack', 'リンクの展開', 'slack',
+          `<div class="sns-sl"><div class="sns-sl-site">${d.icon ? `<img src="${esc(d.icon)}" alt="" referrerpolicy="no-referrer">` : ''}${esc(site)}</div><div class="sns-sl-title">${esc(title)}</div>${desc ? `<div class="sns-sl-desc clamp2">${esc(desc)}</div>` : ''}${ogImg ? `<img class="sns-sl-img" src="${esc(imgUrl(ogImg))}" alt="" referrerpolicy="no-referrer">` : ''}</div>`]);
+        $('sns').innerHTML = cards.map(([name, what, tone, body]) =>
+          `<section><div class="sns-label"><b>${name}</b><span>${what}</span></div><div class="sns-tile sns-${tone}">${body}</div></section>`).join('');
+
+        // 画像
+        $('images').innerHTML = d.images.length ? d.images.map(i => {
+          const fact = (k, val) => `<div class="fact"><b>${k}</b><span>${val}</span></div>`;
+          return `<div class="img-row">${i.status === 200 && !i.error ? `<img src="${esc(i.url)}" alt="" referrerpolicy="no-referrer">` : ''}<div class="facts">`
+            + fact('使われる場所', esc(i.for.join('・')))
+            + fact('URL', `<a href="${esc(i.url)}" target="_blank" rel="noopener noreferrer">${esc(i.url)}</a>`)
+            + (i.error ? fact('結果', '❌ ' + esc(i.error)) : fact('返事', esc(i.status) + (i.type ? '・' + esc(i.type) : '')))
+            + (i.width ? fact('大きさ', `${i.width} × ${i.height} px（${(i.width / i.height).toFixed(2)} : 1）`) : '')
+            + (i.over ? fact('重さ', '10 MB より大きい') : i.bytes != null ? fact('重さ', kb(i.bytes)) : '')
+            + (i.time != null ? fact('読み込み', sec(i.time)) : '')
+            + '</div></div>';
+        }).join('') : '<p class="field-note">og:image・twitter:image がありません</p>';
+
+        // ページの情報
+        const f = [];
+        const fact = (k, val) => f.push(`<div class="fact"><b>${k}</b><span>${val}</span></div>`);
+        fact('返事', esc(d.status) + (d.type ? '・' + esc(d.type) : ''));
+        if (d.chain.length > 1) fact('転送', d.chain.map(c => `${esc(c.status)} ${esc(c.url)}`).join('<br>→ '));
+        fact('返事が来るまで', sec(d.ttfb));
+        fact('読み終わるまで', sec(d.time));
+        fact('ページの大きさ', kb(d.bytes) + (d.over ? '（3 MB で読むのをやめました）' : '') + (d.encoding ? `・${esc(d.encoding)} で圧縮` : '・圧縮なし'));
+        if (d.headEnd != null) fact('&lt;/head&gt; の位置', kb(d.headEnd) + ' 目');
+        fact('&lt;title&gt;', esc(d.title || '（なし）'));
+        if (d.canonical) fact('canonical', esc(d.canonical));
+        if (d.robots) fact('X-Robots-Tag', esc(d.robots));
+        fact('見に行った名乗り', esc($('ua').selectedOptions[0].textContent));
+        $('facts').innerHTML = f.join('');
+
+        // タグ
+        const shown = d.metas.filter(m => /^(og:|twitter:|fb:|article:|description$|theme-color$|al:)/.test(m.key));
+        const seen = new Set();
+        $('tags').innerHTML = shown.length ? shown.map(m => {
+          const dup = seen.has(m.key); seen.add(m.key);
+          return `<tr${dup ? ' class="dup" title="同じ名前のタグが前にもあります（ふつうは最初のものが使われます）"' : ''}><td class="key">${esc(m.key)}</td><td class="val">${esc(m.value)}</td><td class="pos">${kb(m.pos)}</td></tr>`;
+        }).join('') : '<tr><td colspan="3" class="field-note">OGP・X のカードのタグが見つかりません</td></tr>';
+
+        $('result').hidden = false;
+        $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // ---- チェック
+      function diagnose(d, tag, v, img) {
+        const out = [];
+        const add = (level, title, how = '') => out.push({ level, title, how });
+        const code = s => `<code>${esc(s)}</code>`;
+
+        // ページそのもの
+        if (d.status !== 200) add('ng', `ページの返事が ${d.status} です`, '200 以外だと、多くのサービスは OGP を読みません。URL が正しいか、ログインが要るページでないかを確かめてください。');
+        else add('ok', 'ページを読めました（200）');
+        if (d.chain.length > 1) add('info', `${d.chain.length - 1} 回転送されました`, '転送のあとのページの OGP が使われます。貼る URL は、転送のあとの URL にするのが確実です。');
+        if (!/html/i.test(d.type || '')) add('warn', `ページの種類が HTML ではありません（${esc(d.type || '不明')}）`);
+
+        // 重さ・速さ
+        const ogPos = Math.min(...['og:title', 'og:image', 'og:description'].filter(k => tag[k]).map(k => tag[k].pos));
+        if (isFinite(ogPos)) {
+          if (ogPos > 512 * 1024) add('ng', `OGP のタグが、ページの頭から ${kb(ogPos)} 目にあります`, 'Discord などは、ページの頭から決まった量しか読みません。ここまで遠いと、OGP にたどり着く前にやめてしまい、埋め込みが出ないことがあります。<br>多くの場合、CSS や JavaScript がページの中に大量に書き込まれています。WordPress なら、テーマやプラグインの「CSS をインライン化・縮小化」などの高速化の設定を切ると直ることがあります。');
+          else if (ogPos > 200 * 1024) add('warn', `OGP のタグが、ページの頭から ${kb(ogPos)} 目にあります`, 'ページの頭が重めです。返事が遅いときに、Discord などが OGP まで読み切れず、埋め込みが出たり出なかったりすることがあります。ページの中に書き込まれた CSS・JavaScript を減らすと安心です。');
+          else add('ok', `OGP のタグはページの頭の近く（${kb(ogPos)} 目）にあります`);
+          if (d.headEnd != null && ogPos > d.headEnd) add('warn', 'OGP のタグが &lt;head&gt; の外にあります', '&lt;head&gt; の中に書かないと、読まないサービスがあります。');
+        }
+        if (d.over) add('ng', 'ページが 3 MB より大きくて、最後まで読めませんでした', '各サービスも、大きすぎるページは途中で読むのをやめます。');
+        if (d.ttfb > 5) add('ng', `返事が来るまで ${sec(d.ttfb)} かかりました`, '遅すぎると、各サービスが待ちきれずに埋め込みを出さないことがあります。サーバーのキャッシュ機能などで速くしてください。');
+        else if (d.ttfb > 2) add('warn', `返事が来るまで ${sec(d.ttfb)} かかりました`, '少し遅めです。混んでいるときに、埋め込みが出ないことがあります。');
+        if (!d.encoding && d.bytes > 100 * 1024) add('info', 'ページが圧縮されずに送られています', 'gzip や br で圧縮すると、送る量がかなり減ります。');
+
+        // タイトル・説明
+        if (v('og:title')) add('ok', 'og:title があります');
+        else if (d.title) add('warn', 'og:title がありません', `代わりに &lt;title&gt;（${esc(d.title)}）が使われます。${code('<meta property="og:title" content="…">')} を足すのがおすすめです。`);
+        else add('ng', 'og:title も &lt;title&gt; もありません', 'タイトルなしで出るか、埋め込みが出ません。');
+        if (v('og:description')) add('ok', 'og:description があります');
+        else if (v('description')) add('warn', 'og:description がありません', '代わりに description が使われることが多いですが、使わないサービスもあります。');
+        else add('warn', '説明（og:description）がありません', 'カードに説明が出ません。');
+        if (!v('og:url')) add('info', 'og:url がありません', 'なくても出ますが、URL がいくつかあるページでは、まとめ先として入れておくと安心です。');
+        else if (d.canonical && v('og:url') !== d.canonical) add('info', 'og:url と canonical が違います', `og:url：${code(v('og:url'))}<br>canonical：${code(d.canonical)}`);
+
+        // X のカード
+        const card = (v('twitter:card') || '').toLowerCase();
+        if (!card) add('warn', 'twitter:card がありません', `X で大きな画像のカードにするには、${code('<meta name="twitter:card" content="summary_large_image">')} を足してください。`);
+        else if (card === 'summary') add('info', 'X では小さいカード（summary）で出ます', `大きな画像で出したいときは ${code('summary_large_image')} にしてください。`);
+        else add('ok', `twitter:card は ${esc(card)} です`);
+
+        // 画像
+        const ogImg = v('og:image');
+        if (!ogImg && !v('twitter:image')) add('ng', 'og:image がありません', `画像なしのカードになります。${code('<meta property="og:image" content="https://…/ogp.jpg">')} を足してください。大きさは 1200 × 630 px がおすすめです。`);
+        for (const i of d.images) {
+          const where = i.for.join('・');
+          if (!/^https?:\/\//i.test(i.raw)) add('warn', `${where} が「${esc(i.raw)}」のように、https:// から始まっていません`, 'このツールは補って読みましたが、そのままでは読めないサービスがあります。https:// から始まる URL で書いてください。');
+          else if (/^http:\/\//i.test(i.raw)) add('warn', `${where} の URL が http:// です`, 'https:// でないと出ないサービスがあります。');
+          if (i.error) { add('ng', `${where} の画像を読めませんでした`, esc(i.error)); continue; }
+          if (i.status !== 200) { add('ng', `${where} の画像の返事が ${i.status} です`, '画像の URL が正しいか、画像に誰でもアクセスできるかを確かめてください。'); continue; }
+          const mime = i.mime || i.type || '';
+          if (/svg/i.test(mime)) add('ng', `${where} の画像が SVG です`, 'SVG は、ほとんどのサービスで出ません。PNG か JPEG にしてください。');
+          else if (!i.width) add('warn', `${where} の画像の大きさが分かりませんでした`, '画像の形式が珍しいか、壊れているかもしれません。PNG か JPEG がおすすめです。');
+          if (i.over || i.bytes > 5 * 1024 * 1024) add('ng', `${where} の画像が重すぎます（${i.over ? '10 MB より大きい' : kb(i.bytes)}）`, 'X は 5 MB まで、ほかのサービスでも重い画像は出ないことがあります。1 MB 以下を目安に小さくしてください。');
+          else if (i.bytes > 1024 * 1024) add('warn', `${where} の画像が重めです（${kb(i.bytes)}）`, '1 MB 以下にすると、出るまでが速くなります。JPEG で保存するか、WebP にするのがおすすめです。');
+          if (i.width) {
+            const r = i.width / i.height;
+            if (i.width < 200 || i.height < 200) add('ng', `${where} の画像が小さすぎます（${i.width} × ${i.height}）`, '200 × 200 px より小さいと、出ないサービスがあります。1200 × 630 px がおすすめです。');
+            else if (i.width < 600) add('warn', `${where} の画像が小さめです（${i.width} × ${i.height}）`, '大きなカードにするには、横 1200 px くらいがおすすめです。');
+            if (Math.abs(r - 1.91) > 0.25 && card !== 'summary') add('info', `${where} の画像の形が 1.91:1 ではありません（${r.toFixed(2)}:1）`, 'X や Facebook では、上下か左右が切り抜かれます。「見え方」で切れ方を確かめてください。');
+            if (!/svg/i.test(mime) && i.width >= 200 && i.height >= 200 && i.bytes <= 1024 * 1024) add('ok', `${where} の画像は ${i.width} × ${i.height}・${kb(i.bytes)} です`);
+          }
+        }
+        if (ogImg && (!v('og:image:width') || !v('og:image:height'))) add('info', 'og:image:width・og:image:height がありません', 'なくても出ますが、あると Facebook などで、初めてシェアしたときから画像が出やすくなります。');
+        return out;
+      }
+
+      // URL に ?url= が付いていたら、すぐ調べる
+      const q = new URLSearchParams(location.search);
+      if (q.get('ua')) $('ua').value = q.get('ua');
+      if ($('ua').selectedIndex < 0) $('ua').value = 'default';
+      if (q.get('url')) { $('url').value = q.get('url'); run(q.get('url'), $('ua').value); }
+    })();
+  </script>
+</body>
+
+</html>

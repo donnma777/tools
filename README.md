@@ -31,6 +31,7 @@
 | サムネイルメーカー | [thumbnail/](thumbnail/README.md) | アイキャッチ・サムネイル・SNS共有画像を作る |
 | 背景透過ツール | [bg-remove/](bg-remove/README.md) | 画像の背景を色で抜いて透明にする |
 | QRコードメーカー | [qr/](qr/README.md) | URL・Wi-Fi・連絡先などのQRコードを、形・色・ロゴを変えて作る（期限なし）。画像からの読み取りも |
+| OGPチェッカー | [ogp-checker/](ogp-checker/README.md) | URL を入れて、SNS に貼ったときの見え方と OGP の問題を調べる（調べ役は `api/ogp.php`） |
 | 共通の部品 | [common/](common/README.md) | ページ内の確認・お知らせ（`ask.js`） |
 
 ---
