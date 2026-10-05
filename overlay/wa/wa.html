@@ -1876,6 +1876,36 @@
             opacity: 0.6;
             white-space: nowrap;
         }
+
+        /* ---- ストップウォッチの「配信と連動」の切り替え（ふだんは隠し、マウスを乗せたときだけ出す。OBS の画面には出ない） */
+        .sw-part .sw-link {
+            font: inherit;
+            font-size: 11px;
+            line-height: 1.4;
+            padding: 2px 8px;
+            margin-left: 4px;
+            border: 1px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
+            background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+            color: inherit;
+            border-radius: 999px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.15s;
+            white-space: nowrap;
+        }
+
+        .sw-part:hover .sw-link,
+        .sw-part .sw-link:focus-visible {
+            opacity: 1;
+        }
+
+        /* 連動しているときは、開始・リセットは使わないので隠す */
+        .sw-part[data-sw-link="stream"] .sw-btn-start,
+        .sw-part[data-sw-link="stream"] .sw-btn-reset,
+        .sw-part[data-sw-link="record"] .sw-btn-start,
+        .sw-part[data-sw-link="record"] .sw-btn-reset {
+            display: none;
+        }
         /* shared-css:end */
     </style>
 </head>
@@ -2833,7 +2863,9 @@
             captureArea.appendChild(box);
             addResizeHandles(box);
             addHoverMenu(box, box.querySelector('.content'));
-            let elapsed = 0, startTime = null, rafId = null, running = false;
+
+            // 動き（開始・停止・リセット・配信と連動）は共通機能（_shared）のストップウォッチ
+            box.dataset.swLabels = '開始|停止';
             const timeEl = box.querySelector('.sw-time');
             requestAnimationFrame(() => {
                 const _orig = timeEl.textContent;
@@ -2841,16 +2873,7 @@
                 timeEl.style.minWidth = timeEl.offsetWidth + 'px';
                 timeEl.textContent = _orig;
             });
-            const startBtn = box.querySelector('.sw-btn-start');
-            const resetBtn = box.querySelector('.sw-btn-reset');
-            box.resetBox = () => { cancelAnimationFrame(rafId); running = false; elapsed = 0; startBtn.textContent = '開始'; startBtn.classList.remove('running'); if (timeEl) timeEl.textContent = '00:00.00'; };
-            function formatTime(ms) { const s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') + '.' + String(Math.floor((ms % 1000) / 10)).padStart(2, '0'); }
-            function tick() { elapsed = Date.now() - startTime; timeEl.textContent = formatTime(elapsed); rafId = requestAnimationFrame(tick); }
-            startBtn.addEventListener('click', () => {
-                if (!running) { startTime = Date.now() - elapsed; rafId = requestAnimationFrame(tick); running = true; startBtn.textContent = '停止'; startBtn.classList.add('running'); }
-                else { cancelAnimationFrame(rafId); running = false; startBtn.textContent = '開始'; startBtn.classList.remove('running'); }
-            });
-            resetBtn.addEventListener('click', () => { cancelAnimationFrame(rafId); running = false; elapsed = 0; startBtn.textContent = '開始'; startBtn.classList.remove('running'); timeEl.textContent = '00:00.00'; });
+            overlaySwSetup(box);
         }
 
         function addCounter(x, y) {
@@ -4094,6 +4117,161 @@
                 connectFromModal(true);
             }
         }
+
+        /* ---- ストップウォッチ（全テーマ共通。各テーマの addStopwatch は見た目を作って overlaySwSetup を呼ぶだけ）
+         *  状態はパーツの data-* に持つので、自動保存・プリセット・OBS への反映で読み込み直しても続きから動く。
+         *    data-sw-run    '1' なら数えている
+         *    data-sw-start  数え始めた時刻（ms。止めていた間のぶんは進めてある）
+         *    data-sw-acc    止めているときの経過（ms）
+         *    data-sw-link   '' 手動 / 'stream' 配信と連動 / 'record' 録画と連動
+         *    data-sw-labels 開始ボタンの文字「開始|停止」（テーマごと）
+         *  連動は OBS のブラウザソースが知らせる開始・停止（window.obsstudio）で数える。始めた時刻は localStorage に
+         *  覚えるので、ソースを読み込み直しても続きから。Chrome で編集しているときは数えない */
+        const SW_LINK_LABEL = { '': '連動なし', stream: '● 配信と連動', record: '● 録画と連動' };
+        const SW_LINK_NEXT = { '': 'stream', stream: 'record', record: '' };
+        const SW_OBS_KEY = OVERLAY_KEY + 'SwStart-';
+        const swObsOn = { stream: false, record: false };
+        const swPad = (n) => String(n).padStart(2, '0');
+        function swFormat(ms) {
+            ms = Math.max(0, ms);
+            const s = Math.floor(ms / 1000);
+            // 1時間を超えたら 1:23:45、それまでは 12:34.56
+            if (s >= 3600) return Math.floor(s / 3600) + ':' + swPad(Math.floor(s / 60) % 60) + ':' + swPad(s % 60);
+            return swPad(Math.floor(s / 60)) + ':' + swPad(s % 60) + '.' + swPad(Math.floor((ms % 1000) / 10));
+        }
+        const swElapsed = (box) => box.dataset.swRun === '1' ? Date.now() - (+box.dataset.swStart || Date.now()) : (+box.dataset.swAcc || 0);
+        function swRender(box) {
+            const t = box.querySelector('.sw-time');
+            if (t) t.textContent = swFormat(swElapsed(box));
+            const [startLabel, stopLabel] = (box.dataset.swLabels || 'START|STOP').split('|');
+            const b = box.querySelector('.sw-btn-start');
+            if (b) {
+                const on = box.dataset.swRun === '1';
+                b.textContent = on ? (stopLabel || 'STOP') : (startLabel || 'START');
+                b.classList.toggle('running', on);
+            }
+            const lk = box.querySelector('.sw-link');
+            if (lk) lk.textContent = SW_LINK_LABEL[box.dataset.swLink || ''] || SW_LINK_LABEL[''];
+        }
+        function swStart(box, from) {
+            box.dataset.swStart = String(from ?? (Date.now() - (+box.dataset.swAcc || 0)));
+            box.dataset.swRun = '1';
+            swRender(box);
+            swLoop();
+        }
+        function swStop(box) {
+            box.dataset.swAcc = String(swElapsed(box));
+            box.dataset.swRun = '';
+            swRender(box);
+        }
+        function swReset(box) {
+            box.dataset.swRun = '';
+            box.dataset.swAcc = '0';
+            delete box.dataset.swStart;
+            swRender(box);
+        }
+        // 新しく作ったもの・古い保存から読み込んだものに、印と「連動」の切り替えボタンを付ける
+        function overlaySwSetup(box) {
+            if (!box) return;
+            box.classList.add('sw-part');
+            if (!box.dataset.swLabels) {
+                const b = box.querySelector('.sw-btn-start');
+                // 古い保存には停止の文字がないので、開始の文字から決める（テーマの文字と同じ）
+                const st = b && !b.classList.contains('running') ? b.textContent.trim() : 'START';
+                box.dataset.swLabels = st + '|' + ({ '開始': '停止', '▶ 開始': '⏸ 停止' }[st] || 'STOP');
+            }
+            const ctl = box.querySelector('.sw-controls');
+            if (ctl && !ctl.querySelector('.sw-link')) {
+                const lk = document.createElement('button');
+                lk.type = 'button';
+                lk.className = 'sw-link';
+                lk.title = '押すたびに「連動なし → 配信と連動 → 録画と連動」と切り替わります。連動は OBS の中で数えます';
+                ctl.appendChild(lk);
+            }
+            swRender(box);
+        }
+        const swLinked = (kind) => Array.from(captureArea.querySelectorAll('.sw-part')).filter(b => b.dataset.swLink === kind);
+        // OBS の配信・録画が始まった（fresh）／もう動いている（覚えている時刻から）
+        function swObsBegin(kind, fresh) {
+            let st = Date.now();
+            try {
+                const v = +localStorage.getItem(SW_OBS_KEY + kind);
+                if (!fresh && v) st = v;
+                localStorage.setItem(SW_OBS_KEY + kind, String(st));
+            } catch (err) { /* 覚えられなくても数える */ }
+            swLinked(kind).forEach(b => swStart(b, st));
+        }
+        function swObsEnd(kind) {
+            try { localStorage.removeItem(SW_OBS_KEY + kind); } catch (err) { /* ignore */ }
+            swLinked(kind).forEach(swReset);
+        }
+        // 連動しているものを、今の OBS の状態に合わせる（読み込み直したとき・連動を切り替えたとき）
+        function swSyncObs() {
+            if (!window.obsstudio) return;
+            ['stream', 'record'].forEach(kind => {
+                if (swObsOn[kind]) swObsBegin(kind, false);
+                else swLinked(kind).forEach(b => { if (b.dataset.swRun === '1' || +b.dataset.swAcc) swReset(b); });
+            });
+        }
+        let swRaf = 0;
+        function swLoop() {
+            if (swRaf) return;
+            const step = () => {
+                const running = captureArea.querySelectorAll('.sw-part[data-sw-run="1"]');
+                running.forEach(b => { const t = b.querySelector('.sw-time'); if (t) t.textContent = swFormat(swElapsed(b)); });
+                swRaf = running.length ? requestAnimationFrame(step) : 0;
+            };
+            swRaf = requestAnimationFrame(step);
+        }
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.sw-btn-start, .sw-btn-reset, .sw-link');
+            const box = btn && btn.closest('.box');
+            if (!box || !captureArea.contains(box)) return;
+            overlaySwSetup(box);
+            if (btn.classList.contains('sw-link')) {
+                box.dataset.swLink = SW_LINK_NEXT[box.dataset.swLink || ''];
+                swReset(box);
+                swSyncObs();
+            } else if (box.dataset.swLink) {
+                return; // 連動しているときは、開始・リセットは使わない（ボタンも隠れている）
+            } else if (btn.classList.contains('sw-btn-reset')) swReset(box);
+            else if (box.dataset.swRun === '1') swStop(box);
+            else swStart(box);
+        });
+        // 画面を読み込み直した（自動保存・プリセット・OBS への反映）ら、ストップウォッチを整えて動かし直す
+        function swRefreshAll() {
+            captureArea.querySelectorAll('.sw-time').forEach(t => { const b = t.closest('.box'); if (b) overlaySwSetup(b); });
+            swSyncObs();
+            swLoop();
+        }
+        let swMoTimer = 0;
+        new MutationObserver((list) => {
+            // 時間の文字が変わっただけ（文字の入れ替え）は無視する
+            if (!list.some(m => Array.from(m.addedNodes).some(n => n.nodeType === 1))) return;
+            clearTimeout(swMoTimer);
+            swMoTimer = setTimeout(swRefreshAll, 0);
+        }).observe(captureArea, { childList: true, subtree: true });
+        if (window.obsstudio) {
+            addEventListener('obsStreamingStarted', () => { swObsOn.stream = true; swObsBegin('stream', true); });
+            addEventListener('obsStreamingStopped', () => { swObsOn.stream = false; swObsEnd('stream'); });
+            addEventListener('obsRecordingStarted', () => { swObsOn.record = true; swObsBegin('record', true); });
+            addEventListener('obsRecordingStopped', () => { swObsOn.record = false; swObsEnd('record'); });
+            addEventListener('obsRecordingPaused', () => swLinked('record').forEach(swStop));
+            addEventListener('obsRecordingUnpaused', () => {
+                const bs = swLinked('record');
+                bs.forEach(b => swStart(b));
+                // 一時停止の間のぶんを進めた開始時刻を覚え直す
+                try { if (bs[0]) localStorage.setItem(SW_OBS_KEY + 'record', bs[0].dataset.swStart); } catch (err) { /* ignore */ }
+            });
+            try {
+                if (typeof window.obsstudio.getStatus === 'function') window.obsstudio.getStatus((st) => {
+                    swObsOn.stream = !!(st && st.streaming);
+                    swObsOn.record = !!(st && st.recording);
+                    swSyncObs();
+                });
+            } catch (err) { /* ページ権限が足りないときは、開始・停止の知らせだけで数える */ }
+        }
+        swRefreshAll();
         // shared-js:end
 
         const _skipLoad = localStorage.getItem('_skip_waOverlayConfig') === '1';
