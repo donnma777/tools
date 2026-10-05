@@ -996,10 +996,10 @@
       <div class="panel">
         <div class="panel-body">
           <div class="panel-title"><span class="sec-icon">⏱️</span>経過時間</div>
-          <div class="field">
+          <label class="toggle"><span>経過時間を出す</span><input type="checkbox" id="el-on"><span class="sw"></span></label>
+          <div class="field" id="el-mode-row">
             <span class="field-label"><span>いつから数えるか</span></span>
             <select id="el">
-              <option value="none">出さない</option>
               <option value="stream">配信を始めてから</option>
               <option value="record">録画を始めてから</option>
               <option value="since">決めた時刻から</option>
@@ -1145,7 +1145,7 @@
 
       // ---- 設定（このブラウザに覚えておく）
       const STORE = 'donnma-clock-editor';
-      const DEF = { t: 'gaming', a: '', p: false, ly: 'row', al: 'center', sz: 100, c: true, h: '24', wd: 'ja', s: true, d: 'md', l1: '', z: '', zl: '', e: 'stream', el: '配信時間', et: '20:00', eh: false };
+      const DEF = { t: 'gaming', a: '', p: false, ly: 'row', al: 'center', sz: 100, c: true, h: '24', wd: 'ja', s: true, d: 'md', l1: '', z: '', zl: '', e: 'stream', em: 'stream', el: '配信時間', et: '20:00', eh: false };
       let S = { ...DEF };
       try { S = { ...DEF, ...JSON.parse(localStorage.getItem(STORE) || '{}') }; } catch (e) { /* 初めの設定 */ }
       const store = () => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) { /* ignore */ } };
@@ -1196,7 +1196,10 @@
         $('clock').checked = S.c; $('clock-opts').hidden = !S.c;
         $('sec').checked = S.s; $('date').value = S.d; $('lab1').value = S.l1;
         $('tz').value = S.z; $('tz-lab').value = S.zl; $('tz-lab-row').hidden = !S.z;
-        $('el').value = S.e; $('el-note').textContent = EL_NOTE[S.e];
+        if (S.e !== 'none') S.em = S.e;
+        $('el-on').checked = S.e !== 'none';
+        $('el-mode-row').hidden = S.e === 'none';
+        $('el').value = S.em; $('el-note').textContent = EL_NOTE[S.e];
         $('el-opts').hidden = S.e === 'none';
         $('since-row').hidden = S.e !== 'since'; $('since').value = S.et;
         $('el-lab').value = S.el;
@@ -1231,7 +1234,7 @@
         const v = b.dataset.v;
         S.c = v !== 'elapsed';
         if (v === 'clock') S.e = 'none';
-        else if (S.e === 'none') S.e = 'stream';
+        else if (S.e === 'none') S.e = S.em || 'stream';
         changed();
       });
       $('themes').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; S.t = b.dataset.v; S.a = ''; changed(); });
@@ -1250,7 +1253,8 @@
         S.zl = (TZ.find(x => x[0] === S.z) || ['', '', ''])[2];
         changed();
       });
-      $('el').addEventListener('change', () => { S.e = $('el').value; changed(); });
+      $('el-on').addEventListener('change', () => { S.e = $('el-on').checked ? (S.em || 'stream') : 'none'; changed(); });
+      $('el').addEventListener('change', () => { S.e = S.em = $('el').value; changed(); });
       $('since').addEventListener('change', () => { S.et = $('since').value || '20:00'; update(); });
       $('hide').addEventListener('change', () => { S.eh = $('hide').checked; update(); });
       let tTimer;
