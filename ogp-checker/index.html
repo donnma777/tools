@@ -1224,6 +1224,33 @@
       text-align: right;
     }
 
+    .tags tr.missing td.key {
+      color: var(--muted);
+    }
+
+    .tags tr.missing td.val {
+      color: var(--muted);
+    }
+
+    .tags tr.missing td.val b {
+      margin-right: 8px;
+    }
+
+    .tags tr.missing.ng td.val b {
+      color: var(--ng);
+    }
+
+    .tags tr.missing.warn td.val b {
+      color: var(--warn);
+    }
+
+    .tags tr.sub td {
+      padding-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
     .tags tr.dup td {
       opacity: 0.55;
     }
@@ -1512,7 +1539,7 @@
       </section>
 
       <section class="panel panel-body" style="margin-top:16px">
-        <div class="panel-title"><span class="sec-icon">🏷️</span>見つかったタグ</div>
+        <div class="panel-title"><span class="sec-icon">🏷️</span>タグ</div>
         <div class="table-scroll">
           <table class="tags">
             <thead>
@@ -1521,7 +1548,7 @@
             <tbody id="tags"></tbody>
           </table>
         </div>
-        <p class="field-note" style="margin-top:8px">「位置」は、ページの頭から何 KB 目にあるか（ほどいたあとの大きさ）です。OGP・X のカード・説明のタグだけを出しています。</p>
+        <p class="field-note" style="margin-top:8px">大事なタグは、ないときも「なし」で出します（❌ は出ない・崩れる原因、⚠️ は直したほうがよいもの）。「位置」は、ページの頭から何 KB 目にあるか（ほどいたあとの大きさ）です。</p>
       </section>
     </div>
   </main>
@@ -1754,18 +1781,48 @@
         fact('ページの大きさ', kb(d.bytes) + (d.over ? '（3 MB で読むのをやめました）' : '') + (d.encoding ? `・${esc(d.encoding)} で圧縮` : '・圧縮なし'));
         if (d.headEnd != null) fact('&lt;/head&gt; の位置', kb(d.headEnd) + ' 目');
         fact('&lt;title&gt;', esc(d.title || '（なし）'));
-        if (d.canonical) fact('canonical', esc(d.canonical));
+        fact('canonical', esc(d.canonical || '（なし）'));
         if (d.robots) fact('X-Robots-Tag', esc(d.robots));
         fact('見に行った名乗り', esc($('ua').selectedOptions[0].textContent));
         $('facts').innerHTML = f.join('');
 
-        // タグ
-        const shown = d.metas.filter(m => /^(og:|twitter:|fb:|article:|description$|theme-color$|al:)/.test(m.key));
-        const seen = new Set();
-        $('tags').innerHTML = shown.length ? shown.map(m => {
+        // タグ：大事なものは決まった順に、ないものも「なし」で出す。そのあとに、そのほかに見つかったもの
+        // [名前, 値, 位置, ないときの重さ（ng / warn / info / opt）, ないとどうなるか]
+        const first = k => tag[k] || null;
+        const want = [
+          ['<title>', d.title, null, 'warn', 'og:title がないときに使われる'],
+          ['canonical', d.canonical, null, 'info', ''],
+          ['description', first('description'), 'opt', 'og:description がないときに使われる'],
+          ['og:title', first('og:title'), 'ng', '&lt;title&gt; が使われる'],
+          ['og:description', first('og:description'), 'warn', 'description が使われるか、説明なし'],
+          ['og:image', first('og:image'), 'ng', '画像なしのカードになる'],
+          ['og:image:alt', first('og:image:alt'), 'info', '画像の説明なし（読み上げなどで使われる）'],
+          ['og:image:width', first('og:image:width'), 'info', '初めてシェアしたとき、画像が出るのが遅れることがある'],
+          ['og:image:height', first('og:image:height'), 'info', '同上'],
+          ['og:url', first('og:url'), 'info', '開いた URL が使われる'],
+          ['og:type', first('og:type'), 'info', 'website として扱われる'],
+          ['og:site_name', first('og:site_name'), 'info', 'サイト名なし（ドメインが出るサービスもある）'],
+          ['twitter:card', first('twitter:card'), 'warn', 'X で大きなカードにならないことがある'],
+          ['twitter:title', first('twitter:title'), 'opt', 'og:title が使われる'],
+          ['twitter:description', first('twitter:description'), 'opt', 'og:description が使われる'],
+          ['twitter:image', first('twitter:image') || first('twitter:image:src'), 'opt', 'og:image が使われる'],
+          ['twitter:image:alt', first('twitter:image:alt'), 'opt', 'X では画像の説明なし'],
+          ['twitter:site', first('twitter:site'), 'opt', 'カードにサイトのアカウントが出ない'],
+        ].map(w => w.length === 5 ? [w[0], w[1] ? { value: w[1], pos: w[2] } : null, w[3], w[4]] : w);
+        const missMark = { ng: '❌ なし', warn: '⚠️ なし', info: 'なし', opt: 'なし' };
+        const row = (key, m, cls = '', title = '') => `<tr${cls ? ` class="${cls}"` : ''}${title ? ` title="${title}"` : ''}><td class="key">${esc(key)}</td><td class="val">${esc(m.value)}</td><td class="pos">${m.pos == null ? '—' : kb(m.pos)}</td></tr>`;
+        const rows = want.map(([key, m, lv, why]) => m
+          ? row(key, m)
+          : `<tr class="missing ${lv}"><td class="key">${esc(key)}</td><td class="val"><b>${missMark[lv]}</b>${why ? `<span>${why}</span>` : ''}</td><td class="pos">—</td></tr>`);
+        const used = new Set(want.map(w => w[1]).filter(Boolean));
+        const seen = new Set(want.map(w => w[0]));
+        const rest = d.metas.filter(m => /^(og:|twitter:|fb:|article:|description$|theme-color$|al:)/.test(m.key) && !used.has(m));
+        if (rest.length) rows.push('<tr class="sub"><td colspan="3">そのほかに見つかったタグ</td></tr>');
+        for (const m of rest) {
           const dup = seen.has(m.key); seen.add(m.key);
-          return `<tr${dup ? ' class="dup" title="同じ名前のタグが前にもあります（ふつうは最初のものが使われます）"' : ''}><td class="key">${esc(m.key)}</td><td class="val">${esc(m.value)}</td><td class="pos">${kb(m.pos)}</td></tr>`;
-        }).join('') : '<tr><td colspan="3" class="field-note">OGP・X のカードのタグが見つかりません</td></tr>';
+          rows.push(row(m.key, m, dup ? 'dup' : '', dup ? '同じ名前のタグが前にもあります（ふつうは最初のものが使われます）' : ''));
+        }
+        $('tags').innerHTML = rows.join('');
 
         $('result').hidden = false;
         $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1805,6 +1862,10 @@
         else add('warn', '説明（og:description）がありません', 'カードに説明が出ません。');
         if (!v('og:url')) add('info', 'og:url がありません', 'なくても出ますが、URL がいくつかあるページでは、まとめ先として入れておくと安心です。');
         else if (d.canonical && v('og:url') !== d.canonical) add('info', 'og:url と canonical が違います', `og:url：${code(v('og:url'))}<br>canonical：${code(d.canonical)}`);
+        const bare = u => String(u || '').replace(/#.*$/, '').replace(/\/$/, '');
+        if (!d.canonical) add('info', 'canonical がありません', `同じページに URL がいくつかあるとき（? の付いた URL など）、どれが本物かを伝えるタグです。${code('<link rel="canonical" href="https://…">')}`);
+        else if (bare(d.canonical) !== bare(d.url)) add('warn', 'canonical が、このページとは別の URL を指しています', `canonical：${code(d.canonical)}<br>検索エンジンやサービスが、そちらのページを使うことがあります。わざとでなければ、このページの URL にしてください。`);
+        if (!v('og:type')) add('info', 'og:type がありません', `なくても出ますが、${code('website')}（トップなど）か ${code('article')}（記事）を入れておくのがおすすめです。`);
 
         // X のカード
         const card = (v('twitter:card') || '').toLowerCase();
@@ -1834,6 +1895,7 @@
             if (!/svg/i.test(mime) && i.width >= 200 && i.height >= 200 && i.bytes <= 1024 * 1024) add('ok', `${where} の画像は ${i.width} × ${i.height}・${kb(i.bytes)} です`);
           }
         }
+        if (ogImg && !v('og:image:alt')) add('info', 'og:image:alt（画像の説明）がありません', '読み上げソフトや、画像が出ないときに使われます。X では twitter:image:alt が使われます。');
         if (ogImg && (!v('og:image:width') || !v('og:image:height'))) add('info', 'og:image:width・og:image:height がありません', 'なくても出ますが、あると Facebook などで、初めてシェアしたときから画像が出やすくなります。');
         return out;
       }
