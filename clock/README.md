@@ -24,7 +24,7 @@ OBS のブラウザソースで使う時計です。時計・もう1つの時刻
 ## OBS につないで反映（`index.html`）
 
 - obs-websocket v5（`ws://127.0.0.1:ポート`、パスワード認証）につなぎ、ブラウザソースの一覧（`GetInputList` browser_source）を出す。URL に `/clock/view.html` を含むものは「⏱」で先に並べる
-- 時計のソースを選ぶと、その URL から設定を読み込む（`fromUrl`）。つないだ・開いただけでは送らない。設定を変えると 0.6 秒待ってから `SetInputSettings` で URL を書き換える（同じ URL なら送らない）
+- 時計のソースを選ぶと、その URL から設定を読み込む（`fromUrl`）。つないだ・開いただけでは送らない。「すぐ反映」なら設定を変えると 0.6 秒待ってから、「ボタンで反映」なら「📤 OBS に反映」か Ctrl+Enter で、`SetInputSettings` で URL を書き換える（同じ URL なら送らない。まだ送っていない変更があるとボタンが光る）
 - 「＋ 今のシーンに時計のソースを足す」は `CreateInput`（大きさは目安の大きさ）
 - ポート・パスワード・選んだソース・自動でつなぐかは localStorage（`donnma-clock-obs`）
 

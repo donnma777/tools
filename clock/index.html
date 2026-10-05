@@ -757,6 +757,20 @@
       margin-bottom: 8px;
     }
 
+    #obs-linked .obs-mode-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    /* まだ OBS に反映していない変更がある */
+    #obs-commit.dirty {
+      box-shadow: 0 0 0 3px rgba(255, 196, 107, 0.45);
+    }
+
+    #obs-commit:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
     input[type=password] {
       font: inherit;
       font-size: 13px;
@@ -1105,7 +1119,7 @@
         <p class="field-note" id="size-hint"></p>
       </div>
       <div class="obs-box">
-        <div class="obs-head"><span>🔌 OBS につないで、そのまま反映</span><span class="obs-state" id="obs-state">つないでいません</span></div>
+        <div class="obs-head"><span>🔌 OBS につないで反映</span><span class="obs-state" id="obs-state">つないでいません</span></div>
         <div class="obs-row" id="obs-login">
           <input type="text" id="obs-port" inputmode="numeric" placeholder="4455" aria-label="ポート">
           <input type="password" id="obs-pass" placeholder="パスワード（なければ空）" aria-label="パスワード" autocomplete="off">
@@ -1117,10 +1131,17 @@
             <button class="btn btn-sm" type="button" id="obs-refresh" title="ソースの一覧を読み直す">↻</button>
             <button class="btn btn-sm" type="button" id="obs-disconnect">切る</button>
           </div>
+          <div class="obs-row obs-mode-row">
+            <div class="seg" id="obs-mode">
+              <button type="button" data-v="auto">すぐ反映</button>
+              <button type="button" data-v="manual">ボタンで反映</button>
+            </div>
+            <button class="btn btn-primary btn-sm" type="button" id="obs-commit" title="Ctrl+Enter でも反映できます">📤 OBS に反映</button>
+          </div>
           <button class="btn btn-sm" type="button" id="obs-add">＋ 今のシーンに時計のソースを足す</button>
         </div>
         <p class="field-note" id="obs-msg"></p>
-        <p class="field-note">OBS の「ツール → WebSocket サーバー設定」で、サーバーを有効にしてから使います（ポートとパスワードもそこにあります）。つなぐと、ここで変えた見た目が、選んだソースにすぐ反映されます。</p>
+        <p class="field-note">OBS の「ツール → WebSocket サーバー設定」で、サーバーを有効にしてから使います（ポートとパスワードもそこにあります）。つなぐと、ここで変えた見た目を、選んだソースに反映できます。「すぐ反映」は変えるたびに、「ボタンで反映」は「📤 OBS に反映」か Ctrl+Enter を押したときに送ります。</p>
       </div>
     </div>
   </div>
@@ -1135,7 +1156,7 @@
           <li><b>「📋 URL をコピー」</b>を押します。</li>
           <li>OBS で <b>ソースを追加 → ブラウザ</b> を選び、URL に貼り付けます。幅・高さは見本の下に出ている大きさを目安にしてください。</li>
           <li>置く場所と大きさは、OBS の画面でドラッグして合わせます。</li>
-          <li><b>OBS につなぐ</b>と、URL を貼り直さなくても、ここで変えた見た目がそのまま OBS に反映されます。「＋ 今のシーンに時計のソースを足す」で、ソースを作るところからできます。</li>
+          <li><b>OBS につなぐ</b>と、URL を貼り直さなくても、ここで変えた見た目を OBS に反映できます（すぐ反映か、ボタンで反映かを選べます）。「＋ 今のシーンに時計のソースを足す」で、ソースを作るところからできます。</li>
         </ol>
       </div>
     </details>
@@ -1328,7 +1349,7 @@
       // ---- OBS につないで、選んだブラウザソースの URL を書き換える（obs-websocket v5）
       const OBS_KEY = 'donnma-clock-obs';
       const obs = { ws: null, ready: false, id: 1, pending: new Map(), source: '', lastUrl: '', timer: 0 };
-      let obsSaved = { port: 4455, password: '', auto: false, source: '' };
+      let obsSaved = { port: 4455, password: '', auto: false, source: '', mode: 'auto' };
       try { obsSaved = { ...obsSaved, ...JSON.parse(localStorage.getItem(OBS_KEY) || '{}') }; } catch (e) { /* ignore */ }
       const obsStore = () => { try { localStorage.setItem(OBS_KEY, JSON.stringify(obsSaved)); } catch (e) { /* ignore */ } };
       const obsMsg = (t) => { $('obs-msg').textContent = t || ''; };
@@ -1337,6 +1358,13 @@
         $('obs-state').classList.toggle('on', obs.ready);
         $('obs-login').hidden = obs.ready;
         $('obs-linked').hidden = !obs.ready;
+        for (const b of $('obs-mode').children) b.setAttribute('aria-pressed', String(b.dataset.v === obsSaved.mode));
+        const manual = obsSaved.mode === 'manual';
+        $('obs-commit').hidden = !manual;
+        const dirty = manual && !!obs.source && $('url').value !== obs.lastUrl;
+        $('obs-commit').disabled = !obs.source || !dirty;
+        $('obs-commit').classList.toggle('dirty', dirty);
+        $('obs-commit').textContent = dirty ? '📤 OBS に反映（変更あり）' : '📤 OBS に反映';
       }
       async function obsAuth(password, salt, challenge) {
         const enc = new TextEncoder();
@@ -1426,10 +1454,12 @@
         } else if (chosen) {
           obsPush(true);
         } else obsMsg(`「${name}」に反映します`);
+        obsUi();
       }
       // 設定を変えたら、少し待ってから URL を送る（スライダーを動かしている間はまとめる）
       function obsPush(now) {
         if (!obs.ready || !obs.source) return;
+        if (obsSaved.mode === 'manual' && now !== 'commit') { obsUi(); return; }
         clearTimeout(obs.timer);
         obs.timer = setTimeout(async () => {
           const url = $('url').value;
@@ -1437,6 +1467,7 @@
           try {
             await obsReq('SetInputSettings', { inputName: obs.source, inputSettings: { url }, overlay: true });
             obs.lastUrl = url;
+            obsUi();
             obsMsg(`「${obs.source}」に反映しました`);
           } catch (e) { obsMsg('反映できませんでした：' + e.message); }
         }, now ? 0 : 600);
@@ -1458,6 +1489,16 @@
       $('obs-disconnect').addEventListener('click', () => { obsSaved.auto = false; obsStore(); obsClose(); obsMsg(''); });
       $('obs-refresh').addEventListener('click', () => obsLoadSources().catch(e => obsMsg(e.message)));
       $('obs-source').addEventListener('change', () => useSource($('obs-source').value, true));
+      $('obs-mode').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-v]'); if (!b) return;
+        obsSaved.mode = b.dataset.v; obsStore();
+        obsUi();
+        if (obsSaved.mode === 'auto') obsPush(true);
+      });
+      $('obs-commit').addEventListener('click', () => obsPush('commit'));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && obs.ready && obsSaved.mode === 'manual') { e.preventDefault(); obsPush('commit'); }
+      });
       // 今のシーンに、時計のブラウザソースを足す（大きさは目安の大きさ）
       $('obs-add').addEventListener('click', async () => {
         try {
