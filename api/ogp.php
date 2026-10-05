@@ -165,7 +165,9 @@ function ogp_fetch_once(string $url, array $t, string $ua, int $max, bool $wantB
 			if (preg_match('/^HTTP\//', $line)) $headers = [];
 			elseif (strpos($line, ':') !== false) {
 				[$k, $v] = explode(':', $line, 2);
-				$headers[strtolower(trim($k))] = trim($v);
+				$k = strtolower(trim($k));
+				// 同じ名前が何回も来たら（Link など）、つなげて持つ
+				$headers[$k] = isset($headers[$k]) ? $headers[$k] . ', ' . trim($v) : trim($v);
 			}
 			return $len;
 		},
@@ -273,6 +275,12 @@ $first = function (string $key) use ($metas) {
 };
 $title = preg_match('/<title\b[^>]*>(.*?)<\/title>/is', $html, $m) ? trim(html_entity_decode(strip_tags($m[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8')) : null;
 $canonical = preg_match('/<link\b[^>]*rel=["\']?canonical["\']?[^>]*>/i', $html, $m) && preg_match('/href=["\']([^"\']+)/i', $m[0], $h) ? ogp_abs($h[1], $page['url']) : null;
+// HTML になければ、返事のヘッダーの Link: <…>; rel="canonical" を見る（PukiWiki などはこちらで送る）
+$canonicalFrom = $canonical ? 'html' : null;
+if (! $canonical && preg_match('/<([^>]+)>\s*;[^,]*\brel="?canonical\b/i', $page['headers']['link'] ?? '', $m)) {
+	$canonical = ogp_abs($m[1], $page['url']);
+	$canonicalFrom = 'header';
+}
 $icon = null;
 if (preg_match_all('/<link\b[^>]*>/i', $html, $lm)) {
 	foreach ($lm[0] as $l) {
@@ -326,6 +334,7 @@ ogp_out([
 	'headEnd'   => $headEnd === false ? null : $headEnd,
 	'title'     => $title,
 	'canonical' => $canonical,
+	'canonicalFrom' => $canonicalFrom,
 	'icon'      => $icon,
 	'metas'     => $metas,
 	'images'    => array_values($images),

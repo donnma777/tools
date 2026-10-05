@@ -1782,7 +1782,7 @@
         fact('ページの大きさ', kb(d.bytes) + (d.over ? '（3 MB で読むのをやめました）' : '') + (d.encoding ? `・${esc(d.encoding)} で圧縮` : '・圧縮なし'));
         if (d.headEnd != null) fact('&lt;/head&gt; の位置', kb(d.headEnd) + ' 目');
         fact('&lt;title&gt;', esc(d.title || '（なし）'));
-        fact('canonical', esc(d.canonical || '（なし）'));
+        fact('canonical', d.canonical ? esc(d.canonical) + (d.canonicalFrom === 'header' ? '（返事のヘッダーの Link で）' : '') : '（なし）');
         if (d.robots) fact('X-Robots-Tag', esc(d.robots));
         fact('見に行った名乗り', esc($('ua').selectedOptions[0].textContent));
         $('facts').innerHTML = f.join('');
@@ -1792,7 +1792,7 @@
         const first = k => tag[k] || null;
         const want = [
           ['<title>', d.title, null, 'warn', 'og:title がないときに使われる'],
-          ['canonical', d.canonical, null, 'info', ''],
+          [d.canonicalFrom === 'header' ? 'canonical（ヘッダー）' : 'canonical', d.canonical, null, 'info', ''],
           ['description', first('description'), 'opt', 'og:description がないときに使われる'],
           ['og:title', first('og:title'), 'ng', '&lt;title&gt; が使われる'],
           ['og:description', first('og:description'), 'warn', 'description が使われるか、説明なし'],

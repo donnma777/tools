@@ -24,7 +24,7 @@ URL を入れると、そのページの OGP・X のカードのタグを読ん�
   - 名前を引いて（A・AAAA）、プライベート・予約済みの IP が1つでもあれば断る。引いた IP を `CURLOPT_RESOLVE` で固定して、そのまま使う（引き直しのすり替え対策）
   - 転送は自分でたどり、1回ごとに同じ確認をする（5回まで）
   - ページ 3MB・画像 10MB・1回 10 秒まで。同じ IP から 10 分に 30 回まで（`sys_get_temp_dir()/donnma-ogp-rate`）
-- 返すもの：`status`・`chain`（転送）・`time`・`ttfb`・`bytes`・`encoding`・`headEnd`（`</head>` の位置）・`title`・`canonical`・`icon`・`metas`（`{key, value, pos}`。`pos` はほどいたあとの HTML の何バイト目か）・`images`（大きさ・重さ・形式・どのタグで使われているか）
+- 返すもの：`status`・`chain`（転送）・`time`・`ttfb`・`bytes`・`encoding`・`headEnd`（`</head>` の位置）・`title`・`canonical`（HTML になければ Link ヘッダーから。`canonicalFrom` が html / header）・`icon`・`metas`（`{key, value, pos}`。`pos` はほどいたあとの HTML の何バイト目か）・`images`（大きさ・重さ・形式・どのタグで使われているか）
 
 ## 開発メモ
 
