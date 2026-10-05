@@ -713,6 +713,67 @@
       padding: 4px 14px 14px;
     }
 
+    /* OBS につなぐ */
+    .obs-box {
+      border-top: 1px solid var(--border);
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .obs-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .obs-state {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--muted);
+    }
+
+    .obs-state.on {
+      background: rgba(127, 216, 164, 0.15);
+      color: #7fd8a4;
+    }
+
+    .obs-row {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #obs-linked .obs-row {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      margin-bottom: 8px;
+    }
+
+    input[type=password] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    input[type=password]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
     [hidden] {
       display: none !important;
     }
@@ -1043,6 +1104,24 @@
       <div class="main-foot">
         <p class="field-note" id="size-hint"></p>
       </div>
+      <div class="obs-box">
+        <div class="obs-head"><span>🔌 OBS につないで、そのまま反映</span><span class="obs-state" id="obs-state">つないでいません</span></div>
+        <div class="obs-row" id="obs-login">
+          <input type="text" id="obs-port" inputmode="numeric" placeholder="4455" aria-label="ポート">
+          <input type="password" id="obs-pass" placeholder="パスワード（なければ空）" aria-label="パスワード" autocomplete="off">
+          <button class="btn btn-primary" type="button" id="obs-connect">つなぐ</button>
+        </div>
+        <div id="obs-linked" hidden>
+          <div class="obs-row">
+            <select id="obs-source" aria-label="反映するブラウザソース"></select>
+            <button class="btn btn-sm" type="button" id="obs-refresh" title="ソースの一覧を読み直す">↻</button>
+            <button class="btn btn-sm" type="button" id="obs-disconnect">切る</button>
+          </div>
+          <button class="btn btn-sm" type="button" id="obs-add">＋ 今のシーンに時計のソースを足す</button>
+        </div>
+        <p class="field-note" id="obs-msg"></p>
+        <p class="field-note">OBS の「ツール → WebSocket サーバー設定」で、サーバーを有効にしてから使います（ポートとパスワードもそこにあります）。つなぐと、ここで変えた見た目が、選んだソースにすぐ反映されます。</p>
+      </div>
     </div>
   </div>
 
@@ -1056,6 +1135,7 @@
           <li><b>「📋 URL をコピー」</b>を押します。</li>
           <li>OBS で <b>ソースを追加 → ブラウザ</b> を選び、URL に貼り付けます。幅・高さは見本の下に出ている大きさを目安にしてください。</li>
           <li>置く場所と大きさは、OBS の画面でドラッグして合わせます。</li>
+          <li><b>OBS につなぐ</b>と、URL を貼り直さなくても、ここで変えた見た目がそのまま OBS に反映されます。「＋ 今のシーンに時計のソースを足す」で、ソースを作るところからできます。</li>
         </ol>
       </div>
     </details>
@@ -1181,6 +1261,22 @@
         return p.toString();
       }
       const base = () => new URL('view.html', location.href).href;
+      // 時計の URL から設定を読む（OBS のソースに入っている見た目を、ここに取り込む）
+      function fromUrl(url) {
+        let q;
+        try { q = new URL(url).searchParams; } catch (e) { return null; }
+        const g = (k, d) => (q.has(k) ? q.get(k) : d);
+        const t = THEMES.some(x => x[0] === g('t')) ? g('t') : 'simple';
+        const e = g('e', 'none');
+        return {
+          ...S,
+          t, a: /^[0-9a-f]{6}$/i.test(g('a', '')) ? '#' + g('a') : '', p: g('p') === '1',
+          ly: g('ly', 'row'), al: g('al', 'center'), sz: +g('sz', '100') || 100,
+          c: g('c', '1') === '1', h: g('h', '24'), s: g('s', '1') === '1', d: g('d', 'md'), l1: g('l1', ''), wd: g('wd', 'ja'),
+          z: g('z', ''), zl: g('zl', ''),
+          e, em: e !== 'none' ? e : S.em, el: g('el', '配信時間'), et: g('et', S.et), eh: g('eh') === '1',
+        };
+      }
 
       // 今の「出すもの」
       const showing = () => S.c && S.e === 'none' ? 'clock' : !S.c && S.e !== 'none' ? 'elapsed' : S.c && S.e !== 'none' ? 'both' : '';
@@ -1225,8 +1321,161 @@
         box.style.height = Math.round(vh * s) + 'px';
         const src = 'view.html?' + params(true);
         if (src !== frameKey) { frameKey = src; f.src = src; }
+        if (typeof obsPush === 'function') obsPush();
       }
       const changed = () => { syncUI(); update(); };
+
+      // ---- OBS につないで、選んだブラウザソースの URL を書き換える（obs-websocket v5）
+      const OBS_KEY = 'donnma-clock-obs';
+      const obs = { ws: null, ready: false, id: 1, pending: new Map(), source: '', lastUrl: '', timer: 0 };
+      let obsSaved = { port: 4455, password: '', auto: false, source: '' };
+      try { obsSaved = { ...obsSaved, ...JSON.parse(localStorage.getItem(OBS_KEY) || '{}') }; } catch (e) { /* ignore */ }
+      const obsStore = () => { try { localStorage.setItem(OBS_KEY, JSON.stringify(obsSaved)); } catch (e) { /* ignore */ } };
+      const obsMsg = (t) => { $('obs-msg').textContent = t || ''; };
+      function obsUi() {
+        $('obs-state').textContent = obs.ready ? 'つないでいます' : 'つないでいません';
+        $('obs-state').classList.toggle('on', obs.ready);
+        $('obs-login').hidden = obs.ready;
+        $('obs-linked').hidden = !obs.ready;
+      }
+      async function obsAuth(password, salt, challenge) {
+        const enc = new TextEncoder();
+        const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+        const secret = b64(await crypto.subtle.digest('SHA-256', enc.encode(password + salt)));
+        return b64(await crypto.subtle.digest('SHA-256', enc.encode(secret + challenge)));
+      }
+      function obsConnect(port, password) {
+        obsClose();
+        return new Promise((resolve, reject) => {
+          let ws;
+          try { ws = new WebSocket(`ws://127.0.0.1:${port}`, 'obswebsocket.json'); } catch (e) { reject(new Error('ポートが正しくありません')); return; }
+          obs.ws = ws;
+          ws.onmessage = async (ev) => {
+            const msg = JSON.parse(ev.data);
+            if (msg.op === 0) {
+              const identify = { rpcVersion: 1, eventSubscriptions: 0 };
+              const a = msg.d.authentication;
+              if (a) {
+                if (!password) { reject(new Error('パスワードが要ります')); ws.close(); return; }
+                identify.authentication = await obsAuth(password, a.salt, a.challenge);
+              }
+              ws.send(JSON.stringify({ op: 1, d: identify }));
+            } else if (msg.op === 2) {
+              obs.ready = true; obsUi(); resolve();
+            } else if (msg.op === 7) {
+              const pr = obs.pending.get(msg.d.requestId);
+              if (!pr) return;
+              obs.pending.delete(msg.d.requestId);
+              msg.d.requestStatus.result ? pr.resolve(msg.d.responseData || {}) : pr.reject(new Error(msg.d.requestStatus.comment || `エラー ${msg.d.requestStatus.code}`));
+            }
+          };
+          ws.onclose = (ev) => {
+            const was = obs.ready;
+            if (obs.ws === ws) { obs.ws = null; obs.ready = false; }
+            obs.pending.forEach(pr => pr.reject(new Error('切れました'))); obs.pending.clear();
+            obsUi();
+            if (ev.code === 4009) reject(new Error('パスワードが違います'));
+            else if (!was) reject(new Error('OBS につながりません（OBS が起動しているか、WebSocket サーバーが有効か確かめてください）'));
+            else obsMsg('OBS との接続が切れました');
+          };
+        });
+      }
+      function obsClose() {
+        if (obs.ws) { const ws = obs.ws; obs.ws = null; obs.ready = false; ws.close(); }
+        obsUi();
+      }
+      function obsReq(requestType, requestData) {
+        return new Promise((resolve, reject) => {
+          if (!obs.ready) { reject(new Error('OBS につないでいません')); return; }
+          const requestId = String(obs.id++);
+          obs.pending.set(requestId, { resolve, reject });
+          obs.ws.send(JSON.stringify({ op: 6, d: { requestType, requestId, requestData } }));
+        });
+      }
+      const isClock = (url) => /\/clock\/view\.html/.test(url || '');
+      // ブラウザソースの一覧（時計のものを先に、印を付けて）
+      async function obsLoadSources() {
+        const { inputs = [] } = await obsReq('GetInputList', { inputKind: 'browser_source' });
+        const list = [];
+        for (const i of inputs) {
+          let url = '';
+          try { url = ((await obsReq('GetInputSettings', { inputName: i.inputName })).inputSettings || {}).url || ''; } catch (e) { /* ignore */ }
+          list.push({ name: i.inputName, clock: isClock(url), url });
+        }
+        list.sort((a, b) => (b.clock - a.clock));
+        const esc = (t) => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        $('obs-source').innerHTML = '<option value="">反映するソースを選ぶ</option>' + list.map(x => `<option value="${esc(x.name)}">${x.clock ? '⏱ ' : ''}${esc(x.name)}</option>`).join('');
+        // 前に選んだもの → なければ時計のソースが1つだけならそれ
+        const pick = list.find(x => x.name === obsSaved.source) || (list.filter(x => x.clock).length === 1 ? list.find(x => x.clock) : null);
+        $('obs-source').value = pick ? pick.name : '';
+        obs.list = list;
+        useSource($('obs-source').value, false);
+        if (!list.length) obsMsg('ブラウザソースがありません。「＋ 今のシーンに時計のソースを足す」で作れます');
+      }
+      // ソースを選んだ：時計のソースなら、その見た目をここに取り込む（上書きしない）。時計でないなら、選んだ時だけ送る
+      function useSource(name, chosen) {
+        obs.source = name;
+        obsSaved.source = name; obsStore();
+        const x = (obs.list || []).find(v => v.name === name);
+        obs.lastUrl = x ? x.url : '';
+        if (!name) { obsMsg('ここで変えた見た目を反映するソースを選んでください'); return; }
+        if (x && x.clock) {
+          const got = fromUrl(x.url);
+          if (got) { S = got; syncUI(); update(); }
+          obsMsg(`「${name}」の見た目を読み込みました。ここで変えると、すぐ反映されます`);
+        } else if (chosen) {
+          obsPush(true);
+        } else obsMsg(`「${name}」に反映します`);
+      }
+      // 設定を変えたら、少し待ってから URL を送る（スライダーを動かしている間はまとめる）
+      function obsPush(now) {
+        if (!obs.ready || !obs.source) return;
+        clearTimeout(obs.timer);
+        obs.timer = setTimeout(async () => {
+          const url = $('url').value;
+          if (url === obs.lastUrl) return;
+          try {
+            await obsReq('SetInputSettings', { inputName: obs.source, inputSettings: { url }, overlay: true });
+            obs.lastUrl = url;
+            obsMsg(`「${obs.source}」に反映しました`);
+          } catch (e) { obsMsg('反映できませんでした：' + e.message); }
+        }, now ? 0 : 600);
+      }
+      async function connectFromUi() {
+        const port = +$('obs-port').value || 4455, password = $('obs-pass').value;
+        $('obs-connect').disabled = true; obsMsg('つないでいます…');
+        try {
+          await obsConnect(port, password);
+          obsSaved = { ...obsSaved, port, password, auto: true }; obsStore();
+          await obsLoadSources();
+        } catch (e) { obsMsg(e.message); }
+        $('obs-connect').disabled = false;
+      }
+      $('obs-port').value = obsSaved.port || 4455;
+      $('obs-pass').value = obsSaved.password || '';
+      $('obs-connect').addEventListener('click', connectFromUi);
+      $('obs-pass').addEventListener('keydown', (e) => { if (e.key === 'Enter') connectFromUi(); });
+      $('obs-disconnect').addEventListener('click', () => { obsSaved.auto = false; obsStore(); obsClose(); obsMsg(''); });
+      $('obs-refresh').addEventListener('click', () => obsLoadSources().catch(e => obsMsg(e.message)));
+      $('obs-source').addEventListener('change', () => useSource($('obs-source').value, true));
+      // 今のシーンに、時計のブラウザソースを足す（大きさは目安の大きさ）
+      $('obs-add').addEventListener('click', async () => {
+        try {
+          const { currentProgramSceneName: scene } = await obsReq('GetCurrentProgramScene', {});
+          const { inputs = [] } = await obsReq('GetInputList', {});
+          let name = '時計', k = 2;
+          while (inputs.some(i => i.inputName === name)) name = `時計 ${k++}`;
+          const [, w, h] = ($('size-hint').textContent.match(/幅 (\d+)・高さ (\d+)/) || [0, 1000, 200]).map(Number);
+          await obsReq('CreateInput', { sceneName: scene, inputName: name, inputKind: 'browser_source', inputSettings: { url: $('url').value, width: w, height: h }, sceneItemEnabled: true });
+          obsSaved.source = name; obsStore();
+          obs.lastUrl = $('url').value;
+          await obsLoadSources();
+          toast(`「${scene}」に「${name}」を足しました`);
+        } catch (e) { obsMsg('足せませんでした：' + e.message); }
+      });
+      obsUi();
+      // 前につないでいたら、開いたときにつなぎ直す
+      if (obsSaved.auto) connectFromUi();
 
       $('show').addEventListener('click', e => {
         const b = e.target.closest('[data-v]'); if (!b) return;

@@ -21,6 +21,13 @@ OBS のブラウザソースで使う時計です。時計・もう1つの時刻
 | `el` / `et` / `eh` | 上の文字／since の時刻（HH:MM）／`1` で数えていないときは隠す | 配信時間 / 20:00 / 0 |
 | `demo` | `1` なら OBS がなくても今から数える（設定ページの見本用） | 0 |
 
+## OBS につないで反映（`index.html`）
+
+- obs-websocket v5（`ws://127.0.0.1:ポート`、パスワード認証）につなぎ、ブラウザソースの一覧（`GetInputList` browser_source）を出す。URL に `/clock/view.html` を含むものは「⏱」で先に並べる
+- 時計のソースを選ぶと、その URL から設定を読み込む（`fromUrl`）。つないだ・開いただけでは送らない。設定を変えると 0.6 秒待ってから `SetInputSettings` で URL を書き換える（同じ URL なら送らない）
+- 「＋ 今のシーンに時計のソースを足す」は `CreateInput`（大きさは目安の大きさ）
+- ポート・パスワード・選んだソース・自動でつなぐかは localStorage（`donnma-clock-obs`）
+
 ## 経過時間の数え方
 
 - stream / record は OBS のブラウザソースの `window.obsstudio`（`obsStreamingStarted` などのイベントと `getStatus`）で数える。OBS の WebSocket やパスワードは使わない。
