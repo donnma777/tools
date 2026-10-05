@@ -4748,7 +4748,7 @@
 
         /* ---- ストップウォッチ（全テーマ共通。各テーマの addStopwatch は見た目を作って overlaySwSetup を呼ぶだけ。
          *  ≡ メニューには addHoverMenu から overlaySwMenu を呼んで「開始・停止／リセット／連動」を足す）
-         *  画面には時間だけを出す（ボタンは出さない）。時間を押しても開始・停止できる。
+         *  画面には時間だけを出す（ボタンは出さない）。時間を押しても開始・停止できる。連動して数えている間だけ、下に「● 配信中」など。
          *  状態はパーツの data-* に持つので、自動保存・プリセット・OBS への反映で読み込み直しても続きから動く。
          *    data-sw-run    '1' なら数えている
          *    data-sw-start  数え始めた時刻（ms。止めていた間のぶんは進めてある）
@@ -4774,10 +4774,10 @@
             const link = box.dataset.swLink || '';
             const t = box.querySelector('.sw-time');
             if (t) t.textContent = swFormat(swElapsed(box));
-            // 時間の下の小さな文字（連動しているときだけ）
+            // 時間の下の小さな文字（連動して数えているときだけ）
             const st = box.querySelector('.sw-status');
             if (st) {
-                st.textContent = !link ? '' : on ? (link === 'stream' ? '● 配信中' : '● 録画中') : (link === 'stream' ? '配信と連動' : '録画と連動');
+                st.textContent = link && on ? (link === 'stream' ? '● 配信中' : '● 録画中') : '';
                 st.classList.toggle('on', !!link && on);
             }
             box.classList.toggle('sw-running', on);
