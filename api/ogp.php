@@ -32,6 +32,11 @@ const OGP_UAS = [
 	'facebook' => 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)',
 	'line'     => 'facebookexternalhit/1.1;line-poker/1.0',
 	'slack'    => 'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)',
+	'bluesky'  => 'Mozilla/5.0 (compatible; Bluesky Cardyb/1.1; +mailto:support@bsky.app)',
+	'mastodon' => 'http.rb/5.2.0 (Mastodon/4.3.0; +https://mastodon.social/) Bot',
+	'misskey'  => 'Mozilla/5.0 (compatible; SummalyBot/5.1.0; +https://github.com/misskey-dev/summaly/blob/master/README.md)',
+	'linkedin' => 'LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)',
+	'telegram' => 'TelegramBot (like TwitterBot)',
 ];
 
 // ---- 返事

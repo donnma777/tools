@@ -7,9 +7,9 @@
   <title>OGPチェッカー | どんまうんど-Tools</title>
   <link rel="icon" href="../favicon.ico">
   <meta name="description"
-    content="URL を入れるだけで、X・Discord・Facebook・LINE・Slack に貼ったときの見え方（OGP・X のカード）を確かめられる無料ツール。画像の大きさ・重さ、タグの抜け、ページが重くて読まれない問題などを調べて、直し方も案内します。">
+    content="URL を入れるだけで、X・Discord・LINE・Bluesky・Threads・Misskey など 11 のサービスに貼ったときの見え方（OGP・X のカード）を確かめられる無料ツール。画像の大きさ・重さ、タグの抜け、ページが重くて読まれない問題などを調べて、直し方も案内します。">
   <meta property="og:title" content="OGPチェッカー | どんまうんど-Tools">
-  <meta property="og:description" content="URL を入れるだけで、X・Discord・LINE などに貼ったときの見え方と、OGP の問題・直し方が分かる無料ツール。">
+  <meta property="og:description" content="URL を入れるだけで、X・Discord・LINE・Bluesky などに貼ったときの見え方と、OGP の問題・直し方が分かる無料ツール。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://donnma.com/tool/ogp-checker/">
   <meta property="og:site_name" content="どんまうんど-Tools">
@@ -852,6 +852,184 @@
       border-radius: 8px;
     }
 
+    .sns-dark {
+      background: #191b22;
+      color: #d9e1e8;
+    }
+
+    .sns-soft {
+      background: #f4f2ee;
+      color: #191919;
+    }
+
+    .sns-tg {
+      background: #a7c7a0 linear-gradient(160deg, #c8d9a4, #8cb9a0);
+    }
+
+    .sns-card {
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid #d4dbe2;
+      background: #fff;
+    }
+
+    .sns-card-body {
+      padding: 10px 12px;
+    }
+
+    .sns-card-title {
+      font-weight: 700;
+      font-size: 14.5px;
+    }
+
+    .sns-card-desc {
+      margin-top: 3px;
+      font-size: 13px;
+      color: #42576c;
+    }
+
+    .sns-card-foot {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #e5eaee;
+      font-size: 12px;
+      color: #6f869f;
+    }
+
+    .sns-th-cap {
+      margin-top: 6px;
+      padding: 0 2px;
+    }
+
+    .sns-th-cap .sns-small {
+      margin: 0;
+      color: #999;
+    }
+
+    .sns-ma {
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid #393f4f;
+    }
+
+    .sns-ma .sns-pic {
+      background: #313543;
+    }
+
+    .sns-ma-body {
+      padding: 12px 14px;
+    }
+
+    .sns-ma-dom {
+      font-size: 13px;
+      color: #9baec8;
+    }
+
+    .sns-ma-title {
+      margin-top: 2px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .sns-ma-desc {
+      margin-top: 2px;
+      font-size: 13.5px;
+      color: #9baec8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sns-mk {
+      display: flex;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid #e3e3e3;
+      background: #fff;
+      color: #5f5f5f;
+    }
+
+    .sns-mk .sns-pic {
+      width: 104px;
+      flex: none;
+      align-self: stretch;
+      min-height: 104px;
+    }
+
+    .sns-mk-body {
+      padding: 10px 12px;
+      min-width: 0;
+      font-size: 12.5px;
+    }
+
+    .sns-mk-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .sns-mk-desc {
+      margin-top: 4px;
+    }
+
+    .sns-mk-site {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      font-size: 11.5px;
+    }
+
+    .sns-mk-site img {
+      width: 14px;
+      height: 14px;
+    }
+
+    .sns-li-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.9);
+    }
+
+    .sns-tg-bubble {
+      max-width: 340px;
+      padding: 8px 10px 6px;
+      border-radius: 12px;
+      background: #fff;
+      color: #000;
+      font-size: 14px;
+    }
+
+    .sns-tg-link {
+      color: #3390ec;
+      word-break: break-all;
+    }
+
+    .sns-tg-pre {
+      margin-top: 6px;
+      padding: 4px 8px 6px;
+      border-left: 3px solid #3390ec;
+      border-radius: 4px;
+      background: rgba(51, 144, 236, 0.08);
+      font-size: 13.5px;
+    }
+
+    .sns-tg-site {
+      font-weight: 700;
+      color: #3390ec;
+    }
+
+    .sns-tg-title {
+      font-weight: 700;
+    }
+
+    .sns-tg-img {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      border-radius: 6px;
+    }
+
     .sns-none {
       color: #8899a6;
       font-size: 13px;
@@ -1120,7 +1298,7 @@
   <header class="hero">
     <div class="hero-inner">
       <h1>OGPチェッカー</h1>
-      <p>URL を入れるだけで、X・Discord・Facebook・LINE・Slack に貼ったときの見え方を確かめられます。画像の大きさ・重さ、タグの抜け、ページが重くて読まれない問題などを調べて、直し方も案内します。</p>
+      <p>URL を入れるだけで、X・Discord・LINE・Bluesky・Threads・Misskey など 11 のサービスに貼ったときの見え方を確かめられます。画像の大きさ・重さ、タグの抜け、ページが重くて読まれない問題などを調べて、直し方も案内します。</p>
     </div>
   </header>
 
@@ -1132,9 +1310,14 @@
           <option value="default">ふつうに見る</option>
           <option value="discord">Discord として</option>
           <option value="x">X として</option>
-          <option value="facebook">Facebook として</option>
+          <option value="facebook">Facebook・Threads として</option>
           <option value="line">LINE として</option>
           <option value="slack">Slack として</option>
+          <option value="bluesky">Bluesky として</option>
+          <option value="mastodon">Mastodon として</option>
+          <option value="misskey">Misskey として</option>
+          <option value="linkedin">LinkedIn として</option>
+          <option value="telegram">Telegram として</option>
         </select>
         <button class="btn btn-primary" type="submit" id="go">🔍 調べる</button>
       </div>
@@ -1194,7 +1377,7 @@
         <ol class="steps">
           <li>調べたいページの URL を入れて <b>「🔍 調べる」</b> を押します。</li>
           <li><b>チェック</b>に、問題と直し方が出ます。❌ は表示されない・崩れる原因になりやすいもの、⚠ は直したほうがよいものです。</li>
-          <li><b>貼ったときの見え方</b>で、X・Discord・Facebook・LINE・Slack でどう出るかの目安を見られます。</li>
+          <li><b>貼ったときの見え方</b>で、X・Discord・LINE・Facebook・Bluesky・Threads・Slack・Mastodon・Misskey・LinkedIn・Telegram でどう出るかの目安を見られます。</li>
           <li>特定のサービスだけ出ないときは、右の選択で <b>「Discord として」</b> などを選んで調べ直してください。</li>
           <li><b>「🔗 この結果の URL をコピー」</b>で、同じ調べ方のリンクを人に送れます。</li>
         </ol>
@@ -1205,6 +1388,7 @@
       <div class="panel-body">
         <ul class="notes">
           <li>各サービスは、一度取った OGP をしばらく覚えています。直したあとは、URL の後ろに <b>?a=1</b> のような、意味のない文字を付けて貼ると、取り直してくれます。</li>
+          <li>Mastodon・Misskey は、投稿した人のサーバーがそれぞれ取りに行って覚えます。サーバーごとに、新しくなるまでの時間が違います。</li>
           <li>Facebook は <a href="https://developers.facebook.com/tools/debug/" target="_blank" rel="noopener">シェアデバッガー</a> で「もう一度スクレイピング」すると、すぐ新しくなります。</li>
           <li>画像を同じ名前で差し替えたときは、画像の URL の後ろに <b>?v=2</b> などを付けて、別のファイルとして読ませてください。</li>
           <li>WordPress などで、CSS をページの中にまとめて書き込む「高速化」の設定を使っていると、ページの頭が重くなって、OGP まで読まれないことがあります。チェックの「タグの位置」を見てください。</li>
@@ -1355,6 +1539,21 @@
           `<div class="sns-line">${pic(ogImg, '1.91 / 1')}<div class="sns-line-body"><div class="sns-line-title">${esc(title)}</div><div class="sns-small">${esc(dom)}</div></div></div>`]);
         cards.push(['Slack', 'リンクの展開', 'slack',
           `<div class="sns-sl"><div class="sns-sl-site">${d.icon ? `<img src="${esc(d.icon)}" alt="" referrerpolicy="no-referrer">` : ''}${esc(site)}</div><div class="sns-sl-title">${esc(title)}</div>${desc ? `<div class="sns-sl-desc clamp2">${esc(desc)}</div>` : ''}${ogImg ? `<img class="sns-sl-img" src="${esc(imgUrl(ogImg))}" alt="" referrerpolicy="no-referrer">` : ''}</div>`]);
+        const anyImg = ogImg || twImg;
+        const icon = d.icon ? `<img src="${esc(d.icon)}" alt="" referrerpolicy="no-referrer">` : '';
+        cards.push(['Bluesky', 'リンクカード', 'light',
+          `<div class="sns-card">${anyImg ? pic(anyImg, '1.91 / 1') : ''}<div class="sns-card-body"><div class="sns-card-title clamp2">${esc(title)}</div>${desc ? `<div class="sns-card-desc clamp2">${esc(desc)}</div>` : ''}<div class="sns-card-foot">🌐 ${esc(dom)}</div></div></div>`]);
+        cards.push(['Threads', 'リンクのプレビュー', 'light', ogImg
+          ? `<div class="sns-card">${pic(ogImg, '1.91 / 1')}</div><div class="sns-th-cap"><div class="sns-small">${esc(dom)}</div><div class="sns-card-title clamp2">${esc(title)}</div></div>`
+          : `<div class="sns-card"><div class="sns-card-body"><div class="sns-small">${esc(dom)}</div><div class="sns-card-title clamp2">${esc(title)}</div></div></div>`]);
+        cards.push(['Mastodon', 'プレビューカード', 'dark',
+          `<div class="sns-ma">${ogImg ? pic(ogImg, '1.91 / 1') : ''}<div class="sns-ma-body"><div class="sns-ma-dom">${esc(dom)}</div><div class="sns-ma-title clamp2">${esc(title)}</div>${desc ? `<div class="sns-ma-desc">${esc(desc)}</div>` : ''}</div></div>`]);
+        cards.push(['Misskey', 'URL プレビュー', 'soft',
+          `<div class="sns-mk">${anyImg ? pic(anyImg, 'auto') : ''}<div class="sns-mk-body"><div class="sns-mk-title clamp2">${esc(title)}</div>${desc ? `<div class="sns-mk-desc clamp2">${esc(desc)}</div>` : ''}<div class="sns-mk-site">${icon}${esc(site)}</div></div></div>`]);
+        cards.push(['LinkedIn', '投稿のリンク', 'soft',
+          `<div class="sns-card" style="border-radius:8px">${ogImg ? pic(ogImg, '1.91 / 1') : ''}<div class="sns-card-body"><div class="sns-li-title clamp2">${esc(title)}</div><div class="sns-small">${esc(dom)}</div></div></div>`]);
+        cards.push(['Telegram', 'リンクのプレビュー', 'tg',
+          `<div class="sns-tg-bubble"><div class="sns-tg-link">${esc(d.input)}</div><div class="sns-tg-pre"><div class="sns-tg-site">${esc(site)}</div><div class="sns-tg-title">${esc(title)}</div>${desc ? `<div class="clamp2" style="-webkit-line-clamp:3">${esc(desc)}</div>` : ''}${anyImg ? `<img class="sns-tg-img" src="${esc(imgUrl(anyImg))}" alt="" referrerpolicy="no-referrer">` : ''}</div></div>`]);
         $('sns').innerHTML = cards.map(([name, what, tone, body]) =>
           `<section><div class="sns-label"><b>${name}</b><span>${what}</span></div><div class="sns-tile sns-${tone}">${body}</div></section>`).join('');
 
