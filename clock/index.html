@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>配信用の時計・経過時間 | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="OBS のブラウザソースで使える、配信用の時計と経過時間。配信・録画を始めてからの時間を自動で数え、海外の時刻も並べられます。配信オーバーレイと同じ 8 つのデザイン。見た目を選んで URL をコピーするだけ、登録なしの無料ツールです。">
+  <link rel="canonical" href="https://donnma.com/tool/clock/">
+  <meta property="og:title" content="配信用の時計・経過時間 | どんまうんど-Tools">
+  <meta property="og:description" content="OBS で使える時計と、配信・録画を始めてからの経過時間。見た目を選んで URL をコピーするだけ。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/clock/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-clock.jpg?v=20261005a">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="配信用の時計・経過時間">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <meta name="twitter:image:alt" content="配信用の時計・経過時間">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      grid-template-areas: "settings main";
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings {
+      grid-area: settings;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .main {
+      grid-area: main;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+      flex: none;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 7px 0;
+      min-width: 0;
+    }
+
+    .field[hidden] {
+      display: none;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .field-val {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      color: var(--accent-2);
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0 10px;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select,
+    input[type=text],
+    input[type=time] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+      color-scheme: dark;
+    }
+
+    select:focus,
+    input[type=text]:focus,
+    input[type=time]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    input[type=color] {
+      width: 44px;
+      height: 32px;
+      padding: 2px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      background: var(--surface-2);
+      cursor: pointer;
+      flex: none;
+    }
+
+    .inline {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .seg {
+      display: flex;
+      gap: 6px;
+    }
+
+    .seg button {
+      flex: 1 1 0;
+      min-width: 0;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 7px 4px;
+      cursor: pointer;
+    }
+
+    .seg button:hover {
+      border-color: var(--accent);
+    }
+
+    .seg button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .themes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .themes button {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .themes button i {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex: none;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+    }
+
+    .themes button[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+      color: var(--text);
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+      cursor: pointer;
+      padding: 6px 0;
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle .sw {
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      position: relative;
+      flex: none;
+      transition: background 0.15s;
+    }
+
+    .toggle .sw::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .toggle input:checked+.sw {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .toggle input:checked+.sw::after {
+      transform: translateX(18px);
+      background: #fff;
+    }
+
+    .toggle input:focus-visible+.sw {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    /* ── 見本 ── */
+    .main-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .main-head .sp {
+      flex: 1;
+    }
+
+    .main-head select {
+      width: auto;
+    }
+
+    .preview {
+      position: relative;
+      overflow: hidden;
+      background: #140810;
+    }
+
+    .preview[data-bg="check"] {
+      background: repeating-conic-gradient(#3a2a33 0 25%, #2a1c24 0 50%) 0 0 / 20px 20px;
+    }
+
+    .preview[data-bg="light"] {
+      background: #e9e6ef;
+    }
+
+    .preview[data-bg="game"] {
+      background: linear-gradient(160deg, #2b5876, #4e4376 55%, #8a3a5c);
+    }
+
+    .preview iframe {
+      position: absolute;
+      left: 0;
+      top: 0;
+      border: 0;
+      transform-origin: 0 0;
+      background: transparent;
+    }
+
+    .url-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
+      padding: 12px 14px 4px;
+    }
+
+    .url-row input {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .main-foot {
+      padding: 4px 14px 14px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b,
+    .notes b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1000px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "main" "settings";
+        padding: 40px 16px 40px;
+      }
+
+      .main {
+        position: static;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .url-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .url-row input {
+        grid-column: 1 / -1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>配信用の時計・経過時間</h1>
+      <p>OBS のブラウザソースで使える時計です。配信・録画を始めてからの時間を自動で数え、海外の時刻も並べられます。見た目は配信オーバーレイと同じ 8 つから。選んで URL をコピーするだけです。</p>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- 設定 -->
+    <div class="settings">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🎨</span>見た目</div>
+          <div class="themes" id="themes"></div>
+          <div class="field">
+            <span class="field-label"><span>色</span></span>
+            <div class="inline"><input type="color" id="accent" aria-label="色"><button class="btn btn-sm" type="button" id="accent-reset">テーマの色に戻す</button></div>
+          </div>
+          <label class="toggle" id="panel-row"><span>文字の後ろに台を付ける</span><input type="checkbox" id="panel"><span class="sw"></span></label>
+          <div class="two">
+            <div class="field">
+              <span class="field-label"><span>並べ方</span></span>
+              <div class="seg" id="layout"><button type="button" data-v="row">横</button><button type="button" data-v="col">縦</button></div>
+            </div>
+            <div class="field">
+              <span class="field-label"><span>寄せる</span></span>
+              <div class="seg" id="align"><button type="button" data-v="left">左</button><button type="button" data-v="center">中</button><button type="button" data-v="right">右</button></div>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>大きさ</span><span class="field-val" id="size-val"></span></span>
+            <input type="range" id="size" min="40" max="250" step="5">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🕘</span>時計</div>
+          <label class="toggle"><span>時計を出す</span><input type="checkbox" id="clock"><span class="sw"></span></label>
+          <div id="clock-opts">
+            <div class="two">
+              <div class="field">
+                <span class="field-label"><span>表し方</span></span>
+                <div class="seg" id="h"><button type="button" data-v="24">24時間</button><button type="button" data-v="12">12時間</button></div>
+              </div>
+              <div class="field">
+                <span class="field-label"><span>曜日などの言葉</span></span>
+                <div class="seg" id="lang"><button type="button" data-v="ja">日本語</button><button type="button" data-v="en">英語</button></div>
+              </div>
+            </div>
+            <label class="toggle"><span>秒を出す</span><input type="checkbox" id="sec"><span class="sw"></span></label>
+            <div class="field">
+              <span class="field-label"><span>日付</span></span>
+              <select id="date">
+                <option value="none">出さない</option>
+                <option value="md">10/5（日）</option>
+                <option value="ymd">2026/10/05（日）</option>
+                <option value="en">Sun, Oct 5</option>
+              </select>
+            </div>
+            <div class="field">
+              <span class="field-label"><span>上の小さな文字</span></span>
+              <input type="text" id="lab1" placeholder="例：JST・いまの時刻（なしでもよい）" spellcheck="false">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🌏</span>もう1つの時刻</div>
+          <div class="field">
+            <span class="field-label"><span>場所</span></span>
+            <select id="tz"></select>
+          </div>
+          <div class="field" id="tz-lab-row">
+            <span class="field-label"><span>上の小さな文字</span></span>
+            <input type="text" id="tz-lab" spellcheck="false">
+          </div>
+          <p class="field-note">海外の視聴者向けに、向こうの時刻を並べられます。夏時間も自動で合わせます。</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">⏱️</span>経過時間</div>
+          <div class="field">
+            <span class="field-label"><span>いつから数えるか</span></span>
+            <select id="el">
+              <option value="none">出さない</option>
+              <option value="stream">配信を始めてから</option>
+              <option value="record">録画を始めてから</option>
+              <option value="since">決めた時刻から</option>
+              <option value="load">ソースを表示してから</option>
+            </select>
+            <span class="field-note" id="el-note"></span>
+          </div>
+          <div id="el-opts">
+            <div class="field" id="since-row">
+              <span class="field-label"><span>数え始める時刻</span></span>
+              <input type="time" id="since">
+            </div>
+            <div class="field">
+              <span class="field-label"><span>上の小さな文字</span></span>
+              <input type="text" id="el-lab" spellcheck="false" placeholder="例：配信時間">
+            </div>
+            <label class="toggle" id="hide-row"><span>数えていないときは隠す</span><input type="checkbox" id="hide"><span class="sw"></span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 見本 -->
+    <div class="main">
+      <div class="main-head">
+        <span>見本</span>
+        <span class="sp"></span>
+        <select id="pv-bg" aria-label="見本の背景">
+          <option value="game">ゲーム画面っぽい背景</option>
+          <option value="check">チェック柄（透明）</option>
+          <option value="dark">暗い背景</option>
+          <option value="light">明るい背景</option>
+        </select>
+      </div>
+      <div class="preview" id="preview" data-bg="game"><iframe id="frame" title="時計の見本"></iframe></div>
+      <div class="url-row">
+        <input type="text" id="url" readonly aria-label="ブラウザソースの URL">
+        <button class="btn btn-primary" type="button" id="copy">📋 URL をコピー</button>
+        <a class="btn" id="open" target="_blank" rel="noopener">↗ 開く</a>
+      </div>
+      <div class="main-foot">
+        <p class="field-note" id="size-hint"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🔍</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>左で見た目と、出すもの（時計・もう1つの時刻・経過時間）を選びます。右の見本がすぐ変わります。</li>
+          <li><b>「📋 URL をコピー」</b>を押します。</li>
+          <li>OBS で <b>ソースを追加 → ブラウザ</b> を選び、URL に貼り付けます。幅・高さは見本の下に出ている大きさを目安にしてください。</li>
+          <li>置く場所と大きさは、OBS の画面でドラッグして合わせます。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">⏱️</span>経過時間について</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li><b>配信・録画を始めてから</b>は、OBS が知らせてくる開始・停止で数えます。OBS の外（ふつうのブラウザ）では数えません。</li>
+          <li>OBS を開き直したり、ソースを読み込み直したりしても、配信中なら続きから数えます。</li>
+          <li>ブラウザソースの「ページ権限」が「アクセス権なし」だと、開始・停止が届きません。うまく数えないときは、ソースのプロパティで確かめてください。</li>
+          <li>録画を一時停止している間は、経過時間も止まります。</li>
+          <li><b>ソースを表示してから</b>は、ソースの「シーンがアクティブになったときにブラウザの表示を更新」をオンにすると、シーンに切り替えるたびに 0 から数え直せます。</li>
+        </ul>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>ヒント・注意点</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>時計は、OBS を動かしているパソコンの時刻を使います。</li>
+          <li>設定はすべて URL に入っているので、保存やログインは要りません。見た目を変えたいときは、ここで作り直した URL に貼り替えてください。</li>
+          <li>見た目は、どんまうんどの<a href="../overlay/">配信オーバーレイ</a>のテーマと同じです。一緒に使うと、画面のまとまりが出ます。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1400px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2000); };
+
+      const THEMES = [
+        ['simple', 'シンプル', '#ff85a1'], ['gaming', 'GAMING', '#00fff7'], ['cyber', 'CYBERPUNK', '#ff007f'], ['neon', 'GIRLY NEON', '#ff6ec7'],
+        ['rose', 'LOLITA ROSE', '#ea92c1'], ['wa', '和 WA', '#b5627e'], ['pop', 'POP', '#7ec8e3'], ['city', 'CITY POP', '#f59e0b'],
+      ];
+      const TZ = [
+        ['', 'なし', ''], ['Asia/Seoul', '韓国', 'KOREA'], ['Asia/Taipei', '台湾', 'TAIWAN'], ['Asia/Shanghai', '中国', 'CHINA'], ['Asia/Bangkok', 'タイ', 'THAILAND'],
+        ['Asia/Kolkata', 'インド', 'INDIA'], ['Europe/London', 'イギリス', 'UK'], ['Europe/Paris', 'フランス・ドイツなど', 'EUROPE'],
+        ['America/New_York', 'アメリカ東部（ニューヨーク）', 'NEW YORK'], ['America/Chicago', 'アメリカ中部（シカゴ）', 'CHICAGO'],
+        ['America/Los_Angeles', 'アメリカ西部（ロサンゼルス）', 'LOS ANGELES'], ['Pacific/Honolulu', 'ハワイ', 'HAWAII'],
+        ['America/Sao_Paulo', 'ブラジル', 'BRAZIL'], ['Australia/Sydney', 'オーストラリア東部', 'SYDNEY'], ['Asia/Tokyo', '日本', 'JAPAN'], ['UTC', 'UTC（世界標準時）', 'UTC'],
+      ];
+      const EL_NOTE = {
+        none: '',
+        stream: 'OBS で配信を始めると 0 から数え、止めると 0 に戻ります。',
+        record: 'OBS で録画を始めると 0 から数えます。一時停止の間は止まります。',
+        since: '毎日、決めた時刻から数えます。その時刻より前は 0:00:00 です。',
+        load: 'ソースを表示したとき（読み込んだとき）から数えます。',
+      };
+
+      // ---- 設定（このブラウザに覚えておく）
+      const STORE = 'donnma-clock-editor';
+      const DEF = { t: 'gaming', a: '', p: false, ly: 'row', al: 'center', sz: 100, c: true, h: '24', wd: 'ja', s: true, d: 'md', l1: '', z: '', zl: '', e: 'stream', el: '配信時間', et: '20:00', eh: false };
+      let S = { ...DEF };
+      try { S = { ...DEF, ...JSON.parse(localStorage.getItem(STORE) || '{}') }; } catch (e) { /* 初めの設定 */ }
+      const store = () => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) { /* ignore */ } };
+
+      $('themes').innerHTML = THEMES.map(([v, name, c]) => `<button type="button" data-v="${v}" aria-pressed="false"><i style="background:${c}"></i>${name}</button>`).join('');
+      $('tz').innerHTML = TZ.map(([v, name]) => `<option value="${v}">${name}</option>`).join('');
+
+      // 見本に渡す URL
+      function params(demo) {
+        const p = new URLSearchParams();
+        p.set('t', S.t);
+        const themeColor = THEMES.find(x => x[0] === S.t)[2];
+        if (S.a && S.a.toLowerCase() !== themeColor) p.set('a', S.a.replace('#', ''));
+        if (S.t === 'simple' && S.p) p.set('p', '1');
+        if (S.ly !== 'row') p.set('ly', S.ly);
+        if (S.al !== 'center') p.set('al', S.al);
+        if (S.sz !== 100) p.set('sz', S.sz);
+        if (!S.c) p.set('c', '0');
+        else {
+          if (S.h !== '24') p.set('h', S.h);
+          if (!S.s) p.set('s', '0');
+          if (S.d !== 'md') p.set('d', S.d);
+          if (S.l1) p.set('l1', S.l1);
+        }
+        if (S.wd !== 'ja') p.set('wd', S.wd);
+        if (S.z) { p.set('z', S.z); if (S.zl) p.set('zl', S.zl); }
+        if (S.e !== 'none') {
+          p.set('e', S.e);
+          if (S.el !== '配信時間') p.set('el', S.el);
+          if (S.e === 'since') p.set('et', S.et);
+          if (S.eh && (S.e === 'stream' || S.e === 'record')) p.set('eh', '1');
+        } else p.set('e', 'none');
+        if (demo) p.set('demo', '1');
+        return p.toString();
+      }
+      const base = () => new URL('view.html', location.href).href;
+
+      function syncUI() {
+        for (const b of $('themes').children) b.setAttribute('aria-pressed', String(b.dataset.v === S.t));
+        for (const [id, key] of [['layout', 'ly'], ['align', 'al'], ['h', 'h'], ['lang', 'wd']]) for (const b of $(id).children) b.setAttribute('aria-pressed', String(b.dataset.v === S[key]));
+        $('accent').value = S.a || THEMES.find(x => x[0] === S.t)[2];
+        $('panel-row').hidden = S.t !== 'simple'; $('panel').checked = S.p;
+        $('size').value = S.sz; $('size-val').textContent = S.sz + '%';
+        $('clock').checked = S.c; $('clock-opts').hidden = !S.c;
+        $('sec').checked = S.s; $('date').value = S.d; $('lab1').value = S.l1;
+        $('tz').value = S.z; $('tz-lab').value = S.zl; $('tz-lab-row').hidden = !S.z;
+        $('el').value = S.e; $('el-note').textContent = EL_NOTE[S.e];
+        $('el-opts').hidden = S.e === 'none';
+        $('since-row').hidden = S.e !== 'since'; $('since').value = S.et;
+        $('el-lab').value = S.el;
+        $('hide-row').hidden = !(S.e === 'stream' || S.e === 'record'); $('hide').checked = S.eh;
+      }
+
+      // 見本：view.html を 1000×(高さ) で開いて、枠に合わせて縮める
+      let frameKey = '';
+      function update() {
+        store();
+        const url = base() + '?' + params(false);
+        $('url').value = url;
+        $('open').href = url;
+        const n = (S.c ? 1 : 0) + (S.z ? 1 : 0) + (S.e !== 'none' ? 1 : 0);
+        const k = S.sz / 100;
+        const vw = S.ly === 'row' ? Math.round((80 + Math.max(1, n) * 330) * k) : Math.round(480 * k);
+        const vh = S.ly === 'row' ? Math.round(170 * k) : Math.round((40 + Math.max(1, n) * 130) * k);
+        $('size-hint').textContent = `OBS のブラウザソースの大きさの目安：幅 ${vw}・高さ ${vh}（はみ出すときは大きくしてください。余白は透明です）`;
+        const box = $('preview');
+        const s = Math.min(1, (box.clientWidth || 600) / vw);
+        const f = $('frame');
+        f.style.width = vw + 'px'; f.style.height = vh + 'px';
+        f.style.transform = `scale(${s})`;
+        box.style.height = Math.round(vh * s) + 'px';
+        const src = 'view.html?' + params(true);
+        if (src !== frameKey) { frameKey = src; f.src = src; }
+      }
+      const changed = () => { syncUI(); update(); };
+
+      $('themes').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; S.t = b.dataset.v; S.a = ''; changed(); });
+      for (const [id, key] of [['layout', 'ly'], ['align', 'al'], ['h', 'h'], ['lang', 'wd']]) {
+        $(id).addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; S[key] = b.dataset.v; changed(); });
+      }
+      $('accent').addEventListener('input', () => { S.a = $('accent').value; update(); });
+      $('accent-reset').addEventListener('click', () => { S.a = ''; changed(); });
+      $('panel').addEventListener('change', () => { S.p = $('panel').checked; update(); });
+      $('size').addEventListener('input', () => { S.sz = +$('size').value; $('size-val').textContent = S.sz + '%'; clearTimeout(update.t); update.t = setTimeout(update, 120); });
+      $('clock').addEventListener('change', () => { S.c = $('clock').checked; changed(); });
+      $('sec').addEventListener('change', () => { S.s = $('sec').checked; update(); });
+      $('date').addEventListener('change', () => { S.d = $('date').value; update(); });
+      $('tz').addEventListener('change', () => {
+        S.z = $('tz').value;
+        S.zl = (TZ.find(x => x[0] === S.z) || ['', '', ''])[2];
+        changed();
+      });
+      $('el').addEventListener('change', () => { S.e = $('el').value; changed(); });
+      $('since').addEventListener('change', () => { S.et = $('since').value || '20:00'; update(); });
+      $('hide').addEventListener('change', () => { S.eh = $('hide').checked; update(); });
+      let tTimer;
+      for (const [id, key] of [['lab1', 'l1'], ['tz-lab', 'zl'], ['el-lab', 'el']]) {
+        $(id).addEventListener('input', () => { S[key] = $(id).value; clearTimeout(tTimer); tTimer = setTimeout(update, 300); });
+      }
+      $('pv-bg').addEventListener('change', () => { $('preview').dataset.bg = $('pv-bg').value; });
+      $('copy').addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText($('url').value); toast('URL をコピーしました。OBS のブラウザソースに貼ってください'); }
+        catch (e) { $('url').select(); toast('コピーできなかったので、URL を選びました（Ctrl+C でコピー）'); }
+      });
+      window.addEventListener('resize', () => { clearTimeout(update.r); update.r = setTimeout(update, 120); });
+
+      syncUI();
+      update();
+    })();
+  </script>
+</body>
+
+</html>

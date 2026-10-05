@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>時計・経過時間</title>
+  <!-- OBSのブラウザソースで表示するページ。設定はすべて URL に入っている（編集ページ index.html で作る）。
+       経過時間（配信・録画）は、OBS のブラウザソースが知らせてくる開始・停止（window.obsstudio）で数える。
+       開始した時刻はこのブラウザに覚えておくので、ソースを開き直しても続きから数える。 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&family=Orbitron:wght@700;900&family=Rajdhani:wght@700&family=Fira+Code:wght@500;700&family=Outfit:wght@700;900&family=Quicksand:wght@700&family=Noto+Serif+JP:wght@600;900&family=Nunito:wght@800;900&family=Josefin+Sans:wght@600;700&family=DM+Sans:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: calc(12px * var(--k));
+      box-sizing: border-box;
+      --k: 1;
+      --a: #ff85a1;
+    }
+
+    body.al-left {
+      justify-content: flex-start;
+    }
+
+    body.al-right {
+      justify-content: flex-end;
+    }
+
+    #stage {
+      display: flex;
+      align-items: stretch;
+      gap: calc(26px * var(--k));
+      padding: calc(14px * var(--k)) calc(26px * var(--k));
+      box-sizing: border-box;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    #stage.col {
+      flex-direction: column;
+      gap: calc(12px * var(--k));
+    }
+
+    .box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: calc(6px * var(--k));
+    }
+
+    .al-left .box {
+      align-items: flex-start;
+    }
+
+    .al-center .box {
+      align-items: center;
+    }
+
+    .al-right .box {
+      align-items: flex-end;
+    }
+
+    .box:not([hidden])~.box:not([hidden]) {
+      border-left: calc(2px * var(--k)) solid var(--sep, rgba(255, 255, 255, 0.25));
+      padding-left: calc(26px * var(--k));
+    }
+
+    .col .box:not([hidden])~.box:not([hidden]) {
+      border-left: 0;
+      padding-left: 0;
+      border-top: calc(2px * var(--k)) solid var(--sep, rgba(255, 255, 255, 0.25));
+      padding-top: calc(12px * var(--k));
+    }
+
+    .lab {
+      font-size: calc(18px * var(--k));
+      letter-spacing: 0.08em;
+    }
+
+    .lab:empty {
+      display: none;
+    }
+
+    .time {
+      font-size: calc(60px * var(--k));
+      display: flex;
+      align-items: baseline;
+    }
+
+    .box.sub .time {
+      font-size: calc(44px * var(--k));
+    }
+
+    /* 数字の幅をそろえて、秒が変わっても揺れないように */
+    .time .d {
+      display: inline-block;
+      width: 0.62em;
+      text-align: center;
+    }
+
+    .time .c {
+      display: inline-block;
+      width: 0.32em;
+      text-align: center;
+      transform: translateY(-0.06em);
+    }
+
+    .time .ap {
+      font-size: 0.42em;
+      margin: 0 0.25em;
+      letter-spacing: 0.04em;
+    }
+
+    .time .s {
+      font-size: 0.62em;
+      opacity: 0.85;
+    }
+
+    .date {
+      font-size: calc(20px * var(--k));
+      letter-spacing: 0.04em;
+    }
+
+    .date:empty {
+      display: none;
+    }
+
+    .idle .time {
+      opacity: 0.45;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ── テーマ（配信オーバーレイと同じ見た目） ── */
+    /* シンプル：文字だけ（台は付けられる） */
+    .t-simple #stage {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 calc(2px * var(--k)) calc(6px * var(--k)) rgba(0, 0, 0, 0.7);
+    }
+
+    .t-simple.panel #stage {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: calc(18px * var(--k));
+    }
+
+    .t-simple .lab,
+    .t-simple .date {
+      font-weight: 700;
+      color: var(--a);
+    }
+
+    /* GAMING */
+    .t-gaming #stage {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      color: #fff;
+      background: rgba(4, 10, 20, 0.82);
+      border: calc(2px * var(--k)) solid var(--a);
+      border-radius: calc(6px * var(--k));
+      box-shadow: 0 0 calc(18px * var(--k)) color-mix(in srgb, var(--a) 55%, transparent), inset 0 0 calc(16px * var(--k)) color-mix(in srgb, var(--a) 18%, transparent);
+      text-shadow: 0 0 calc(10px * var(--k)) var(--a);
+      --sep: color-mix(in srgb, var(--a) 45%, transparent);
+    }
+
+    .t-gaming .lab,
+    .t-gaming .date {
+      font-family: 'Rajdhani', 'Zen Maru Gothic', sans-serif;
+      font-weight: 700;
+      color: var(--a);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      text-shadow: none;
+    }
+
+    /* Orbitron は数字の幅が広い */
+    .t-gaming .time .d {
+      width: 0.82em;
+    }
+
+    .t-gaming .time .c {
+      width: 0.38em;
+    }
+
+    /* CYBERPUNK */
+    .t-cyber #stage {
+      font-family: 'Fira Code', monospace;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(11, 7, 26, 0.9);
+      border: calc(2px * var(--k)) solid var(--a);
+      border-left-width: calc(8px * var(--k));
+      text-shadow: calc(3px * var(--k)) calc(3px * var(--k)) 0 var(--a);
+      --sep: rgba(255, 238, 0, 0.5);
+    }
+
+    .t-cyber .lab,
+    .t-cyber .date {
+      color: #ffee00;
+      text-shadow: none;
+      font-family: 'Fira Code', 'Zen Maru Gothic', monospace;
+    }
+
+    .t-cyber .time .d {
+      width: 0.6em;
+    }
+
+    .t-cyber .time .c {
+      width: 0.34em;
+    }
+
+    /* GIRLY NEON */
+    .t-neon #stage {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      color: #fff;
+      background: rgba(22, 6, 28, 0.78);
+      border: calc(2px * var(--k)) solid var(--a);
+      border-radius: calc(24px * var(--k));
+      box-shadow: 0 0 calc(22px * var(--k)) color-mix(in srgb, var(--a) 60%, transparent);
+      text-shadow: 0 0 calc(12px * var(--k)) var(--a), 0 0 calc(2px * var(--k)) var(--a);
+      --sep: color-mix(in srgb, var(--a) 40%, transparent);
+    }
+
+    .t-neon .lab,
+    .t-neon .date {
+      font-family: 'Quicksand', 'Zen Maru Gothic', sans-serif;
+      font-weight: 700;
+      color: var(--a);
+      text-shadow: none;
+    }
+
+    /* SWEET LOLITA ROSE */
+    .t-rose #stage {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      color: #df6ba6;
+      background: rgba(255, 245, 250, 0.95);
+      border: calc(3px * var(--k)) solid var(--a);
+      border-radius: calc(28px * var(--k));
+      box-shadow: 0 0 0 calc(5px * var(--k)) rgba(255, 245, 250, 0.7), 0 calc(6px * var(--k)) calc(18px * var(--k)) rgba(122, 77, 106, 0.25);
+      --sep: color-mix(in srgb, var(--a) 50%, transparent);
+    }
+
+    .t-rose .lab,
+    .t-rose .date {
+      font-family: 'Quicksand', 'Zen Maru Gothic', sans-serif;
+      font-weight: 700;
+      color: #7a4d6a;
+    }
+
+    /* 和 */
+    .t-wa #stage {
+      font-family: 'Noto Serif JP', serif;
+      font-weight: 900;
+      color: #3a2a20;
+      background: rgba(250, 246, 240, 0.96);
+      border: calc(2px * var(--k)) solid var(--a);
+      outline: calc(1px * var(--k)) solid var(--a);
+      outline-offset: calc(-7px * var(--k));
+      border-radius: calc(4px * var(--k));
+      --sep: color-mix(in srgb, var(--a) 45%, transparent);
+    }
+
+    .t-wa .lab,
+    .t-wa .date {
+      font-weight: 600;
+      color: var(--a);
+    }
+
+    /* POP */
+    .t-pop #stage {
+      font-family: 'Nunito', 'Zen Maru Gothic', sans-serif;
+      font-weight: 900;
+      color: #2a4a5a;
+      background: #f0faff;
+      border: calc(4px * var(--k)) solid var(--a);
+      border-radius: calc(28px * var(--k));
+      box-shadow: 0 calc(6px * var(--k)) 0 color-mix(in srgb, var(--a) 70%, #000);
+      --sep: color-mix(in srgb, var(--a) 55%, transparent);
+    }
+
+    .t-pop .lab,
+    .t-pop .date {
+      font-family: 'Quicksand', 'Zen Maru Gothic', sans-serif;
+      font-weight: 700;
+      color: color-mix(in srgb, var(--a) 70%, #000);
+    }
+
+    /* CITY POP */
+    .t-city #stage {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, rgba(28, 10, 0, 0.92), rgba(59, 20, 5, 0.92));
+      border-radius: calc(16px * var(--k));
+      box-shadow: 0 0 0 calc(2px * var(--k)) color-mix(in srgb, var(--a) 60%, transparent);
+      --sep: color-mix(in srgb, var(--a) 40%, transparent);
+    }
+
+    /* 文字ごとに色を流す（親に付けると、幅をそろえた数字の箱で切れるため） */
+    .t-city .time .d,
+    .t-city .time .c,
+    .t-city .time .ap {
+      background: linear-gradient(180deg, var(--a), #ec4899);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .t-city .lab,
+    .t-city .date {
+      font-family: 'DM Sans', 'Zen Maru Gothic', sans-serif;
+      font-weight: 600;
+      color: #fcd34d;
+      letter-spacing: 0.14em;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="stage">
+    <div class="box" id="b-clock"><div class="lab" id="l-clock"></div><div class="time" id="t-clock"></div><div class="date" id="d-clock"></div></div>
+    <div class="box sub" id="b-tz"><div class="lab" id="l-tz"></div><div class="time" id="t-tz"></div><div class="date" id="d-tz"></div></div>
+    <div class="box" id="b-el"><div class="lab" id="l-el"></div><div class="time" id="t-el"></div></div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const q = new URLSearchParams(location.search);
+      const get = (k, d) => (q.has(k) ? q.get(k) : d);
+
+      // ---- 設定（URL から）
+      const C = {
+        theme: get('t', 'simple'),
+        clock: get('c', '1') === '1',
+        h12: get('h', '24') === '12',
+        sec: get('s', '1') === '1',
+        date: get('d', 'md'),         // none / md / ymd / en
+        lab1: get('l1', ''),
+        tz: get('z', ''),             // 2つ目の時刻（IANA の名前）。空なら出さない
+        tzLab: get('zl', ''),
+        el: get('e', 'none'),         // none / stream / record / since / load
+        elLab: get('el', '配信時間'),
+        since: get('et', '20:00'),
+        hideIdle: get('eh', '0') === '1',
+        layout: get('ly', 'row'),
+        align: get('al', 'center'),
+        accent: get('a', ''),
+        size: Math.max(30, Math.min(400, +get('sz', '100') || 100)),
+        panel: get('p', '0') === '1',
+        lang: get('wd', 'ja'),
+        demo: get('demo', '0') === '1', // 編集ページの見本：OBS がなくても数える
+      };
+      const THEMES = ['simple', 'gaming', 'cyber', 'neon', 'rose', 'wa', 'pop', 'city'];
+      document.body.classList.add('t-' + (THEMES.includes(C.theme) ? C.theme : 'simple'), 'al-' + C.align);
+      if (C.panel) document.body.classList.add('panel');
+      if (C.layout === 'col') $('stage').classList.add('col');
+      document.body.style.setProperty('--k', C.size / 100);
+      if (/^[0-9a-f]{6}$/i.test(C.accent)) document.body.style.setProperty('--a', '#' + C.accent);
+      else document.body.style.setProperty('--a', { simple: '#ff85a1', gaming: '#00fff7', cyber: '#ff007f', neon: '#ff6ec7', rose: '#ea92c1', wa: '#b5627e', pop: '#7ec8e3', city: '#f59e0b' }[C.theme] || '#ff85a1');
+
+      $('b-clock').hidden = !C.clock;
+      $('b-tz').hidden = !C.tz;
+      $('b-el').hidden = C.el === 'none';
+      $('l-clock').textContent = C.lab1;
+      $('l-tz').textContent = C.tzLab;
+      $('l-el').textContent = C.elLab;
+
+      // ---- 数字を、幅をそろえた文字にする
+      const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const chars = s => [...s].map(ch => /\d/.test(ch) ? `<span class="d">${ch}</span>` : ch === ':' ? '<span class="c">:</span>' : esc(ch)).join('');
+      const setHTML = (el, html) => { if (el._h !== html) { el.innerHTML = html; el._h = html; } };
+
+      // ---- 時刻
+      const WD_JA = ['日', '月', '火', '水', '木', '金', '土'];
+      function parts(tz) {
+        const f = new Intl.DateTimeFormat('en-US', { timeZone: tz || undefined, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hourCycle: 'h23', weekday: 'short' });
+        const o = {};
+        for (const p of f.formatToParts(new Date())) o[p.type] = p.value;
+        return { y: +o.year, mo: +o.month, d: +o.day, h: +o.hour % 24, mi: +o.minute, s: +o.second, wd: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(o.weekday) };
+      }
+      const p2 = n => String(n).padStart(2, '0');
+      function timeHTML(t, withSec) {
+        let h = t.h, ap = '';
+        if (C.h12) {
+          ap = C.lang === 'en' ? (h < 12 ? 'AM' : 'PM') : (h < 12 ? '午前' : '午後');
+          h = h % 12 || 12;
+        }
+        const main = chars(`${C.h12 ? h : p2(h)}:${p2(t.mi)}`);
+        const sec = withSec ? `<span class="s">${chars(':' + p2(t.s))}</span>` : '';
+        if (!ap) return main + sec;
+        return C.lang === 'en' ? main + sec + `<span class="ap">${ap}</span>` : `<span class="ap">${ap}</span>` + main + sec;
+      }
+      function dateText(t) {
+        const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const WD_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        if (C.date === 'none') return '';
+        if (C.date === 'en') return `${WD_EN[t.wd]}, ${MON[t.mo - 1]} ${t.d}`;
+        const w = C.lang === 'en' ? ` ${WD_EN[t.wd]}` : `（${WD_JA[t.wd]}）`;
+        return C.date === 'ymd' ? `${t.y}/${p2(t.mo)}/${p2(t.d)}${w}` : `${t.mo}/${t.d}${w}`;
+      }
+
+      // ---- 経過時間
+      const KEY = 'donnma-clock-' + C.el;
+      let start = null;     // 数え始めた時刻（ms）
+      let pausedAt = null;  // 録画を一時停止した時刻
+      let running = false;
+      const load = () => { try { const v = JSON.parse(localStorage.getItem(KEY) || 'null'); return v && typeof v.start === 'number' ? v : null; } catch (e) { return null; } };
+      const save = () => { try { start ? localStorage.setItem(KEY, JSON.stringify({ start })) : localStorage.removeItem(KEY); } catch (e) { /* 覚えられなくても数える */ } };
+      function begin(fresh) {
+        const v = load();
+        // 開き直したときは覚えている時刻から。新しく始まったときは今から
+        start = !fresh && v ? v.start : Date.now();
+        running = true; pausedAt = null; save();
+      }
+      function stop() { running = false; start = null; pausedAt = null; save(); }
+
+      if (C.el === 'load' || C.demo) begin(true);
+      else if (C.el === 'stream' || C.el === 'record') {
+        const obs = window.obsstudio;
+        const kind = C.el === 'stream' ? 'Streaming' : 'Recording';
+        if (obs) {
+          window.addEventListener(`obs${kind}Started`, () => begin(true));
+          window.addEventListener(`obs${kind}Stopped`, stop);
+          if (C.el === 'record') {
+            window.addEventListener('obsRecordingPaused', () => { pausedAt = Date.now(); });
+            window.addEventListener('obsRecordingUnpaused', () => { if (pausedAt && start) start += Date.now() - pausedAt; pausedAt = null; save(); });
+          }
+          // 開いたときに、もう配信・録画しているか
+          try {
+            if (typeof obs.getStatus === 'function') obs.getStatus(st => {
+              const on = st && (C.el === 'stream' ? st.streaming : st.recording);
+              if (on) begin(false);
+              else stop();
+              if (C.el === 'record' && st && st.recordingPaused) pausedAt = Date.now();
+            });
+          } catch (e) { /* ページ権限が足りないときは、開始・停止の知らせだけで数える */ }
+        }
+      }
+
+      function elapsedHTML() {
+        if (C.el === 'since') {
+          const [hh, mm] = C.since.split(':').map(Number);
+          const now = new Date();
+          const s = new Date(now); s.setHours(hh || 0, mm || 0, 0, 0);
+          // 決めた時刻より前なら、まだ始まっていない
+          if (now < s) return { html: chars('0:00:00'), idle: true };
+          return { html: chars(fmtDur(now - s)), idle: false };
+        }
+        if (!running || !start) return { html: chars('0:00:00'), idle: true };
+        const now = pausedAt || Date.now();
+        return { html: chars(fmtDur(now - start)), idle: !!pausedAt };
+      }
+      function fmtDur(ms) {
+        const t = Math.max(0, Math.floor(ms / 1000));
+        return `${Math.floor(t / 3600)}:${p2(Math.floor(t / 60) % 60)}:${p2(t % 60)}`;
+      }
+
+      // ---- 描く（毎秒、秒の変わり目に合わせて）
+      function tick() {
+        if (C.clock) {
+          const t = parts('');
+          setHTML($('t-clock'), timeHTML(t, C.sec));
+          $('d-clock').textContent = dateText(t);
+        }
+        if (C.tz) {
+          let t = null;
+          try { t = parts(C.tz); } catch (e) { /* 知らないタイムゾーン */ }
+          setHTML($('t-tz'), t ? timeHTML(t, false) : '--:--');
+          $('d-tz').textContent = t && C.date !== 'none' ? dateText(t) : '';
+        }
+        if (C.el !== 'none') {
+          const e = elapsedHTML();
+          setHTML($('t-el'), e.html);
+          $('b-el').classList.toggle('idle', e.idle);
+          $('b-el').hidden = e.idle && C.hideIdle;
+        }
+        setTimeout(tick, 1000 - (Date.now() % 1000) + 5);
+      }
+      tick();
+    })();
+  </script>
+</body>
+
+</html>
