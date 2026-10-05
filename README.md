@@ -34,6 +34,7 @@
 | 名刺メーカー | [meishi/](meishi/README.md) | 名前・SNS・QRコードの名刺を作り、A4・10面 PDF や印刷所向けの PDF・PNG で保存（`qr/qr-core.js` を使う） |
 | 画像の圧縮・変換 | [image-compress/](image-compress/README.md) | 画像を軽く・JPEG/PNG/WebP に変換する（まとめて・○KB 以下・見比べ・ZIP。送信しない） |
 | OGPチェッカー | [ogp-checker/](ogp-checker/README.md) | URL を入れて、SNS に貼ったときの見え方と OGP の問題を調べる（調べ役は `api/ogp.php`） |
+| robots.txt チェッカー | [robots-checker/](robots-checker/README.md) | Google・AI・X・AdSense などがページを読めるかを robots.txt から判定（調べ役は `api/robots.php`） |
 | 共通の部品 | [common/](common/README.md) | ページ内の確認・お知らせ（`ask.js`） |
 
 ---

@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>robots.txt チェッカー | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="URL を入れるだけで、Google・Bing・AI（ChatGPT・Claude など）・X・AdSense などのクローラーがそのページを読めるかを調べる無料ツール。どの行で止められているか、noindex、サイトマップ、書き方の間違いも確かめられます。robots.txt を書き換えて、公開前に試すこともできます。">
+  <link rel="canonical" href="https://donnma.com/tool/robots-checker/">
+  <meta property="og:title" content="robots.txt チェッカー | どんまうんど-Tools">
+  <meta property="og:description" content="Google・AI・X・AdSense などのクローラーがページを読めるかを、URL を入れるだけで調べる無料ツール。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/robots-checker/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-robots-checker.jpg?v=20261005a">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="robots.txt チェッカー">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <meta name="twitter:image:alt" content="robots.txt チェッカー">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --ok: #7fd8a4;
+      --warn: #ffc46b;
+      --ng: #ff7a8a;
+      --info: #8ec5ff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 44px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title .sp {
+      flex: 1;
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+      flex: none;
+    }
+
+    .ask {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+    }
+
+    input[type=text],
+    textarea {
+      font: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 9px 12px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    input[type=text]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+      font-size: 14px;
+      padding: 9px 20px;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .field-note {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .status-line {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      padding: 10px;
+    }
+
+    .status-line.err {
+      color: var(--ng);
+      font-weight: 700;
+    }
+
+    .spin {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border-strong);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: -2px;
+      margin-right: 6px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 16px;
+    }
+
+    .summary-url {
+      font-size: 13px;
+      word-break: break-all;
+      flex: 1 1 300px;
+      min-width: 0;
+    }
+
+    .summary-url small {
+      display: block;
+      color: var(--muted);
+      font-size: 11.5px;
+    }
+
+    .counts {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .count {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+    }
+
+    .count.ng {
+      color: var(--ng);
+    }
+
+    .count.warn {
+      color: var(--warn);
+    }
+
+    .count.ok {
+      color: var(--ok);
+    }
+
+    .checks {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .check {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr);
+      gap: 4px 8px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--surface-2);
+      border-left: 4px solid var(--border-strong);
+      font-size: 13.5px;
+    }
+
+    .check.ng {
+      border-left-color: var(--ng);
+    }
+
+    .check.warn {
+      border-left-color: var(--warn);
+    }
+
+    .check.ok {
+      border-left-color: var(--ok);
+    }
+
+    .check.info {
+      border-left-color: var(--info);
+    }
+
+    .check-mark {
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .check-title {
+      font-weight: 700;
+    }
+
+    .check-how {
+      grid-column: 2;
+      font-size: 12.5px;
+      color: var(--label);
+    }
+
+    code {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+      background: var(--bg-deep);
+      padding: 1px 5px;
+      border-radius: 4px;
+      word-break: break-all;
+    }
+
+    /* 試すパス */
+    .path-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .path-row label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--label);
+    }
+
+    .path-row input {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 13px;
+    }
+
+    /* クローラーの表 */
+    .bots {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .bots th,
+    .bots td {
+      text-align: left;
+      vertical-align: top;
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .bots tr.cat td {
+      padding-top: 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-2);
+      border-bottom-color: var(--border-strong);
+    }
+
+    .bots td.name small {
+      display: block;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .bots td.res {
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .bots td.res.ok {
+      color: var(--ok);
+    }
+
+    .bots td.res.ng {
+      color: var(--ng);
+    }
+
+    .bots td.res.skip {
+      color: var(--muted);
+    }
+
+    .bots td.why {
+      font-size: 12px;
+      color: var(--label);
+    }
+
+    .bots td.why small {
+      display: block;
+      color: var(--muted);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    /* robots.txt の中身 */
+    .src {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      background: var(--bg-deep);
+      border-radius: 10px;
+      padding: 10px 0;
+      max-height: 520px;
+      overflow: auto;
+    }
+
+    .src .ln {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr);
+      padding: 0 12px 0 0;
+    }
+
+    .src .ln>span:first-child {
+      text-align: right;
+      padding-right: 12px;
+      color: #7a5868;
+      user-select: none;
+    }
+
+    .src .ln>span:last-child {
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .src .ln.hit {
+      background: rgba(255, 133, 161, 0.16);
+    }
+
+    .src .ln.bad>span:last-child {
+      text-decoration: underline wavy var(--warn);
+      text-underline-offset: 3px;
+    }
+
+    .src .k-ua {
+      color: #8ec5ff;
+    }
+
+    .src .k-dis {
+      color: #ff9aae;
+    }
+
+    .src .k-allow {
+      color: #7fd8a4;
+    }
+
+    .src .k-site {
+      color: #ffc46b;
+    }
+
+    .src .cm {
+      color: #8d6a7b;
+    }
+
+    #edit-area {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      min-height: 320px;
+      resize: vertical;
+      background: var(--bg-deep);
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+      gap: 8px;
+    }
+
+    .fact {
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13px;
+      min-width: 0;
+    }
+
+    .fact b {
+      display: block;
+      font-size: 11.5px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .fact span {
+      word-break: break-all;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 8px 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b,
+    .notes b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 720px) {
+      .wrap {
+        padding: 36px 16px 16px;
+      }
+
+      .guide {
+        padding: 8px 16px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .path-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      /* 表は、名前と結果を1行目に、決めた行をその下に */
+      .bots thead {
+        display: none;
+      }
+
+      .bots tr {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .bots td {
+        border-bottom: 0;
+      }
+
+      .bots tr.cat td,
+      .bots td.why {
+        grid-column: 1 / -1;
+      }
+
+      .bots td.why {
+        padding-top: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>robots.txt チェッカー</h1>
+      <p>URL を入れるだけで、Google・AI・X・AdSense などのクローラーがそのページを読めるかを調べます。どの行で止められているか、noindex やサイトマップも確かめられます。</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <form class="panel panel-body" id="form" autocomplete="off">
+      <div class="ask">
+        <input type="text" id="url" inputmode="url" placeholder="https://example.com/page/" aria-label="調べる URL" spellcheck="false">
+        <button class="btn btn-primary" type="submit" id="go">🔍 調べる</button>
+      </div>
+      <p class="field-note" style="margin-top:8px">サイトの中のページの URL を入れると、そのサイトの robots.txt を読んで、そのページを各クローラーが読めるかを調べます。</p>
+    </form>
+
+    <p class="status-line" id="status" hidden></p>
+
+    <div id="result" hidden>
+      <div class="panel panel-body summary">
+        <div class="summary-url" id="sum-url"></div>
+        <div class="counts" id="sum-counts"></div>
+        <button class="btn btn-sm" type="button" id="share">🔗 この結果の URL をコピー</button>
+      </div>
+
+      <section class="panel panel-body" style="margin-top:16px">
+        <div class="panel-title"><span class="sec-icon">🩺</span>チェック</div>
+        <ul class="checks" id="checks"></ul>
+      </section>
+
+      <section class="panel panel-body" style="margin-top:16px">
+        <div class="panel-title"><span class="sec-icon">🤖</span>クローラーごとの結果</div>
+        <div class="path-row">
+          <label for="path">調べるパス</label>
+          <input type="text" id="path" spellcheck="false" aria-label="調べるパス">
+        </div>
+        <p class="field-note" style="margin:-4px 0 10px">パスを書き換えると、すぐに判定し直します（例：<code>/wp-admin/</code>）。</p>
+        <div class="table-scroll">
+          <table class="bots">
+            <thead>
+              <tr><th>クローラー</th><th>結果</th><th>決めた行</th></tr>
+            </thead>
+            <tbody id="bots"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel panel-body" style="margin-top:16px">
+        <div class="panel-title"><span class="sec-icon">📄</span>robots.txt<span class="sp"></span>
+          <button class="btn btn-sm" type="button" id="edit">✏️ 書き換えて試す</button>
+          <button class="btn btn-sm" type="button" id="revert" hidden>↩ 元に戻す</button>
+          <button class="btn btn-sm" type="button" id="copy-src">📋 コピー</button>
+        </div>
+        <p class="field-note" id="src-note" style="margin:-4px 0 10px"></p>
+        <div class="src" id="src"></div>
+        <textarea id="edit-area" spellcheck="false" hidden aria-label="robots.txt を書き換える"></textarea>
+      </section>
+
+      <section class="panel panel-body" style="margin-top:16px">
+        <div class="panel-title"><span class="sec-icon">📋</span>くわしい情報</div>
+        <div class="facts" id="facts"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🔍</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>調べたいページの URL を入れて <b>「🔍 調べる」</b> を押します。</li>
+          <li><b>チェック</b>に、止めてしまっているもの・書き方の間違いなどが出ます。</li>
+          <li><b>クローラーごとの結果</b>で、Google・AI・X・AdSense などが、そのページを読めるかと、決めた行が分かります。パスを書き換えると、ほかのページもすぐ試せます。</li>
+          <li><b>「✏️ 書き換えて試す」</b>で robots.txt を書き換えると、サーバーに置く前に結果を確かめられます。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">📘</span>robots.txt の読まれ方</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>クローラーは、自分の名前が書かれた <code>User-agent</code> の決まりだけを使います。なければ <code>User-agent: *</code> の決まりを使います。</li>
+          <li>当てはまる行がいくつかあるときは、<b>いちばん長く当てはまる行</b>が勝ちます。同じ長さなら <code>Allow</code> が勝ちます。</li>
+          <li><code>*</code> は「何でも」、行の終わりの <code>$</code> は「ここで終わり」です。</li>
+          <li>robots.txt がない（404）ときは、全部読んでよい扱いです。サーバーが落ちている（5xx）ときは、Google はしばらくサイト全体を読みに来なくなります。</li>
+          <li>Google の広告のクローラー（AdSense・AdsBot）は、<code>User-agent: *</code> の決まりを見ません。名前を書いたときだけ従います。</li>
+          <li>Discord などは robots.txt を見ません。X・Slack・LinkedIn は、画像も robots.txt を見てから読みます。</li>
+        </ul>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>ヒント・注意点</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>robots.txt は「読みに来ないで」というお願いで、検索に出なくする設定ではありません。検索に出したくないページは <b>noindex</b> を使い、robots.txt では止めないでください（止めると noindex を読めません）。</li>
+          <li>AI の学習用（GPTBot・ClaudeBot・Google-Extended など）だけを止めても、検索やリンクの表示には影響しません。</li>
+          <li>入れた URL のサイトの robots.txt とページは、このサイトのサーバー（donnma.com）が代わりに取りに行きます。調べた URL や結果は保存しません。</li>
+          <li>判定は、Google が公開している決まり（RFC 9309）に合わせた、このツールでの計算です。各クローラーの実際の動きと少し違うことがあります。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1100px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      // 調べ役（PHP）は donnma.com にだけある。tools.donnma.com（GitHub Pages）からも、そちらを呼ぶ
+      const API = location.hostname === 'tools.donnma.com' ? 'https://donnma.com/tool/api/robots.php' : '../api/robots.php';
+
+      const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const kb = n => n == null ? '—' : n < 1024 ? n + ' B' : (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' KB';
+      const code = s => `<code>${esc(s)}</code>`;
+      const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2000); };
+
+      // ---- クローラー
+      // token：robots.txt の User-agent に書く名前（小文字）。fallback：自分の組がなければ、その名前の組を使う
+      // ignoreStar：User-agent: * を見ない。ignores：robots.txt を見ない
+      const BOTS = [
+        ['検索', 'Google', 'googlebot'],
+        ['検索', 'Google 画像検索', 'googlebot-image', { fallback: 'googlebot' }],
+        ['検索', 'Bing', 'bingbot'],
+        ['検索', 'Apple（Siri・Spotlight）', 'applebot', { fallback: 'googlebot', note: 'Applebot の組がなければ Googlebot の決まりに従う' }],
+        ['検索', 'DuckDuckGo', 'duckduckbot'],
+        ['検索', 'Yandex', 'yandex'],
+        ['検索', 'Baidu', 'baiduspider'],
+        ['広告', 'Google AdSense', 'mediapartners-google', { ignoreStar: true }],
+        ['広告', 'Google 広告（AdsBot）', 'adsbot-google', { ignoreStar: true }],
+        ['AI', 'OpenAI（学習用）', 'gptbot'],
+        ['AI', 'ChatGPT の検索', 'oai-searchbot'],
+        ['AI', 'ChatGPT（使う人の操作で見に来る）', 'chatgpt-user'],
+        ['AI', 'Anthropic（学習用）', 'claudebot'],
+        ['AI', 'Claude の検索', 'claude-searchbot'],
+        ['AI', 'Claude（使う人の操作で見に来る）', 'claude-user'],
+        ['AI', 'Google の AI（Gemini など）', 'google-extended', { note: '読みに来るのは Googlebot。AI に使ってよいかの印' }],
+        ['AI', 'Apple の AI', 'applebot-extended', { note: '読みに来るのは Applebot。AI に使ってよいかの印' }],
+        ['AI', 'Perplexity', 'perplexitybot'],
+        ['AI', 'Common Crawl', 'ccbot'],
+        ['AI', 'ByteDance', 'bytespider'],
+        ['AI', 'Meta の AI', 'meta-externalagent'],
+        ['AI', 'Amazon', 'amazonbot'],
+        ['SNS', 'X のカード', 'twitterbot'],
+        ['SNS', 'Facebook・Threads・LINE', 'facebookexternalhit', { note: 'セキュリティの確かめなどでは守らないことがある' }],
+        ['SNS', 'Slack', 'slackbot'],
+        ['SNS', 'LinkedIn', 'linkedinbot'],
+        ['SNS', 'Pinterest', 'pinterestbot'],
+        ['SNS', 'Discord', 'discordbot', { ignores: true }],
+      ].map(([cat, name, token, o = {}]) => ({ cat, name, token, ...o }));
+
+      // ---- robots.txt を読む（RFC 9309）
+      const KNOWN = ['user-agent', 'allow', 'disallow', 'sitemap', 'crawl-delay', 'host', 'clean-param', 'noindex', 'request-rate', 'visit-time'];
+      function parse(text) {
+        const groups = []; const sitemaps = []; const problems = []; const crawlDelay = [];
+        let cur = null, inRules = false;
+        const lines = String(text || '').split(/\r\n|\r|\n/);
+        lines.forEach((raw, i) => {
+          const no = i + 1;
+          const line = raw.replace(/#.*/, '').trim();
+          if (!line) return;
+          const m = line.match(/^([A-Za-z-]+)\s*:\s*(.*)$/);
+          if (!m) { problems.push({ no, level: 'warn', msg: '「名前: 中身」の形になっていない行です（読み飛ばされます）' }); return; }
+          const key = m[1].toLowerCase(), val = m[2].trim();
+          if (key === 'user-agent') {
+            if (!cur || inRules) { cur = { agents: [], rules: [], line: no }; groups.push(cur); inRules = false; }
+            cur.agents.push(val.toLowerCase().replace(/\/.*$/, '').trim());
+          } else if (key === 'allow' || key === 'disallow') {
+            if (!cur) { problems.push({ no, level: 'warn', msg: `User-agent より前に ${m[1]} があります（どのクローラーにも使われません）` }); return; }
+            inRules = true;
+            if (val && !/^[/*]/.test(val)) problems.push({ no, level: 'warn', msg: `パスが「/」から始まっていません（${val}）。「/${val}」のつもりなら直してください` });
+            cur.rules.push({ allow: key === 'allow', path: val, no });
+          } else if (key === 'sitemap') {
+            sitemaps.push({ url: val, no });
+            if (!/^https?:\/\//i.test(val)) problems.push({ no, level: 'warn', msg: 'Sitemap は https:// から始まる URL で書く決まりです' });
+          } else if (key === 'crawl-delay') {
+            crawlDelay.push({ no, val });
+            if (cur) inRules = true;
+          } else if (key === 'noindex') {
+            problems.push({ no, level: 'warn', msg: 'robots.txt の noindex は、Google では 2019 年から使えません。ページの <meta name="robots" content="noindex"> を使ってください' });
+          } else if (!KNOWN.includes(key)) {
+            problems.push({ no, level: 'info', msg: `「${m[1]}」は知られていない書き方です。つづりの間違いかもしれません（読み飛ばされます）` });
+          }
+        });
+        return { groups, sitemaps, problems, crawlDelay, lines };
+      }
+
+      // パスを比べられる形にそろえる（%XX と日本語のちがいをなくす）
+      const norm = s => { try { return encodeURI(decodeURI(s)); } catch (e) { return s; } };
+      const toRe = pat => {
+        const end = pat.endsWith('$');
+        const body = (end ? pat.slice(0, -1) : pat).split('*').map(x => x.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*');
+        return new RegExp('^' + body + (end ? '$' : ''));
+      };
+
+      // あるクローラーが path を読めるか。決めた行も返す
+      function judge(P, bot, path) {
+        if (bot.ignores) return { skip: true };
+        const find = t => P.groups.filter(g => g.agents.includes(t));
+        let gs = find(bot.token), via = bot.token;
+        if (!gs.length && bot.fallback) { gs = find(bot.fallback); via = bot.fallback; }
+        if (!gs.length && !bot.ignoreStar) { gs = find('*'); via = '*'; }
+        if (!gs.length) return { allowed: true, via: null };
+        const rules = gs.flatMap(g => g.rules);
+        const p = norm(path);
+        let best = null;
+        for (const r of rules) {
+          if (!r.path) continue; // 「Disallow:」だけは「止めない」
+          if (!toRe(norm(r.path)).test(p)) continue;
+          const len = norm(r.path).length;
+          if (!best || len > best.len || (len === best.len && r.allow && !best.rule.allow)) best = { len, rule: r };
+        }
+        return { allowed: best ? best.rule.allow : true, rule: best && best.rule, via, groupLine: gs[0].line };
+      }
+
+      // ---- 調べる
+      let D = null;       // 返事
+      let P = null;       // 読んだ robots.txt
+      let editing = false;
+      let busy = false;
+
+      async function run(url) {
+        if (busy) return;
+        url = url.trim();
+        if (!url) { $('url').focus(); return; }
+        busy = true; $('go').disabled = true;
+        $('result').hidden = true;
+        const st = $('status'); st.hidden = false; st.className = 'status-line';
+        st.innerHTML = '<span class="spin"></span>調べています…（robots.txt とページを取りに行っています）';
+        history.replaceState(null, '', '?' + new URLSearchParams({ url }));
+        try {
+          const res = await fetch(API + '?' + new URLSearchParams({ url }), { cache: 'no-store' });
+          let d;
+          try { d = await res.json(); } catch (e) { throw new Error('調べ役から正しい返事がありませんでした（' + res.status + '）'); }
+          if (!d.ok) throw new Error(d.error || '調べられませんでした');
+          st.hidden = true;
+          D = d;
+          editing = false;
+          P = parse(d.robots.body || '');
+          let path = '/';
+          try { const u = new URL(d.page.finalUrl || d.input); path = u.pathname + u.search; } catch (e) { /* そのまま */ }
+          $('path').value = path;
+          show();
+        } catch (e) {
+          st.className = 'status-line err';
+          st.textContent = '⚠ ' + (e.message === 'Failed to fetch' ? '調べ役（donnma.com）につながりませんでした。少し待ってからもう一度ためしてください' : e.message);
+        } finally {
+          busy = false; $('go').disabled = false;
+        }
+      }
+
+      // robots.txt の返事が、どう扱われるか
+      function robotsState() {
+        const r = D.robots;
+        if (editing) return 'ok';
+        if (r.error || r.status >= 500) return 'down';     // サイト全体を止める扱い
+        if (r.status >= 400 || r.status === 0) return 'none'; // 全部読める扱い
+        return 'ok';
+      }
+
+      function show() {
+        $('sum-url').innerHTML = `<b>${esc(D.origin)}/robots.txt</b><small>${esc(D.input)}</small>`;
+        renderBots();
+        renderChecks();
+        renderSrc();
+        renderFacts();
+        $('result').hidden = false;
+        $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function results(path) {
+        const state = robotsState();
+        return BOTS.map(b => {
+          if (b.ignores) return { b, skip: true };
+          if (state === 'down') return { b, allowed: false, down: true };
+          if (state === 'none') return { b, allowed: true, none: true };
+          return { b, ...judge(P, b, path) };
+        });
+      }
+
+      function renderBots() {
+        const path = $('path').value.trim() || '/';
+        const rs = results(path);
+        const hit = new Set();
+        let cat = '';
+        $('bots').innerHTML = rs.map(r => {
+          let row = '';
+          if (r.b.cat !== cat) { cat = r.b.cat; row += `<tr class="cat"><td colspan="3">${{ 検索: '🔎 検索', 広告: '💰 広告', AI: '🧠 AI', SNS: '💬 SNS・チャット' }[cat]}</td></tr>`; }
+          let res, cls, why;
+          if (r.skip) { res = '➖ 見ない'; cls = 'skip'; why = 'robots.txt を見ずに読みに来ます'; }
+          else if (r.down) { res = '❌ 読めない'; cls = 'ng'; why = 'robots.txt を読めないので、サイト全体を止めている扱い'; }
+          else if (r.none) { res = '✅ 読める'; cls = 'ok'; why = 'robots.txt がないので、全部読める'; }
+          else {
+            res = r.allowed ? '✅ 読める' : '❌ 読めない'; cls = r.allowed ? 'ok' : 'ng';
+            if (r.rule) {
+              hit.add(r.rule.no);
+              why = `${r.rule.no} 行目 ${code((r.rule.allow ? 'Allow: ' : 'Disallow: ') + r.rule.path)}<small>User-agent: ${esc(r.via)} の組${r.via !== r.b.token && r.via !== '*' ? `（${esc(r.b.token)} の組がないので）` : ''}</small>`;
+            } else if (r.via) {
+              why = `当てはまる行がない<small>User-agent: ${esc(r.via)} の組</small>`;
+            } else {
+              why = r.b.ignoreStar ? '名前で書かれていないので、止められていない<small>* の決まりは見ません</small>' : '当てはまる組がない';
+            }
+          }
+          if (r.b.note) why += `<small>${esc(r.b.note)}</small>`;
+          return row + `<tr><td class="name">${esc(r.b.name)}<small>${esc(r.b.token)}</small></td><td class="res ${cls}">${res}</td><td class="why">${why}</td></tr>`;
+        }).join('');
+        // 決めた行に色を付ける
+        for (const el of $('src').querySelectorAll('.ln')) el.classList.toggle('hit', hit.has(+el.dataset.no));
+        return rs;
+      }
+
+      function renderSrc() {
+        const r = D.robots;
+        const bad = new Set(P.problems.filter(p => p.level === 'warn').map(p => p.no));
+        if (!editing && (r.error || !(r.status >= 200 && r.status < 300))) {
+          $('src').innerHTML = `<div class="ln"><span></span><span class="cm">${r.error ? esc(r.error) : `返事が ${esc(r.status)} だったので、中身はありません`}</span></div>`;
+        } else {
+          const color = l => {
+            const m = l.match(/^(\s*)([A-Za-z-]+)(\s*:)(.*?)(#.*)?$/);
+            if (!m) return l.startsWith('#') || /^\s*#/.test(l) ? `<span class="cm">${esc(l)}</span>` : esc(l);
+            const k = m[2].toLowerCase();
+            const cls = k === 'user-agent' ? 'k-ua' : k === 'disallow' ? 'k-dis' : k === 'allow' ? 'k-allow' : k === 'sitemap' ? 'k-site' : '';
+            return `${esc(m[1])}<span class="${cls}">${esc(m[2])}</span>${esc(m[3])}${esc(m[4])}${m[5] ? `<span class="cm">${esc(m[5])}</span>` : ''}`;
+          };
+          $('src').innerHTML = P.lines.map((l, i) => `<div class="ln${bad.has(i + 1) ? ' bad' : ''}" data-no="${i + 1}"><span>${i + 1}</span><span>${color(l) || ' '}</span></div>`).join('');
+        }
+        $('src-note').textContent = editing
+          ? '書き換えた内容で、上のチェックと表をすぐ判定し直します（サーバーの robots.txt は変わりません）。'
+          : '色の付いた行が、上の表で使われた行です。波線の行は、書き方に問題があります。';
+        renderBots();
+      }
+
+      function renderFacts() {
+        const r = D.robots, p = D.page;
+        const f = [];
+        const fact = (k, v) => f.push(`<div class="fact"><b>${k}</b><span>${v}</span></div>`);
+        fact('robots.txt の返事', r.error ? '❌ ' + esc(r.error) : esc(r.status) + (r.type ? '・' + esc(r.type) : ''));
+        if (r.chain && r.chain.length > 1) fact('robots.txt の転送', r.chain.map(c => `${esc(c.status)} ${esc(c.url)}`).join('<br>→ '));
+        if (r.bytes != null) fact('robots.txt の大きさ', kb(r.bytes) + `（${P.lines.length} 行）`);
+        fact('ページの返事', p.error ? '❌ ' + esc(p.error) : esc(p.status));
+        if (p.chain && p.chain.length > 1) fact('ページの転送', p.chain.map(c => `${esc(c.status)} ${esc(c.url)}`).join('<br>→ '));
+        fact('meta robots', p.metaRobots && p.metaRobots.length ? p.metaRobots.map(m => `${esc(m.name)}: ${esc(m.content)}`).join('<br>') : '（なし）');
+        fact('X-Robots-Tag', esc(p.xRobots || '（なし）'));
+        fact('サイトマップ', D.sitemaps.length ? D.sitemaps.map(s => `${s.error ? '❌' : s.status === 200 ? '✅' : '⚠'} ${esc(s.url)}${s.error ? '（' + esc(s.error) + '）' : s.status !== 200 ? `（${esc(s.status)}）` : ''}`).join('<br>') : '（書かれていません）');
+        $('facts').innerHTML = f.join('');
+      }
+
+      // ---- チェック
+      function renderChecks() {
+        const out = [];
+        const add = (level, title, how = '') => out.push({ level, title, how });
+        const r = D.robots, p = D.page;
+        const state = robotsState();
+        const path = (() => { try { const u = new URL(p.finalUrl || D.input); return u.pathname + u.search; } catch (e) { return '/'; } })();
+        const bot = t => BOTS.find(b => b.token === t);
+
+        if (editing) add('info', '書き換えた robots.txt で判定しています', 'サーバーの robots.txt はまだ変わっていません。よければ、書き換えた内容をコピーしてサーバーに置いてください。');
+        if (state === 'down') add('ng', 'robots.txt を読めませんでした' + (r.status ? `（${r.status}）` : ''), `${r.error ? esc(r.error) + '。' : ''}サーバーが robots.txt に 5xx を返したり、つながらなかったりすると、Google はしばらくサイト全体を読みに来なくなります。`);
+        else if (state === 'none') add('info', `robots.txt がありません（${r.status}）`, '全部読んでよい扱いになるので、問題はありません。サイトマップの場所を伝えたいときは、robots.txt を置いて <code>Sitemap:</code> を書いてください。');
+        else if (!editing) {
+          add('ok', `robots.txt を読めました（${P.lines.length} 行・${kb(r.bytes)}）`);
+          if (r.over) add('ng', 'robots.txt が 500KB より大きいです', 'Google は頭の 500KB しか読まないので、後ろの決まりは使われません。');
+          if (!/text\/plain/i.test(r.type || '')) {
+            if (/html/i.test(r.type || '') || /<html|<!doctype/i.test(r.body || '')) add('ng', 'robots.txt の代わりに HTML のページが返っています', 'robots.txt がないときに、トップページなどを返す設定になっているかもしれません。中身は robots.txt として読めないので、全部読んでよい扱いになります。');
+            else add('warn', `robots.txt の種類が text/plain ではありません（${esc(r.type || '不明')}）`, 'たいていは読まれますが、<code>Content-Type: text/plain</code> で返すのが決まりです。');
+          }
+          if (r.chain && r.chain.length > 1) {
+            const last = r.chain[r.chain.length - 1].url;
+            if (new URL(last).host !== new URL(D.origin).host) add('info', 'robots.txt が別のドメインに転送されています', `転送先：${code(last)}<br>Google は転送先の robots.txt を、このサイトのものとして使います。`);
+          }
+        }
+
+        if (state === 'ok') {
+          // サイト全体を止めていないか
+          const star = P.groups.filter(g => g.agents.includes('*')).flatMap(g => g.rules);
+          if (star.some(x => !x.allow && x.path === '/') && !star.some(x => x.allow && x.path === '/'))
+            add('ng', '<code>User-agent: *</code> でサイト全体を止めています（Disallow: /）', '名前を書いていないクローラーは、どのページも読めません。テスト用の設定が残っていないか確かめてください。');
+          const g = judge(P, bot('googlebot'), path);
+          if (!g.allowed) add('ng', `Google がこのページを読めません（${g.rule.no} 行目 ${code('Disallow: ' + g.rule.path)}）`, '検索に出なくなったり、出ても説明が「この結果の説明はありません」になったりします。');
+          else add('ok', 'Google はこのページを読めます');
+          const ad = judge(P, bot('mediapartners-google'), path);
+          if (!ad.allowed) add('warn', `AdSense のクローラーがこのページを読めません（${ad.rule.no} 行目）`, 'ページの中身に合った広告が出にくくなり、広告が出ないこともあります。AdSense を使っていないなら問題ありません。');
+          const x = judge(P, bot('twitterbot'), path);
+          if (!x.allowed) add('warn', `X がこのページを読めません（${x.rule.no} 行目）`, 'X に貼ってもカードが出ません。画像の URL が止められていても、画像なしの小さいカードになります。');
+          const ai = BOTS.filter(b => b.cat === 'AI').filter(b => !judge(P, b, path).allowed);
+          if (ai.length) add('info', `AI のクローラーを ${ai.length} 個止めています`, esc(ai.map(b => b.name).join('・')) + '<br>検索やリンクの表示には影響しません。');
+        }
+
+        // ページの noindex
+        if (!p.error) {
+          if (p.status !== 200) add('info', `ページの返事が ${p.status} です`, '200 でないページは、検索に出ません。');
+          const tags = [...(p.metaRobots || []).filter(m => /noindex|none/i.test(m.content) && /robots|googlebot/.test(m.name)).map(m => `meta ${m.name}: ${m.content}`), ...(p.xRobots && /noindex|none/i.test(p.xRobots) ? ['X-Robots-Tag: ' + p.xRobots] : [])];
+          if (tags.length) {
+            const blocked = state === 'ok' && !judge(P, bot('googlebot'), path).allowed;
+            add(blocked ? 'warn' : 'info', 'このページは検索に出さない設定です（noindex）', esc(tags.join('・')) + (blocked ? '<br>ただし robots.txt で止めているので、Google は noindex を読めません。URL だけ検索に出ることがあるので、出したくないなら robots.txt では止めないでください。' : '<br>わざとでなければ、テーマやプラグインの設定を確かめてください。'));
+          }
+        } else add('warn', 'ページを読めませんでした', esc(p.error));
+
+        // サイトマップ
+        if (state === 'ok' || editing) {
+          if (!P.sitemaps.length) add('info', 'サイトマップ（Sitemap:）が書かれていません', 'なくても大丈夫ですが、書いておくと、検索エンジンが新しいページを見つけやすくなります。');
+          // 届くかどうかは、サーバーの robots.txt に書かれたものだけ調べてある
+          for (const s of editing ? [] : D.sitemaps) {
+            if (s.error) add('warn', 'サイトマップに届きません', `${code(s.url)}<br>${esc(s.error)}`);
+            else if (s.status !== 200) add('warn', `サイトマップの返事が ${s.status} です`, code(s.url));
+          }
+          if (!editing && D.sitemaps.length && D.sitemaps.every(s => s.status === 200)) add('ok', `サイトマップに届きます（${D.sitemaps.length} 個）`);
+        }
+
+        // 書き方
+        for (const pr of P.problems) add(pr.level, `${pr.no} 行目：${esc(pr.msg)}`, code(P.lines[pr.no - 1]));
+        if (P.crawlDelay.length) add('info', `Crawl-delay が書かれています（${P.crawlDelay.map(c => c.no + ' 行目').join('・')}）`, 'Bing などは従いますが、Google は Crawl-delay を見ません。');
+
+        const order = { ng: 0, warn: 1, info: 2, ok: 3 };
+        const mark = { ng: '❌', warn: '⚠️', info: 'ℹ️', ok: '✅' };
+        out.sort((a, b) => order[a.level] - order[b.level]);
+        $('checks').innerHTML = out.map(c => `<li class="check ${c.level}"><span class="check-mark">${mark[c.level]}</span><span class="check-title">${c.title}</span>${c.how ? `<span class="check-how">${c.how}</span>` : ''}</li>`).join('');
+        const n = t => out.filter(c => c.level === t).length;
+        $('sum-counts').innerHTML = [['ng', '❌', n('ng')], ['warn', '⚠', n('warn')], ['ok', '✅', n('ok')]].map(([c, m, k]) => `<span class="count ${c}">${m} ${k}</span>`).join('');
+      }
+
+      // ---- 操作
+      $('form').addEventListener('submit', e => { e.preventDefault(); run($('url').value); });
+      $('path').addEventListener('input', () => { if (D) renderBots(); });
+      $('share').addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(location.href); toast('URL をコピーしました'); } catch (e) { toast('コピーできませんでした'); }
+      });
+      $('copy-src').addEventListener('click', async () => {
+        const text = editing ? $('edit-area').value : (D && D.robots.body) || '';
+        try { await navigator.clipboard.writeText(text); toast('robots.txt をコピーしました'); } catch (e) { toast('コピーできませんでした'); }
+      });
+      $('edit').addEventListener('click', () => {
+        if (!D) return;
+        editing = !editing;
+        if (editing) {
+          $('edit-area').value = D.robots.body || (robotsState() === 'none' ? 'User-agent: *\nDisallow:\n' : '');
+          P = parse($('edit-area').value);
+        }
+        $('edit-area').hidden = !editing;
+        $('src').hidden = editing;
+        $('revert').hidden = !editing;
+        $('edit').textContent = editing ? '👀 見るだけに戻す' : '✏️ 書き換えて試す';
+        if (!editing) P = parse(D.robots.body || '');
+        renderSrc(); renderChecks();
+        if (editing) $('edit-area').focus();
+      });
+      $('revert').addEventListener('click', () => {
+        $('edit-area').value = D.robots.body || '';
+        P = parse($('edit-area').value);
+        renderSrc(); renderChecks();
+      });
+      let editTimer;
+      $('edit-area').addEventListener('input', () => {
+        clearTimeout(editTimer);
+        editTimer = setTimeout(() => { P = parse($('edit-area').value); renderSrc(); renderChecks(); }, 150);
+      });
+
+      // URL に ?url= が付いていたら、すぐ調べる
+      const q = new URLSearchParams(location.search);
+      if (q.get('url')) { $('url').value = q.get('url'); run(q.get('url')); }
+    })();
+  </script>
+</body>
+
+</html>
