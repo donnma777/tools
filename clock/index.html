@@ -909,6 +909,18 @@
     <div class="settings">
       <div class="panel">
         <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">⭐</span>出すもの</div>
+          <div class="seg" id="show">
+            <button type="button" data-v="clock">時計だけ</button>
+            <button type="button" data-v="elapsed">経過時間だけ</button>
+            <button type="button" data-v="both">両方</button>
+          </div>
+          <p class="field-note" style="margin-top:6px">細かい設定は下で変えられます。海外の時刻を足すときは「もう1つの時刻」で。</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
           <div class="panel-title"><span class="sec-icon">🎨</span>見た目</div>
           <div class="themes" id="themes"></div>
           <div class="field">
@@ -1171,7 +1183,11 @@
       }
       const base = () => new URL('view.html', location.href).href;
 
+      // 今の「出すもの」
+      const showing = () => S.c && S.e === 'none' ? 'clock' : !S.c && S.e !== 'none' ? 'elapsed' : S.c && S.e !== 'none' ? 'both' : '';
+
       function syncUI() {
+        for (const b of $('show').children) b.setAttribute('aria-pressed', String(b.dataset.v === showing()));
         for (const b of $('themes').children) b.setAttribute('aria-pressed', String(b.dataset.v === S.t));
         for (const [id, key] of [['layout', 'ly'], ['align', 'al'], ['h', 'h'], ['lang', 'wd']]) for (const b of $(id).children) b.setAttribute('aria-pressed', String(b.dataset.v === S[key]));
         $('accent').value = S.a || THEMES.find(x => x[0] === S.t)[2];
@@ -1210,6 +1226,14 @@
       }
       const changed = () => { syncUI(); update(); };
 
+      $('show').addEventListener('click', e => {
+        const b = e.target.closest('[data-v]'); if (!b) return;
+        const v = b.dataset.v;
+        S.c = v !== 'elapsed';
+        if (v === 'clock') S.e = 'none';
+        else if (S.e === 'none') S.e = 'stream';
+        changed();
+      });
       $('themes').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; S.t = b.dataset.v; S.a = ''; changed(); });
       for (const [id, key] of [['layout', 'ly'], ['align', 'al'], ['h', 'h'], ['lang', 'wd']]) {
         $(id).addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; S[key] = b.dataset.v; changed(); });
