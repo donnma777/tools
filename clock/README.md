@@ -17,7 +17,7 @@ OBS のブラウザソースで使う時計です。時計・もう1つの時刻
 | `ly` / `al` / `sz` | 並べ方 row・col／寄せ left・center・right／大きさ % | row / center / 100 |
 | `c` `h` `s` `d` `l1` `wd` | 時計を出す・12/24・秒・日付（none/md/ymd/en）・上の文字・曜日の言葉（ja/en） | 1 / 24 / 1 / md / なし / ja |
 | `z` / `zl` | もう1つの時刻（IANA の名前）／上の文字 | なし |
-| `e` | 経過時間：none / stream / record / since / load | none |
+| `e` | 経過時間：none / stream / record / replay（リプレイバッファ）/ vcam（仮想カメラ）/ since / load | none |
 | `el` / `et` / `eh` | 上の文字／since の時刻（HH:MM）／`1` で数えていないときは隠す | 配信時間 / 20:00 / 0 |
 | `demo` | `1` なら OBS がなくても今から数える（設定ページの見本用） | 0 |
 
@@ -30,7 +30,7 @@ OBS のブラウザソースで使う時計です。時計・もう1つの時刻
 
 ## 経過時間の数え方
 
-- stream / record は OBS のブラウザソースの `window.obsstudio`（`obsStreamingStarted` などのイベントと `getStatus`）で数える。OBS の WebSocket やパスワードは使わない。
+- stream / record / replay / vcam は OBS のブラウザソースの `window.obsstudio`（`obsStreamingStarted` などのイベントと `getStatus`）で数える。OBS の WebSocket やパスワードは使わない。
 - 始めた時刻は localStorage（`donnma-clock-stream` / `donnma-clock-record`）に覚えて、ソースを読み込み直しても続きから数える。止めたら消す。録画の一時停止の間は数えない。
 - ページ権限が「アクセス権なし」だとイベントが来ない（説明に書いてある）。
 

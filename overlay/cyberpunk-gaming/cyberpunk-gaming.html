@@ -4706,13 +4706,16 @@
          *    data-sw-run    '1' なら数えている
          *    data-sw-start  数え始めた時刻（ms。止めていた間のぶんは進めてある）
          *    data-sw-acc    止めているときの経過（ms）
-         *    data-sw-link   '' 手動 / 'stream' 配信と連動 / 'record' 録画と連動
+         *    data-sw-link   '' 手動 / 'stream' 配信 / 'record' 録画 / 'replay' リプレイバッファ / 'vcam' 仮想カメラ と連動
          *  連動は OBS のブラウザソースが知らせる開始・停止（window.obsstudio）で数える。始めた時刻は localStorage に
          *  覚えるので、ソースを読み込み直しても続きから。Chrome で編集しているときは数えない */
-        const SW_LINK_NAME = { '': 'なし', stream: '配信', record: '録画' };
-        const SW_LINK_NEXT = { '': 'stream', stream: 'record', record: '' };
+        const SW_LINK_NAME = { '': 'なし', stream: '配信', record: '録画', replay: 'リプレイ', vcam: '仮想カメラ' };
+        const SW_LINK_NEXT = { '': 'stream', stream: 'record', record: 'replay', replay: 'vcam', vcam: '' };
+        const SW_LIVE_TEXT = { stream: '● 配信中', record: '● 録画中', replay: '● リプレイ中', vcam: '● 仮想カメラ' };
+        // OBS の知らせの名前（obs○○Started / Stopped）と、getStatus の項目
+        const SW_OBS_KINDS = { stream: ['Streaming', 'streaming'], record: ['Recording', 'recording'], replay: ['Replaybuffer', 'replaybuffer'], vcam: ['Virtualcam', 'virtualcam'] };
         const SW_OBS_KEY = OVERLAY_KEY + 'SwStart-';
-        const swObsOn = { stream: false, record: false };
+        const swObsOn = { stream: false, record: false, replay: false, vcam: false };
         const swPad = (n) => String(n).padStart(2, '0');
         function swFormat(ms) {
             ms = Math.max(0, ms);
@@ -4730,7 +4733,7 @@
             // 時間の下の小さな文字（連動して数えているときだけ）
             const st = box.querySelector('.sw-status');
             if (st) {
-                st.textContent = link && on ? (link === 'stream' ? '● 配信中' : '● 録画中') : '';
+                st.textContent = link && on ? (SW_LIVE_TEXT[link] || '') : '';
                 st.classList.toggle('on', !!link && on);
             }
             box.classList.toggle('sw-running', on);
@@ -4806,7 +4809,7 @@
                 const sep = document.createElement('div');
                 sep.className = 'hover-menu-sep';
                 const lk = mk('link', '🔗 連動：なし');
-                lk.title = '押すたびに「なし → 配信 → 録画」と切り替わります。連動すると、OBS で配信・録画を始めたときに自動で数え、止めると 0 に戻ります';
+                lk.title = '押すたびに「なし → 配信 → 録画 → リプレイ → 仮想カメラ」と切り替わります。連動すると、OBS でそれを始めたときに自動で数え、止めると 0 に戻ります';
                 menu.prepend(mk('go', '▶ 開始'), mk('reset', '↺ リセット'), lk, sep);
                 box._swMenu = menu;
                 swRender(box);
@@ -4830,7 +4833,7 @@
         // 連動しているものを、今の OBS の状態に合わせる（読み込み直したとき・連動を切り替えたとき）
         function swSyncObs() {
             if (!window.obsstudio) return;
-            ['stream', 'record'].forEach(kind => {
+            Object.keys(SW_OBS_KINDS).forEach(kind => {
                 if (swObsOn[kind]) swObsBegin(kind, false);
                 else swLinked(kind).forEach(b => { if (b.dataset.swRun === '1' || +b.dataset.swAcc) swReset(b); });
             });
@@ -4868,10 +4871,10 @@
             swMoTimer = setTimeout(swRefreshAll, 0);
         }).observe(captureArea, { childList: true, subtree: true });
         if (window.obsstudio) {
-            addEventListener('obsStreamingStarted', () => { swObsOn.stream = true; swObsBegin('stream', true); });
-            addEventListener('obsStreamingStopped', () => { swObsOn.stream = false; swObsEnd('stream'); });
-            addEventListener('obsRecordingStarted', () => { swObsOn.record = true; swObsBegin('record', true); });
-            addEventListener('obsRecordingStopped', () => { swObsOn.record = false; swObsEnd('record'); });
+            Object.entries(SW_OBS_KINDS).forEach(([kind, [ev]]) => {
+                addEventListener(`obs${ev}Started`, () => { swObsOn[kind] = true; swObsBegin(kind, true); });
+                addEventListener(`obs${ev}Stopped`, () => { swObsOn[kind] = false; swObsEnd(kind); });
+            });
             addEventListener('obsRecordingPaused', () => swLinked('record').forEach(swStop));
             addEventListener('obsRecordingUnpaused', () => {
                 const bs = swLinked('record');
@@ -4881,8 +4884,7 @@
             });
             try {
                 if (typeof window.obsstudio.getStatus === 'function') window.obsstudio.getStatus((st) => {
-                    swObsOn.stream = !!(st && st.streaming);
-                    swObsOn.record = !!(st && st.recording);
+                    Object.entries(SW_OBS_KINDS).forEach(([kind, [, key]]) => { swObsOn[kind] = !!(st && st[key]); });
                     swSyncObs();
                 });
             } catch (err) { /* ページ権限が足りないときは、開始・停止の知らせだけで数える */ }

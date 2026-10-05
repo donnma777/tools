@@ -359,7 +359,7 @@
         lab1: get('l1', ''),
         tz: get('z', ''),             // 2つ目の時刻（IANA の名前）。空なら出さない
         tzLab: get('zl', ''),
-        el: get('e', 'none'),         // none / stream / record / since / load
+        el: get('e', 'none'),         // none / stream / record / replay / vcam / since / load
         elLab: get('el', '配信時間'),
         since: get('et', '20:00'),
         hideIdle: get('eh', '0') === '1',
@@ -435,10 +435,12 @@
       }
       function stop() { running = false; start = null; pausedAt = null; save(); }
 
+      // OBS の知らせの名前（obs○○Started / Stopped）と、getStatus の項目
+      const OBS_KINDS = { stream: ['Streaming', 'streaming'], record: ['Recording', 'recording'], replay: ['Replaybuffer', 'replaybuffer'], vcam: ['Virtualcam', 'virtualcam'] };
       if (C.el === 'load' || C.demo) begin(true);
-      else if (C.el === 'stream' || C.el === 'record') {
+      else if (OBS_KINDS[C.el]) {
         const obs = window.obsstudio;
-        const kind = C.el === 'stream' ? 'Streaming' : 'Recording';
+        const [kind, statusKey] = OBS_KINDS[C.el];
         if (obs) {
           window.addEventListener(`obs${kind}Started`, () => begin(true));
           window.addEventListener(`obs${kind}Stopped`, stop);
@@ -446,10 +448,10 @@
             window.addEventListener('obsRecordingPaused', () => { pausedAt = Date.now(); });
             window.addEventListener('obsRecordingUnpaused', () => { if (pausedAt && start) start += Date.now() - pausedAt; pausedAt = null; save(); });
           }
-          // 開いたときに、もう配信・録画しているか
+          // 開いたときに、もう配信・録画などをしているか
           try {
             if (typeof obs.getStatus === 'function') obs.getStatus(st => {
-              const on = st && (C.el === 'stream' ? st.streaming : st.recording);
+              const on = st && st[statusKey];
               if (on) begin(false);
               else stop();
               if (C.el === 'record' && st && st.recordingPaused) pausedAt = Date.now();

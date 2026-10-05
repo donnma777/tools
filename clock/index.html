@@ -1077,6 +1077,8 @@
             <select id="el">
               <option value="stream">配信を始めてから</option>
               <option value="record">録画を始めてから</option>
+              <option value="replay">リプレイバッファを始めてから</option>
+              <option value="vcam">仮想カメラを始めてから</option>
               <option value="since">決めた時刻から</option>
               <option value="load">ソースを表示してから</option>
             </select>
@@ -1164,7 +1166,7 @@
       <summary><span class="sec-icon">⏱️</span>経過時間について</summary>
       <div class="panel-body">
         <ul class="notes">
-          <li><b>配信・録画を始めてから</b>は、OBS が知らせてくる開始・停止で数えます。OBS の外（ふつうのブラウザ）では数えません。</li>
+          <li><b>配信・録画・リプレイバッファ・仮想カメラを始めてから</b>は、OBS が知らせてくる開始・停止で数えます。OBS の外（ふつうのブラウザ）では数えません。</li>
           <li>OBS を開き直したり、ソースを読み込み直したりしても、配信中なら続きから数えます。</li>
           <li>ブラウザソースの「ページ権限」が「アクセス権なし」だと、開始・停止が届きません。うまく数えないときは、ソースのプロパティで確かめてください。</li>
           <li>録画を一時停止している間は、経過時間も止まります。</li>
@@ -1239,9 +1241,14 @@
         none: '',
         stream: 'OBS で配信を始めると 0 から数え、止めると 0 に戻ります。',
         record: 'OBS で録画を始めると 0 から数えます。一時停止の間は止まります。',
+        replay: 'OBS でリプレイバッファを始めると 0 から数え、止めると 0 に戻ります（保存したクリップの長さとは関係ありません）。',
+        vcam: 'OBS で仮想カメラを始めると 0 から数え、止めると 0 に戻ります。',
         since: '毎日、決めた時刻から数えます。その時刻より前は 0:00:00 です。',
         load: 'ソースを表示したとき（読み込んだとき）から数えます。',
       };
+
+      // OBS の知らせで数えるもの
+      const OBS_MODES = ['stream', 'record', 'replay', 'vcam'];
 
       // ---- 設定（このブラウザに覚えておく）
       const STORE = 'donnma-clock-editor';
@@ -1276,7 +1283,7 @@
           p.set('e', S.e);
           if (S.el !== '配信時間') p.set('el', S.el);
           if (S.e === 'since') p.set('et', S.et);
-          if (S.eh && (S.e === 'stream' || S.e === 'record')) p.set('eh', '1');
+          if (S.eh && OBS_MODES.includes(S.e)) p.set('eh', '1');
         } else p.set('e', 'none');
         if (demo) p.set('demo', '1');
         return p.toString();
@@ -1319,7 +1326,7 @@
         $('el-opts').hidden = S.e === 'none';
         $('since-row').hidden = S.e !== 'since'; $('since').value = S.et;
         $('el-lab').value = S.el;
-        $('hide-row').hidden = !(S.e === 'stream' || S.e === 'record'); $('hide').checked = S.eh;
+        $('hide-row').hidden = !OBS_MODES.includes(S.e); $('hide').checked = S.eh;
       }
 
       // 見本：view.html を 1000×(高さ) で開いて、枠に合わせて縮める
