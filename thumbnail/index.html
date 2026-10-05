@@ -3998,7 +3998,7 @@
           c.strokeRect(hv.x - lw, hv.y - lw, hv.w + lw * 2, hv.h + lw * 2);
           c.restore();
         }
-        // 背景を「なし（透明）」にしたときだけ、透明が分かるように市松模様を敷く
+        // 背景を「なし（透明）」にしたときだけ、透明が分かるようにチェック柄を敷く
         $('ec-stage').classList.toggle('bg-checker', S.bg === 'none' || S.hidden.includes('@bg'));
         setBgThumb();
         const [W, H] = dims();
