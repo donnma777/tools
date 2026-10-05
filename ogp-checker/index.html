@@ -1300,6 +1300,45 @@
       background: var(--bg-deep);
     }
 
+    .crops {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+      gap: 12px;
+      align-items: start;
+      margin-top: 14px;
+    }
+
+    .crop-frame {
+      overflow: hidden;
+      border-radius: 8px;
+      background: var(--bg-deep);
+      max-width: 100%;
+    }
+
+    .crop:nth-child(2) .crop-frame {
+      width: 62%;
+    }
+
+    .crop-frame img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .crop figcaption {
+      margin-top: 6px;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .crop figcaption b {
+      display: block;
+      font-size: 12.5px;
+      color: var(--text);
+    }
+
     .img-row .facts {
       flex: 1 1 280px;
     }
@@ -1531,6 +1570,7 @@
 
       <section class="panel panel-body" style="margin-top:16px">
         <div class="panel-title"><span class="sec-icon">🖼️</span>画像</div>
+        <p class="field-note" style="margin:-4px 0 4px">サービスによって、画像の形に合わせて上下か左右が切り抜かれます（ふつうは真ん中が残ります）。文字や顔が切れていないか確かめてください。</p>
         <div id="images"></div>
       </section>
 
@@ -1763,7 +1803,15 @@
         $('sns').innerHTML = cards.map(([name, what, tone, body]) =>
           `<section><div class="sns-label"><b>${name}</b><span>${what}</span></div><div class="sns-tile sns-${tone}">${body}</div></section>`).join('');
 
-        // 画像
+        // 画像：サービスごとの切り抜き方（真ん中で切り抜く）
+        const CROPS = [
+          ['1.91 / 1', '1.91 : 1', 'X（大きいカード）・Facebook・LINE・Bluesky・Threads・Mastodon・LinkedIn・Google Chat・WhatsApp・iMessage・Reddit'],
+          ['1 / 1', '1 : 1', 'X（小さいカード）・Chatwork・Misskey・Teams'],
+          ['3 / 2', '3 : 2', 'はてなブックマーク'],
+          [null, 'そのまま', 'Discord・Slack・Telegram・Pinterest'],
+        ];
+        const crops = i => `<div class="crops">${CROPS.map(([r, name, who]) =>
+          `<figure class="crop"><div class="crop-frame"${r ? ` style="aspect-ratio:${r}"` : ''}><img src="${esc(i.url)}" alt="" referrerpolicy="no-referrer"${r ? '' : ' style="height:auto;object-fit:contain"'}></div><figcaption><b>${name}</b>${who}</figcaption></figure>`).join('')}</div>`;
         $('images').innerHTML = d.images.length ? d.images.map(i => {
           const fact = (k, val) => `<div class="fact"><b>${k}</b><span>${val}</span></div>`;
           return `<div class="img-row">${i.status === 200 && !i.error ? `<img src="${esc(i.url)}" alt="" referrerpolicy="no-referrer">` : ''}<div class="facts">`
@@ -1773,7 +1821,8 @@
             + (i.width ? fact('大きさ', `${i.width} × ${i.height} px（${(i.width / i.height).toFixed(2)} : 1）`) : '')
             + (i.over ? fact('重さ', '10 MB より大きい') : i.bytes != null ? fact('重さ', kb(i.bytes)) : '')
             + (i.time != null ? fact('読み込み', sec(i.time)) : '')
-            + '</div></div>';
+            + '</div></div>'
+            + (i.status === 200 && !i.error && i.width ? crops(i) : '');
         }).join('') : '<p class="field-note">og:image・twitter:image がありません</p>';
 
         // ページの情報
