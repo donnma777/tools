@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>配信スケジュール（OBS 用）</title>
+  <!--
+    OBS のブラウザソースに入れるページ。中身はすべて URL の d= から読む（index.html で作る）。
+    今日の予定を目立たせ、過ぎた日を薄くする（1分ごとに描き直す）。大きさはブラウザソースの幅・高さに合わせて縮める。
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho+B1:wght@500;800&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100vw;
+      max-height: 100vh;
+    }
+
+    .msg {
+      font: 700 24px sans-serif;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 16px 24px;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="cv"></canvas>
+  <script src="schedule-core.js?v=20261006a"></script>
+  <script>
+    (async () => {
+      'use strict';
+      const q = new URLSearchParams(location.search);
+      const data = ScheduleCore.decode(q.get('d') || '');
+      const cv = document.getElementById('cv');
+      if (!data) {
+        cv.remove();
+        document.body.insertAdjacentHTML('beforeend', '<div class="msg">スケジュールの URL が正しくありません。作るページで URL をコピーし直してください。</div>');
+        return;
+      }
+      // キャラの画像（URL で決めたものだけ。ファイルは URL に入らない）
+      const images = {};
+      if (data.chara) {
+        images.chara = await new Promise(res => {
+          const img = new Image();
+          img.onload = () => res(img);
+          img.onerror = () => res(null);
+          img.src = data.chara;
+        });
+      }
+      await ScheduleCore.ensureFonts(data);
+      // today=YYYY-MM-DD で「今日」を決められる（確かめる用）
+      const fixed = ScheduleCore.parseYmd(q.get('today') || '');
+      const paint = () => ScheduleCore.draw(cv, data, { images, now: fixed || new Date() });
+      paint();
+      // 日付が変わったら描き直す
+      setInterval(paint, 60 * 1000);
+      // 字体があとから届いたときも描き直す
+      if (document.fonts) document.fonts.addEventListener('loadingdone', paint);
+    })();
+  </script>
+</body>
+
+</html>

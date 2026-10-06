@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>配信スケジュールメーカー | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="1週間の配信予定を入れるだけで、X などに載せるスケジュール画像を作れる無料ツール。ポップ・シンプル・ネオン・和風の見た目、キャラの立ち絵、横長・縦長の大きさを選べます。OBS のブラウザソースに入れると、今日の予定を目立たせて配信画面にも出せます。">
+  <link rel="canonical" href="https://donnma.com/tool/schedule/">
+  <meta property="og:title" content="配信スケジュールメーカー | どんまうんど-Tools">
+  <meta property="og:description" content="1週間の配信予定から、SNS に載せるスケジュール画像を作る。OBS に入れると今日の予定を目立たせて表示。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/schedule/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-schedule.jpg?v=20261006a">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="配信スケジュールメーカー">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <meta name="twitter:image:alt" content="配信スケジュールメーカー">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho+B1:wght@500;800&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --ok: #7fd8a4;
+      --warn: #ffc46b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace：左に設定、右に見本 ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+      display: grid;
+      grid-template-columns: 420px minmax(0, 1fr);
+      grid-template-areas: "settings main";
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings {
+      grid-area: settings;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .main {
+      grid-area: main;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      min-width: 0;
+      max-height: calc(100vh - 88px);
+      overflow-y: auto;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .panel-title .sp {
+      flex: 1;
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+      flex: none;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      border-color: var(--border-strong);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 7px 0;
+      min-width: 0;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    select,
+    input[type=text],
+    input[type=url],
+    input[type=date],
+    input[type=password] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+      color-scheme: dark;
+    }
+
+    select:focus,
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    input[type=color] {
+      width: 44px;
+      height: 32px;
+      padding: 2px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      background: var(--surface-2);
+      cursor: pointer;
+      flex: none;
+    }
+
+    .inline {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .seg {
+      display: flex;
+      gap: 6px;
+    }
+
+    .seg button {
+      flex: 1 1 0;
+      min-width: 0;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 7px 4px;
+      cursor: pointer;
+      line-height: 1.3;
+    }
+
+    .seg button small {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    .seg button:hover {
+      border-color: var(--accent);
+    }
+
+    .seg button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .themes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .themes button {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .themes button i {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex: none;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+    }
+
+    .themes button[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+      color: var(--text);
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+      cursor: pointer;
+      padding: 6px 0;
+      position: relative;
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle .sw {
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      position: relative;
+      flex: none;
+      transition: background 0.15s;
+    }
+
+    .toggle .sw::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .toggle input:checked+.sw {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .toggle input:checked+.sw::after {
+      transform: translateX(18px);
+      background: #fff;
+    }
+
+    .toggle input:focus-visible+.sw {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    /* ── 1日ずつの予定 ── */
+    .days {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .day {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      padding: 8px 10px;
+    }
+
+    .day.off .items,
+    .day.off .add {
+      display: none;
+    }
+
+    .day-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .day.off .day-head {
+      margin-bottom: 0;
+    }
+
+    .day-head .d6 {
+      color: #8fb8ff;
+    }
+
+    .day-head .d0 {
+      color: #ff9a9a;
+    }
+
+    .day-head .sp {
+      flex: 1;
+    }
+
+    .mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--label);
+      cursor: pointer;
+    }
+
+    .mini input {
+      accent-color: var(--accent);
+    }
+
+    .icon-btn {
+      font: inherit;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+
+    .icon-btn:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    .items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 66px 78px minmax(0, 1fr) 26px;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .item input {
+      padding: 6px 8px;
+      font-size: 12.5px;
+    }
+
+    .add {
+      margin-top: 6px;
+    }
+
+    /* ── 見本 ── */
+    .main-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .main-head .sp {
+      flex: 1;
+    }
+
+    .main-head select {
+      width: auto;
+    }
+
+    .preview {
+      padding: 14px;
+      background: repeating-conic-gradient(#3a2a33 0 25%, #2a1c24 0 50%) 0 0 / 20px 20px;
+      display: grid;
+      place-items: center;
+    }
+
+    .preview canvas {
+      display: block;
+      max-width: 100%;
+      max-height: 62vh;
+      height: auto;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .save-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .save-row .size {
+      font-size: 12px;
+      color: var(--muted);
+      margin-right: auto;
+    }
+
+    .obs-sec {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .obs-sec h3 {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .obs-toggles {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 16px;
+    }
+
+    .url-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
+    }
+
+    .url-row input {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .warn-note {
+      font-size: 11.5px;
+      color: var(--warn);
+    }
+
+    /* OBS につなぐ */
+    .obs-box {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .obs-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .obs-state {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--muted);
+    }
+
+    .obs-state.on {
+      background: rgba(127, 216, 164, 0.15);
+      color: #7fd8a4;
+    }
+
+    .obs-row {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #obs-linked .obs-row {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      margin-bottom: 8px;
+    }
+
+    #obs-linked .obs-mode-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    #obs-commit.dirty {
+      box-shadow: 0 0 0 3px rgba(255, 196, 107, 0.45);
+    }
+
+    #obs-commit:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .img-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .img-row .thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2) center / contain no-repeat;
+      flex: none;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .notes b {
+      color: var(--label);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 400;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1000px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "main" "settings";
+        padding: 40px 16px 40px;
+      }
+
+      .main {
+        position: static;
+        max-height: none;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .item {
+        grid-template-columns: 62px 72px minmax(0, 1fr) 24px;
+      }
+
+      .obs-toggles {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      /* スマホでは OBS は動かないので、つなぐところは出さない */
+      .obs-box {
+        display: none;
+      }
+
+      .url-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .url-row #open {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>配信スケジュールメーカー</h1>
+      <p>1週間の配信予定を入れるだけで、SNS に載せるスケジュール画像を作れます。OBS のブラウザソースに入れれば、今日の予定を目立たせて配信画面にも出せます。</p>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- 設定 -->
+    <div class="settings">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">📅</span>いつの週か</div>
+          <div class="inline">
+            <input type="date" id="start" aria-label="最初の日">
+            <button class="btn btn-sm" type="button" id="wk-prev" title="前の週">◀</button>
+            <button class="btn btn-sm" type="button" id="wk-now">今週</button>
+            <button class="btn btn-sm" type="button" id="wk-next" title="次の週">▶</button>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>週のはじまり</span></span>
+            <div class="seg" id="first">
+              <button type="button" data-v="1">月曜日</button>
+              <button type="button" data-v="0">日曜日</button>
+            </div>
+          </div>
+          <p class="field-note">週を変えても、予定はそのまま残ります（曜日ごとに覚えます）。</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🗓️</span>予定<span class="sp"></span><button class="icon-btn" type="button" id="clear">全部消す</button></div>
+          <div class="days" id="days"></div>
+          <datalist id="tag-list"></datalist>
+          <p class="field-note" style="margin-top:8px">左から「時刻」「種類」「内容」。種類は選ぶか、自由に書けます（色は種類ごとに決まります）。1日に3つまで入れられます。</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">✏️</span>文字</div>
+          <div class="field">
+            <span class="field-label"><span>タイトル</span></span>
+            <input type="text" id="title" maxlength="40" spellcheck="false">
+          </div>
+          <div class="field">
+            <span class="field-label"><span>名前・ひとこと</span></span>
+            <input type="text" id="sub" maxlength="60" placeholder="例：どんまの配信予定">
+          </div>
+          <div class="field">
+            <span class="field-label"><span>お知らせ（下に出す）</span></span>
+            <input type="text" id="note" maxlength="80" placeholder="例：土曜日はコラボ配信！ 予定は変わることがあります">
+          </div>
+          <div class="field">
+            <span class="field-label"><span>曜日</span></span>
+            <div class="seg" id="wd">
+              <button type="button" data-v="ja">月・火・水</button>
+              <button type="button" data-v="en">MON・TUE</button>
+            </div>
+          </div>
+          <label class="toggle"><span>時刻のあとに「〜」を付ける</span><input type="checkbox" id="tl"><span class="sw"></span></label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🎨</span>見た目</div>
+          <div class="themes" id="themes"></div>
+          <div class="field">
+            <span class="field-label"><span>色</span></span>
+            <div class="inline">
+              <input type="color" id="accent" aria-label="色">
+              <button class="btn btn-sm" type="button" id="accent-reset">テーマの色に戻す</button>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>大きさ</span></span>
+            <div class="seg" id="size"></div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>背景</span></span>
+            <div class="seg" id="bg">
+              <button type="button" data-v="theme">テーマ</button>
+              <button type="button" data-v="image">画像</button>
+              <button type="button" data-v="transparent">透明</button>
+            </div>
+            <div class="img-row" id="bg-row">
+              <span class="thumb" id="bg-thumb"></span>
+              <button class="btn btn-sm" type="button" id="bg-pick">🖼 背景の画像を選ぶ</button>
+              <button class="btn btn-sm" type="button" id="bg-del">外す</button>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>キャラの画像（右に出す）</span></span>
+            <div class="img-row">
+              <span class="thumb" id="chara-thumb"></span>
+              <button class="btn btn-sm" type="button" id="chara-pick">🧸 画像を選ぶ</button>
+              <button class="btn btn-sm" type="button" id="chara-del">外す</button>
+            </div>
+            <input type="url" id="chara-url" placeholder="または画像の URL（https://…）" spellcheck="false">
+            <span class="field-note">背景が透明な PNG がおすすめです。OBS で出すときは、画像のファイルは URL に入らないので、ネットに置いた画像の URL を入れてください。</span>
+          </div>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+      </div>
+    </div>
+
+    <!-- 見本 -->
+    <div class="main">
+      <div class="main-head">
+        <span>見本</span>
+        <span class="sp"></span>
+        <select id="pv-mode" aria-label="見本の出し方">
+          <option value="image">画像の見え方</option>
+          <option value="obs">OBS の見え方（今日を目立たせる）</option>
+        </select>
+      </div>
+      <div class="preview"><canvas id="cv" aria-label="スケジュールの見本"></canvas></div>
+      <div class="save-row">
+        <span class="size" id="size-text"></span>
+        <button class="btn" type="button" id="copy-img">📋 画像をコピー</button>
+        <button class="btn btn-primary" type="button" id="save">⬇ PNG で保存</button>
+      </div>
+
+      <div class="obs-sec">
+        <h3>📺 OBS に出す</h3>
+        <div class="obs-toggles">
+          <label class="toggle"><span>今日の予定を目立たせる</span><input type="checkbox" id="today"><span class="sw"></span></label>
+          <label class="toggle"><span>過ぎた日を薄くする</span><input type="checkbox" id="past"><span class="sw"></span></label>
+        </div>
+        <div class="url-row">
+          <input type="text" id="url" readonly aria-label="ブラウザソースの URL">
+          <button class="btn btn-primary" type="button" id="copy-url">📋 URL をコピー</button>
+          <a class="btn" id="open" target="_blank" rel="noopener">↗ 開く</a>
+        </div>
+        <p class="field-note" id="obs-size"></p>
+        <p class="warn-note" id="obs-warn" hidden></p>
+      </div>
+
+      <div class="obs-box">
+        <div class="obs-head"><span>🔌 OBS につないで反映</span><span class="obs-state" id="obs-state">つないでいません</span></div>
+        <div class="obs-row" id="obs-login">
+          <input type="text" id="obs-port" inputmode="numeric" placeholder="4455" aria-label="ポート">
+          <input type="password" id="obs-pass" placeholder="パスワード（なければ空）" aria-label="パスワード" autocomplete="off">
+          <button class="btn btn-primary" type="button" id="obs-connect">つなぐ</button>
+        </div>
+        <div id="obs-linked" hidden>
+          <div class="obs-row">
+            <select id="obs-source" aria-label="反映するブラウザソース"></select>
+            <button class="btn btn-sm" type="button" id="obs-refresh" title="ソースの一覧を読み直す">↻</button>
+            <button class="btn btn-sm" type="button" id="obs-disconnect">切る</button>
+          </div>
+          <div class="obs-row obs-mode-row">
+            <div class="seg" id="obs-mode">
+              <button type="button" data-v="auto">すぐ反映</button>
+              <button type="button" data-v="manual">ボタンで反映</button>
+            </div>
+            <button class="btn btn-primary btn-sm" type="button" id="obs-commit" title="Ctrl+Enter でも反映できます">📤 OBS に反映</button>
+          </div>
+          <button class="btn btn-sm" type="button" id="obs-add">＋ 今のシーンにスケジュールのソースを足す</button>
+        </div>
+        <p class="field-note" id="obs-msg"></p>
+        <p class="field-note">OBS の「ツール → WebSocket サーバー設定」で、サーバーを有効にしてから使います。つなぐと、ここで変えた予定や見た目を、URL を貼り直さずに OBS に反映できます。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🔍</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li><b>いつの週か</b>を選び、曜日ごとに<b>時刻・種類・内容</b>を入れます。配信しない日は「お休み」にチェック。</li>
+          <li><b>文字</b>と<b>見た目</b>（テーマ・色・大きさ・背景・キャラの画像）を選びます。右の見本がすぐ変わります。</li>
+          <li><b>「⬇ PNG で保存」</b>で画像にして、X などに載せます。「📋 画像をコピー」なら、そのまま貼り付けられます。</li>
+          <li>OBS に出すときは<b>「📋 URL をコピー」</b>を押し、OBS で <b>ソースを追加 → ブラウザ</b> の URL に貼ります。幅・高さは URL の下に出ている大きさにします。</li>
+          <li>OBS では、<b>今日の予定が目立ち、過ぎた日が薄く</b>なります（日付が変わると自動で切り替わります）。予定を変えたら、URL を貼り直すか、<b>OBS につないで反映</b>してください。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">📐</span>大きさの選び方</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li><b>横長 16:9（1920×1080）</b>：X にそのまま大きく出て、OBS の配信画面にもぴったりです。迷ったらこれ。</li>
+          <li><b>縦長 4:5（1080×1350）</b>：X や Instagram で、タイムラインに縦に大きく出ます。スマホで見る人が多いとき向け。</li>
+          <li><b>正方形（1080×1080）</b>：Instagram の投稿や、どこでも崩れずに出したいとき。</li>
+          <li><b>縦長 9:16（1080×1920）</b>：Instagram・X のストーリーや、YouTube のショート向けです。</li>
+        </ul>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>ヒント・注意点</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>入れた予定・見た目・選んだ画像は、このブラウザに覚えておきます。来週は「▶」で週を進めて、変わったところだけ直せば作れます。</li>
+          <li>画像はどこにも送信しません。キャラの画像は、背景を透明にした PNG がきれいに出ます。</li>
+          <li>OBS の URL には予定と見た目が入っています（ログインや保存は要りません）。画像のファイルは入らないので、OBS でキャラを出したいときは、画像の URL を入れるか、OBS で画像のソースを重ねてください。</li>
+          <li>背景を<b>透明</b>にすると、OBS で好きな背景や配信画面の上に重ねられます。</li>
+          <li>OBS では、OBS を動かしているパソコンの日付で「今日」を決めます。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1400px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../common/ask.js?v=20260929a"></script>
+  <script src="schedule-core.js?v=20261006a"></script>
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const ask = (msg, yes) => window.DonnmaAsk.ask(msg, { yes }).then(r => r === true);
+      const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2400); };
+      const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const C = window.ScheduleCore;
+
+      // ── 設定（このブラウザに覚えておく） ──
+      const STORE = 'donnma-schedule';
+      const IMG_STORE = 'donnma-schedule-img';
+      let S = C.defaults();
+      try { const got = JSON.parse(localStorage.getItem(STORE) || 'null'); if (got) S = C.normalize(got); } catch (e) { }
+      const store = () => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) { } };
+
+      // 選んだ画像（data URL。URL には入れない）
+      let imgData = { chara: '', bg: '' };
+      try { imgData = { ...imgData, ...JSON.parse(localStorage.getItem(IMG_STORE) || '{}') }; } catch (e) { }
+      const images = { chara: null, bg: null, charaUrl: null };
+      const loadImg = (src, cors) => new Promise(res => {
+        if (!src) { res(null); return; }
+        const img = new Image();
+        if (cors) img.crossOrigin = 'anonymous';
+        img.onload = () => res(img);
+        img.onerror = () => res(null);
+        img.src = src;
+      });
+
+      // ── 曜日ごとの入力 ──
+      $('tag-list').innerHTML = C.TAGS.map(t => `<option value="${esc(t[0])}">`).join('');
+      const dayDate = i => { const d = C.parseYmd(S.start); d.setDate(d.getDate() + i); return d; };
+      function buildDays() {
+        const wd = C.WD.ja;
+        $('days').innerHTML = S.days.map((day, i) => {
+          const d = dayDate(i);
+          const items = day.items.map((it, k) => `
+            <div class="item" data-k="${k}">
+              <input type="text" class="t" value="${esc(it.t)}" placeholder="21:00" maxlength="20" aria-label="時刻">
+              <input type="text" class="tag" value="${esc(it.tag)}" placeholder="種類" list="tag-list" maxlength="12" aria-label="種類">
+              <input type="text" class="s" value="${esc(it.s)}" placeholder="内容" maxlength="80" aria-label="内容">
+              <button class="icon-btn del" type="button" title="この枠を消す" aria-label="この枠を消す">✕</button>
+            </div>`).join('');
+          return `<div class="day${day.off ? ' off' : ''}" data-i="${i}">
+            <div class="day-head">
+              <span class="d${d.getDay()}">${d.getMonth() + 1}/${d.getDate()}（${wd[d.getDay()]}）</span>
+              <span class="sp"></span>
+              ${i > 0 ? '<button class="icon-btn copy-prev" type="button" title="前の日と同じにする">↑ 前の日と同じ</button>' : ''}
+              <label class="mini"><input type="checkbox" class="off"${day.off ? ' checked' : ''}>お休み</label>
+            </div>
+            <div class="items">${items}</div>
+            <button class="btn btn-sm add" type="button"${day.items.length >= 3 ? ' hidden' : ''}>＋ 枠を足す</button>
+          </div>`;
+        }).join('');
+      }
+      // 日付の見出しだけ書きかえる（入力中の欄を作り直さない）
+      function relabelDays() {
+        const wd = C.WD.ja;
+        document.querySelectorAll('#days .day').forEach(el => {
+          const d = dayDate(Number(el.dataset.i));
+          const s = el.querySelector('.day-head span');
+          s.className = 'd' + d.getDay();
+          s.textContent = `${d.getMonth() + 1}/${d.getDate()}（${wd[d.getDay()]}）`;
+        });
+      }
+      $('days').addEventListener('input', e => {
+        const el = e.target.closest('.item');
+        if (!el) return;
+        const i = Number(e.target.closest('.day').dataset.i), k = Number(el.dataset.k);
+        const it = S.days[i].items[k];
+        if (e.target.classList.contains('t')) it.t = e.target.value;
+        else if (e.target.classList.contains('tag')) it.tag = e.target.value;
+        else if (e.target.classList.contains('s')) it.s = e.target.value;
+        update();
+      });
+      $('days').addEventListener('change', e => {
+        if (!e.target.classList.contains('off')) return;
+        const dayEl = e.target.closest('.day');
+        S.days[Number(dayEl.dataset.i)].off = e.target.checked;
+        dayEl.classList.toggle('off', e.target.checked);
+        update();
+      });
+      $('days').addEventListener('click', e => {
+        const dayEl = e.target.closest('.day');
+        if (!dayEl) return;
+        const i = Number(dayEl.dataset.i);
+        const day = S.days[i];
+        if (e.target.closest('.add')) {
+          if (day.items.length >= 3) return;
+          const last = day.items[day.items.length - 1];
+          day.items.push({ t: '', s: '', tag: last ? last.tag : '' });
+          buildDays(); update();
+          const inputs = $('days').querySelectorAll(`.day[data-i="${i}"] .item:last-child .t`);
+          if (inputs[0]) inputs[0].focus();
+        } else if (e.target.closest('.del')) {
+          const k = Number(e.target.closest('.item').dataset.k);
+          if (day.items.length > 1) day.items.splice(k, 1);
+          else day.items[0] = { t: '', s: '', tag: '' };
+          buildDays(); update();
+        } else if (e.target.closest('.copy-prev')) {
+          const prev = S.days[i - 1];
+          S.days[i] = { off: prev.off, items: prev.items.map(it => ({ ...it })) };
+          buildDays(); update();
+        }
+      });
+      $('clear').addEventListener('click', async () => {
+        if (!await ask('7日分の予定を全部消しますか？', '消す')) return;
+        S.days = C.defaults().days;
+        buildDays(); update();
+      });
+
+      // ── 週 ──
+      const setStart = d => { S.start = C.ymd(d); syncUI(); relabelDays(); update(); };
+      $('start').addEventListener('change', () => {
+        const d = C.parseYmd($('start').value);
+        if (d) setStart(d);
+      });
+      $('wk-prev').addEventListener('click', () => { const d = C.parseYmd(S.start); d.setDate(d.getDate() - 7); setStart(d); });
+      $('wk-next').addEventListener('click', () => { const d = C.parseYmd(S.start); d.setDate(d.getDate() + 7); setStart(d); });
+      $('wk-now').addEventListener('click', () => setStart(C.weekStart(new Date(), S.first)));
+      $('first').addEventListener('click', e => {
+        const b = e.target.closest('[data-v]'); if (!b) return;
+        S.first = Number(b.dataset.v);
+        setStart(C.weekStart(C.parseYmd(S.start), S.first));
+      });
+
+      // ── 文字・見た目 ──
+      $('themes').innerHTML = Object.entries(C.THEMES).map(([k, t]) => `<button type="button" data-v="${k}"><i style="background:${t.accent}"></i>${t.name}</button>`).join('');
+      $('size').innerHTML = Object.entries(C.SIZES).map(([k, s]) => `<button type="button" data-v="${k}">${s.name}<small>${s.w}×${s.h}</small></button>`).join('');
+      const bindSeg = (id, key, conv = v => v) => $(id).addEventListener('click', e => {
+        const b = e.target.closest('[data-v]'); if (!b) return;
+        S[key] = conv(b.dataset.v); syncUI(); update();
+      });
+      bindSeg('themes', 'theme');
+      bindSeg('size', 'size');
+      bindSeg('bg', 'bg');
+      bindSeg('wd', 'wd');
+      $('themes').addEventListener('click', e => { if (e.target.closest('[data-v]')) { S.accent = ''; syncUI(); update(); } });
+      for (const k of ['title', 'sub', 'note']) $(k).addEventListener('input', () => { S[k] = $(k).value; update(); });
+      $('tl').addEventListener('change', () => { S.tl = $('tl').checked; update(); });
+      $('today').addEventListener('change', () => { S.today = $('today').checked; update(); });
+      $('past').addEventListener('change', () => { S.past = $('past').checked; update(); });
+      $('accent').addEventListener('input', () => { S.accent = $('accent').value; update(); });
+      $('accent-reset').addEventListener('click', () => { S.accent = ''; syncUI(); update(); });
+
+      function syncUI() {
+        const press = (id, v) => { for (const b of $(id).children) b.setAttribute('aria-pressed', String(b.dataset.v === String(v))); };
+        press('themes', S.theme); press('size', S.size); press('bg', S.bg); press('wd', S.wd); press('first', S.first);
+        $('start').value = S.start;
+        for (const k of ['title', 'sub', 'note']) if ($(k).value !== S[k]) $(k).value = S[k];
+        $('tl').checked = S.tl; $('today').checked = S.today; $('past').checked = S.past;
+        $('accent').value = S.accent || C.THEMES[S.theme].accent;
+        $('bg-row').hidden = S.bg !== 'image';
+        if ($('chara-url').value !== S.chara) $('chara-url').value = S.chara;
+        $('chara-thumb').style.backgroundImage = imgData.chara ? `url(${imgData.chara})` : (S.chara ? `url("${S.chara.replace(/"/g, '%22')}")` : '');
+        $('bg-thumb').style.backgroundImage = imgData.bg ? `url(${imgData.bg})` : '';
+        $('chara-del').hidden = !imgData.chara && !S.chara;
+        $('bg-del').hidden = !imgData.bg;
+      }
+
+      // ── 画像を選ぶ（大きすぎるものは縮めて覚える） ──
+      let picking = '';
+      const shrink = (file, max, type) => new Promise((res, rej) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          const s = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement('canvas');
+          c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          URL.revokeObjectURL(url);
+          res(c.toDataURL(type, 0.9));
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('bad')); };
+        img.src = url;
+      });
+      const saveImgs = () => {
+        try { localStorage.setItem(IMG_STORE, JSON.stringify(imgData)); }
+        catch (e) { toast('画像が大きくて、このブラウザに覚えておけませんでした（開き直すと消えます）'); }
+      };
+      $('chara-pick').addEventListener('click', () => { picking = 'chara'; $('file').click(); });
+      $('bg-pick').addEventListener('click', () => { picking = 'bg'; $('file').click(); });
+      $('file').addEventListener('change', async e => {
+        const f = e.target.files[0]; e.target.value = '';
+        if (!f) return;
+        try {
+          // キャラは透明を残す（WebP）、背景は JPEG
+          imgData[picking] = picking === 'chara' ? await shrink(f, 1600, 'image/webp') : await shrink(f, 1920, 'image/jpeg');
+        } catch (err) { toast('この画像は開けませんでした'); return; }
+        if (picking === 'bg') S.bg = 'image';
+        saveImgs();
+        await loadImages();
+        syncUI(); update();
+      });
+      $('chara-del').addEventListener('click', async () => {
+        imgData.chara = ''; S.chara = ''; saveImgs();
+        await loadImages(); syncUI(); update();
+      });
+      $('bg-del').addEventListener('click', async () => {
+        imgData.bg = ''; if (S.bg === 'image') S.bg = 'theme'; saveImgs();
+        await loadImages(); syncUI(); update();
+      });
+      let urlTimer = 0;
+      $('chara-url').addEventListener('input', () => {
+        clearTimeout(urlTimer);
+        urlTimer = setTimeout(async () => {
+          const v = $('chara-url').value.trim();
+          S.chara = /^https?:\/\//i.test(v) ? v : '';
+          await loadImages(); syncUI(); update();
+        }, 500);
+      });
+      async function loadImages() {
+        images.chara = await loadImg(imgData.chara);
+        images.bg = await loadImg(imgData.bg);
+        // URL の画像は、まず CORS ありで（保存できるように）。だめなら見本だけでも出す
+        images.charaUrl = null; images.charaTainted = false;
+        if (S.chara) {
+          images.charaUrl = await loadImg(S.chara, true);
+          if (!images.charaUrl) { images.charaUrl = await loadImg(S.chara, false); images.charaTainted = !!images.charaUrl; }
+        }
+      }
+
+      // ── 見本・URL ──
+      const base = () => new URL('view.html', location.href).href;
+      const urlOf = () => base() + '?d=' + C.encode(S);
+      let drawQueued = false;
+      function paint() {
+        drawQueued = false;
+        const obsMode = $('pv-mode').value === 'obs';
+        // OBS には URL の画像しか出ないので、見本もそれに合わせる
+        const chara = obsMode ? images.charaUrl : (images.chara || images.charaUrl);
+        C.draw($('cv'), S, { images: { chara, bg: images.bg }, now: obsMode ? new Date() : null });
+      }
+      const queuePaint = () => { if (!drawQueued) { drawQueued = true; requestAnimationFrame(paint); } };
+      function update() {
+        store();
+        queuePaint();
+        // 新しい字（テーマを変えた・字を足した）の字体が届いたら、もう一度描く
+        C.ensureFonts(S).then(queuePaint);
+        const sz = C.SIZES[S.size];
+        $('size-text').textContent = `${sz.w}×${sz.h}`;
+        const url = urlOf();
+        $('url').value = url;
+        $('open').href = url;
+        $('obs-size').textContent = `OBS のブラウザソースの大きさ：幅 ${sz.w}・高さ ${sz.h}`;
+        const warns = [];
+        if (imgData.chara && !S.chara) warns.push('選んだキャラの画像ファイルは OBS には出ません（画像の URL を入れると出せます）');
+        if (S.bg === 'image' && imgData.bg) warns.push('背景の画像は OBS には出ません（背景はテーマの柄になります。OBS で画像のソースを下に重ねるなら「透明」がおすすめ）');
+        $('obs-warn').textContent = warns.join('。');
+        $('obs-warn').hidden = !warns.length;
+        if (typeof obsPush === 'function') obsPush();
+      }
+      $('pv-mode').addEventListener('change', paint);
+      // 字体が届いたら描き直す
+      if (document.fonts) document.fonts.addEventListener('loadingdone', () => { if (!drawQueued) { drawQueued = true; requestAnimationFrame(paint); } });
+
+      // ── 保存・コピー ──
+      const fileName = () => `schedule-${S.start.replace(/-/g, '')}.png`;
+      const pngBlob = () => new Promise((res, rej) => {
+        // 保存は「画像の見え方」で描く
+        const cv = document.createElement('canvas');
+        C.draw(cv, S, { images: { chara: images.chara || images.charaUrl, bg: images.bg } });
+        try { cv.toBlob(b => b ? res(b) : rej(new Error('blob')), 'image/png'); }
+        catch (e) { rej(e); }
+      });
+      const blobFail = () => toast(images.charaTainted
+        ? 'キャラの画像の URL が、ほかのサイトから使えない設定なので保存できません。画像をファイルで選んでください'
+        : '画像を作れませんでした');
+      $('save').addEventListener('click', async () => {
+        let blob;
+        try { blob = await pngBlob(); } catch (e) { blobFail(); return; }
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName();
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      });
+      $('copy-img').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob() })]);
+          toast('画像をコピーしました。X などに貼り付けられます');
+        } catch (e) {
+          if (images.charaTainted) blobFail();
+          else toast('このブラウザでは画像をコピーできません。「PNG で保存」を使ってください');
+        }
+      });
+      $('copy-url').addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText($('url').value); toast('URL をコピーしました。OBS のブラウザソースに貼ってください'); }
+        catch (e) { $('url').select(); document.execCommand('copy'); toast('URL をコピーしました'); }
+      });
+
+      // ---- OBS につないで、選んだブラウザソースの URL を書き換える（obs-websocket v5。時計・経過時間と同じ作り）
+      const OBS_KEY = 'donnma-schedule-obs';
+      const obs = { ws: null, ready: false, id: 1, pending: new Map(), source: '', lastUrl: '', timer: 0 };
+      let obsSaved = { port: 4455, password: '', auto: false, source: '', mode: 'manual' };
+      try { obsSaved = { ...obsSaved, ...JSON.parse(localStorage.getItem(OBS_KEY) || '{}') }; } catch (e) { }
+      const obsStore = () => { try { localStorage.setItem(OBS_KEY, JSON.stringify(obsSaved)); } catch (e) { } };
+      const obsMsg = t => { $('obs-msg').textContent = t || ''; };
+      function obsUi() {
+        $('obs-state').textContent = obs.ready ? 'つないでいます' : 'つないでいません';
+        $('obs-state').classList.toggle('on', obs.ready);
+        $('obs-login').hidden = obs.ready;
+        $('obs-linked').hidden = !obs.ready;
+        for (const b of $('obs-mode').children) b.setAttribute('aria-pressed', String(b.dataset.v === obsSaved.mode));
+        const manual = obsSaved.mode === 'manual';
+        $('obs-commit').hidden = !manual;
+        const dirty = manual && !!obs.source && $('url').value !== obs.lastUrl;
+        $('obs-commit').disabled = !obs.source || !dirty;
+        $('obs-commit').classList.toggle('dirty', dirty);
+        $('obs-commit').textContent = dirty ? '📤 OBS に反映（変更あり）' : '📤 OBS に反映';
+      }
+      async function obsAuth(password, salt, challenge) {
+        const enc = new TextEncoder();
+        const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+        const secret = b64(await crypto.subtle.digest('SHA-256', enc.encode(password + salt)));
+        return b64(await crypto.subtle.digest('SHA-256', enc.encode(secret + challenge)));
+      }
+      function obsConnect(port, password) {
+        obsClose();
+        return new Promise((resolve, reject) => {
+          let ws;
+          try { ws = new WebSocket(`ws://127.0.0.1:${port}`, 'obswebsocket.json'); } catch (e) { reject(new Error('ポートが正しくありません')); return; }
+          obs.ws = ws;
+          ws.onmessage = async ev => {
+            const msg = JSON.parse(ev.data);
+            if (msg.op === 0) {
+              const identify = { rpcVersion: 1, eventSubscriptions: 0 };
+              const a = msg.d.authentication;
+              if (a) {
+                if (!password) { reject(new Error('パスワードが要ります')); ws.close(); return; }
+                identify.authentication = await obsAuth(password, a.salt, a.challenge);
+              }
+              ws.send(JSON.stringify({ op: 1, d: identify }));
+            } else if (msg.op === 2) {
+              obs.ready = true; obsUi(); resolve();
+            } else if (msg.op === 7) {
+              const pr = obs.pending.get(msg.d.requestId);
+              if (!pr) return;
+              obs.pending.delete(msg.d.requestId);
+              msg.d.requestStatus.result ? pr.resolve(msg.d.responseData || {}) : pr.reject(new Error(msg.d.requestStatus.comment || `エラー ${msg.d.requestStatus.code}`));
+            }
+          };
+          ws.onclose = ev => {
+            const was = obs.ready;
+            if (obs.ws === ws) { obs.ws = null; obs.ready = false; }
+            obs.pending.forEach(pr => pr.reject(new Error('切れました'))); obs.pending.clear();
+            obsUi();
+            if (ev.code === 4009) reject(new Error('パスワードが違います'));
+            else if (!was) reject(new Error('OBS につながりません（OBS が起動しているか、WebSocket サーバーが有効か確かめてください）'));
+            else obsMsg('OBS との接続が切れました');
+          };
+        });
+      }
+      function obsClose() {
+        if (obs.ws) { const ws = obs.ws; obs.ws = null; obs.ready = false; ws.close(); }
+        obsUi();
+      }
+      function obsReq(requestType, requestData) {
+        return new Promise((resolve, reject) => {
+          if (!obs.ready) { reject(new Error('OBS につないでいません')); return; }
+          const requestId = String(obs.id++);
+          obs.pending.set(requestId, { resolve, reject });
+          obs.ws.send(JSON.stringify({ op: 6, d: { requestType, requestId, requestData } }));
+        });
+      }
+      const isSchedule = url => /\/schedule\/view\.html/.test(url || '');
+      async function obsLoadSources() {
+        const { inputs = [] } = await obsReq('GetInputList', { inputKind: 'browser_source' });
+        const list = [];
+        for (const i of inputs) {
+          let url = '';
+          try { url = ((await obsReq('GetInputSettings', { inputName: i.inputName })).inputSettings || {}).url || ''; } catch (e) { }
+          list.push({ name: i.inputName, mine: isSchedule(url), url });
+        }
+        list.sort((a, b) => (b.mine - a.mine));
+        $('obs-source').innerHTML = '<option value="">反映するソースを選ぶ</option>' + list.map(x => `<option value="${esc(x.name)}">${x.mine ? '🗓 ' : ''}${esc(x.name)}</option>`).join('');
+        const pick = list.find(x => x.name === obsSaved.source) || (list.filter(x => x.mine).length === 1 ? list.find(x => x.mine) : null);
+        $('obs-source').value = pick ? pick.name : '';
+        obs.list = list;
+        useSource($('obs-source').value, false);
+        if (!list.length) obsMsg('ブラウザソースがありません。「＋ 今のシーンにスケジュールのソースを足す」で作れます');
+      }
+      // スケジュールのソースを選んだときは、その中身をここに読み込まない（ここで作っている予定を優先する）。選んだ時だけ送る
+      function useSource(name, chosen) {
+        obs.source = name;
+        obsSaved.source = name; obsStore();
+        const x = (obs.list || []).find(v => v.name === name);
+        obs.lastUrl = x ? x.url : '';
+        if (!name) { obsMsg('ここで作った予定を反映するソースを選んでください'); obsUi(); return; }
+        if (chosen && obsSaved.mode === 'auto') obsPush(true);
+        else obsMsg(`「${name}」に反映します`);
+        obsUi();
+      }
+      function obsPush(now) {
+        if (!obs.ready || !obs.source) return;
+        if (obsSaved.mode === 'manual' && now !== 'commit') { obsUi(); return; }
+        clearTimeout(obs.timer);
+        obs.timer = setTimeout(async () => {
+          const url = $('url').value;
+          if (url === obs.lastUrl) return;
+          try {
+            await obsReq('SetInputSettings', { inputName: obs.source, inputSettings: { url }, overlay: true });
+            obs.lastUrl = url;
+            obsUi();
+            obsMsg(`「${obs.source}」に反映しました`);
+          } catch (e) { obsMsg('反映できませんでした：' + e.message); }
+        }, now ? 0 : 800);
+      }
+      async function connectFromUi() {
+        const port = +$('obs-port').value || 4455, password = $('obs-pass').value;
+        $('obs-connect').disabled = true; obsMsg('つないでいます…');
+        try {
+          await obsConnect(port, password);
+          obsSaved = { ...obsSaved, port, password, auto: true }; obsStore();
+          await obsLoadSources();
+        } catch (e) { obsMsg(e.message); }
+        $('obs-connect').disabled = false;
+      }
+      $('obs-port').value = obsSaved.port || 4455;
+      $('obs-pass').value = obsSaved.password || '';
+      $('obs-connect').addEventListener('click', connectFromUi);
+      $('obs-pass').addEventListener('keydown', e => { if (e.key === 'Enter') connectFromUi(); });
+      $('obs-disconnect').addEventListener('click', () => { obsSaved.auto = false; obsStore(); obsClose(); obsMsg(''); });
+      $('obs-refresh').addEventListener('click', () => obsLoadSources().catch(e => obsMsg(e.message)));
+      $('obs-source').addEventListener('change', () => useSource($('obs-source').value, true));
+      $('obs-mode').addEventListener('click', e => {
+        const b = e.target.closest('[data-v]'); if (!b) return;
+        obsSaved.mode = b.dataset.v; obsStore();
+        obsUi();
+        if (obsSaved.mode === 'auto') obsPush(true);
+      });
+      $('obs-commit').addEventListener('click', () => obsPush('commit'));
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && obs.ready && obsSaved.mode === 'manual') { e.preventDefault(); obsPush('commit'); }
+      });
+      $('obs-add').addEventListener('click', async () => {
+        try {
+          const { currentProgramSceneName: scene } = await obsReq('GetCurrentProgramScene', {});
+          const { inputs = [] } = await obsReq('GetInputList', {});
+          let name = 'スケジュール', k = 2;
+          while (inputs.some(i => i.inputName === name)) name = `スケジュール ${k++}`;
+          const sz = C.SIZES[S.size];
+          await obsReq('CreateInput', { sceneName: scene, inputName: name, inputKind: 'browser_source', inputSettings: { url: $('url').value, width: sz.w, height: sz.h }, sceneItemEnabled: true });
+          obsSaved.source = name; obsStore();
+          obs.lastUrl = $('url').value;
+          await obsLoadSources();
+          toast(`「${scene}」に「${name}」を足しました`);
+        } catch (e) { obsMsg('足せませんでした：' + e.message); }
+      });
+      obsUi();
+      if (obsSaved.auto) connectFromUi();
+
+      // ── はじめ ──
+      buildDays();
+      syncUI();
+      loadImages().then(() => C.ensureFonts(S)).then(() => update());
+      update();
+    })();
+  </script>
+</body>
+
+</html>
