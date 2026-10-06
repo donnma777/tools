@@ -982,6 +982,14 @@
       grid-template-areas: "settings main";
     }
 
+    /* 狭い画面では1列に（点数を入れるところを先に） */
+    @media (max-width: 1000px) {
+      .workspace.rk {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "settings" "main";
+      }
+    }
+
     .main .preview canvas {
       max-height: 52vh;
     }
