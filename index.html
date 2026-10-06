@@ -403,7 +403,8 @@
     }
 
     /* 上に貼りついたメニューに見出しが隠れないように */
-    .section-title[id] {
+    .section-title[id],
+    #web-tools {
       scroll-margin-top: 72px;
     }
 
@@ -746,7 +747,9 @@
     <!-- 見出しへ飛ぶ -->
     <nav class="jump-nav" aria-label="このページの見出し">
       <a href="#streamers">配信の便利ツール</a>
-      <a href="#web-tools">だれでも使えるツール</a>
+      <a href="#events">大会・抽選</a>
+      <a href="#images">画像づくり</a>
+      <a href="#sites">サイトづくり</a>
       <a href="#plugins">インストールして使うもの</a>
     </nav>
 
@@ -853,7 +856,9 @@
 
     </div>
 
-    <h2 class="section-title" id="web-tools">だれでも使えるツール<small>Web Tools</small></h2>
+    <!-- 前の「だれでも使えるツール」（#web-tools）へのリンクは、ここに着く -->
+    <span id="web-tools"></span>
+    <h2 class="section-title" id="events">大会・抽選<small>Events &amp; Games</small></h2>
 
     <div class="tool-list">
 
@@ -927,6 +932,12 @@
           <span class="btn btn-primary">ツールを開く →</span>
         </div>
       </a>
+    </div>
+
+    <h2 class="section-title" id="images">画像づくり<small>Image Tools</small></h2>
+
+    <div class="tool-list">
+
       <!-- thumbnail -->
       <a class="tool-card" href="thumbnail/">
         <div class="tool-head">
@@ -1076,6 +1087,12 @@
           <span class="btn btn-primary">ツールを開く →</span>
         </div>
       </a>
+
+    </div>
+
+    <h2 class="section-title" id="sites">サイトづくり<small>For Websites</small></h2>
+
+    <div class="tool-list">
 
       <!-- ogp-checker -->
       <a class="tool-card" href="ogp-checker/">
