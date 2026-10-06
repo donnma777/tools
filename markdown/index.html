@@ -1,0 +1,2413 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マークダウンメーカー | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="Markdown を書きながら、すぐ見た目を確かめられる無料ツール。ボタンで見出し・太字・リスト・表などを入れられて、表は Excel から貼り付けても作れます。Web ページや Word の文章を貼ると Markdown に変換。.md・HTML で保存できます。書いたものはどこにも送信しません。">
+  <link rel="canonical" href="https://donnma.com/tool/markdown/">
+  <meta property="og:title" content="マークダウンメーカー | どんまうんど-Tools">
+  <meta property="og:description" content="Markdown を書きながら見た目を確かめられる。ボタンで入力・表づくり・貼り付けて変換・.md／HTML で保存。送信しません。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/markdown/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-markdown.jpg?v=20261006a">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="マークダウンメーカー">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <meta name="twitter:image:alt" content="マークダウンメーカー">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --ok: #7fd8a4;
+      --warn: #ffc46b;
+      --mono: ui-monospace, 'SFMono-Regular', Consolas, 'BIZ UDGothic', 'MS Gothic', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+    }
+
+    .editor-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: filter 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      border-color: var(--border-strong);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* 上の帯：書式ボタン */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-deep);
+      align-items: center;
+    }
+
+    .tb {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--label);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .tb:hover {
+      background: var(--surface-2);
+      border-color: var(--border-strong);
+      color: var(--text);
+    }
+
+    .tb svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+
+    .tb-sep {
+      width: 1px;
+      height: 22px;
+      background: var(--border-strong);
+      margin: 0 4px;
+    }
+
+    /* 2段目：表示の切り替え・設定 */
+    .subbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      font-size: 12.5px;
+      color: var(--label);
+    }
+
+    .seg {
+      display: inline-flex;
+      gap: 0;
+      border: 1px solid var(--border-strong);
+      border-radius: 9px;
+      overflow: hidden;
+    }
+
+    .seg button {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    .seg button+button {
+      border-left: 1px solid var(--border-strong);
+    }
+
+    .seg button[aria-pressed="true"] {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .check input {
+      accent-color: var(--accent);
+      width: 15px;
+      height: 15px;
+    }
+
+    .subbar .spacer {
+      flex: 1;
+    }
+
+    /* 書くところ・見るところ */
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      height: clamp(420px, calc(100vh - 230px), 1100px);
+    }
+
+    .split[data-view="write"] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .split[data-view="write"] .pane-view,
+    .split[data-view="view"] .pane-write {
+      display: none;
+    }
+
+    .split[data-view="view"] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pane {
+      min-width: 0;
+      min-height: 0;
+      position: relative;
+    }
+
+    .pane-write {
+      border-right: 1px solid var(--border);
+    }
+
+    .split[data-view="write"] .pane-write {
+      border-right: none;
+    }
+
+    #src {
+      display: block;
+      width: 100%;
+      height: 100%;
+      resize: none;
+      border: none;
+      outline: none;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 14.5px;
+      line-height: 1.75;
+      padding: 18px 20px 40vh;
+      tab-size: 4;
+    }
+
+    #src::placeholder {
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    .pane.drag::after {
+      content: 'ここに .md ファイルをドロップ';
+      position: absolute;
+      inset: 10px;
+      border: 2px dashed var(--accent);
+      border-radius: 12px;
+      background: rgba(37, 14, 28, 0.85);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      color: var(--accent);
+      pointer-events: none;
+    }
+
+    .pane-view {
+      overflow: auto;
+      padding: 18px 24px 40vh;
+    }
+
+    .split[data-view="write"] #src,
+    .split[data-view="view"] .pane-view {
+      padding-left: max(24px, calc((100% - 860px) / 2));
+      padding-right: max(24px, calc((100% - 860px) / 2));
+    }
+
+    /* 下の帯：文字数・保存 */
+    .footbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 12px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-deep);
+      align-items: center;
+    }
+
+    .count {
+      font-size: 12px;
+      color: var(--muted);
+      margin-right: auto;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .saved {
+      color: var(--ok);
+      margin-left: 8px;
+    }
+
+    /* ── 見た目（プレビュー） ── */
+    .md {
+      font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Meiryo', sans-serif;
+      font-size: 15px;
+      line-height: 1.85;
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+
+    .md> :first-child {
+      margin-top: 0 !important;
+    }
+
+    .md h1,
+    .md h2,
+    .md h3,
+    .md h4,
+    .md h5,
+    .md h6 {
+      font-weight: 700;
+      line-height: 1.4;
+      margin: 1.6em 0 0.6em;
+    }
+
+    .md h1 {
+      font-size: 1.8em;
+      padding-bottom: 0.3em;
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .md h2 {
+      font-size: 1.45em;
+      padding-bottom: 0.3em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .md h3 {
+      font-size: 1.2em;
+    }
+
+    .md h4 {
+      font-size: 1.05em;
+    }
+
+    .md h5,
+    .md h6 {
+      font-size: 0.95em;
+      color: var(--label);
+    }
+
+    .md p,
+    .md ul,
+    .md ol,
+    .md blockquote,
+    .md pre,
+    .md table,
+    .md details {
+      margin: 0 0 1em;
+    }
+
+    .md ul,
+    .md ol {
+      padding-left: 1.8em;
+    }
+
+    .md li+li,
+    .md li>ul,
+    .md li>ol {
+      margin-top: 0.25em;
+    }
+
+    .md li>ul,
+    .md li>ol {
+      margin-bottom: 0;
+    }
+
+    .md li:has(> input[type="checkbox"]) {
+      list-style: none;
+      margin-left: -1.4em;
+    }
+
+    .md li>input[type="checkbox"] {
+      margin-right: 0.45em;
+      accent-color: var(--accent);
+      vertical-align: -0.1em;
+    }
+
+    .md a {
+      color: var(--accent-2);
+    }
+
+    .md strong {
+      color: #fff;
+    }
+
+    .md del {
+      color: var(--muted);
+    }
+
+    .md blockquote {
+      padding: 0.2em 1em;
+      border-left: 4px solid var(--border-strong);
+      color: var(--muted);
+    }
+
+    .md blockquote> :last-child {
+      margin-bottom: 0;
+    }
+
+    .md code {
+      font-family: var(--mono);
+      font-size: 0.88em;
+      background: var(--surface-2);
+      border-radius: 5px;
+      padding: 0.15em 0.4em;
+    }
+
+    .md pre {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      overflow: auto;
+      line-height: 1.6;
+    }
+
+    .md pre code {
+      background: none;
+      padding: 0;
+      font-size: 0.85em;
+      white-space: pre;
+    }
+
+    .md hr {
+      border: none;
+      border-top: 2px solid var(--border-strong);
+      margin: 1.8em 0;
+    }
+
+    .md img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    .md table {
+      border-collapse: collapse;
+      display: block;
+      max-width: 100%;
+      overflow: auto;
+      font-size: 0.95em;
+    }
+
+    .md th,
+    .md td {
+      border: 1px solid var(--border-strong);
+      padding: 6px 12px;
+    }
+
+    .md th {
+      background: var(--surface-2);
+      font-weight: 700;
+    }
+
+    .md tr:nth-child(2n) td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .md mark {
+      background: var(--accent-2);
+      color: var(--on-accent);
+      border-radius: 3px;
+      padding: 0 0.15em;
+    }
+
+    .md kbd {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      border: 1px solid var(--border-strong);
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      padding: 0.1em 0.4em;
+      background: var(--surface-2);
+    }
+
+    .md details {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5em 1em;
+    }
+
+    .md summary {
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .empty-view {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* ── 表をつくる ── */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-box {
+      width: min(880px, 100%);
+      max-height: calc(100vh - 32px);
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+    }
+
+    .modal-head .x {
+      margin-left: auto;
+    }
+
+    .modal-body {
+      padding: 14px 16px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-foot {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .modal-foot .note {
+      margin-right: auto;
+      font-size: 11.5px;
+      color: var(--muted);
+      align-self: center;
+    }
+
+    .size-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      align-items: center;
+      font-size: 12.5px;
+      color: var(--label);
+    }
+
+    .stepper {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stepper button {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+    }
+
+    .stepper b {
+      min-width: 2ch;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tgrid-wrap {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .tgrid {
+      border-collapse: collapse;
+      min-width: 100%;
+    }
+
+    .tgrid td,
+    .tgrid th {
+      border: 1px solid var(--border);
+      padding: 0;
+      min-width: 110px;
+    }
+
+    .tgrid thead th {
+      background: var(--bg-deep);
+      padding: 4px;
+    }
+
+    .tgrid input {
+      width: 100%;
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 7px 9px;
+    }
+
+    .tgrid input:focus {
+      background: var(--accent-soft);
+    }
+
+    .tgrid tbody tr:first-child input {
+      font-weight: 700;
+      background: var(--surface-2);
+    }
+
+    .tgrid tbody tr:first-child input:focus {
+      background: var(--accent-soft);
+    }
+
+    .align-seg {
+      display: flex;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .align-seg button {
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .align-seg button[aria-pressed="true"] {
+      background: var(--surface-2);
+      border-color: var(--border-strong);
+      color: var(--accent-2);
+    }
+
+    .tpreview {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      white-space: pre;
+      overflow: auto;
+      max-height: 160px;
+      color: var(--label);
+    }
+
+    .hint {
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+      flex: none;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .notes b {
+      color: var(--label);
+    }
+
+    .notes code,
+    .cheat code {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent-2);
+      background: var(--bg-deep);
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+    }
+
+    .cheat {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .cheat th,
+    .cheat td {
+      text-align: left;
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .cheat th {
+      color: var(--label);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .cheat td {
+      color: var(--muted);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 400;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* 狭い画面では「両方」をやめて、書く・見るを切り替える */
+    @media (max-width: 800px) {
+      .workspace {
+        padding: 40px 12px 40px;
+      }
+
+      .guide {
+        padding: 0 12px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      #view-both {
+        display: none;
+      }
+
+      .split[data-view="both"] {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .split[data-view="both"] .pane-view {
+        display: none;
+      }
+
+      .split[data-view="both"] .pane-write {
+        border-right: none;
+      }
+
+      .split {
+        height: clamp(380px, calc(100vh - 260px), 900px);
+      }
+
+      #src {
+        font-size: 15px;
+        padding: 14px 14px 40vh;
+      }
+
+      .pane-view {
+        padding: 14px 16px 40vh;
+      }
+
+      .split[data-view="write"] #src,
+      .split[data-view="view"] .pane-view {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .footbar .btn {
+        flex: 1 1 auto;
+      }
+
+      .count {
+        flex-basis: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>マークダウンメーカー</h1>
+      <p>Markdown を書きながら、すぐ見た目を確かめられます。ボタンで見出しや表を入れたり、Web ページの文章を貼って Markdown にしたりできます。書いたものはどこにも送信しません。</p>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <div class="editor-box">
+
+      <!-- 書式ボタン -->
+      <div class="toolbar" id="toolbar" role="toolbar" aria-label="書式">
+        <button class="tb" type="button" data-cmd="h1" title="大見出し（# ）">H1</button>
+        <button class="tb" type="button" data-cmd="h2" title="中見出し（## ）">H2</button>
+        <button class="tb" type="button" data-cmd="h3" title="小見出し（### ）">H3</button>
+        <span class="tb-sep"></span>
+        <button class="tb" type="button" data-cmd="bold" title="太字（Ctrl+B）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 5h6a3.5 3.5 0 0 1 0 7H7zM7 12h7a3.5 3.5 0 0 1 0 7H7z" /></svg>
+        </button>
+        <button class="tb" type="button" data-cmd="italic" title="斜体（Ctrl+I）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M14 5h5M5 19h5M15 5l-6 14" /></svg>
+        </button>
+        <button class="tb" type="button" data-cmd="strike" title="取り消し線">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 12h16M16.5 7.5C16 5.8 14.3 5 12 5c-2.8 0-4.5 1.3-4.5 3.2 0 1.2.7 2.1 2 2.8M8 16.5c.5 1.7 2.2 2.5 4.2 2.5 2.9 0 4.6-1.3 4.6-3.3 0-.9-.3-1.6-.9-2.2" /></svg>
+        </button>
+        <button class="tb" type="button" data-cmd="code" title="コード（` `）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5" /></svg>
+        </button>
+        <span class="tb-sep"></span>
+        <button class="tb" type="button" data-cmd="ul" title="箇条書き（- ）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10" /><circle cx="5" cy="6" r="1.2" fill="currentColor" /><circle cx="5" cy="12" r="1.2" fill="currentColor" /><circle cx="5" cy="18" r="1.2" fill="currentColor" /></svg>
+        </button>
+        <button class="tb" type="button" data-cmd="ol" title="番号つき（1. ）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10M4 5l1.5-1v5M4 14.5c0-1 2.8-1 2.8.3 0 .9-2.8 2.2-2.8 3.2h3" /></svg>
+        </button>
+        <button class="tb" type="button" data-cmd="task" title="チェックリスト（- [ ] ）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="1.5" /><path d="M4.8 7.6l1.4 1.4 2.3-2.6M13 7.5h8M3 14h7v7H3zM13 17.5h8" /></svg>
+        </button>
+        <button class="tb" type="button" data-cmd="quote" title="引用（> ）">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.5 6C6.5 7 4.5 9.6 4.5 13v5h6v-6H7.6c.2-2.2 1.4-3.6 2.9-4.4zM19.5 6c-3 1-5 3.6-5 7v5h6v-6h-2.9c.2-2.2 1.4-3.6 2.9-4.4z" /></svg>
+        </button>
+        <button class="tb" type="button" data-cmd="codeblock" title="コードのかたまり（```）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M10 10l-2.5 2.5L10 15M14 10l2.5 2.5L14 15" /></svg>
+        </button>
+        <span class="tb-sep"></span>
+        <button class="tb" type="button" data-cmd="link" title="リンク（Ctrl+K）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" /></svg>
+        </button>
+        <button class="tb" type="button" data-cmd="image" title="画像（URL で入れる）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="10" r="1.8" /><path d="M21 16l-5-5-9 9" /></svg>
+        </button>
+        <button class="tb" type="button" data-cmd="table" title="表をつくる・直す">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 10h18M3 15h18M9 4v16M15 4v16" /></svg>
+          <span>表</span>
+        </button>
+        <button class="tb" type="button" data-cmd="hr" title="区切り線（---）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 12h18M7 6h10M7 18h10" opacity="0.35" /><path d="M3 12h18" /></svg>
+        </button>
+        <button class="tb" type="button" data-cmd="toc" title="見出しから目次をつくる">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M8 11h12M8 16h12M4 21h16" /></svg>
+          <span>目次</span>
+        </button>
+      </div>
+
+      <!-- 表示の切り替え・設定 -->
+      <div class="subbar">
+        <div class="seg" role="group" aria-label="表示">
+          <button type="button" data-view="write" aria-pressed="false">✏️ 書く</button>
+          <button type="button" data-view="both" id="view-both" aria-pressed="true">両方</button>
+          <button type="button" data-view="view" aria-pressed="false">👀 見る</button>
+        </div>
+        <label class="check" title="オンにすると、1回の改行もそのまま改行になります（GitHub のコメント・Discord などと同じ）。オフは普通の Markdown と同じで、段落を分けるには空の行が要ります。">
+          <input type="checkbox" id="opt-breaks">改行をそのまま改行にする
+        </label>
+        <label class="check" title="Web ページ・Word・Google ドキュメントの文章や、Excel の表を貼ると Markdown にします。Ctrl+Shift+V で貼ると、そのままの文字になります。">
+          <input type="checkbox" id="opt-paste" checked>貼り付けたら Markdown にする
+        </label>
+        <span class="spacer"></span>
+        <div class="row">
+          <button class="btn btn-sm" type="button" id="btn-open">📂 開く</button>
+          <button class="btn btn-sm" type="button" id="btn-new">📄 新しく書く</button>
+        </div>
+        <input type="file" id="file" accept=".md,.markdown,.txt,.mdown,.mkd,text/markdown,text/plain" hidden>
+      </div>
+
+      <div class="split" id="split" data-view="both">
+        <div class="pane pane-write" id="pane-write">
+          <textarea id="src" spellcheck="false" aria-label="Markdown" placeholder="ここに Markdown を書きます。&#10;&#10;# 見出し&#10;**太字** や - 箇条書き など。上のボタンからも入れられます。"></textarea>
+        </div>
+        <div class="pane pane-view" id="pane-view">
+          <div class="md" id="view"></div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <span class="count" id="count"></span>
+        <button class="btn" type="button" id="copy-md">📋 Markdown をコピー</button>
+        <button class="btn" type="button" id="copy-rich" title="見た目のままコピーします。Word・Gmail・Google ドキュメントなどに貼れます">📋 見た目のままコピー</button>
+        <button class="btn" type="button" id="copy-html">&lt;/&gt; HTML をコピー</button>
+        <button class="btn" type="button" id="save-html">⬇ HTML で保存</button>
+        <button class="btn btn-primary" type="button" id="save-md">⬇ .md で保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 表をつくる -->
+  <div class="modal" id="tmodal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="tmodal-title">
+      <div class="modal-head">
+        <span class="sec-icon">▦</span><span id="tmodal-title">表をつくる</span>
+        <button class="btn btn-sm x" type="button" id="t-close" aria-label="閉じる">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="size-row">
+          <span class="stepper">横（列）<button class="btn btn-sm" type="button" data-step="c-">−</button><b id="t-cols">3</b><button class="btn btn-sm" type="button" data-step="c+">＋</button></span>
+          <span class="stepper">縦（行）<button class="btn btn-sm" type="button" data-step="r-">−</button><b id="t-rows">3</b><button class="btn btn-sm" type="button" data-step="r+">＋</button></span>
+          <button class="btn btn-sm" type="button" id="t-clear">中身を消す</button>
+        </div>
+        <div class="hint">1行目は見出しになります。列の上のボタンで、左・真ん中・右よせを選べます。Excel やスプレッドシートでコピーした表は、ます目に貼り付けるとそのまま入ります。</div>
+        <div class="tgrid-wrap">
+          <table class="tgrid" id="tgrid"></table>
+        </div>
+        <div class="tpreview" id="t-preview" aria-label="できあがりの Markdown"></div>
+      </div>
+      <div class="modal-foot">
+        <span class="note" id="t-note"></span>
+        <button class="btn" type="button" id="t-cancel">やめる</button>
+        <button class="btn btn-primary" type="button" id="t-insert">この表を入れる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🔍</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>左に Markdown を書くと、右に<b>できあがりの見た目</b>がすぐ出ます。記号を覚えていなくても、<b>上のボタン</b>で見出し・太字・リストなどを入れられます。</li>
+          <li>表は<b>「表」ボタン</b>から、ます目に書いて作れます。表の中で押すと、その表を直せます。Excel の表は、そのまま左に貼り付けても表になります。</li>
+          <li>Web ページ・Word・Google ドキュメントの文章を貼ると、<b>見出しやリンクを Markdown にして</b>入れます。</li>
+          <li>できたら<b>「.md で保存」</b>か、<b>コピー</b>して使う先に貼ります。書いている途中のものはブラウザに覚えておくので、閉じても続きから書けます。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">📝</span>書き方の早見表</summary>
+      <div class="panel-body">
+        <table class="cheat">
+          <tr><th>見出し</th><td><code># 大</code> <code>## 中</code> <code>### 小</code>（# のあとに空白）</td></tr>
+          <tr><th>太字・斜体</th><td><code>**太字**</code> <code>*斜体*</code> <code>~~取り消し~~</code></td></tr>
+          <tr><th>箇条書き</th><td><code>- 項目</code>、番号は <code>1. 項目</code>。前に空白を入れると1段下がる</td></tr>
+          <tr><th>チェック</th><td><code>- [ ] まだ</code> <code>- [x] 済み</code></td></tr>
+          <tr><th>リンク</th><td><code>[文字](https://…)</code></td></tr>
+          <tr><th>画像</th><td><code>![説明](https://…/画像.png)</code></td></tr>
+          <tr><th>引用</th><td><code>&gt; 文</code></td></tr>
+          <tr><th>コード</th><td><code>`短いコード`</code>、かたまりは <code>```</code> の行ではさむ</td></tr>
+          <tr><th>区切り線</th><td><code>---</code>（前に空の行）</td></tr>
+          <tr><th>改行</th><td>段落を分けるときは空の行。段落の中で改行するときは、行の終わりに空白を2つ（または「改行をそのまま改行にする」をオン）</td></tr>
+        </table>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>ヒント・注意点</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>書いたものはブラウザの中だけで扱います。どこにも送信しません。途中のものは、この端末のブラウザに覚えておきます（別の端末やブラウザには出ません）。</li>
+          <li>箇条書きの行で <b>Enter</b> を押すと、次の行にも記号が付きます。何も書かずにもう一度 Enter で、箇条書きを終わります。<b>Tab</b> / <b>Shift+Tab</b> で1段下げる・上げる。</li>
+          <li>ショートカット：<b>Ctrl+B</b> 太字、<b>Ctrl+I</b> 斜体、<b>Ctrl+K</b> リンク、<b>Ctrl+S</b> .md で保存。Tab でほかの場所へ移りたいときは、先に Esc を押します。</li>
+          <li>リンクの URL を選んだまま <b>URL を貼り付ける</b>と、<code>[文字](URL)</code> のリンクになります。</li>
+          <li>画像はファイルを貼り付けられません。ネットに置いた画像の URL を <code>![説明](URL)</code> で書いてください。</li>
+          <li>Markdown はサービスによって少しずつ違います。ここでの見た目は GitHub と同じ書き方（GFM）です。note・Qiita・Zenn・Discord などでは、出方が少し違うことがあります。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1400px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../common/ask.js?v=20260929a"></script>
+  <script src="marked.umd.js?v=20261006a"></script>
+  <script src="purify.min.js?v=20261006a"></script>
+  <script src="turndown.js?v=20261006a"></script>
+  <script src="turndown-plugin-gfm.js?v=20261006a"></script>
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const ask = (msg, yes) => window.DonnmaAsk.ask(msg, { yes }).then(r => r === true);
+      const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2200); };
+
+      const src = $('src');
+      const view = $('view');
+      const split = $('split');
+      const paneView = $('pane-view');
+      const STORE = 'donnma-markdown';
+
+      const SAMPLE = `# マークダウンメーカーへようこそ
+
+左に **Markdown** を書くと、右にすぐ見た目が出ます。上のボタンを押せば、記号を覚えていなくても書けます。
+
+## 文字の飾り
+
+- **太字**・*斜体*・~~取り消し線~~
+- \`短いコード\` や [リンク](https://donnma.com/tool/)
+  - 前に空白を入れると、1段下がります
+
+## チェックリスト
+
+- [x] 下書きを書く
+- [ ] 見直す
+- [ ] .md で保存する
+
+## 表
+
+| ツール | できること |
+| :-- | :-- |
+| マークダウンメーカー | Markdown を書いて見る |
+| 画像の圧縮・変換 | 画像を軽くする |
+
+> 引用はこんなふうに出ます。
+
+\`\`\`js
+console.log('コードもそのまま出ます');
+\`\`\`
+
+---
+
+この見本は「📄 新しく書く」で消せます。
+`;
+
+      // ── 設定・下書きを覚える ──
+      const opts = { view: 'both', breaks: false, paste: true };
+      let stored = null;
+      try { stored = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (e) { }
+      if (stored && typeof stored === 'object') {
+        if (['write', 'both', 'view'].includes(stored.view)) opts.view = stored.view;
+        opts.breaks = !!stored.breaks;
+        opts.paste = stored.paste !== false;
+      }
+      src.value = stored && typeof stored.text === 'string' ? stored.text : SAMPLE;
+      $('opt-breaks').checked = opts.breaks;
+      $('opt-paste').checked = opts.paste;
+
+      let saveTimer = 0;
+      const save = () => {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          try { localStorage.setItem(STORE, JSON.stringify({ text: src.value, ...opts })); } catch (e) { }
+        }, 300);
+      };
+
+      // ── 見た目を作る ──
+      DOMPurify.addHook('afterSanitizeAttributes', node => {
+        if (node.tagName === 'A' && /^https?:/i.test(node.getAttribute('href') || '')) {
+          node.setAttribute('target', '_blank');
+          node.setAttribute('rel', 'noopener noreferrer');
+        }
+      });
+
+      // 見出しに id を付ける（目次のリンク先。GitHub と同じ作り方）
+      const slugger = () => {
+        const seen = new Map();
+        return text => {
+          let s = text.trim().toLowerCase()
+            .replace(/<[^>]+>/g, '')
+            .replace(/[^\p{L}\p{N}\p{M}\s_-]/gu, '')
+            .replace(/\s/g, '-');
+          const n = seen.get(s) || 0;
+          seen.set(s, n + 1);
+          return n ? `${s}-${n}` : s;
+        };
+      };
+      const plainOf = html => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent; };
+
+      const toHtml = text => {
+        const slug = slugger();
+        const md = new marked.Marked({ gfm: true, breaks: opts.breaks });
+        md.use({
+          renderer: {
+            heading({ tokens, depth }) {
+              const inner = this.parser.parseInline(tokens);
+              return `<h${depth} id="${slug(plainOf(inner))}">${inner}</h${depth}>\n`;
+            }
+          }
+        });
+        return DOMPurify.sanitize(md.parse(text), { ADD_ATTR: ['target'] });
+      };
+
+      let renderQueued = false;
+      const render = () => {
+        renderQueued = false;
+        const text = src.value;
+        view.innerHTML = text.trim() ? toHtml(text) : '<p class="empty-view">左に書くと、ここに見た目が出ます。</p>';
+        updateCount();
+      };
+      const queueRender = () => {
+        if (renderQueued) return;
+        renderQueued = true;
+        requestAnimationFrame(render);
+      };
+
+      const updateCount = () => {
+        const text = src.value;
+        const chars = [...text.replace(/\r?\n/g, '')].length;
+        const lines = text ? text.split('\n').length : 0;
+        $('count').textContent = `${chars.toLocaleString()} 文字・${lines.toLocaleString()} 行`;
+      };
+
+      // ── 表示の切り替え ──
+      const setView = v => {
+        opts.view = v;
+        split.dataset.view = v;
+        document.querySelectorAll('.seg [data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+        save();
+      };
+      document.querySelectorAll('.seg [data-view]').forEach(b => b.addEventListener('click', () => {
+        setView(b.dataset.view);
+        if (b.dataset.view !== 'view') src.focus({ preventScroll: true });
+      }));
+      // 狭い画面では「両方」は「書く」と同じに見えるので、ボタンも「書く」を押した見た目にする
+      const narrow = matchMedia('(max-width: 800px)');
+      const fixNarrow = () => { if (narrow.matches && opts.view === 'both') setView('write'); };
+      narrow.addEventListener('change', fixNarrow);
+
+      $('opt-breaks').addEventListener('change', e => { opts.breaks = e.target.checked; save(); render(); });
+      $('opt-paste').addEventListener('change', e => { opts.paste = e.target.checked; save(); });
+
+      // ── 書いているところと見た目のスクロールを合わせる ──
+      let scrollLock = null;
+      const syncScroll = (from, to) => {
+        if (split.dataset.view !== 'both' || scrollLock === to) return;
+        const max = from.scrollHeight - from.clientHeight;
+        const ratio = max > 0 ? from.scrollTop / max : 0;
+        scrollLock = from;
+        to.scrollTop = ratio * (to.scrollHeight - to.clientHeight);
+        clearTimeout(syncScroll.t);
+        syncScroll.t = setTimeout(() => { scrollLock = null; }, 80);
+      };
+      src.addEventListener('scroll', () => syncScroll(src, paneView));
+      paneView.addEventListener('scroll', () => syncScroll(paneView, src));
+
+      // ── 文字を書きかえる（Ctrl+Z で戻せるように execCommand を使う） ──
+      const replaceRange = (start, end, text, selStart, selEnd) => {
+        src.focus({ preventScroll: true });
+        src.setSelectionRange(start, end);
+        let ok = false;
+        try { ok = document.execCommand('insertText', false, text); } catch (e) { }
+        if (!ok || src.value.slice(start, start + text.length) !== text) {
+          src.setRangeText(text, start, end, 'end');
+        }
+        if (selStart != null) src.setSelectionRange(selStart, selEnd ?? selStart);
+        src.dispatchEvent(new Event('input'));
+      };
+
+      const lineStartOf = pos => src.value.lastIndexOf('\n', pos - 1) + 1;
+      const lineEndOf = pos => { const i = src.value.indexOf('\n', pos); return i < 0 ? src.value.length : i; };
+
+      // 文字を記号ではさむ（もうはさんであれば外す）
+      const wrap = (before, after, placeholder) => {
+        const v = src.value;
+        let s = src.selectionStart, e = src.selectionEnd;
+        // 選んだ文字の前後の空白は外に出す
+        while (s < e && /\s/.test(v[s])) s++;
+        while (e > s && /\s/.test(v[e - 1])) e--;
+        const sel = v.slice(s, e);
+        if (sel && sel.startsWith(before) && sel.endsWith(after) && sel.length >= before.length + after.length) {
+          const inner = sel.slice(before.length, sel.length - after.length);
+          replaceRange(s, e, inner, s, s + inner.length);
+          return;
+        }
+        if (v.slice(s - before.length, s) === before && v.slice(e, e + after.length) === after) {
+          replaceRange(s - before.length, e + after.length, sel, s - before.length, e - before.length);
+          return;
+        }
+        const body = sel || placeholder;
+        replaceRange(s, e, before + body + after, s + before.length, s + before.length + body.length);
+      };
+
+      // 選んだ行の頭に記号を付ける（全部の行に付いていれば外す）
+      const LIST_RE = /^(\s*)([-*+]|\d+[.)])(\s+\[[ xX]\])?\s+/;
+      const prefixLines = kind => {
+        const v = src.value;
+        const s = lineStartOf(src.selectionStart);
+        let endPos = src.selectionEnd;
+        if (endPos > src.selectionStart && v[endPos - 1] === '\n') endPos--;
+        const e = lineEndOf(endPos);
+        const lines = v.slice(s, e).split('\n');
+        const target = lines.filter(l => l.trim());
+        let out;
+        if (kind === 'h1' || kind === 'h2' || kind === 'h3') {
+          const mark = '#'.repeat(Number(kind[1])) + ' ';
+          const all = target.length && target.every(l => l.startsWith(mark) && !l.startsWith(mark.trim() + '#'));
+          out = lines.map(l => {
+            const body = l.replace(/^#{1,6}\s+/, '');
+            if (!l.trim()) return l;
+            return all ? body : mark + body;
+          });
+        } else if (kind === 'quote') {
+          const all = target.length && target.every(l => /^>\s?/.test(l));
+          out = lines.map(l => all ? l.replace(/^>\s?/, '') : (l.trim() ? '> ' + l : '>'));
+        } else {
+          const test = { ul: /^\s*[-*+]\s+(?!\[[ xX]\])/, ol: /^\s*\d+[.)]\s+/, task: /^\s*[-*+]\s+\[[ xX]\]\s+/ }[kind];
+          const all = target.length && target.every(l => test.test(l));
+          let n = 0;
+          out = lines.map(l => {
+            if (!l.trim()) return l;
+            const m = l.match(LIST_RE);
+            const indent = m ? m[1] : (l.match(/^\s*/)[0]);
+            const body = m ? l.slice(m[0].length) : l.slice(indent.length);
+            if (all) return indent + body;
+            n++;
+            return indent + (kind === 'ul' ? '- ' : kind === 'ol' ? `${n}. ` : '- [ ] ') + body;
+          });
+        }
+        const text = out.join('\n');
+        if (lines.length === 1) {
+          // 1行だけなら、カーソルは行の終わりへ
+          replaceRange(s, e, text, s + text.length);
+        } else {
+          replaceRange(s, e, text, s, s + text.length);
+        }
+      };
+
+      // 前後に空の行を入れて、かたまりを置く
+      const insertBlock = (text, selFrom, selTo) => {
+        const v = src.value;
+        let s = src.selectionStart, e = src.selectionEnd;
+        const before = v.slice(0, s);
+        const after = v.slice(e);
+        const pre = !before ? '' : before.endsWith('\n\n') ? '' : before.endsWith('\n') ? '\n' : '\n\n';
+        const post = !after ? '\n' : after.startsWith('\n\n') ? '' : after.startsWith('\n') ? '\n' : '\n\n';
+        const base = s + pre.length;
+        replaceRange(s, e, pre + text + post, base + (selFrom ?? text.length), base + (selTo ?? selFrom ?? text.length));
+      };
+
+      const isUrl = t => /^https?:\/\/\S+$/i.test(t.trim());
+
+      const commands = {
+        h1: () => prefixLines('h1'),
+        h2: () => prefixLines('h2'),
+        h3: () => prefixLines('h3'),
+        bold: () => wrap('**', '**', '太字'),
+        italic: () => wrap('*', '*', '斜体'),
+        strike: () => wrap('~~', '~~', '取り消し'),
+        code: () => {
+          const sel = src.value.slice(src.selectionStart, src.selectionEnd);
+          if (sel.includes('\n')) commands.codeblock();
+          else wrap('`', '`', 'コード');
+        },
+        ul: () => prefixLines('ul'),
+        ol: () => prefixLines('ol'),
+        task: () => prefixLines('task'),
+        quote: () => prefixLines('quote'),
+        codeblock: () => {
+          const v = src.value;
+          const sel = v.slice(src.selectionStart, src.selectionEnd);
+          if (sel) {
+            const s = lineStartOf(src.selectionStart);
+            const e = lineEndOf(src.selectionEnd - (v[src.selectionEnd - 1] === '\n' ? 1 : 0));
+            src.setSelectionRange(s, e);
+            const body = v.slice(s, e);
+            insertBlock('```\n' + body + '\n```', 3, 3);
+          } else {
+            insertBlock('```\nここにコード\n```', 4, 10);
+          }
+        },
+        link: () => {
+          const s = src.selectionStart, e = src.selectionEnd;
+          const sel = src.value.slice(s, e);
+          if (isUrl(sel)) {
+            const url = sel.trim();
+            replaceRange(s, e, `[リンクの文字](${url})`, s + 1, s + 7);
+          } else {
+            const label = sel || 'リンクの文字';
+            const text = `[${label}](https://)`;
+            const u = s + label.length + 3;
+            replaceRange(s, e, text, sel ? u : s + 1, sel ? u + 8 : s + 1 + label.length);
+          }
+        },
+        image: () => {
+          const s = src.selectionStart, e = src.selectionEnd;
+          const sel = src.value.slice(s, e);
+          if (isUrl(sel)) {
+            replaceRange(s, e, `![画像の説明](${sel.trim()})`, s + 2, s + 7);
+          } else {
+            const alt = sel || '画像の説明';
+            const u = s + alt.length + 4;
+            replaceRange(s, e, `![${alt}](https://)`, u, u + 8);
+          }
+        },
+        hr: () => insertBlock('---'),
+        table: () => openTable(),
+        toc: () => insertToc(),
+      };
+
+      document.querySelectorAll('#toolbar [data-cmd]').forEach(b => {
+        // ボタンを押しても、選んでいる文字が外れないように
+        b.addEventListener('mousedown', e => e.preventDefault());
+        b.addEventListener('click', () => {
+          if (split.dataset.view === 'view') setView(narrow.matches ? 'write' : 'both');
+          commands[b.dataset.cmd]();
+        });
+      });
+
+      // ── 目次 ──
+      const insertToc = () => {
+        const tokens = marked.lexer(src.value, { gfm: true });
+        const slug = slugger();
+        const heads = [];
+        const walk = list => list.forEach(t => {
+          if (t.type === 'heading') {
+            const html = marked.parseInline(t.text, { gfm: true });
+            heads.push({ depth: t.depth, text: plainOf(DOMPurify.sanitize(html)), id: slug(plainOf(DOMPurify.sanitize(html))) });
+          }
+        });
+        walk(tokens);
+        const items = heads.filter(h => h.depth >= 2 && h.depth <= 3 && h.text !== '目次');
+        if (!items.length) { toast('## の見出しがありません。先に見出しを書いてください'); return; }
+        const min = Math.min(...items.map(h => h.depth));
+        const body = items.map(h => `${'  '.repeat(h.depth - min)}- [${h.text.replace(/([\[\]])/g, '\\$1')}](#${encodeURI(h.id)})`).join('\n');
+        insertBlock('## 目次\n\n' + body);
+        toast('目次を入れました（## と ### の見出しから）');
+      };
+
+      // ── キー操作 ──
+      let tabEscape = false;
+      src.addEventListener('keydown', e => {
+        if (e.isComposing || e.keyCode === 229) return;
+        const mod = e.ctrlKey || e.metaKey;
+        if (mod && !e.altKey) {
+          const k = e.key.toLowerCase();
+          if (k === 'b' && !e.shiftKey) { e.preventDefault(); commands.bold(); return; }
+          if (k === 'i' && !e.shiftKey) { e.preventDefault(); commands.italic(); return; }
+          if (k === 'k' && !e.shiftKey) { e.preventDefault(); commands.link(); return; }
+          if (k === 'v' && e.shiftKey) { plainPaste = true; setTimeout(() => { plainPaste = false; }, 300); return; }
+        }
+        if (e.key === 'Escape') { tabEscape = true; return; }
+        if (e.key === 'Tab' && !mod && !e.altKey) {
+          if (tabEscape) { tabEscape = false; return; }
+          e.preventDefault();
+          indentLines(e.shiftKey ? -1 : 1);
+          return;
+        }
+        tabEscape = false;
+        if (e.key === 'Enter' && !mod && !e.shiftKey && !e.altKey) {
+          if (continueList()) e.preventDefault();
+        }
+      });
+
+      // Enter で箇条書き・引用を続ける
+      const continueList = () => {
+        const s = src.selectionStart;
+        if (s !== src.selectionEnd) return false;
+        const ls = lineStartOf(s);
+        const line = src.value.slice(ls, s);
+        const restOfLine = src.value.slice(s, lineEndOf(s));
+        const m = line.match(LIST_RE);
+        if (m) {
+          if (line.length === m[0].length && !restOfLine.trim()) {
+            // 中身のない項目で Enter → 箇条書きを終わる
+            replaceRange(ls, s, '', ls);
+            return true;
+          }
+          let marker = m[2];
+          const num = marker.match(/^(\d+)([.)])$/);
+          if (num) marker = (Number(num[1]) + 1) + num[2];
+          const box = m[3] ? ' [ ]' : '';
+          const ins = '\n' + m[1] + marker + box + ' ';
+          replaceRange(s, s, ins, s + ins.length);
+          return true;
+        }
+        const q = line.match(/^(\s*>+\s?)/);
+        if (q) {
+          if (line.length === q[0].length && !restOfLine.trim()) { replaceRange(ls, s, '', ls); return true; }
+          const ins = '\n' + q[1];
+          replaceRange(s, s, ins, s + ins.length);
+          return true;
+        }
+        return false;
+      };
+
+      // Tab / Shift+Tab：箇条書きは親の項目の文字の位置まで下げる。ほかは空白4つ
+      const indentLines = dir => {
+        const v = src.value;
+        const s0 = src.selectionStart, e0 = src.selectionEnd;
+        const s = lineStartOf(s0);
+        let endPos = e0;
+        if (endPos > s0 && v[endPos - 1] === '\n') endPos--;
+        const e = lineEndOf(endPos);
+        const lines = v.slice(s, e).split('\n');
+        const isList = LIST_RE.test(lines[0]);
+        if (s0 === e0 && !isList && dir > 0) {
+          replaceRange(s0, s0, '    ', s0 + 4);
+          return;
+        }
+        // 下げる幅：上にある箇条書きの、記号の後ろの位置
+        const above = v.slice(0, s).split('\n');
+        let unit = 4;
+        if (isList) {
+          const ind = lines[0].match(LIST_RE)[1].length;
+          for (let i = above.length - 1; i >= 0; i--) {
+            const m = above[i].match(LIST_RE);
+            if (!above[i].trim()) continue;
+            if (!m) break;
+            if (m[1].length === ind) { unit = m[0].length - (m[3] ? m[3].length : 0) - m[1].length; break; }
+            if (m[1].length < ind) break;
+          }
+        }
+        let firstDelta = 0, total = 0;
+        const out = lines.map((l, i) => {
+          let r;
+          if (dir > 0) r = l.trim() ? ' '.repeat(unit) + l : l;
+          else {
+            const cut = Math.min(unit, l.match(/^ */)[0].length) || (l.startsWith('\t') ? 1 : 0);
+            r = l.slice(cut);
+          }
+          const d = r.length - l.length;
+          if (i === 0) firstDelta = d;
+          total += d;
+          return r;
+        });
+        const text = out.join('\n');
+        if (text === lines.join('\n')) return;
+        const ns = Math.max(s, s0 + firstDelta);
+        replaceRange(s, e, text, ns, s0 === e0 ? ns : e0 + total);
+      };
+
+      // ── 貼り付け ──
+      let plainPaste = false;
+      const td = new TurndownService({
+        headingStyle: 'atx',
+        hr: '---',
+        bulletListMarker: '-',
+        codeBlockStyle: 'fenced',
+        emDelimiter: '*',
+        strongDelimiter: '**',
+        linkStyle: 'inlined',
+      });
+      td.use([turndownPluginGfm.strikethrough, turndownPluginGfm.taskListItems, turndownPluginGfm.highlightedCodeBlock]);
+      td.remove(['style', 'script', 'noscript', 'meta', 'link', 'title', 'colgroup']);
+      // 箇条書きの記号の後ろは空白1つにする（Turndown のままだと「-   項目」になる）
+      td.addRule('listItem', {
+        filter: 'li',
+        replacement: (content, node) => {
+          const parent = node.parentNode;
+          let prefix = '- ';
+          if (parent.nodeName === 'OL') {
+            const start = Number(parent.getAttribute('start')) || 1;
+            prefix = (start + [...parent.children].indexOf(node)) + '. ';
+          }
+          const body = content.replace(/^\n+/, '').replace(/\n+$/, '\n').replace(/\n/gm, '\n' + ' '.repeat(prefix.length));
+          return prefix + body + (node.nextSibling && !/\n$/.test(body) ? '\n' : '');
+        }
+      });
+      // 表は1行目を見出しにして、全部 Markdown の表にする
+      td.addRule('table', {
+        filter: 'table',
+        replacement: (content, node) => {
+          const rows = [...node.rows].map(tr => [...tr.cells].map(c =>
+            td.turndown(c.innerHTML).replace(/\n+/g, ' ').trim()));
+          return rows.length ? '\n\n' + tableToMd(rows, []) + '\n\n' : '';
+        }
+      });
+
+      // Google ドキュメントは太字を span の style で表し、全体を <b> で包むので直す
+      const tidyHtml = html => {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        doc.querySelectorAll('b[id^="docs-internal-guid"]').forEach(b => b.replaceWith(...b.childNodes));
+        doc.querySelectorAll('b, strong').forEach(b => {
+          const w = b.style.fontWeight;
+          if (w === 'normal' || (w && Number(w) < 600)) b.replaceWith(...b.childNodes);
+        });
+        doc.querySelectorAll('span[style]').forEach(sp => {
+          let node = sp;
+          const w = sp.style.fontWeight;
+          const bold = w === 'bold' || Number(w) >= 600;
+          const italic = sp.style.fontStyle === 'italic';
+          const strike = /line-through/.test(sp.style.textDecoration || sp.style.textDecorationLine || '');
+          if (!sp.textContent.trim()) return;
+          const wrapIn = tag => { const el = doc.createElement(tag); node.replaceWith(el); el.appendChild(node); node = el; };
+          if (bold) wrapIn('strong');
+          if (italic) wrapIn('em');
+          if (strike) wrapIn('del');
+        });
+        // Google ドキュメントの見出しの中の太字は外す
+        doc.querySelectorAll('h1 strong, h2 strong, h3 strong, h4 strong, h5 strong, h6 strong').forEach(b => b.replaceWith(...b.childNodes));
+        return doc.body.innerHTML;
+      };
+
+      // Excel・スプレッドシートの表（タブ区切り）か
+      const parseTsv = text => {
+        const t = text.replace(/\r\n?/g, '\n').replace(/\n$/, '');
+        if (!t.includes('\t')) return null;
+        const rows = [];
+        // セルの中の改行（"…" で囲まれる）にも対応する
+        let row = [], cell = '', q = false;
+        for (let i = 0; i < t.length; i++) {
+          const ch = t[i];
+          if (q) {
+            if (ch === '"' && t[i + 1] === '"') { cell += '"'; i++; }
+            else if (ch === '"') q = false;
+            else cell += ch;
+          } else if (ch === '"' && cell === '') q = true;
+          else if (ch === '\t') { row.push(cell); cell = ''; }
+          else if (ch === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
+          else cell += ch;
+        }
+        row.push(cell); rows.push(row);
+        const n = rows[0].length;
+        if (n < 2 || !rows.every(r => r.length === n)) return null;
+        return rows.map(r => r.map(c => c.replace(/\n/g, ' ').trim()));
+      };
+
+      const STRUCT_RE = /<(h[1-6]|ul|ol|li|table|a\s|b[\s>]|strong|em[\s>]|i[\s>]|img|blockquote|pre|del|s[\s>]|hr)\b/i;
+
+      src.addEventListener('paste', e => {
+        const cd = e.clipboardData;
+        if (!cd) return;
+        const text = cd.getData('text/plain');
+        const html = cd.getData('text/html');
+        const s = src.selectionStart, en = src.selectionEnd;
+        const sel = src.value.slice(s, en);
+
+        // 文字を選んだまま URL を貼る → リンクにする
+        if (sel && !sel.includes('\n') && !isUrl(sel) && isUrl(text) && !plainPaste) {
+          e.preventDefault();
+          const ins = `[${sel}](${text.trim()})`;
+          replaceRange(s, en, ins, s + ins.length);
+          return;
+        }
+        if (!text && !html && cd.files && cd.files.length) {
+          e.preventDefault();
+          toast('画像のファイルは貼り付けられません。画像の URL を ![説明](URL) で書いてください');
+          return;
+        }
+        if (!opts.paste || plainPaste) return;
+
+        const tsv = parseTsv(text);
+        if (tsv && (!html || /<table/i.test(html))) {
+          e.preventDefault();
+          insertBlock(tableToMd(tsv, []));
+          toast('表にしました（Ctrl+Z で元に戻せます）');
+          return;
+        }
+        if (html && STRUCT_RE.test(html)) {
+          let md = '';
+          try { md = td.turndown(tidyHtml(html)).replace(/\n{3,}/g, '\n\n').trim(); } catch (err) { return; }
+          if (!md || md === text.trim()) return;
+          e.preventDefault();
+          replaceRange(s, en, md, s + md.length);
+          toast('Markdown にして貼りました（そのまま貼るときは Ctrl+Shift+V）');
+        }
+      });
+
+      // ── 表をつくる ──
+      const strWidth = s => {
+        let w = 0;
+        for (const ch of s) {
+          const c = ch.codePointAt(0);
+          w += (c >= 0x1100 && (c <= 0x115f || (c >= 0x2e80 && c <= 0xa4cf) || (c >= 0xac00 && c <= 0xd7a3) ||
+            (c >= 0xf900 && c <= 0xfaff) || (c >= 0xfe30 && c <= 0xfe4f) || (c >= 0xff00 && c <= 0xff60) ||
+            (c >= 0xffe0 && c <= 0xffe6) || c >= 0x1f300)) ? 2 : 1;
+        }
+        return w;
+      };
+      const escCell = s => s.replace(/\\?\|/g, '\\|');
+
+      // rows[0] が見出し。aligns は 'l' / 'c' / 'r' / ''
+      const tableToMd = (rows, aligns) => {
+        const cols = Math.max(...rows.map(r => r.length));
+        const cells = rows.map(r => Array.from({ length: cols }, (_, i) => escCell(r[i] ?? '')));
+        const width = Array.from({ length: cols }, (_, i) => Math.max(3, ...cells.map(r => strWidth(r[i]))));
+        const pad = (s, i) => {
+          const gap = width[i] - strWidth(s);
+          const a = aligns[i];
+          if (a === 'r') return ' '.repeat(gap) + s;
+          if (a === 'c') return ' '.repeat(Math.floor(gap / 2)) + s + ' '.repeat(Math.ceil(gap / 2));
+          return s + ' '.repeat(gap);
+        };
+        const line = r => '| ' + r.map(pad).join(' | ') + ' |';
+        const sep = '| ' + width.map((w, i) => {
+          const a = aligns[i];
+          if (a === 'l') return ':' + '-'.repeat(w - 1);
+          if (a === 'r') return '-'.repeat(w - 1) + ':';
+          if (a === 'c') return ':' + '-'.repeat(w - 2) + ':';
+          return '-'.repeat(w);
+        }).join(' | ') + ' |';
+        return [line(cells[0]), sep, ...cells.slice(1).map(line)].join('\n');
+      };
+
+      // カーソルのある表を探す
+      const splitRow = line => {
+        let t = line.trim();
+        if (t.startsWith('|')) t = t.slice(1);
+        if (t.endsWith('|') && !t.endsWith('\\|')) t = t.slice(0, -1);
+        const out = [];
+        let cur = '';
+        for (let i = 0; i < t.length; i++) {
+          if (t[i] === '\\' && t[i + 1] === '|') { cur += '|'; i++; }
+          else if (t[i] === '|') { out.push(cur.trim()); cur = ''; }
+          else cur += t[i];
+        }
+        out.push(cur.trim());
+        return out;
+      };
+      const SEP_RE = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
+      const findTable = pos => {
+        const lines = src.value.split('\n');
+        let idx = src.value.slice(0, pos).split('\n').length - 1;
+        if (!lines[idx] || !lines[idx].includes('|')) return null;
+        let a = idx, b = idx;
+        while (a > 0 && lines[a - 1].includes('|') && lines[a - 1].trim()) a--;
+        while (b < lines.length - 1 && lines[b + 1].includes('|') && lines[b + 1].trim()) b++;
+        if (b - a < 1 || !SEP_RE.test(lines[a + 1])) return null;
+        const aligns = splitRow(lines[a + 1]).map(c => {
+          const l = c.startsWith(':'), r = c.endsWith(':');
+          return l && r ? 'c' : r ? 'r' : l ? 'l' : '';
+        });
+        const rows = [lines[a], ...lines.slice(a + 2, b + 1)].map(splitRow);
+        const start = lines.slice(0, a).join('\n').length + (a ? 1 : 0);
+        const end = start + lines.slice(a, b + 1).join('\n').length;
+        return { rows, aligns, start, end };
+      };
+
+      const T = { rows: [], aligns: [], edit: null };
+      const tgrid = $('tgrid');
+      const MAXC = 12, MAXR = 60;
+
+      const readGrid = () => {
+        tgrid.querySelectorAll('tbody tr').forEach((tr, r) => {
+          tr.querySelectorAll('input').forEach((inp, c) => { T.rows[r][c] = inp.value; });
+        });
+      };
+      const resize = (rows, cols) => {
+        rows = Math.max(2, Math.min(MAXR, rows));
+        cols = Math.max(1, Math.min(MAXC, cols));
+        T.rows = Array.from({ length: rows }, (_, r) => Array.from({ length: cols }, (_, c) => (T.rows[r] && T.rows[r][c]) || ''));
+        T.aligns = Array.from({ length: cols }, (_, c) => T.aligns[c] || '');
+      };
+      const drawGrid = () => {
+        const cols = T.rows[0].length;
+        $('t-cols').textContent = cols;
+        $('t-rows').textContent = T.rows.length;
+        const al = [['l', '左'], ['c', '中'], ['r', '右']];
+        let h = '<thead><tr>' + T.aligns.map((a, c) => `<th><div class="align-seg">${al.map(([k, n]) =>
+          `<button type="button" data-col="${c}" data-al="${k}" aria-pressed="${a === k}" title="${n}よせ">${n}</button>`).join('')}</div></th>`).join('') + '</tr></thead><tbody>';
+        T.rows.forEach((row, r) => {
+          h += '<tr>' + row.map((_, c) => `<td><input type="text" data-r="${r}" data-c="${c}" aria-label="${r + 1}行目 ${c + 1}列目"></td>`).join('') + '</tr>';
+        });
+        tgrid.innerHTML = h + '</tbody>';
+        tgrid.querySelectorAll('tbody input').forEach(inp => { inp.value = T.rows[inp.dataset.r][inp.dataset.c]; });
+        drawPreview();
+      };
+      const drawPreview = () => { $('t-preview').textContent = tableToMd(T.rows, T.aligns); };
+
+      const openTable = () => {
+        const found = findTable(src.selectionStart);
+        if (found) {
+          T.rows = found.rows; T.aligns = found.aligns; T.edit = found;
+          resize(found.rows.length, Math.max(...found.rows.map(r => r.length)));
+          $('tmodal-title').textContent = '表を直す';
+          $('t-insert').textContent = 'この表に置きかえる';
+          $('t-note').textContent = 'カーソルのある表を読み込みました';
+        } else {
+          T.rows = []; T.aligns = []; T.edit = null;
+          resize(3, 3);
+          $('tmodal-title').textContent = '表をつくる';
+          $('t-insert').textContent = 'この表を入れる';
+          $('t-note').textContent = '';
+        }
+        drawGrid();
+        $('tmodal').hidden = false;
+        const first = tgrid.querySelector('tbody input');
+        if (first) first.focus();
+      };
+      const closeTable = () => { $('tmodal').hidden = true; src.focus({ preventScroll: true }); };
+
+      tgrid.addEventListener('input', e => {
+        const inp = e.target;
+        if (inp.dataset.r == null) return;
+        T.rows[inp.dataset.r][inp.dataset.c] = inp.value;
+        drawPreview();
+      });
+      tgrid.addEventListener('click', e => {
+        const b = e.target.closest('[data-al]');
+        if (!b) return;
+        const c = Number(b.dataset.col);
+        T.aligns[c] = T.aligns[c] === b.dataset.al ? '' : b.dataset.al;
+        tgrid.querySelectorAll(`[data-col="${c}"]`).forEach(x => x.setAttribute('aria-pressed', String(x.dataset.al === T.aligns[c])));
+        drawPreview();
+      });
+      // ます目に Excel の表を貼る → そこから右下へ入れる
+      tgrid.addEventListener('paste', e => {
+        const inp = e.target;
+        if (inp.dataset.r == null) return;
+        const text = e.clipboardData.getData('text/plain');
+        const rows = parseTsv(text) || (text.includes('\n') ? text.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').map(l => [l]) : null);
+        if (!rows) return;
+        e.preventDefault();
+        readGrid();
+        const r0 = Number(inp.dataset.r), c0 = Number(inp.dataset.c);
+        // まだ何も書いていない表に貼ったときは、貼った大きさにそろえる
+        if (T.rows.every(r => r.every(c => !c.trim()))) { T.rows = []; resize(r0 + rows.length, c0 + Math.max(...rows.map(r => r.length))); }
+        resize(Math.max(T.rows.length, r0 + rows.length), Math.max(T.rows[0].length, c0 + Math.max(...rows.map(r => r.length))));
+        rows.forEach((row, i) => row.forEach((v, j) => { if (T.rows[r0 + i] && c0 + j < T.rows[0].length) T.rows[r0 + i][c0 + j] = v; }));
+        drawGrid();
+        toast(`${rows.length} 行を貼り付けました`);
+      });
+      // Enter で下のます、いちばん下なら行を足す
+      tgrid.addEventListener('keydown', e => {
+        const inp = e.target;
+        if (inp.dataset.r == null || e.isComposing || e.keyCode === 229) return;
+        const r = Number(inp.dataset.r), c = Number(inp.dataset.c);
+        const go = (rr, cc) => { const t = tgrid.querySelector(`input[data-r="${rr}"][data-c="${cc}"]`); if (t) { t.focus(); t.select(); return true; } return false; };
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (!go(e.shiftKey ? r - 1 : r + 1, c) && !e.shiftKey && T.rows.length < MAXR) {
+            readGrid(); resize(T.rows.length + 1, T.rows[0].length); drawGrid(); go(r + 1, c);
+          }
+        } else if (e.key === 'ArrowUp') { if (go(r - 1, c)) e.preventDefault(); }
+        else if (e.key === 'ArrowDown') { if (go(r + 1, c)) e.preventDefault(); }
+      });
+      document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
+        readGrid();
+        const k = b.dataset.step;
+        const d = k.endsWith('+') ? 1 : -1;
+        if (k[0] === 'c') resize(T.rows.length, T.rows[0].length + d);
+        else resize(T.rows.length + d, T.rows[0].length);
+        drawGrid();
+      }));
+      $('t-clear').addEventListener('click', () => { T.rows = T.rows.map(r => r.map(() => '')); drawGrid(); });
+      $('t-close').addEventListener('click', closeTable);
+      $('t-cancel').addEventListener('click', closeTable);
+      $('tmodal').addEventListener('click', e => { if (e.target === $('tmodal')) closeTable(); });
+      $('tmodal').addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); closeTable(); } });
+      $('t-insert').addEventListener('click', () => {
+        readGrid();
+        // 中身のない行（見出し以外）は捨てる
+        let rows = [T.rows[0], ...T.rows.slice(1).filter(r => r.some(c => c.trim()))].map(r => r.map(c => c.trim()));
+        // 見出しも中身もない列も捨てる
+        const keep = rows[0].map((_, c) => rows.some(r => r[c]));
+        if (keep.some(Boolean)) rows = rows.map(r => r.filter((_, c) => keep[c]));
+        const aligns = keep.some(Boolean) ? T.aligns.filter((_, c) => keep[c]) : T.aligns;
+        if (rows.length < 2) rows.push(rows[0].map(() => ''));
+        const md = tableToMd(rows, aligns);
+        $('tmodal').hidden = true;
+        if (T.edit && src.value.slice(T.edit.start, T.edit.end).includes('|')) {
+          replaceRange(T.edit.start, T.edit.end, md, T.edit.start + md.length);
+        } else {
+          insertBlock(md);
+        }
+        toast(T.edit ? '表を置きかえました' : '表を入れました');
+      });
+
+      // ── 開く・新しく書く ──
+      const loadText = async (text, name) => {
+        if (src.value.trim() && src.value !== text) {
+          if (!await ask(`今書いているものを消して、「${name}」を開きますか？`, '開く')) return;
+        }
+        src.value = '';
+        replaceRange(0, 0, text.replace(/\r\n?/g, '\n'), 0);
+        src.scrollTop = 0;
+        paneView.scrollTop = 0;
+        toast(`「${name}」を開きました`);
+      };
+      const readFile = async file => {
+        if (file.size > 5 * 1024 * 1024) { toast('5MB より大きいファイルは開けません'); return; }
+        if (!/\.(md|markdown|mdown|mkd|txt)$/i.test(file.name) && !/^text\//.test(file.type)) {
+          toast('.md か .txt のファイルを選んでください');
+          return;
+        }
+        const buf = await file.arrayBuffer();
+        let text;
+        try { text = new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+        catch (e) { text = new TextDecoder('shift_jis').decode(buf); }
+        await loadText(text.replace(/^\uFEFF/, ''), file.name);
+      };
+      $('btn-open').addEventListener('click', () => $('file').click());
+      $('file').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) readFile(f); });
+      $('btn-new').addEventListener('click', async () => {
+        if (src.value.trim() && !await ask('今書いているものを消して、新しく書きますか？\n（Ctrl+Z で戻せます）', '消す')) return;
+        replaceRange(0, src.value.length, '', 0);
+        if (split.dataset.view === 'view') setView(narrow.matches ? 'write' : 'both');
+        src.focus();
+      });
+
+      const editorBox = document.querySelector('.editor-box');
+      const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
+      editorBox.addEventListener('dragover', e => { if (!hasFiles(e)) return; e.preventDefault(); $('pane-write').classList.add('drag'); });
+      editorBox.addEventListener('dragleave', e => { if (!editorBox.contains(e.relatedTarget)) $('pane-write').classList.remove('drag'); });
+      editorBox.addEventListener('drop', e => {
+        $('pane-write').classList.remove('drag');
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        const f = e.dataTransfer.files[0];
+        if (f) readFile(f);
+      });
+
+      // ── コピー・保存 ──
+      const fileBase = () => {
+        const m = src.value.match(/^#{1,6}\s+(.+)$/m);
+        const name = (m ? plainOf(marked.parseInline(m[1])) : '').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '').trim().slice(0, 60);
+        return name || 'markdown';
+      };
+      const download = (blob, name) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      };
+      const copyText = async (text, done) => {
+        try { await navigator.clipboard.writeText(text); toast(done); }
+        catch (e) {
+          const t = document.createElement('textarea');
+          t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+          document.body.appendChild(t); t.select();
+          const ok = document.execCommand('copy');
+          t.remove();
+          toast(ok ? done : 'コピーできませんでした');
+        }
+      };
+      const htmlBody = () => toHtml(src.value);
+      const escHtml = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+      const EXPORT_CSS = `body{margin:0;background:#fff;color:#1f2328;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;font-size:16px;line-height:1.8}
+article{max-width:860px;margin:0 auto;padding:40px 24px 80px;overflow-wrap:anywhere}
+article>:first-child{margin-top:0}
+h1,h2,h3,h4,h5,h6{line-height:1.4;margin:1.6em 0 .6em}
+h1{font-size:1.9em;padding-bottom:.3em;border-bottom:1px solid #d1d9e0}
+h2{font-size:1.5em;padding-bottom:.3em;border-bottom:1px solid #d1d9e0}
+h3{font-size:1.25em}
+p,ul,ol,blockquote,pre,table,details{margin:0 0 1em}
+ul,ol{padding-left:1.8em}
+li+li,li>ul,li>ol{margin-top:.25em}
+li>ul,li>ol{margin-bottom:0}
+li:has(>input[type=checkbox]){list-style:none;margin-left:-1.4em}
+li>input[type=checkbox]{margin-right:.45em}
+a{color:#0969da}
+blockquote{padding:.2em 1em;border-left:4px solid #d1d9e0;color:#59636e}
+blockquote>:last-child{margin-bottom:0}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,"BIZ UDGothic",monospace;font-size:.88em;background:#eff1f3;border-radius:5px;padding:.15em .4em}
+pre{background:#f6f8fa;border-radius:8px;padding:14px 16px;overflow:auto;line-height:1.6}
+pre code{background:none;padding:0;font-size:.85em}
+hr{border:none;border-top:2px solid #d1d9e0;margin:1.8em 0}
+img{max-width:100%;height:auto}
+table{border-collapse:collapse;display:block;max-width:100%;overflow:auto}
+th,td{border:1px solid #d1d9e0;padding:6px 12px}
+th{background:#f6f8fa}
+tr:nth-child(2n) td{background:#fafbfc}`;
+
+      $('copy-md').addEventListener('click', () => {
+        if (!src.value.trim()) { toast('まだ何も書いていません'); return; }
+        copyText(src.value, 'Markdown をコピーしました');
+      });
+      $('copy-html').addEventListener('click', () => {
+        if (!src.value.trim()) { toast('まだ何も書いていません'); return; }
+        copyText(htmlBody(), 'HTML をコピーしました');
+      });
+      $('copy-rich').addEventListener('click', async () => {
+        if (!src.value.trim()) { toast('まだ何も書いていません'); return; }
+        render();
+        const html = view.innerHTML;
+        try {
+          await navigator.clipboard.write([new ClipboardItem({
+            'text/html': new Blob([html], { type: 'text/html' }),
+            'text/plain': new Blob([view.innerText], { type: 'text/plain' }),
+          })]);
+          toast('見た目のままコピーしました');
+        } catch (e) {
+          // 古いブラウザ：見た目のところを選んでコピーする
+          const r = document.createRange();
+          r.selectNodeContents(view);
+          const s = getSelection();
+          s.removeAllRanges(); s.addRange(r);
+          const ok = document.execCommand('copy');
+          s.removeAllRanges();
+          toast(ok ? '見た目のままコピーしました' : 'コピーできませんでした');
+        }
+      });
+      const saveMd = () => {
+        if (!src.value.trim()) { toast('まだ何も書いていません'); return; }
+        download(new Blob([src.value], { type: 'text/markdown;charset=utf-8' }), fileBase() + '.md');
+      };
+      $('save-md').addEventListener('click', saveMd);
+      $('save-html').addEventListener('click', () => {
+        if (!src.value.trim()) { toast('まだ何も書いていません'); return; }
+        const title = escHtml(fileBase());
+        const doc = `<!DOCTYPE html>\n<html lang="ja">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>${title}</title>\n<style>\n${EXPORT_CSS}\n</style>\n</head>\n<body>\n<article>\n${htmlBody()}\n</article>\n</body>\n</html>\n`;
+        download(new Blob([doc], { type: 'text/html;charset=utf-8' }), fileBase() + '.html');
+      });
+      document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 's' && $('tmodal').hidden) {
+          e.preventDefault();
+          saveMd();
+        }
+      });
+
+      src.addEventListener('input', () => { queueRender(); save(); });
+
+      setView(opts.view);
+      fixNarrow();
+      render();
+    })();
+  </script>
+</body>
+
+</html>

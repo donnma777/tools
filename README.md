@@ -37,6 +37,7 @@
 | 画像の圧縮・変換 | [image-compress/](image-compress/README.md) | 画像を軽く・JPEG/PNG/WebP に変換する（まとめて・○KB 以下・見比べ・ZIP。送信しない） |
 | OGPチェッカー | [ogp-checker/](ogp-checker/README.md) | URL を入れて、SNS に貼ったときの見え方と OGP の問題を調べる（調べ役は `api/ogp.php`） |
 | robots.txt チェッカー | [robots-checker/](robots-checker/README.md) | Google・AI・X・AdSense などがページを読めるかを robots.txt から判定（調べ役は `api/robots.php`） |
+| マークダウンメーカー | [markdown/](markdown/README.md) | Markdown を書きながら見た目を確かめる。ボタンで入力・表づくり・貼り付けて変換・.md／HTML で保存（marked・DOMPurify・Turndown を使う） |
 | 共通の部品 | [common/](common/README.md) | ページ内の確認・お知らせ（`ask.js`） |
 
 ---
