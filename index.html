@@ -404,7 +404,8 @@
 
     /* 上に貼りついたメニューに見出しが隠れないように */
     .section-title[id],
-    #web-tools {
+    #web-tools,
+    #plugins {
       scroll-margin-top: 72px;
     }
 
@@ -751,7 +752,8 @@
       <a href="#images">画像づくり</a>
       <a href="#sites">サイトづくり</a>
       <a href="#utils">便利ツール</a>
-      <a href="#plugins">インストールして使うもの</a>
+      <a href="#extensions">Chrome 拡張機能</a>
+      <a href="#wordpress">WordPress プラグイン</a>
     </nav>
 
     <!-- Tools list -->
@@ -1273,7 +1275,38 @@
 
     </div>
 
-    <h2 class="section-title" id="plugins">インストールして使うもの<small>Plugins &amp; Extensions</small></h2>
+    <!-- 前の「インストールして使うもの」（#plugins）へのリンクは、ここに着く -->
+    <span id="plugins"></span>
+    <h2 class="section-title" id="extensions">Chrome 拡張機能<small>Chrome Extensions</small></h2>
+
+    <div class="tool-list">
+
+      <!-- feature-browser-benri-tools -->
+      <div class="tool-card">
+        <div class="tool-head">
+          <div class="tool-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" aria-hidden="true">
+              <path
+                d="M10 4a2 2 0 1 1 4 0v2h4a1 1 0 0 1 1 1v4h-2a2 2 0 1 0 0 4h2v4a1 1 0 0 1-1 1h-4v-2a2 2 0 1 0-4 0v2H6a1 1 0 0 1-1-1v-4h2a2 2 0 1 0 0-4H5V7a1 1 0 0 1 1-1h4z" />
+            </svg>
+          </div>
+          <div>
+            <div class="tool-tag">Chrome 拡張機能</div>
+            <div class="tool-name">便利ツール拡張機能まとめ</div>
+          </div>
+          <span class="kind-badge">Chrome拡張</span>
+        </div>
+        <div class="tool-desc">広告ブロック・強制ダークモード・スクリーンショットなどを単体または統合版でまとめたChrome拡張機能リポジトリ。</div>
+        <div class="card-actions">
+          <a class="btn btn-primary" href="https://github.com/donnma777/feature-browser-benri-tools" target="_blank"
+            rel="noopener">GitHub</a>
+        </div>
+      </div>
+
+    </div>
+
+    <h2 class="section-title" id="wordpress">WordPress プラグイン<small>WordPress Plugins</small></h2>
 
     <div class="tool-list">
 
@@ -1374,29 +1407,6 @@
         <div class="card-actions">
           <a class="btn btn-primary" href="https://github.com/donnma777/wp-webp-upload/releases/latest"
             target="_blank" rel="noopener">GitHub</a>
-        </div>
-      </div>
-
-      <!-- feature-browser-benri-tools -->
-      <div class="tool-card">
-        <div class="tool-head">
-          <div class="tool-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" aria-hidden="true">
-              <path
-                d="M10 4a2 2 0 1 1 4 0v2h4a1 1 0 0 1 1 1v4h-2a2 2 0 1 0 0 4h2v4a1 1 0 0 1-1 1h-4v-2a2 2 0 1 0-4 0v2H6a1 1 0 0 1-1-1v-4h2a2 2 0 1 0 0-4H5V7a1 1 0 0 1 1-1h4z" />
-            </svg>
-          </div>
-          <div>
-            <div class="tool-tag">Chrome 拡張機能</div>
-            <div class="tool-name">便利ツール拡張機能まとめ</div>
-          </div>
-          <span class="kind-badge">Chrome拡張</span>
-        </div>
-        <div class="tool-desc">広告ブロック・強制ダークモード・スクリーンショットなどを単体または統合版でまとめたChrome拡張機能リポジトリ。</div>
-        <div class="card-actions">
-          <a class="btn btn-primary" href="https://github.com/donnma777/feature-browser-benri-tools" target="_blank"
-            rel="noopener">GitHub</a>
         </div>
       </div>
 
