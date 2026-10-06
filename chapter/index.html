@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube チャプターメーカー | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="YouTube の概要欄に入れるチャプター（目次）を作れる無料ツール。メモのタイムスタンプを貼るだけで整え、0:00 から始まる・3つ以上・10秒以上などの YouTube の条件を確かめて直せます。動画を見ながらボタンで区切ったり、全体の時刻をずらしたりもできます。">
+  <link rel="canonical" href="https://donnma.com/tool/chapter/">
+  <meta property="og:title" content="YouTube チャプターメーカー | どんまうんど-Tools">
+  <meta property="og:description" content="タイムスタンプを貼るだけで、YouTube のチャプターに整える。条件チェック・動画を見ながら区切る・時刻をずらす。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/chapter/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-chapter.jpg?v=20261007a">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="YouTube チャプターメーカー">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <meta name="twitter:image:alt" content="YouTube チャプターメーカー">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --ok: #7fd8a4;
+      --warn: #ffc46b;
+      --ng: #ff8a8a;
+      --mono: ui-monospace, 'SFMono-Regular', Consolas, 'BIZ UDGothic', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace：左に入力、右にできあがり ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .col-out {
+      position: sticky;
+      top: 72px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .panel-title .sp {
+      flex: 1;
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+      flex: none;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      border-color: var(--border-strong);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input[type=text],
+    input[type=number],
+    select,
+    textarea {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+      color-scheme: dark;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .field-note {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .field-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .seg {
+      display: flex;
+      gap: 6px;
+    }
+
+    .seg button {
+      flex: 1 1 0;
+      min-width: 0;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 7px 4px;
+      cursor: pointer;
+    }
+
+    .seg button:hover {
+      border-color: var(--accent);
+    }
+
+    .seg button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--label);
+      cursor: pointer;
+    }
+
+    .check input {
+      accent-color: var(--accent);
+    }
+
+    /* ── 動画 ── */
+    .player-wrap {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .player-wrap>div,
+    .player-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .mark-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .now {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent-2);
+      margin-right: auto;
+    }
+
+    /* ── チャプターの行 ── */
+    .rows {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .crow {
+      display: grid;
+      grid-template-columns: 22px 92px minmax(0, 1fr) auto;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .crow .no {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .crow .t {
+      font-family: var(--mono);
+      text-align: right;
+    }
+
+    .crow.bad-t .t {
+      border-color: var(--ng);
+      background: rgba(255, 138, 138, 0.08);
+    }
+
+    .crow.short .t {
+      border-color: var(--warn);
+    }
+
+    .crow .acts {
+      display: flex;
+      gap: 2px;
+    }
+
+    .icon-btn {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+    }
+
+    .icon-btn:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    .icon-btn:disabled {
+      opacity: 0.25;
+      cursor: default;
+      border-color: transparent;
+    }
+
+    .add-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .bulk textarea {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      min-height: 150px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    /* ── できあがり ── */
+    #out {
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.7;
+      min-height: 220px;
+      resize: vertical;
+      background: var(--bg-deep);
+    }
+
+    .checks {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .checks li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--label);
+    }
+
+    .checks li .mk {
+      flex: none;
+      width: 18px;
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .checks li.ok .mk {
+      color: var(--ok);
+    }
+
+    .checks li.ng .mk {
+      color: var(--ng);
+    }
+
+    .checks li.warn .mk {
+      color: var(--warn);
+    }
+
+    .checks li .tx {
+      flex: 1;
+    }
+
+    .checks li .btn {
+      flex: none;
+    }
+
+    .verdict {
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .verdict.ok {
+      background: rgba(127, 216, 164, 0.12);
+      color: var(--ok);
+    }
+
+    .verdict.ng {
+      background: rgba(255, 138, 138, 0.1);
+      color: var(--ng);
+    }
+
+    .opts {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px 12px;
+    }
+
+    .opts .full {
+      grid-column: 1 / -1;
+    }
+
+    .opts label.f {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .shift {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .count {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-right: auto;
+    }
+
+    /* 進行表から読み込む */
+    .from-schedule {
+      display: grid;
+      grid-template-columns: auto 110px auto;
+      gap: 8px;
+      align-items: center;
+      font-size: 12.5px;
+      color: var(--label);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .notes b {
+      color: var(--label);
+    }
+
+    .notes code {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent-2);
+      background: var(--bg-deep);
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 400;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1000px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 40px 16px 40px;
+      }
+
+      .col-out {
+        position: static;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .crow {
+        grid-template-columns: 18px 80px minmax(0, 1fr) auto;
+      }
+
+      .opts {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>YouTube チャプターメーカー</h1>
+      <p>概要欄に入れるチャプター（目次）を作れます。メモのタイムスタンプを貼るだけで整えて、YouTube の条件に合っているかも確かめます。</p>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- 入力 -->
+    <div class="col">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">📋</span>まとめて貼る<span class="sp"></span>
+            <button class="btn btn-sm" type="button" id="from-sched-btn" hidden title="配信スケジュールメーカーの「1日」の進行表から読み込みます">🗓 進行表から</button>
+          </div>
+          <div class="bulk">
+            <textarea id="bulk" spellcheck="false" placeholder="メモやコメントのタイムスタンプを貼り付けます。&#10;&#10;0:00 オープニング&#10;5:12 マリオカート&#10;1:02:30 歌枠&#10;&#10;「12:34〜 内容」「[12:34] 内容」「内容 12:34」などでも読めます。"></textarea>
+          </div>
+          <div class="from-schedule" id="from-sched" hidden>
+            <span>配信を始めた時刻</span>
+            <input type="text" id="sched-start" placeholder="20:00" maxlength="8">
+            <button class="btn btn-sm btn-primary" type="button" id="sched-load">読み込む</button>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn btn-primary" type="button" id="bulk-replace">読み込む（入れかえ）</button>
+            <button class="btn" type="button" id="bulk-append">下に足す</button>
+            <span class="field-note" id="bulk-note"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">▶️</span>動画を見ながら区切る<span class="sp"></span><span class="field-note">なくても使えます</span></div>
+          <div class="row">
+            <input type="text" id="yt" placeholder="動画の URL（https://www.youtube.com/watch?v=… や youtu.be/…）" spellcheck="false" style="flex:1">
+            <button class="btn" type="button" id="yt-load">開く</button>
+          </div>
+          <div id="player-box" hidden>
+            <div class="player-wrap">
+              <div id="player"></div>
+            </div>
+            <div class="mark-row">
+              <span class="now" id="now">0:00</span>
+              <button class="btn btn-sm" type="button" id="back5" title="5秒もどる">−5秒</button>
+              <button class="btn btn-sm" type="button" id="fwd5" title="5秒すすむ">+5秒</button>
+              <button class="btn btn-primary" type="button" id="mark" title="M キーでも区切れます（入力欄の外で）">✂ 今の時刻で区切る（M）</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">✏️</span>チャプター<span class="sp"></span>
+            <button class="btn btn-sm" type="button" id="sort">時刻の順に並べる</button>
+            <button class="btn btn-sm" type="button" id="clear">全部消す</button>
+          </div>
+          <div class="rows" id="rows"></div>
+          <div class="add-row">
+            <button class="btn btn-sm" type="button" id="add">＋ 行を足す</button>
+          </div>
+          <p class="field-note" style="margin-top:8px">時刻は「1:23」「01:02:03」「83秒」のどれでも入れられます。▶ を押すと、動画のその時刻へ飛びます。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- できあがり -->
+    <div class="col col-out">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">✅</span>YouTube の条件</div>
+          <div class="verdict" id="verdict"></div>
+          <ul class="checks" id="checks"></ul>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">📄</span>できあがり（概要欄に貼る）</div>
+          <textarea id="out" readonly spellcheck="false" aria-label="できあがりのチャプター"></textarea>
+          <div class="row" style="margin-top:10px">
+            <span class="count" id="count"></span>
+            <button class="btn btn-primary" type="button" id="copy">📋 コピー</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">⚙️</span>書き方</div>
+          <div class="opts">
+            <label class="f full"><span class="field-label">時刻の書き方</span>
+              <div class="seg" id="fmt">
+                <button type="button" data-v="short">0:00 / 1:02:03</button>
+                <button type="button" data-v="pad">00:00 / 01:02:03</button>
+              </div>
+            </label>
+            <label class="f"><span class="field-label">時刻と内容のあいだ</span>
+              <select id="sep">
+                <option value=" ">空白（0:00 内容）</option>
+                <option value=" - ">ハイフン（0:00 - 内容）</option>
+                <option value=" | ">縦線（0:00 | 内容）</option>
+                <option value="　">全角の空白</option>
+              </select>
+            </label>
+            <label class="f"><span class="field-label">上に付ける見出し</span>
+              <input type="text" id="head" placeholder="例：▼ 目次（なしでもよい）" maxlength="40">
+            </label>
+            <label class="f full"><span class="field-label">全部の時刻をずらす（配信の遅れ・カットした分など）</span>
+              <div class="shift">
+                <input type="text" id="shift" placeholder="例：-30 や +1:05" maxlength="10">
+                <button class="btn btn-sm" type="button" id="shift-apply">ずらす</button>
+                <span class="field-note">0:00 の行は動かしません</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🔍</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>配信中や見返しながら取ったメモを、<b>「まとめて貼る」</b>に貼って「読み込む」を押します。時刻のない行は飛ばします。</li>
+          <li>メモがないときは、<b>動画の URL を開いて</b>、区切りたいところで<b>「今の時刻で区切る」</b>（M キー）を押します。内容はあとから書けます。</li>
+          <li>右の<b>「YouTube の条件」</b>が全部 ✓ になるまで直します。直せるものはボタン1つで直せます。</li>
+          <li><b>「📋 コピー」</b>して、YouTube Studio で動画の概要欄に貼り付けます。保存すると、動画のシークバーに区切りが出ます。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">📏</span>YouTube のチャプターの条件</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>いちばん最初の時刻が <code>0:00</code> であること。</li>
+          <li>時刻が <b>3つ以上</b>あり、<b>小さい順</b>に並んでいること。</li>
+          <li>どの区切りも <b>10秒以上</b>あること（次の時刻まで 10 秒より短いと、チャプターになりません）。</li>
+          <li>時刻は行の頭に書くのが確実です。このツールは「時刻 内容」の形で書き出します。</li>
+          <li>条件を満たしていても、YouTube の「自動チャプター」がオフだったり、動画によってはすぐに出なかったりすることがあります。</li>
+        </ul>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>ヒント</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>配信のアーカイブで、配信の始まりと動画の始まりがずれているときは、<b>「全部の時刻をずらす」</b>でまとめて直せます（例：最初の 30 秒をカットしたなら <code>-30</code>）。</li>
+          <li><b>配信スケジュールメーカーの「1日」</b>で進行表を作っていれば、「🗓 進行表から」で、配信を始めた時刻を引いてチャプターにできます。</li>
+          <li>入れた内容は、このブラウザに覚えておきます。動画やメモはどこにも送信しません（動画は YouTube のプレーヤーで見ます）。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1400px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../common/ask.js?v=20260929a"></script>
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const ask = (msg, yes) => window.DonnmaAsk.ask(msg, { yes }).then(r => r === true);
+      const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2400); };
+      const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const STORE = 'donnma-chapter';
+      const MIN_LEN = 10;
+
+      // ── 時刻 ──
+      // 「1:23」「01:02:03」「83秒」「1分23秒」「1時間2分3秒」→ 秒。読めなければ null
+      const parseTime = str => {
+        const s = String(str).trim().replace(/[０-９：]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+        let m = /^(\d+):(\d{1,2}):(\d{1,2})$/.exec(s);
+        if (m && +m[2] < 60 && +m[3] < 60) return +m[1] * 3600 + +m[2] * 60 + +m[3];
+        m = /^(\d+):(\d{1,2})$/.exec(s);
+        if (m && +m[2] < 60) return +m[1] * 60 + +m[2];
+        m = /^(?:(\d+)\s*時間)?\s*(?:(\d+)\s*分)?\s*(?:(\d+)\s*秒)?$/.exec(s);
+        if (m && (m[1] || m[2] || m[3])) return (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0);
+        if (/^\d+$/.test(s)) return +s;
+        return null;
+      };
+      const p2 = n => String(n).padStart(2, '0');
+      const fmtTime = (sec, pad, hours) => {
+        const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+        if (h || hours) return `${pad ? p2(h) : h}:${p2(m)}:${p2(s)}`;
+        return `${pad ? p2(m) : m}:${p2(s)}`;
+      };
+
+      // ── 中身（このブラウザに覚えておく） ──
+      let S = { rows: [], fmt: 'short', sep: ' ', head: '', yt: '' };
+      try { S = { ...S, ...JSON.parse(localStorage.getItem(STORE) || '{}') }; } catch (e) { }
+      if (!Array.isArray(S.rows)) S.rows = [];
+      S.rows = S.rows.filter(r => r && typeof r === 'object').map(r => ({ t: String(r.t ?? ''), title: String(r.title ?? '') }));
+      const store = () => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) { } };
+
+      // 入れてあるか（はじめに置く「0:00」だけの行は数えない）
+      const hasRows = () => S.rows.some(r => r.title.trim() || (r.t.trim() && parseTime(r.t) !== 0));
+
+      // ── まとめて貼る ──
+      const TIME_RE = /(?:\d+:)?\d{1,2}:\d{2}|\d+\s*時間\s*(?:\d+\s*分)?\s*(?:\d+\s*秒)?|\d+\s*分\s*(?:\d+\s*秒)?/;
+      const parseBulk = text => {
+        const out = [];
+        text.replace(/\r\n?/g, '\n').split('\n').forEach(line => {
+          const raw = line.replace(/[０-９：]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+          const m = TIME_RE.exec(raw);
+          if (!m) return;
+          const sec = parseTime(m[0]);
+          if (sec == null) return;
+          // 時刻を抜く。時刻をかこむかっこ（[12:34] など）も一緒に抜き、内容の中のかっこは残す
+          let a = m.index, z = m.index + m[0].length;
+          const open = raw.slice(0, a).match(/[\[【(（]\s*$/), close = raw.slice(z).match(/^\s*[\]】)）]/);
+          if (open && close) { a -= open[0].length; z += close[0].length; }
+          // まわりの記号（- | ・ 〜 ~ ：）を外す
+          let title = (raw.slice(0, a) + ' ' + raw.slice(z))
+            .replace(/^\s*(?:[-|｜・〜~:：>＞▶]+\s*)+/, '')
+            .replace(/\s*(?:[-|｜・〜~:：]+\s*)+$/, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+          out.push({ t: fmtTime(sec, false), title });
+        });
+        return out;
+      };
+      const loadBulk = append => {
+        const got = parseBulk($('bulk').value);
+        if (!got.length) { toast('時刻の入った行が見つかりませんでした'); return; }
+        S.rows = append ? S.rows.concat(got) : got;
+        build(); update();
+        $('bulk-note').textContent = `${got.length} 行を読み込みました`;
+        toast(`${got.length} 行を読み込みました`);
+      };
+      $('bulk-replace').addEventListener('click', async () => {
+        if (hasRows() && !await ask('今のチャプターを、貼ったもので入れかえますか？', '入れかえる')) return;
+        loadBulk(false);
+      });
+      $('bulk-append').addEventListener('click', () => loadBulk(true));
+
+      // ── 行 ──
+      const rowsEl = $('rows');
+      function build() {
+        if (!S.rows.length) S.rows = [{ t: '0:00', title: '' }];
+        rowsEl.innerHTML = S.rows.map((r, i) => `
+          <div class="crow" data-i="${i}">
+            <span class="no">${i + 1}</span>
+            <input type="text" class="t" value="${esc(r.t)}" placeholder="0:00" maxlength="12" aria-label="${i + 1}行目の時刻" spellcheck="false">
+            <input type="text" class="title" value="${esc(r.title)}" placeholder="内容" maxlength="100" aria-label="${i + 1}行目の内容">
+            <span class="acts">
+              <button class="icon-btn jump" type="button" title="動画のこの時刻へ" aria-label="動画のこの時刻へ"${player ? '' : ' disabled'}>▶</button>
+              <button class="icon-btn up" type="button" title="上へ" aria-label="上へ"${i ? '' : ' disabled'}>↑</button>
+              <button class="icon-btn del" type="button" title="この行を消す" aria-label="この行を消す">✕</button>
+            </span>
+          </div>`).join('');
+      }
+      rowsEl.addEventListener('input', e => {
+        const row = e.target.closest('.crow'); if (!row) return;
+        const r = S.rows[Number(row.dataset.i)];
+        if (e.target.classList.contains('t')) r.t = e.target.value;
+        else r.title = e.target.value;
+        update();
+      });
+      // 時刻の欄を出たら、書き方をそろえる
+      rowsEl.addEventListener('focusout', e => {
+        if (!e.target.classList.contains('t')) return;
+        const r = S.rows[Number(e.target.closest('.crow').dataset.i)];
+        const sec = parseTime(r.t);
+        if (sec != null) { r.t = fmtTime(sec, false); e.target.value = r.t; update(); }
+      });
+      rowsEl.addEventListener('keydown', e => {
+        // 内容の欄で Enter → 次の行（なければ足す）
+        if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229 || !e.target.classList.contains('title')) return;
+        e.preventDefault();
+        const i = Number(e.target.closest('.crow').dataset.i);
+        if (i === S.rows.length - 1) { S.rows.push({ t: '', title: '' }); build(); update(); }
+        const next = rowsEl.querySelector(`.crow[data-i="${i + 1}"] .t`);
+        if (next) next.focus();
+      });
+      rowsEl.addEventListener('click', e => {
+        const row = e.target.closest('.crow'); if (!row) return;
+        const i = Number(row.dataset.i);
+        if (e.target.closest('.del')) {
+          S.rows.splice(i, 1); build(); update();
+        } else if (e.target.closest('.up') && i > 0) {
+          [S.rows[i - 1], S.rows[i]] = [S.rows[i], S.rows[i - 1]]; build(); update();
+        } else if (e.target.closest('.jump')) {
+          const sec = parseTime(S.rows[i].t);
+          if (player && sec != null) { player.seekTo(sec, true); player.playVideo(); }
+        }
+      });
+      $('add').addEventListener('click', () => {
+        S.rows.push({ t: '', title: '' }); build(); update();
+        const last = rowsEl.querySelector('.crow:last-child .t'); if (last) last.focus();
+      });
+      const sortRows = () => {
+        S.rows.sort((a, b) => (parseTime(a.t) ?? Infinity) - (parseTime(b.t) ?? Infinity));
+        build(); update();
+      };
+      $('sort').addEventListener('click', sortRows);
+      $('clear').addEventListener('click', async () => {
+        if (!await ask('チャプターを全部消しますか？', '消す')) return;
+        S.rows = []; build(); update();
+      });
+
+      // ── ずらす ──
+      $('shift-apply').addEventListener('click', () => {
+        const v = $('shift').value.trim();
+        const m = /^([+-]?)(.+)$/.exec(v);
+        const amt = m ? parseTime(m[2]) : null;
+        if (amt == null || !amt) { toast('ずらす秒数を入れてください（例：-30 や +1:05）'); return; }
+        const d = m[1] === '-' ? -amt : amt;
+        let moved = 0;
+        S.rows.forEach(r => {
+          const sec = parseTime(r.t);
+          if (sec == null || sec === 0) return;
+          r.t = fmtTime(Math.max(0, sec + d), false);
+          moved++;
+        });
+        build(); update();
+        toast(`${moved} 行を ${d > 0 ? '+' : '−'}${fmtTime(Math.abs(d), false)} ずらしました`);
+      });
+
+      // ── 確かめる・書き出す ──
+      function update() {
+        store();
+        const items = S.rows.map((r, i) => ({ i, sec: parseTime(r.t), title: r.title.trim(), empty: !r.t.trim() && !r.title.trim() }));
+        const valid = items.filter(x => x.sec != null);
+        const checks = [];
+        // 読めない時刻
+        const bad = items.filter(x => !x.empty && x.sec == null);
+        if (bad.length) checks.push({ st: 'ng', tx: `時刻が読めない行があります（${bad.map(x => x.i + 1).join('・')} 行目）` });
+        // 0:00 から
+        const sorted = valid.slice().sort((a, b) => a.sec - b.sec);
+        if (!valid.length || sorted[0].sec !== 0) checks.push({ st: 'ng', tx: 'いちばん最初が 0:00 ではありません', fix: 'zero', fixTx: '0:00 の行を足す' });
+        else checks.push({ st: 'ok', tx: '0:00 から始まっています' });
+        // 3つ以上
+        if (valid.length < 3) checks.push({ st: 'ng', tx: `時刻が ${valid.length} つです（3つ以上要ります）` });
+        else checks.push({ st: 'ok', tx: `時刻が ${valid.length} つあります` });
+        // 小さい順
+        const inOrder = valid.every((x, k) => k === 0 || valid[k - 1].sec <= x.sec);
+        if (!inOrder) checks.push({ st: 'ng', tx: '時刻が小さい順に並んでいません', fix: 'sort', fixTx: '並べる' });
+        else if (valid.length) checks.push({ st: 'ok', tx: '時刻が小さい順に並んでいます' });
+        // 同じ時刻
+        const dups = sorted.filter((x, k) => k > 0 && sorted[k - 1].sec === x.sec);
+        if (dups.length) checks.push({ st: 'ng', tx: `同じ時刻が ${dups.length + 1} つ以上あります（${dups.map(x => x.i + 1).join('・')} 行目）`, fix: 'dup', fixTx: 'あとの行を消す' });
+        // 10秒以上
+        const shorts = sorted.filter((x, k) => k < sorted.length - 1 && sorted[k + 1].sec - x.sec < MIN_LEN && sorted[k + 1].sec !== x.sec);
+        if (shorts.length) checks.push({ st: 'ng', tx: `次の区切りまで 10 秒ない行があります（${shorts.map(x => x.i + 1).join('・')} 行目）` });
+        else if (valid.length > 1) checks.push({ st: 'ok', tx: 'どの区切りも 10 秒以上あります' });
+        // 動画の長さ
+        if (duration && sorted.length) {
+          const last = sorted[sorted.length - 1];
+          if (last.sec > duration) checks.push({ st: 'ng', tx: `動画の長さ（${fmtTime(Math.floor(duration), false)}）より後ろの時刻があります` });
+          else if (duration - last.sec < MIN_LEN) checks.push({ st: 'warn', tx: '最後の区切りが、動画の終わりまで 10 秒ありません' });
+        }
+        // 内容が空
+        const noTitle = items.filter(x => x.sec != null && !x.title);
+        if (noTitle.length) checks.push({ st: 'warn', tx: `内容が空の行があります（${noTitle.map(x => x.i + 1).join('・')} 行目）` });
+
+        const ng = checks.filter(c => c.st === 'ng').length;
+        $('verdict').className = 'verdict ' + (ng ? 'ng' : 'ok');
+        $('verdict').textContent = ng ? `あと ${ng} つ直すと、チャプターになります` : '✓ このままチャプターになります';
+        $('checks').innerHTML = checks.map(c => `<li class="${c.st}"><span class="mk">${c.st === 'ok' ? '✓' : c.st === 'ng' ? '✕' : '!'}</span><span class="tx">${esc(c.tx)}</span>${c.fix ? `<button class="btn btn-sm" type="button" data-fix="${c.fix}">${esc(c.fixTx)}</button>` : ''}</li>`).join('');
+
+        // 行の色
+        rowsEl.querySelectorAll('.crow').forEach(el => {
+          const x = items[Number(el.dataset.i)];
+          if (!x) return;
+          el.classList.toggle('bad-t', !x.empty && x.sec == null);
+          el.classList.toggle('short', shorts.some(s => s.i === x.i));
+        });
+
+        // 書き出し（時刻の読める行を、入れた順のまま）
+        const hours = S.fmt === 'pad' && valid.some(x => x.sec >= 3600);
+        const lines = valid.map(x => `${fmtTime(x.sec, S.fmt === 'pad', hours)}${S.sep}${x.title}`.trimEnd());
+        const text = (S.head.trim() ? S.head.trim() + '\n' : '') + lines.join('\n');
+        $('out').value = text;
+        $('count').textContent = `${[...text].length} 文字（概要欄は 5000 文字まで）`;
+        for (const b of $('fmt').children) b.setAttribute('aria-pressed', String(b.dataset.v === S.fmt));
+        $('sep').value = S.sep;
+        if ($('head').value !== S.head) $('head').value = S.head;
+      }
+      $('checks').addEventListener('click', e => {
+        const b = e.target.closest('[data-fix]'); if (!b) return;
+        if (b.dataset.fix === 'zero') {
+          S.rows.unshift({ t: '0:00', title: 'オープニング' });
+          build(); update();
+          toast('0:00 の行を足しました（内容は書きかえてください）');
+        } else if (b.dataset.fix === 'sort') {
+          sortRows();
+        } else if (b.dataset.fix === 'dup') {
+          const seen = new Set();
+          S.rows = S.rows.filter(r => { const s = parseTime(r.t); if (s == null) return true; if (seen.has(s)) return false; seen.add(s); return true; });
+          build(); update();
+        }
+      });
+      $('fmt').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; S.fmt = b.dataset.v; update(); });
+      $('sep').addEventListener('change', () => { S.sep = $('sep').value; update(); });
+      $('head').addEventListener('input', () => { S.head = $('head').value; update(); });
+      $('copy').addEventListener('click', async () => {
+        const text = $('out').value;
+        if (!text.trim()) { toast('まだチャプターがありません'); return; }
+        try { await navigator.clipboard.writeText(text); }
+        catch (e) { $('out').select(); document.execCommand('copy'); }
+        toast('コピーしました。YouTube Studio の概要欄に貼ってください');
+      });
+
+      // ── 動画（YouTube のプレーヤー） ──
+      let player = null, duration = 0, apiLoading = null;
+      const videoId = input => {
+        const s = input.trim();
+        if (/^[\w-]{11}$/.test(s)) return s;
+        try {
+          const u = new URL(s);
+          if (u.searchParams.get('v')) return u.searchParams.get('v');
+          const m = u.pathname.match(/\/(?:live|embed|shorts)\/([\w-]{11})/) || (u.hostname === 'youtu.be' && u.pathname.match(/^\/([\w-]{11})/));
+          if (m) return m[1];
+        } catch (e) { }
+        return '';
+      };
+      const loadApi = () => apiLoading || (apiLoading = new Promise((res, rej) => {
+        if (window.YT && window.YT.Player) { res(); return; }
+        window.onYouTubeIframeAPIReady = () => res();
+        const s = document.createElement('script');
+        s.src = 'https://www.youtube.com/iframe_api';
+        s.onerror = () => { apiLoading = null; rej(new Error('api')); };
+        document.head.appendChild(s);
+      }));
+      async function openVideo() {
+        const id = videoId($('yt').value);
+        if (!id) { toast('YouTube の動画の URL を入れてください'); return; }
+        S.yt = $('yt').value.trim(); store();
+        try { await loadApi(); } catch (e) { toast('YouTube のプレーヤーを読み込めませんでした'); return; }
+        $('player-box').hidden = false;
+        if (player) { player.loadVideoById(id); return; }
+        player = new YT.Player('player', {
+          videoId: id,
+          playerVars: { rel: 0, playsinline: 1 },
+          events: {
+            onReady: () => { build(); update(); },
+            onStateChange: () => { const d = player.getDuration(); if (d && d !== duration) { duration = d; update(); } },
+          },
+        });
+      }
+      $('yt-load').addEventListener('click', openVideo);
+      $('yt').addEventListener('keydown', e => { if (e.key === 'Enter') openVideo(); });
+      const curSec = () => (player && player.getCurrentTime ? Math.floor(player.getCurrentTime()) : 0);
+      setInterval(() => { if (player && player.getCurrentTime) $('now').textContent = '今 ' + fmtTime(curSec(), false); }, 250);
+      const mark = () => {
+        if (!player) return;
+        const sec = curSec();
+        const t = fmtTime(sec, false);
+        if (S.rows.some(r => parseTime(r.t) === sec)) { toast(`${t} はもう入っています`); return; }
+        // 空の行が最後にあれば、そこに入れる
+        const last = S.rows[S.rows.length - 1];
+        if (last && !last.t.trim() && !last.title.trim()) last.t = t;
+        else S.rows.push({ t, title: '' });
+        sortRows();
+        toast(`${t} で区切りました`);
+      };
+      $('mark').addEventListener('click', mark);
+      $('back5').addEventListener('click', () => { if (player) player.seekTo(Math.max(0, player.getCurrentTime() - 5), true); });
+      $('fwd5').addEventListener('click', () => { if (player) player.seekTo(player.getCurrentTime() + 5, true); });
+      document.addEventListener('keydown', e => {
+        if (e.key.toLowerCase() !== 'm' || e.ctrlKey || e.metaKey || e.altKey) return;
+        if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+        if (!player) return;
+        e.preventDefault();
+        mark();
+      });
+
+      // ── 配信スケジュールメーカーの「1日」の進行表から ──
+      // 同じサイトなので、スケジュールメーカーが覚えている中身を読める
+      let sched = null;
+      try { sched = JSON.parse(localStorage.getItem('donnma-schedule') || 'null'); } catch (e) { }
+      const clockMin = t => { const m = /^\s*(\d{1,2})\s*[:：時]\s*(\d{1,2})?/.exec(t || ''); return m ? +m[1] * 60 + (+m[2] || 0) : null; };
+      const schedItems = sched && sched.tday && Array.isArray(sched.tday.items)
+        ? sched.tday.items.filter(it => clockMin(it.t) != null).sort((a, b) => clockMin(a.t) - clockMin(b.t)) : [];
+      if (schedItems.length) {
+        $('from-sched-btn').hidden = false;
+        $('sched-start').value = schedItems[0].t;
+      }
+      $('from-sched-btn').addEventListener('click', () => { $('from-sched').hidden = !$('from-sched').hidden; if (!$('from-sched').hidden) $('sched-start').focus(); });
+      $('sched-load').addEventListener('click', async () => {
+        const st = clockMin($('sched-start').value);
+        if (st == null) { toast('配信を始めた時刻を「20:00」のように入れてください'); return; }
+        const rows = schedItems.map(it => {
+          let d = clockMin(it.t) - st;
+          if (d < 0) d += 24 * 60;
+          return { t: fmtTime(d * 60, false), title: (it.s || '').split('\n')[0].trim() || it.tag };
+        });
+        if (hasRows() && !await ask('今のチャプターを、進行表から作ったもので入れかえますか？', '入れかえる')) return;
+        S.rows = rows;
+        build(); update();
+        $('from-sched').hidden = true;
+        toast(`進行表の ${rows.length} 枠を読み込みました。実際に始めた時刻とずれていたら「全部の時刻をずらす」で直せます`);
+      });
+
+      // ── はじめ ──
+      $('yt').value = S.yt || '';
+      build();
+      update();
+    })();
+  </script>
+</body>
+
+</html>
