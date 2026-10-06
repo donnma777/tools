@@ -1214,6 +1214,7 @@
 
     .fs canvas {
       display: block;
+      cursor: zoom-out;
       max-width: 100%;
       max-height: calc(100vh - 80px);
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -1503,7 +1504,7 @@
     <canvas id="fs-cv" aria-label="順位表（大きく）"></canvas>
     <div class="fs-bar">
       <span class="pager" id="fs-pager"><button class="btn btn-sm" type="button" id="fs-prev">◀</button><span id="fs-text"></span><button class="btn btn-sm" type="button" id="fs-next">▶</button></span>
-      <span class="fs-hint">点数を入れると、そのまま変わります。Esc で閉じる</span>
+      <span class="fs-hint">点数を入れると、そのまま変わります。押すか Esc で閉じる</span>
       <button class="btn btn-sm" type="button" id="fs-full">全画面</button>
       <button class="btn btn-sm btn-primary" type="button" id="fs-close">✕ 閉じる</button>
     </div>
@@ -1763,6 +1764,8 @@
       $('fs-open').addEventListener('click', openFs);
       $('cv').addEventListener('click', openFs);
       $('fs-close').addEventListener('click', closeFs);
+      // 大きい見本をもう一度押したら、閉じる
+      $('fs-cv').addEventListener('click', closeFs);
       $('fs-prev').addEventListener('click', () => { page = Math.max(0, page - 1); paint(); });
       $('fs-next').addEventListener('click', () => { page++; paint(); });
       $('fs-full').addEventListener('click', () => {

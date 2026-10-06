@@ -1049,6 +1049,7 @@
 
     .fs canvas {
       display: block;
+      cursor: zoom-out;
       max-width: 100%;
       max-height: calc(100vh - 80px);
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -1547,7 +1548,7 @@
   <div class="fs" id="fs" hidden>
     <canvas id="fs-cv" aria-label="スケジュール（大きく）"></canvas>
     <div class="fs-bar">
-      <span class="fs-hint">ここで変えると、そのまま変わります。Esc で閉じる</span>
+      <span class="fs-hint">ここで変えると、そのまま変わります。押すか Esc で閉じる</span>
       <button class="btn btn-sm" type="button" id="fs-full">全画面</button>
       <button class="btn btn-sm btn-primary" type="button" id="fs-close">✕ 閉じる</button>
     </div>
@@ -1966,6 +1967,8 @@
       $('fs-open').addEventListener('click', openFs);
       $('cv').addEventListener('click', openFs);
       $('fs-close').addEventListener('click', closeFs);
+      // 大きい見本をもう一度押したら、閉じる
+      $('fs-cv').addEventListener('click', closeFs);
       $('fs-full').addEventListener('click', () => {
         if (document.fullscreenElement) document.exitFullscreen().catch(() => { });
         else if ($('fs').requestFullscreen) $('fs').requestFullscreen().catch(() => toast('全画面にできませんでした'));
