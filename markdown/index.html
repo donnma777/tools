@@ -821,6 +821,68 @@
       font-weight: 700;
     }
 
+    /* 見た目の欄で書く */
+    .md[contenteditable="true"] {
+      outline: none;
+      min-height: 100%;
+      caret-color: var(--accent);
+      position: relative;
+    }
+
+    .md[contenteditable="true"] [contenteditable="false"] {
+      outline: 1px dashed var(--border-strong);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+
+    .md[data-empty]::before {
+      content: 'ここに書くと、左に Markdown が入ります';
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: var(--muted);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .md[contenteditable="true"] input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    .visual-note {
+      font-size: 11.5px;
+      color: var(--warn);
+    }
+
+    .modal-sm {
+      width: min(480px, 100%);
+    }
+
+    .lfield {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--label);
+    }
+
+    .lfield input {
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+      outline: none;
+    }
+
+    .lfield input:focus {
+      border-color: var(--accent);
+    }
+
     .empty-view {
       color: var(--muted);
       font-size: 13px;
@@ -1341,9 +1403,13 @@
         <label class="check" title="オンにすると、1回の改行もそのまま改行になります（GitHub のコメント・Discord などと同じ）。オフは普通の Markdown と同じで、段落を分けるには空の行が要ります。">
           <input type="checkbox" id="opt-breaks">改行をそのまま改行にする
         </label>
+        <label class="check" title="オンにすると、右の見た目の欄でも Word のように書けます。書いたところは Markdown になって左に入ります（そのかたまりの書き方は、このツールの形にそろいます）。">
+          <input type="checkbox" id="opt-visual" checked>見た目の欄でも書く
+        </label>
         <label class="check" title="Web ページ・Word・Google ドキュメントの文章や、Excel の表を貼ると Markdown にします。Ctrl+Shift+V で貼ると、そのままの文字になります。">
           <input type="checkbox" id="opt-paste" checked>貼り付けたら Markdown にする
         </label>
+        <span class="visual-note" id="visual-note" hidden></span>
         <span class="spacer"></span>
         <div class="row">
           <button class="btn btn-sm" type="button" id="btn-open">📂 開く</button>
@@ -1399,6 +1465,25 @@
     </div>
   </div>
 
+  <!-- リンク・画像（見た目の欄） -->
+  <div class="modal" id="lmodal" hidden>
+    <div class="modal-box modal-sm" role="dialog" aria-modal="true" aria-labelledby="lmodal-title">
+      <div class="modal-head">
+        <span class="sec-icon">🔗</span><span id="lmodal-title">リンクを入れる</span>
+        <button class="btn btn-sm x" type="button" id="l-close" aria-label="閉じる">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="lfield"><span id="l-url-label">URL</span><input type="url" id="l-url" placeholder="https://" spellcheck="false"></label>
+        <label class="lfield"><span id="l-text-label">表示する文字</span><input type="text" id="l-text"></label>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" type="button" id="l-unlink" hidden>リンクを外す</button>
+        <button class="btn" type="button" id="l-cancel">やめる</button>
+        <button class="btn btn-primary" type="button" id="l-ok">入れる</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Guide -->
   <section class="guide">
     <details class="sec">
@@ -1406,6 +1491,7 @@
       <div class="panel-body">
         <ol class="steps">
           <li>左に Markdown を書くと、右に<b>できあがりの見た目</b>がすぐ出ます。記号を覚えていなくても、<b>上のボタン</b>で見出し・太字・リストなどを入れられます。</li>
+          <li>Markdown を知らなくても、<b>右の見た目の欄に直接</b> Word のように書けます。書いたところは Markdown になって左に入ります。上のボタンは、最後に触った側（左か右）に効きます。</li>
           <li>表は<b>「表」ボタン</b>から、ます目に書いて作れます。表の中で押すと、その表を直せます。Excel の表は、そのまま左に貼り付けても表になります。</li>
           <li>Web ページ・Word・Google ドキュメントの文章を貼ると、<b>見出しやリンクを Markdown にして</b>入れます。</li>
           <li>できたら<b>「.md で保存」</b>か、<b>コピー</b>して使う先に貼ります。書いている途中のものはブラウザに覚えておくので、閉じても続きから書けます。</li>
@@ -1436,6 +1522,8 @@
           <li>書いたものはブラウザの中だけで扱います。どこにも送信しません。途中のものは、この端末のブラウザに覚えておきます（別の端末やブラウザには出ません）。</li>
           <li>箇条書きの行で <b>Enter</b> を押すと、次の行にも記号が付きます。何も書かずにもう一度 Enter で、箇条書きを終わります。<b>Tab</b> / <b>Shift+Tab</b> で1段下げる・上げる。</li>
           <li>ショートカット：<b>Ctrl+B</b> 太字、<b>Ctrl+I</b> 斜体、<b>Ctrl+K</b> リンク、<b>Ctrl+S</b> .md で保存。Tab でほかの場所へ移りたいときは、先に Esc を押します。</li>
+          <li>見た目の欄で書きかえたかたまり（段落・見出し・リスト・表など）は、このツールの書き方にそろいます（例：<code>__太字__</code> → <code>**太字**</code>、<code>* 項目</code> → <code>- 項目</code>）。触っていないところは、そのまま残ります。<code>&lt;details&gt;</code> のような HTML のかたまりがあるときは、見た目の欄では書けません。</li>
+          <li>見た目の欄では、チェックボックスを押すと <code>[x]</code> / <code>[ ]</code> が切り替わります。リンクは Ctrl を押しながらクリックで開きます。</li>
           <li>リンクの URL を選んだまま <b>URL を貼り付ける</b>と、<code>[文字](URL)</code> のリンクになります。</li>
           <li>画像はファイルを貼り付けられません。ネットに置いた画像の URL を <code>![説明](URL)</code> で書いてください。</li>
           <li>Markdown はサービスによって少しずつ違います。ここでの見た目は GitHub と同じ書き方（GFM）です。note・Qiita・Zenn・Discord などでは、出方が少し違うことがあります。</li>
@@ -1532,17 +1620,19 @@ console.log('コードもそのまま出ます');
 `;
 
       // ── 設定・下書きを覚える ──
-      const opts = { view: 'both', breaks: false, paste: true };
+      const opts = { view: 'both', breaks: false, paste: true, visual: true };
       let stored = null;
       try { stored = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (e) { }
       if (stored && typeof stored === 'object') {
         if (['write', 'both', 'view'].includes(stored.view)) opts.view = stored.view;
         opts.breaks = !!stored.breaks;
         opts.paste = stored.paste !== false;
+        opts.visual = stored.visual !== false;
       }
       src.value = stored && typeof stored.text === 'string' ? stored.text : SAMPLE;
       $('opt-breaks').checked = opts.breaks;
       $('opt-paste').checked = opts.paste;
+      $('opt-visual').checked = opts.visual;
 
       let saveTimer = 0;
       const save = () => {
@@ -1575,7 +1665,7 @@ console.log('コードもそのまま出ます');
       };
       const plainOf = html => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent; };
 
-      const toHtml = text => {
+      const newMarked = () => {
         const slug = slugger();
         const md = new marked.Marked({ gfm: true, breaks: opts.breaks });
         md.use({
@@ -1586,15 +1676,166 @@ console.log('コードもそのまま出ます');
             }
           }
         });
-        return DOMPurify.sanitize(md.parse(text), { ADD_ATTR: ['target'] });
+        return md;
+      };
+      const PURIFY = { ADD_ATTR: ['target'] };
+      const toHtml = text => DOMPurify.sanitize(newMarked().parse(text), PURIFY);
+
+      // ── 見た目の欄で書く ──
+      // 見た目はかたまり（marked の一番上のトークン）ごとに作り、要素に data-b で番号を付けておく。
+      // 見た目の欄で書きかえたら、変わったかたまりだけを Markdown に戻して、左の文字の同じところを置きかえる。
+      // blocks[i] = { raw: 今の Markdown, origRaw: 描いたときの Markdown, el: 見た目に要素があるか, orig/last: 要素の HTML }
+      let blocks = [];
+      let viewEditable = false;
+      const SAFE_HTML_RE = /^\s*(<!--[\s\S]*-->|<(br|hr|img)\b[^>]*>|<([a-z][\w-]*)\b[\s\S]*<\/\3>)\s*$/i;
+
+      const groupHtml = () => {
+        const map = new Map();
+        for (const el of view.children) {
+          const b = el.dataset.b;
+          map.set(b, (map.get(b) || '') + el.outerHTML);
+        }
+        return map;
+      };
+
+      const renderBlocks = text => {
+        const md = newMarked();
+        const tokens = md.lexer(text);
+        // 置きかえは文字の位置で行うので、トークンをつなげて元の文字に戻らないときは書けないことにする
+        if (tokens.map(t => t.raw).join('') !== text) return 'mismatch';
+        // 閉じていない HTML（<details> だけの行など）は、かたまりごとに描くと形が崩れる
+        if (tokens.some(t => t.type === 'html' && !SAFE_HTML_RE.test(t.raw))) return 'html';
+        const frag = document.createDocumentFragment();
+        const list = tokens.map((t, i) => {
+          const arr = [t];
+          arr.links = tokens.links;
+          const f = DOMPurify.sanitize(md.parser(arr), { ...PURIFY, RETURN_DOM_FRAGMENT: true });
+          let el = false;
+          [...f.childNodes].forEach(n => {
+            if (n.nodeType === 1) {
+              n.dataset.b = i;
+              if (t.type === 'html') n.contentEditable = 'false';
+              n.querySelectorAll('input[type="checkbox"]').forEach(c => c.removeAttribute('disabled'));
+              el = true;
+            } else if (n.nodeType === 3 && n.textContent.trim()) {
+              const p = document.createElement('p');
+              p.dataset.b = i;
+              p.appendChild(n.cloneNode());
+              f.replaceChild(p, n);
+              el = true;
+            }
+          });
+          frag.appendChild(f);
+          return { type: t.type, raw: t.raw, origRaw: t.raw, el, orig: '', last: '' };
+        });
+        // 何も書いていないときは、書き始められるように空の段落を置く
+        if (!list.some(b => b.el)) {
+          const p = document.createElement('p');
+          p.dataset.b = list.length;
+          p.appendChild(document.createElement('br'));
+          frag.appendChild(p);
+          list.push({ raw: '', origRaw: '', el: true, orig: '', last: '' });
+        }
+        view.replaceChildren(frag);
+        const html = groupHtml();
+        list.forEach((b, i) => { b.orig = b.last = html.get(String(i)) || ''; });
+        blocks = list;
+        return 'ok';
       };
 
       let renderQueued = false;
       const render = () => {
         renderQueued = false;
         const text = src.value;
-        view.innerHTML = text.trim() ? toHtml(text) : '<p class="empty-view">左に書くと、ここに見た目が出ます。</p>';
+        viewEditable = false;
+        let note = '';
+        if (opts.visual) {
+          const r = renderBlocks(text);
+          if (r === 'ok') viewEditable = true;
+          else note = r === 'html' ? 'HTML のかたまり（<details> など）があるので、見た目の欄では書けません' : '見た目の欄では書けない書き方があります';
+        }
+        if (!viewEditable) {
+          blocks = [];
+          view.innerHTML = text.trim() ? toHtml(text) : '<p class="empty-view">左に書くと、ここに見た目が出ます。</p>';
+        }
+        view.contentEditable = viewEditable ? 'true' : 'false';
+        view.toggleAttribute('data-empty', viewEditable && !text.trim());
+        $('visual-note').textContent = note;
+        $('visual-note').hidden = !note;
         updateCount();
+      };
+
+      // 見た目の欄の HTML → Markdown
+      const toMd = html => {
+        td.options.br = opts.breaks ? '' : '  ';
+        return td.turndown(html).replace(/ /g, ' ').trim();
+      };
+
+      // 見た目の欄で書いたら、変わったかたまりだけを左に戻す
+      const syncFromView = () => {
+        if (!viewEditable) return;
+        view.removeAttribute('data-empty');
+        // かたまりの外に直接書かれた文字は、段落に入れる
+        const sel = getSelection();
+        [...view.childNodes].forEach(n => {
+          if (n.nodeType !== 3 || !n.textContent.trim()) return;
+          const off = sel.anchorNode === n ? sel.anchorOffset : null;
+          const p = document.createElement('p');
+          n.replaceWith(p);
+          p.appendChild(n);
+          if (off != null) sel.collapse(n, off);
+        });
+        // 番号のない要素（Enter で増えた段落など）は、すぐ前のかたまりに入れる。順番が前後したものも同じ
+        // ただし、見出し↔段落のように要素が置きかわって消えたかたまりがあれば、そこに入れる
+        const present = new Set([...view.children].map(x => x.dataset.b).filter(b => b != null));
+        let cur = -1;
+        const kids = [...view.children];
+        for (const [k, el] of kids.entries()) {
+          let b = Number(el.dataset.b);
+          if (el.dataset.b == null || !(b in blocks) || b < cur || !blocks[b].el) {
+            const next = kids.slice(k + 1).find(x => Number(x.dataset.b) in blocks && Number(x.dataset.b) > cur);
+            const limit = next ? Number(next.dataset.b) : blocks.length;
+            let gone = -1;
+            for (let i = cur + 1; i < limit; i++) if (blocks[i].el && !present.has(String(i))) { gone = i; break; }
+            if (gone >= 0) { b = gone; present.add(String(gone)); }
+            else if (cur >= 0) b = cur;
+            else b = next ? Number(next.dataset.b) : -1;
+            if (b < 0) { blocks.push({ raw: '', origRaw: '', el: true, orig: '', last: '' }); b = blocks.length - 1; }
+            el.dataset.b = b;
+          }
+          cur = b;
+        }
+        const html = groupHtml();
+        let changed = false;
+        blocks.forEach((b, i) => {
+          if (!b.el) return;
+          const h = html.get(String(i)) || '';
+          if (h === b.last) return;
+          b.last = h;
+          changed = true;
+          if (h === b.orig) b.raw = b.origRaw;
+          else if (!h || !plainOf(h).trim() && !/<(img|hr|input|table)\b/i.test(h)) b.raw = '';
+          else {
+            const body = toMd(h);
+            // 後ろの改行は元のまま（段落のあとの空の行は、次の space トークンが持っている）
+            b.raw = body ? body + b.origRaw.match(/\n*$/)[0] : '';
+          }
+        });
+        if (!changed) return;
+        let out = '';
+        blocks.forEach((b, i) => {
+          let r = b.raw;
+          // 消えたかたまりのあとの空の行も消す
+          if (b.type === 'space' && i > 0 && blocks[i - 1].el && !blocks[i - 1].raw && blocks[i - 1].origRaw) r = '';
+          // 書きかえたかたまりは、前と空の行で分ける
+          if (r && r !== b.origRaw && out && !out.endsWith('\n\n')) r = (out.endsWith('\n') ? '\n' : '\n\n') + r;
+          out += r;
+        });
+        if (out !== src.value) {
+          src.value = out;
+          updateCount();
+          save();
+        }
       };
       const queueRender = () => {
         if (renderQueued) return;
@@ -1627,6 +1868,7 @@ console.log('コードもそのまま出ます');
 
       $('opt-breaks').addEventListener('change', e => { opts.breaks = e.target.checked; save(); render(); });
       $('opt-paste').addEventListener('change', e => { opts.paste = e.target.checked; save(); });
+      $('opt-visual').addEventListener('change', e => { opts.visual = e.target.checked; save(); render(); });
 
       // ── 書いているところと見た目のスクロールを合わせる ──
       let scrollLock = null;
@@ -1647,7 +1889,10 @@ console.log('コードもそのまま出ます');
         src.focus({ preventScroll: true });
         src.setSelectionRange(start, end);
         let ok = false;
-        try { ok = document.execCommand('insertText', false, text); } catch (e) { }
+        // 左が隠れているとき（「見る」）は focus が移らないので、execCommand は使わない（見た目の欄に入ってしまう）
+        if (document.activeElement === src) {
+          try { ok = document.execCommand('insertText', false, text); } catch (e) { }
+        }
         if (!ok || src.value.slice(start, start + text.length) !== text) {
           src.setRangeText(text, start, end, 'end');
         }
@@ -1796,13 +2041,213 @@ console.log('コードもそのまま出ます');
         toc: () => insertToc(),
       };
 
+      // ── 見た目の欄での書式 ──
+      let lastPane = 'src';
+      src.addEventListener('focus', () => { lastPane = 'src'; });
+      view.addEventListener('focus', () => { lastPane = 'view'; });
+      const viewActive = () => {
+        if (document.activeElement === view) lastPane = 'view';
+        else if (document.activeElement === src) lastPane = 'src';
+        return viewVisible();
+      };
+      const viewVisible = () => viewEditable && lastPane === 'view' && split.dataset.view !== 'write' &&
+        !(narrow.matches && split.dataset.view === 'both');
+
+      const exec = (c, v) => { view.focus({ preventScroll: true }); document.execCommand(c, false, v); };
+      const selNode = () => {
+        const s = getSelection();
+        if (!s.rangeCount || !view.contains(s.anchorNode)) return null;
+        return s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentElement;
+      };
+      const inView = sel => { const n = selNode(); return n ? n.closest(sel) : null; };
+      const topOf = n => { while (n && n.parentElement !== view) n = n.parentElement; return n; };
+      // カーソルのあるかたまりの、左の文字での終わりの位置
+      const srcPosAfterView = () => {
+        const top = topOf(selNode());
+        if (!top || !(Number(top.dataset.b) in blocks)) return src.value.length;
+        const i = Number(top.dataset.b);
+        return blocks.slice(0, i + 1).reduce((n, b) => n + b.raw.length, 0);
+      };
+      const srcPosOfView = () => {
+        const top = topOf(selNode());
+        if (!top || !(Number(top.dataset.b) in blocks)) return 0;
+        return blocks.slice(0, Number(top.dataset.b)).reduce((n, b) => n + b.raw.length, 0);
+      };
+      const toggleBlock = tag => {
+        const cur = inView('h1, h2, h3, h4, h5, h6, pre, p, li, blockquote');
+        exec('formatBlock', cur && cur.tagName.toLowerCase() === tag ? 'p' : tag);
+      };
+      const unwrapEl = el => { el.replaceWith(...el.childNodes); syncFromView(); };
+
+      const viewCommands = {
+        h1: () => toggleBlock('h1'),
+        h2: () => toggleBlock('h2'),
+        h3: () => toggleBlock('h3'),
+        bold: () => exec('bold'),
+        italic: () => exec('italic'),
+        strike: () => exec('strikeThrough'),
+        code: () => {
+          const c = inView('code');
+          if (c && !c.closest('pre')) { unwrapEl(c); return; }
+          const t = getSelection().toString();
+          if (t.includes('\n')) { toggleBlock('pre'); return; }
+          exec('insertHTML', `<code>${escHtml(t || 'コード')}</code>`);
+        },
+        ul: () => exec('insertUnorderedList'),
+        ol: () => exec('insertOrderedList'),
+        task: () => {
+          let li = inView('li');
+          if (!li) { exec('insertUnorderedList'); li = inView('li'); }
+          if (!li) return;
+          const box = li.querySelector(':scope > input[type="checkbox"], :scope > p:first-child > input[type="checkbox"]');
+          if (box) {
+            if (box.nextSibling && box.nextSibling.nodeType === 3) box.nextSibling.textContent = box.nextSibling.textContent.replace(/^ /, '');
+            box.remove();
+          } else {
+            const c = document.createElement('input');
+            c.type = 'checkbox';
+            const host = li.firstElementChild && li.firstElementChild.tagName === 'P' ? li.firstElementChild : li;
+            host.insertBefore(document.createTextNode(' '), host.firstChild);
+            host.insertBefore(c, host.firstChild);
+          }
+          syncFromView();
+        },
+        quote: () => {
+          const q = inView('blockquote');
+          if (q) unwrapEl(q);
+          else exec('formatBlock', 'blockquote');
+        },
+        codeblock: () => toggleBlock('pre'),
+        link: () => openLink('link'),
+        image: () => openLink('image'),
+        // かたまりを足すものは、左の文字に入れて描き直す
+        hr: () => { const p = srcPosAfterView(); src.setSelectionRange(p, p); commands.hr(); },
+        table: () => {
+          const tb = inView('table');
+          const p = tb ? srcPosOfView() + 1 : srcPosAfterView();
+          src.setSelectionRange(p, p);
+          openTable();
+        },
+        toc: () => { const p = srcPosOfView(); src.setSelectionRange(p, p); commands.toc(); },
+      };
+
       document.querySelectorAll('#toolbar [data-cmd]').forEach(b => {
         // ボタンを押しても、選んでいる文字が外れないように
         b.addEventListener('mousedown', e => e.preventDefault());
         b.addEventListener('click', () => {
-          if (split.dataset.view === 'view') setView(narrow.matches ? 'write' : 'both');
+          if (viewActive()) { viewCommands[b.dataset.cmd](); return; }
+          if (split.dataset.view === 'view') {
+            if (viewEditable) { view.focus(); lastPane = 'view'; viewCommands[b.dataset.cmd](); return; }
+            setView(narrow.matches ? 'write' : 'both');
+          }
           commands[b.dataset.cmd]();
         });
+      });
+
+      // 見た目の欄の入力
+      document.execCommand('defaultParagraphSeparator', false, 'p');
+      view.addEventListener('input', syncFromView);
+      view.addEventListener('change', e => {
+        // チェックボックスを押したら、[x] / [ ] を切り替える
+        if (e.target.matches('input[type="checkbox"]')) {
+          e.target.toggleAttribute('checked', e.target.checked);
+          syncFromView();
+        }
+      });
+      view.addEventListener('click', e => {
+        const a = e.target.closest('a[href]');
+        if (a && viewEditable && (e.ctrlKey || e.metaKey)) { e.preventDefault(); window.open(a.href, '_blank', 'noopener'); }
+      });
+      view.addEventListener('keydown', e => {
+        if (!viewEditable || e.isComposing || e.keyCode === 229) return;
+        const mod = e.ctrlKey || e.metaKey;
+        if (mod && !e.altKey && !e.shiftKey) {
+          const k = e.key.toLowerCase();
+          if (k === 'b' || k === 'i') { e.preventDefault(); viewCommands[k === 'b' ? 'bold' : 'italic'](); return; }
+          if (k === 'k') { e.preventDefault(); openLink('link'); return; }
+        }
+        if (mod && e.shiftKey && e.key.toLowerCase() === 'v') { plainPaste = true; setTimeout(() => { plainPaste = false; }, 300); return; }
+        if (e.key === 'Enter' && !mod && !e.altKey && inView('pre')) {
+          e.preventDefault();
+          exec('insertText', '\n');
+          return;
+        }
+        if (e.key === 'Tab' && !mod && !e.altKey && inView('li')) {
+          e.preventDefault();
+          exec(e.shiftKey ? 'outdent' : 'indent');
+        }
+      });
+      view.addEventListener('paste', e => {
+        if (!viewEditable) return;
+        const cd = e.clipboardData;
+        if (!cd) return;
+        e.preventDefault();
+        const text = cd.getData('text/plain');
+        const html = cd.getData('text/html');
+        if (plainPaste || !opts.paste) { exec('insertText', text); return; }
+        const tsv = parseTsv(text);
+        if (tsv && (!html || /<table/i.test(html))) {
+          exec('insertHTML', toHtml(tableToMd(tsv, [])));
+          return;
+        }
+        if (html && STRUCT_RE.test(html)) {
+          exec('insertHTML', DOMPurify.sanitize(tidyHtml(html), { FORBID_ATTR: ['style', 'class', 'id'], FORBID_TAGS: ['style', 'meta', 'link'] }));
+          return;
+        }
+        if (!text) return;
+        // 文字は Markdown として読んで入れる（Markdown を貼ると、見た目になって入る）
+        if (/\n/.test(text.trim()) || /^(#{1,6}\s|[-*+]\s|\d+\.\s|>|```|\|)/m.test(text) || /\*\*|\[[^\]]+\]\(/.test(text)) {
+          exec('insertHTML', toHtml(text));
+        } else {
+          exec('insertText', text);
+        }
+      });
+
+      // ── リンク・画像（見た目の欄） ──
+      let linkRange = null, linkKind = 'link', linkEl = null;
+      const openLink = kind => {
+        const s = getSelection();
+        linkRange = s.rangeCount && view.contains(s.anchorNode) ? s.getRangeAt(0).cloneRange() : null;
+        linkKind = kind;
+        linkEl = kind === 'link' ? inView('a') : null;
+        const text = linkEl ? linkEl.textContent : s.toString();
+        $('lmodal-title').textContent = kind === 'link' ? (linkEl ? 'リンクを直す' : 'リンクを入れる') : '画像を入れる';
+        $('l-text-label').textContent = kind === 'link' ? '表示する文字' : '画像の説明（読み上げ・表示できないときの文字）';
+        $('l-url-label').textContent = kind === 'link' ? 'URL' : '画像の URL';
+        $('l-unlink').hidden = !linkEl;
+        $('l-text').value = isUrl(text) ? '' : text;
+        $('l-url').value = linkEl ? linkEl.getAttribute('href') : isUrl(text) ? text.trim() : '';
+        $('lmodal').hidden = false;
+        ($('l-url').value ? $('l-text') : $('l-url')).focus();
+      };
+      const closeLink = () => {
+        $('lmodal').hidden = true;
+        view.focus({ preventScroll: true });
+        if (linkRange) { const s = getSelection(); s.removeAllRanges(); s.addRange(linkRange); }
+      };
+      const doLink = () => {
+        const url = $('l-url').value.trim();
+        const text = $('l-text').value.trim();
+        if (!url) { $('l-url').focus(); toast('URL を入れてください'); return; }
+        closeLink();
+        if (linkKind === 'image') {
+          exec('insertHTML', `<img src="${escHtml(url)}" alt="${escHtml(text)}">`);
+        } else if (linkEl && view.contains(linkEl)) {
+          linkEl.setAttribute('href', url);
+          if (text) linkEl.textContent = text;
+          syncFromView();
+        } else {
+          exec('insertHTML', `<a href="${escHtml(url)}">${escHtml(text || url)}</a>`);
+        }
+      };
+      $('l-ok').addEventListener('click', doLink);
+      $('l-cancel').addEventListener('click', closeLink);
+      $('l-close').addEventListener('click', closeLink);
+      $('l-unlink').addEventListener('click', () => { closeLink(); if (linkEl && view.contains(linkEl)) unwrapEl(linkEl); });
+      $('lmodal').addEventListener('click', e => { if (e.target === $('lmodal')) closeLink(); });
+      $('lmodal').addEventListener('keydown', e => {
+        if (e.key === 'Escape') { e.preventDefault(); closeLink(); }
+        if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); doLink(); }
       });
 
       // ── 目次 ──
@@ -1955,14 +2400,23 @@ console.log('コードもそのまま出ます');
           return prefix + body + (node.nextSibling && !/\n$/.test(body) ? '\n' : '');
         }
       });
-      // 表は1行目を見出しにして、全部 Markdown の表にする
+      // 表は1行目を見出しにして、全部 Markdown の表にする（左・中・右よせも読む）
       td.addRule('table', {
         filter: 'table',
         replacement: (content, node) => {
           const rows = [...node.rows].map(tr => [...tr.cells].map(c =>
             td.turndown(c.innerHTML).replace(/\n+/g, ' ').trim()));
-          return rows.length ? '\n\n' + tableToMd(rows, []) + '\n\n' : '';
+          const aligns = node.rows.length ? [...node.rows[0].cells].map(c => {
+            const a = (c.getAttribute('align') || c.style.textAlign || '').toLowerCase();
+            return a === 'left' ? 'l' : a === 'center' ? 'c' : a === 'right' ? 'r' : '';
+          }) : [];
+          return rows.length ? '\n\n' + tableToMd(rows, aligns) + '\n\n' : '';
         }
+      });
+      // チェックリスト（項目の間が空いたリストでは、チェックボックスが <p> の中に入る）
+      td.addRule('taskCheckbox', {
+        filter: node => node.nodeName === 'INPUT' && node.type === 'checkbox' && !!node.closest('li'),
+        replacement: (content, node) => (node.checked ? '[x]' : '[ ]') + (/^\s/.test(node.nextSibling ? node.nextSibling.textContent : '') ? '' : ' '),
       });
 
       // Google ドキュメントは太字を span の style で表し、全体を <b> で包むので直す
@@ -2176,7 +2630,7 @@ console.log('コードもそのまま出ます');
         const first = tgrid.querySelector('tbody input');
         if (first) first.focus();
       };
-      const closeTable = () => { $('tmodal').hidden = true; src.focus({ preventScroll: true }); };
+      const closeTable = () => { $('tmodal').hidden = true; (lastPane === 'view' && viewEditable ? view : src).focus({ preventScroll: true }); };
 
       tgrid.addEventListener('input', e => {
         const inp = e.target;
@@ -2364,22 +2818,25 @@ tr:nth-child(2n) td{background:#fafbfc}`;
       });
       $('copy-rich').addEventListener('click', async () => {
         if (!src.value.trim()) { toast('まだ何も書いていません'); return; }
-        render();
-        const html = view.innerHTML;
+        const box = document.createElement('div');
+        box.innerHTML = htmlBody();
+        const html = box.innerHTML;
         try {
           await navigator.clipboard.write([new ClipboardItem({
             'text/html': new Blob([html], { type: 'text/html' }),
-            'text/plain': new Blob([view.innerText], { type: 'text/plain' }),
+            'text/plain': new Blob([box.textContent], { type: 'text/plain' }),
           })]);
           toast('見た目のままコピーしました');
         } catch (e) {
           // 古いブラウザ：見た目のところを選んでコピーする
           const r = document.createRange();
-          r.selectNodeContents(view);
+          document.body.appendChild(box);
+          r.selectNodeContents(box);
           const s = getSelection();
           s.removeAllRanges(); s.addRange(r);
           const ok = document.execCommand('copy');
           s.removeAllRanges();
+          box.remove();
           toast(ok ? '見た目のままコピーしました' : 'コピーできませんでした');
         }
       });
