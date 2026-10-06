@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>テキスト比較（diff） | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="2つの文章を貼るだけで、違うところを色分けして見せる無料のテキスト比較（diff）ツール。行ごとの違いに加えて、変わった行の中のどの文字が変わったかまで出します。並べて・まとめての表示、空白・全角半角・大文字小文字を無視、差分のコピーつき。文章はどこにも送信しません。">
+  <link rel="canonical" href="https://donnma.com/tool/diff/">
+  <meta property="og:title" content="テキスト比較（diff） | どんまうんど-Tools">
+  <meta property="og:description" content="2つの文章の違いを、行と文字で色分けして見せる。空白・全角半角を無視、差分のコピーつき。送信しません。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/diff/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-diff.jpg?v=20261007a">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="テキスト比較（diff）">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <meta name="twitter:image:alt" content="テキスト比較（diff）">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --ok: #7fd8a4;
+      --warn: #ffc46b;
+      --ng: #ff8a8a;
+      --mono: ui-monospace, 'SFMono-Regular', Consolas, 'BIZ UDGothic', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      border-color: var(--border-strong);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .sp {
+      flex: 1;
+    }
+
+    /* 入れるところ */
+    .inputs {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .side {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+      position: relative;
+    }
+
+    .side-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .side-head .tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 999px;
+    }
+
+    .tag-a {
+      background: rgba(255, 110, 120, 0.16);
+      color: #ff9aa2;
+    }
+
+    .tag-b {
+      background: rgba(110, 220, 150, 0.14);
+      color: #8ee6ad;
+    }
+
+    .side-head .info {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    .side textarea {
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg-deep);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 10px 12px;
+      width: 100%;
+      min-height: 220px;
+      height: 30vh;
+      resize: vertical;
+      tab-size: 4;
+      white-space: pre;
+      overflow: auto;
+    }
+
+    .side textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .side.drag textarea {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .opts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      align-items: center;
+      font-size: 12.5px;
+      color: var(--label);
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .check input {
+      accent-color: var(--accent);
+    }
+
+    .seg {
+      display: inline-flex;
+      border: 1px solid var(--border-strong);
+      border-radius: 9px;
+      overflow: hidden;
+    }
+
+    .seg button {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    .seg button+button {
+      border-left: 1px solid var(--border-strong);
+    }
+
+    .seg button[aria-pressed="true"] {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    /* 結果 */
+    .result-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 56px;
+      background: var(--surface);
+      z-index: 5;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .stats .del {
+      color: #ff9aa2;
+    }
+
+    .stats .ins {
+      color: #8ee6ad;
+    }
+
+    .stats .same {
+      color: var(--muted);
+    }
+
+    .stats .ok {
+      color: var(--ok);
+    }
+
+    .diff {
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.6;
+      overflow: auto;
+      max-height: 75vh;
+    }
+
+    .diff table {
+      border-collapse: collapse;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    .diff td {
+      vertical-align: top;
+      padding: 0 8px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .diff td.n {
+      width: 52px;
+      text-align: right;
+      color: var(--muted);
+      opacity: 0.7;
+      user-select: none;
+      font-size: 11.5px;
+      padding-top: 2px;
+      border-right: 1px solid var(--border);
+    }
+
+    .diff td.m {
+      width: 22px;
+      text-align: center;
+      user-select: none;
+      color: var(--muted);
+    }
+
+    .diff col.n {
+      width: 52px;
+    }
+
+    .diff col.m {
+      width: 22px;
+    }
+
+    .diff tr.del td.t,
+    .diff tr.del td.m,
+    .diff td.t.del,
+    .diff td.m.del {
+      background: rgba(255, 90, 110, 0.12);
+    }
+
+    .diff tr.ins td.t,
+    .diff tr.ins td.m,
+    .diff td.t.ins,
+    .diff td.m.ins {
+      background: rgba(80, 210, 140, 0.11);
+    }
+
+    .diff td.t.empty {
+      background: repeating-linear-gradient(135deg, transparent 0 6px, rgba(255, 255, 255, 0.025) 6px 12px);
+    }
+
+    .diff del,
+    .diff ins {
+      text-decoration: none;
+      border-radius: 3px;
+    }
+
+    .diff del {
+      background: rgba(255, 90, 110, 0.42);
+      color: #fff;
+    }
+
+    .diff ins {
+      background: rgba(80, 210, 140, 0.38);
+      color: #fff;
+    }
+
+    .diff tr.fold td {
+      text-align: center;
+      color: var(--muted);
+      font-family: 'Zen Maru Gothic', sans-serif;
+      font-size: 12px;
+      padding: 4px;
+      background: var(--bg-deep);
+      cursor: pointer;
+      border-top: 1px dashed var(--border);
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .diff tr.fold td:hover {
+      color: var(--accent-2);
+    }
+
+    .diff tr.cur td.t,
+    .diff tr.cur td.m {
+      box-shadow: inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent);
+    }
+
+    .diff .ws {
+      color: var(--muted);
+      opacity: 0.55;
+    }
+
+    .diff-empty {
+      padding: 28px 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .diff-empty.same {
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .notes b {
+      color: var(--label);
+    }
+
+    .notes code {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent-2);
+      background: var(--bg-deep);
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 400;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 800px) {
+      .workspace {
+        padding: 40px 12px 24px;
+      }
+
+      .inputs {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .side textarea {
+        height: 22vh;
+        min-height: 160px;
+      }
+
+      .guide {
+        padding: 0 12px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .result-head {
+        position: static;
+      }
+
+      .diff td.n {
+        width: 34px;
+        padding: 2px 4px 0;
+      }
+
+      .diff col.n {
+        width: 34px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>テキスト比較（diff）</h1>
+      <p>2つの文章を貼ると、どこが変わったかを色分けして見せます。変わった行の中では、どの文字が変わったかまで出します。文章はどこにも送信しません。</p>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <div class="panel">
+      <div class="panel-body">
+        <div class="inputs">
+          <div class="side" id="side-a">
+            <div class="side-head"><span class="tag tag-a">前</span>変える前<span class="info" id="info-a"></span></div>
+            <textarea id="a" spellcheck="false" aria-label="変える前の文章" placeholder="変える前の文章を貼ります（ファイルをドロップしても入ります）"></textarea>
+            <div class="row"><button class="btn btn-sm" type="button" data-open="a">📂 ファイルを開く</button><button class="btn btn-sm" type="button" data-clear="a">消す</button></div>
+          </div>
+          <div class="side" id="side-b">
+            <div class="side-head"><span class="tag tag-b">後</span>変えた後<span class="info" id="info-b"></span></div>
+            <textarea id="b" spellcheck="false" aria-label="変えた後の文章" placeholder="変えた後の文章を貼ります（ファイルをドロップしても入ります）"></textarea>
+            <div class="row"><button class="btn btn-sm" type="button" data-open="b">📂 ファイルを開く</button><button class="btn btn-sm" type="button" data-clear="b">消す</button></div>
+          </div>
+        </div>
+        <input type="file" id="file" hidden>
+        <div class="opts" style="margin-top:12px">
+          <button class="btn btn-sm" type="button" id="swap" title="前と後を入れかえます">⇄ 入れかえ</button>
+          <label class="check"><input type="checkbox" id="o-space">空白の違いを無視</label>
+          <label class="check"><input type="checkbox" id="o-case">大文字・小文字を無視</label>
+          <label class="check"><input type="checkbox" id="o-width">全角・半角を無視</label>
+          <label class="check"><input type="checkbox" id="o-blank">空の行を無視</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="result-head">
+        <div class="stats" id="stats"></div>
+        <span class="sp"></span>
+        <div class="seg" id="view" role="group" aria-label="出し方">
+          <button type="button" data-v="split" aria-pressed="true">並べて</button>
+          <button type="button" data-v="unified" aria-pressed="false">まとめて</button>
+        </div>
+        <label class="check" style="font-size:12.5px;color:var(--label)"><input type="checkbox" id="o-all">同じ行も全部出す</label>
+        <button class="btn btn-sm" type="button" id="prev" title="前の違いへ（Shift+F7）">↑ 前の違い</button>
+        <button class="btn btn-sm" type="button" id="next" title="次の違いへ（F7）">↓ 次の違い</button>
+        <button class="btn btn-sm" type="button" id="copy" title="違いを「diff」の書き方（- と +）でコピーします">📋 差分をコピー</button>
+      </div>
+      <div class="diff" id="diff"></div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🔍</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>左に<b>変える前</b>、右に<b>変えた後</b>の文章を貼ります。ファイル（.txt・.md・.csv・.html など）をドロップしても入ります。</li>
+          <li>下に違いが出ます。<span style="color:#ff9aa2">赤</span>が消えたところ、<span style="color:#8ee6ad">緑</span>が増えたところです。変わった行の中では、変わった文字だけが濃く出ます。</li>
+          <li><b>「並べて」</b>は左右に、<b>「まとめて」</b>は1列に出します。同じ行が続くところはたたむので、押すと開きます。</li>
+          <li><b>「↓ 次の違い」</b>（F7）で、違うところを順に見られます。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>こんなときに</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>直してもらった原稿や、規約・お知らせの文章の、どこが変わったかを確かめるとき。</li>
+          <li>設定ファイルや CSS・HTML の、2つの版を見比べるとき。</li>
+          <li>名簿やリストの、増えた人・消えた人を探すとき（並び順が同じなら、行ごとに出ます）。</li>
+        </ul>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">⚙️</span>無視のしかた</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li><b>空白の違いを無視</b>：行の前後の空白を除き、続く空白（全角の空白も）を1つとして比べます。</li>
+          <li><b>全角・半角を無視</b>：「ＡＢＣ１２３」と「ABC123」、「ｶﾞ」と「ガ」などを同じとして比べます。</li>
+          <li><b>空の行を無視</b>：何も書いていない行を、比べる前に除きます（行番号は元の文章のままです）。</li>
+          <li>無視しても、出す文字は元の文章のままです。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1400px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2400); };
+      const esc = t => t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const STORE = 'donnma-diff';
+      const FOLD = 3;          // 違いの前後に残す同じ行の数
+      const MAX_D = 6000;      // これより違いが多いときは、残りをまとめて「消えた・増えた」にする
+
+      // ── 設定・文章（このブラウザに覚えておく） ──
+      let opt = { space: false, case: false, width: false, blank: false, view: 'split', all: false };
+      try {
+        const got = JSON.parse(localStorage.getItem(STORE) || 'null');
+        if (got) { opt = { ...opt, ...got.opt }; $('a').value = got.a || ''; $('b').value = got.b || ''; }
+      } catch (e) { }
+      const save = () => {
+        try { localStorage.setItem(STORE, JSON.stringify({ opt, a: $('a').value.slice(0, 300000), b: $('b').value.slice(0, 300000) })); } catch (e) { }
+      };
+
+      // ── Myers の差分（a・b は比べる値の配列）→ [{ t: '=' | '-' | '+', i, j }] ──
+      function myers(a, b) {
+        const n = a.length, m = b.length;
+        // 前と後ろの同じところは先に除く（速くなる）
+        let s = 0;
+        while (s < n && s < m && a[s] === b[s]) s++;
+        let e = 0;
+        while (e < n - s && e < m - s && a[n - 1 - e] === b[m - 1 - e]) e++;
+        const A = a.slice(s, n - e), B = b.slice(s, m - e);
+        const N = A.length, M = B.length, max = N + M;
+        const ops = [];
+        for (let k = 0; k < s; k++) ops.push({ t: '=', i: k, j: k });
+        const mid = [];
+        if (N === 0) for (let j = 0; j < M; j++) mid.push({ t: '+', j: s + j });
+        else if (M === 0) for (let i = 0; i < N; i++) mid.push({ t: '-', i: s + i });
+        else {
+          const off = max + 1;
+          let v = new Int32Array(2 * max + 3);
+          const trace = [];
+          let found = -1;
+          for (let d = 0; d <= Math.min(max, MAX_D); d++) {
+            trace.push(v.slice(off - d - 1, off + d + 2));
+            for (let k = -d; k <= d; k += 2) {
+              let x = (k === -d || (k !== d && v[off + k - 1] < v[off + k + 1])) ? v[off + k + 1] : v[off + k - 1] + 1;
+              let y = x - k;
+              while (x < N && y < M && A[x] === B[y]) { x++; y++; }
+              v[off + k] = x;
+              if (x >= N && y >= M) { found = d; break; }
+            }
+            if (found >= 0) break;
+          }
+          if (found < 0) {
+            // 違いが多すぎる：残りは全部消えて増えたとする
+            for (let i = 0; i < N; i++) mid.push({ t: '-', i: s + i });
+            for (let j = 0; j < M; j++) mid.push({ t: '+', j: s + j });
+          } else {
+            // うしろからたどる
+            let x = N, y = M;
+            const rev = [];
+            for (let d = found; d > 0; d--) {
+              const tv = trace[d];           // d 回目の前の v（-d-1 … d+1）
+              const at = k => tv[k + d + 1];
+              const k = x - y;
+              const prevK = (k === -d || (k !== d && at(k - 1) < at(k + 1))) ? k + 1 : k - 1;
+              const prevX = at(prevK), prevY = prevX - prevK;
+              while (x > prevX && y > prevY) { x--; y--; rev.push({ t: '=', i: s + x, j: s + y }); }
+              if (x === prevX) { y--; rev.push({ t: '+', j: s + y }); }
+              else { x--; rev.push({ t: '-', i: s + x }); }
+            }
+            while (x > 0 && y > 0) { x--; y--; rev.push({ t: '=', i: s + x, j: s + y }); }
+            mid.push(...rev.reverse());
+          }
+        }
+        ops.push(...mid);
+        for (let k = 0; k < e; k++) ops.push({ t: '=', i: n - e + k, j: m - e + k });
+        return ops;
+      }
+
+      // ── 比べる値（無視のしかたを反映） ──
+      const keyOf = line => {
+        let s = line;
+        if (opt.width) s = s.normalize('NFKC');
+        if (opt.case) s = s.toLowerCase();
+        if (opt.space) s = s.replace(/[\s　]+/g, ' ').trim();
+        return s;
+      };
+      const splitLines = t => (t === '' ? [] : t.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n'));
+
+      // 行の中の文字の違い（1文字ずつ。長すぎる行は行ごと）
+      function charDiff(x, y) {
+        const ca = [...x], cb = [...y];
+        if (ca.length * cb.length > 4e6) return null;
+        const k = c => { let s = c; if (opt.width) s = s.normalize('NFKC'); if (opt.case) s = s.toLowerCase(); if (opt.space && /[\s　]/.test(s)) s = ' '; return s; };
+        const ops = myers(ca.map(k), cb.map(k));
+        // かたまりにする：{ eq: true, a, b }（同じ）／{ eq: false, a, b }（変わった）
+        let segs = [];
+        for (const o of ops) {
+          const eq = o.t === '=';
+          let last = segs[segs.length - 1];
+          if (!last || last.eq !== eq) { last = { eq, a: '', b: '' }; segs.push(last); }
+          if (o.t !== '+') last.a += ca[o.i];
+          if (o.t !== '-') last.b += cb[o.j];
+        }
+        // 変わったところにはさまれた短い「同じ」（2文字まで）は、変わったところに入れる（日本語が細切れにならないように）
+        for (let changed = true; changed;) {
+          changed = false;
+          for (let i = 1; i < segs.length - 1; i++) {
+            const m = segs[i];
+            if (m.eq && [...m.a].length <= 2 && !segs[i - 1].eq && !segs[i + 1].eq) {
+              const p = segs[i - 1], n = segs[i + 1];
+              segs.splice(i - 1, 3, { eq: false, a: p.a + m.a + n.a, b: p.b + m.b + n.b });
+              changed = true;
+              break;
+            }
+          }
+        }
+        let ha = '', hb = '';
+        for (const g of segs) {
+          if (g.eq) { ha += esc(g.a); hb += esc(g.b); }
+          else { if (g.a) ha += `<del>${esc(g.a)}</del>`; if (g.b) hb += `<ins>${esc(g.b)}</ins>`; }
+        }
+        // ほとんど全部ちがうなら、文字の色分けはしない（読みにくいので）
+        const same = ops.filter(o => o.t === '=').length;
+        if (same < Math.min(ca.length, cb.length) * 0.3) return null;
+        return [ha, hb];
+      }
+
+      // ── 比べる ──
+      let blocks = [];   // 表に出すかたまり
+      let changes = [];  // 違いの行（次の違いへ用）
+      let cur = -1;
+      const opened = new Set(); // 開いた「同じ行」のたたみ
+
+      function compare() {
+        save();
+        const A = splitLines($('a').value), B = splitLines($('b').value);
+        $('info-a').textContent = `${A.length.toLocaleString()} 行・${[...$('a').value].length.toLocaleString()} 文字`;
+        $('info-b').textContent = `${B.length.toLocaleString()} 行・${[...$('b').value].length.toLocaleString()} 文字`;
+        // 空の行を無視するときは、比べる前に除く（行番号は元のまま）
+        const ia = A.map((_, i) => i).filter(i => !opt.blank || A[i].trim());
+        const ib = B.map((_, i) => i).filter(i => !opt.blank || B[i].trim());
+        const ops = myers(ia.map(i => keyOf(A[i])), ib.map(i => keyOf(B[i]))).map(o => ({ t: o.t, i: o.i != null ? ia[o.i] : null, j: o.j != null ? ib[o.j] : null }));
+        // 並べて出すため、続く「消えた」と「増えた」を組にする
+        const rows = [];
+        for (let p = 0; p < ops.length;) {
+          if (ops[p].t === '=') { rows.push({ t: '=', i: ops[p].i, j: ops[p].j }); p++; continue; }
+          const dels = [], inss = [];
+          while (p < ops.length && ops[p].t !== '=') { (ops[p].t === '-' ? dels : inss).push(ops[p]); p++; }
+          const n = Math.max(dels.length, inss.length);
+          for (let k = 0; k < n; k++) {
+            const d = dels[k], s = inss[k];
+            rows.push(d && s ? { t: '~', i: d.i, j: s.j } : d ? { t: '-', i: d.i } : { t: '+', j: s.j });
+          }
+        }
+        const del = rows.filter(r => r.t === '-' || r.t === '~').length;
+        const ins = rows.filter(r => r.t === '+' || r.t === '~').length;
+        const mod = rows.filter(r => r.t === '~').length;
+        const same = rows.filter(r => r.t === '=').length;
+        if (!A.length && !B.length) {
+          $('stats').innerHTML = '';
+          $('diff').innerHTML = '<div class="diff-empty">上の2つの欄に文章を貼ると、ここに違いが出ます。</div>';
+          changes = []; return;
+        }
+        if (!del && !ins) {
+          $('stats').innerHTML = '<span class="ok">✓ 違いはありません</span>';
+          $('diff').innerHTML = `<div class="diff-empty same">✓ 2つの文章は同じです${opt.space || opt.case || opt.width || opt.blank ? '（無視の設定をしたうえで）' : ''}</div>`;
+          changes = []; return;
+        }
+        $('stats').innerHTML = `<span class="del">− ${(del - mod).toLocaleString()} 行消えた</span><span class="ins">＋ ${(ins - mod).toLocaleString()} 行増えた</span><span>〜 ${mod.toLocaleString()} 行変わった</span><span class="same">${same.toLocaleString()} 行は同じ</span>`;
+        // 同じ行が長く続くところはたたむ
+        blocks = [];
+        let k = 0;
+        while (k < rows.length) {
+          if (rows[k].t !== '=') { blocks.push(rows[k]); k++; continue; }
+          let e = k;
+          while (e < rows.length && rows[e].t === '=') e++;
+          const run = rows.slice(k, e);
+          const keepHead = k === 0 ? 0 : FOLD, keepTail = e === rows.length ? 0 : FOLD;
+          if (opt.all || run.length <= keepHead + keepTail + 2 || opened.has(run[0].i)) blocks.push(...run);
+          else {
+            blocks.push(...run.slice(0, keepHead));
+            blocks.push({ t: 'fold', rows: run.slice(keepHead, run.length - keepTail) });
+            blocks.push(...run.slice(run.length - keepTail));
+          }
+          k = e;
+        }
+        render(A, B);
+      }
+
+      function render(A, B) {
+        const split = opt.view === 'split';
+        const vis = s => esc(s).replace(/\t/g, '<span class="ws">→</span>\t');
+        let h = split
+          ? '<table><colgroup><col class="n"><col class="m"><col><col class="n"><col class="m"><col></colgroup><tbody>'
+          : '<table><colgroup><col class="n"><col class="n"><col class="m"><col></colgroup><tbody>';
+        changes = [];
+        let ci = 0;
+        blocks.forEach(r => {
+          if (r.t === 'fold') {
+            h += `<tr class="fold" data-fold="${r.rows[0].i}"><td colspan="${split ? 6 : 4}">⋯ 同じ行が ${r.rows.length.toLocaleString()} 行（押すと出します） ⋯</td></tr>`;
+            return;
+          }
+          const a = r.i != null ? A[r.i] : null, b = r.j != null ? B[r.j] : null;
+          const na = r.i != null ? r.i + 1 : '', nb = r.j != null ? r.j + 1 : '';
+          const isChange = r.t !== '=';
+          const cid = isChange ? ` data-c="${ci++}"` : '';
+          if (split) {
+            let ta = a != null ? vis(a) : '', tb = b != null ? vis(b) : '';
+            if (r.t === '~') { const cd = charDiff(a, b); if (cd) [ta, tb] = cd; }
+            const ca = r.t === '-' || r.t === '~' ? 'del' : r.t === '+' ? 'empty' : '';
+            const cb = r.t === '+' || r.t === '~' ? 'ins' : r.t === '-' ? 'empty' : '';
+            h += `<tr${cid}><td class="n">${na}</td><td class="m ${ca === 'empty' ? '' : ca}">${ca === 'del' ? '−' : ''}</td><td class="t ${ca}">${ta}</td>`
+              + `<td class="n">${nb}</td><td class="m ${cb === 'empty' ? '' : cb}">${cb === 'ins' ? '+' : ''}</td><td class="t ${cb}">${tb}</td></tr>`;
+          } else if (r.t === '~') {
+            const cd = charDiff(a, b);
+            h += `<tr class="del"${cid}><td class="n">${na}</td><td class="n"></td><td class="m">−</td><td class="t">${cd ? cd[0] : vis(a)}</td></tr>`;
+            h += `<tr class="ins"><td class="n"></td><td class="n">${nb}</td><td class="m">+</td><td class="t">${cd ? cd[1] : vis(b)}</td></tr>`;
+          } else {
+            const cls = r.t === '-' ? 'del' : r.t === '+' ? 'ins' : '';
+            h += `<tr class="${cls}"${cid}><td class="n">${na}</td><td class="n">${nb}</td><td class="m">${r.t === '-' ? '−' : r.t === '+' ? '+' : ''}</td><td class="t">${vis(a != null ? a : b)}</td></tr>`;
+          }
+        });
+        $('diff').innerHTML = h + '</tbody></table>';
+        changes = [...$('diff').querySelectorAll('tr[data-c]')];
+        cur = -1;
+      }
+
+      let timer = 0;
+      const queue = () => { clearTimeout(timer); timer = setTimeout(compare, 250); };
+      $('a').addEventListener('input', queue);
+      $('b').addEventListener('input', queue);
+      $('diff').addEventListener('click', e => {
+        const f = e.target.closest('tr.fold'); if (!f) return;
+        opened.add(Number(f.dataset.fold));
+        compare();
+      });
+
+      // ── 違いを順に見る ──
+      // 続く違いの行はひとまとまりとして飛ぶ
+      const groupStarts = () => changes.filter((tr, k) => {
+        const prev = tr.previousElementSibling;
+        return k === 0 || !prev || (!prev.hasAttribute('data-c') && !prev.classList.contains('ins'));
+      });
+      const go = dir => {
+        const gs = groupStarts();
+        if (!gs.length) { toast('違いはありません'); return; }
+        cur = (cur + dir + gs.length) % gs.length;
+        $('diff').querySelectorAll('tr.cur').forEach(t => t.classList.remove('cur'));
+        const tr = gs[cur];
+        tr.classList.add('cur');
+        const box = $('diff');
+        box.scrollTop = tr.offsetTop - box.clientHeight / 3;
+        tr.scrollIntoView({ block: 'nearest' });
+        toast(`${cur + 1} / ${gs.length} 番目の違い`);
+      };
+      $('next').addEventListener('click', () => go(1));
+      $('prev').addEventListener('click', () => go(-1));
+      document.addEventListener('keydown', e => {
+        if (e.key === 'F7') { e.preventDefault(); go(e.shiftKey ? -1 : 1); }
+      });
+
+      // ── 差分をコピー（unified diff の形） ──
+      $('copy').addEventListener('click', async () => {
+        const A = splitLines($('a').value), B = splitLines($('b').value);
+        const ia = A.map((_, i) => i).filter(i => !opt.blank || A[i].trim());
+        const ib = B.map((_, i) => i).filter(i => !opt.blank || B[i].trim());
+        const ops = myers(ia.map(i => keyOf(A[i])), ib.map(i => keyOf(B[i]))).map(o => ({ t: o.t, i: o.i != null ? ia[o.i] : null, j: o.j != null ? ib[o.j] : null }));
+        if (!ops.some(o => o.t !== '=')) { toast('違いはありません'); return; }
+        // 違いの前後3行をつけたかたまり（hunk）にする
+        const out = ['--- 変える前', '+++ 変えた後'];
+        let p = 0;
+        while (p < ops.length) {
+          while (p < ops.length && ops[p].t === '=') p++;
+          if (p >= ops.length) break;
+          let st = Math.max(0, p - 3), en = p;
+          while (en < ops.length) {
+            while (en < ops.length && ops[en].t !== '=') en++;
+            let q = en;
+            while (q < ops.length && ops[q].t === '=') q++;
+            if (q < ops.length && q - en <= 6) en = q; else { en = Math.min(ops.length, en + 3); break; }
+          }
+          const part = ops.slice(st, en);
+          const aStart = (part.find(o => o.i != null) || {}).i, bStart = (part.find(o => o.j != null) || {}).j;
+          const aLen = part.filter(o => o.t !== '+').length, bLen = part.filter(o => o.t !== '-').length;
+          out.push(`@@ -${aLen ? aStart + 1 : 0},${aLen} +${bLen ? bStart + 1 : 0},${bLen} @@`);
+          part.forEach(o => out.push(o.t === '=' ? ' ' + A[o.i] : o.t === '-' ? '-' + A[o.i] : '+' + B[o.j]));
+          p = en;
+        }
+        const text = out.join('\n') + '\n';
+        try { await navigator.clipboard.writeText(text); toast('差分をコピーしました'); }
+        catch (e) { toast('コピーできませんでした'); }
+      });
+
+      // ── 設定 ──
+      const bindCheck = (id, key) => { $(id).checked = opt[key]; $(id).addEventListener('change', () => { opt[key] = $(id).checked; compare(); }); };
+      bindCheck('o-space', 'space'); bindCheck('o-case', 'case'); bindCheck('o-width', 'width'); bindCheck('o-blank', 'blank'); bindCheck('o-all', 'all');
+      const syncView = () => { for (const b of $('view').children) b.setAttribute('aria-pressed', String(b.dataset.v === opt.view)); };
+      $('view').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; opt.view = b.dataset.v; syncView(); compare(); });
+      syncView();
+      $('swap').addEventListener('click', () => { const t = $('a').value; $('a').value = $('b').value; $('b').value = t; opened.clear(); compare(); });
+      document.querySelectorAll('[data-clear]').forEach(b => b.addEventListener('click', () => { $(b.dataset.clear).value = ''; opened.clear(); compare(); }));
+
+      // ── ファイル ──
+      let target = 'a';
+      const readFile = async (file, side) => {
+        if (file.size > 5 * 1024 * 1024) { toast('5MB より大きいファイルは開けません'); return; }
+        const buf = await file.arrayBuffer();
+        let text;
+        try { text = new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+        catch (e) { text = new TextDecoder('shift_jis').decode(buf); }
+        if (/\u0000/.test(text.slice(0, 2000))) { toast('文字のファイルではないようです'); return; }
+        $(side).value = text.replace(/^﻿/, '');
+        opened.clear();
+        compare();
+        toast(`「${file.name}」を${side === 'a' ? '前' : '後'}に入れました`);
+      };
+      document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => { target = b.dataset.open; $('file').click(); }));
+      $('file').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) readFile(f, target); });
+      for (const side of ['a', 'b']) {
+        const box = $('side-' + side);
+        box.addEventListener('dragover', e => { if ([...e.dataTransfer.types].includes('Files')) { e.preventDefault(); box.classList.add('drag'); } });
+        box.addEventListener('dragleave', e => { if (!box.contains(e.relatedTarget)) box.classList.remove('drag'); });
+        box.addEventListener('drop', e => {
+          box.classList.remove('drag');
+          const files = [...e.dataTransfer.files];
+          if (!files.length) return;
+          e.preventDefault();
+          // 2つ一緒に落としたら、前と後に入れる
+          if (files.length >= 2) { readFile(files[0], 'a'); readFile(files[1], 'b'); }
+          else readFile(files[0], side);
+        });
+      }
+
+      compare();
+    })();
+  </script>
+</body>
+
+</html>

@@ -41,6 +41,7 @@
 | OGPチェッカー | [ogp-checker/](ogp-checker/README.md) | URL を入れて、SNS に貼ったときの見え方と OGP の問題を調べる（調べ役は `api/ogp.php`） |
 | robots.txt チェッカー | [robots-checker/](robots-checker/README.md) | Google・AI・X・AdSense などがページを読めるかを robots.txt から判定（調べ役は `api/robots.php`） |
 | マークダウンメーカー | [markdown/](markdown/README.md) | Markdown を書きながら見た目を確かめる。ボタンで入力・表づくり・貼り付けて変換・.md／HTML で保存（marked・DOMPurify・Turndown を使う） |
+| テキスト比較（diff） | [diff/](diff/README.md) | 2つの文章の違いを行と文字で色分け（並べて・まとめて、空白・全角半角・大文字小文字・空の行を無視、差分のコピー） |
 | 共通の部品 | [common/](common/README.md) | ページ内の確認・お知らせ（`ask.js`） |
 
 ---
