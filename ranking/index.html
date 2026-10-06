@@ -1194,6 +1194,48 @@
       align-items: center;
     }
 
+    /* 大きく見る */
+    .main .preview canvas {
+      cursor: zoom-in;
+    }
+
+    .fs {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(10, 4, 8, 0.94);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .fs canvas {
+      display: block;
+      max-width: 100%;
+      max-height: calc(100vh - 80px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .fs:fullscreen canvas {
+      max-height: calc(100vh - 70px);
+    }
+
+    .fs-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fs-hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
     input[type=number] {
       font: inherit;
       font-size: 13px;
@@ -1349,8 +1391,10 @@
           <span id="pg-text"></span>
           <button class="btn btn-sm" type="button" id="pg-next">▶</button>
         </span>
+        <button class="btn btn-sm" type="button" id="fs-open" title="画面いっぱいに大きく見ます（見本を押しても開きます）">⛶ 大きく見る</button>
+        <button class="btn btn-sm" type="button" id="win-open" title="別のウィンドウで開きます。点数を入れるとそのまま変わるので、会場のモニターなどに出せます">↗ 別ウィンドウ</button>
       </div>
-      <div class="preview"><canvas id="cv" aria-label="順位表の見本"></canvas></div>
+      <div class="preview"><canvas id="cv" aria-label="順位表の見本" title="押すと大きく見られます"></canvas></div>
       <div class="save-row">
         <span class="size" id="size-text"></span>
         <button class="btn" type="button" id="copy-pass" title="本戦に進む人の名前を、順位の順にコピーします（トーナメント表メーカーの参加者にそのまま貼れます）">🏆 通過者をコピー</button>
@@ -1454,6 +1498,17 @@
   </footer>
   <!-- /shared:footer -->
 
+  <!-- 大きく見る -->
+  <div class="fs" id="fs" hidden>
+    <canvas id="fs-cv" aria-label="順位表（大きく）"></canvas>
+    <div class="fs-bar">
+      <span class="pager" id="fs-pager"><button class="btn btn-sm" type="button" id="fs-prev">◀</button><span id="fs-text"></span><button class="btn btn-sm" type="button" id="fs-next">▶</button></span>
+      <span class="fs-hint">点数を入れると、そのまま変わります。Esc で閉じる</span>
+      <button class="btn btn-sm" type="button" id="fs-full">全画面</button>
+      <button class="btn btn-sm btn-primary" type="button" id="fs-close">✕ 閉じる</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="../common/ask.js?v=20260929a"></script>
@@ -1474,10 +1529,17 @@
       let drawQueued = false;
       const paint = () => {
         drawQueued = false;
-        const r = K.draw($('cv'), S, { page, flash: S.last.id && Date.now() - S.last.at < 8000 ? S.last.id : '' });
+        const flash = S.last.id && Date.now() - S.last.at < 8000 ? S.last.id : '';
+        const r = K.draw($('cv'), S, { page, flash });
         page = r.page;
         $('pager').hidden = r.pages <= 1;
         $('pg-text').textContent = `${r.page + 1} / ${r.pages}`;
+        // 大きく見ているときは、そちらも描く
+        if (!$('fs').hidden) {
+          K.draw($('fs-cv'), S, { page, flash });
+          $('fs-pager').hidden = r.pages <= 1;
+          $('fs-text').textContent = `${r.page + 1} / ${r.pages}`;
+        }
       };
       const queuePaint = () => { if (!drawQueued) { drawQueued = true; requestAnimationFrame(paint); } };
       function changed() {
@@ -1691,6 +1753,34 @@
       $('song-rank').addEventListener('change', () => { S.songRank = $('song-rank').checked; changed(); });
       $('pg-prev').addEventListener('click', () => { page = Math.max(0, page - 1); paint(); });
       $('pg-next').addEventListener('click', () => { page++; paint(); });
+
+      // ── 大きく見る・別ウィンドウ ──
+      const openFs = () => { $('fs').hidden = false; document.body.style.overflow = 'hidden'; paint(); $('fs-close').focus(); };
+      const closeFs = () => {
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => { });
+        $('fs').hidden = true; document.body.style.overflow = '';
+      };
+      $('fs-open').addEventListener('click', openFs);
+      $('cv').addEventListener('click', openFs);
+      $('fs-close').addEventListener('click', closeFs);
+      $('fs-prev').addEventListener('click', () => { page = Math.max(0, page - 1); paint(); });
+      $('fs-next').addEventListener('click', () => { page++; paint(); });
+      $('fs-full').addEventListener('click', () => {
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => { });
+        else if ($('fs').requestFullscreen) $('fs').requestFullscreen().catch(() => toast('全画面にできませんでした'));
+      });
+      document.addEventListener('keydown', e => {
+        if ($('fs').hidden) return;
+        if (e.key === 'Escape' && !document.fullscreenElement) { e.preventDefault(); closeFs(); }
+        else if (e.key === 'ArrowLeft') { page = Math.max(0, page - 1); paint(); }
+        else if (e.key === 'ArrowRight') { page++; paint(); }
+      });
+      $('win-open').addEventListener('click', () => {
+        const sz = K.SIZES[S.size];
+        // 同じブラウザなら、点数を入れると storage イベントでそのまま変わる
+        const w = window.open('view.html', 'donnma-ranking-view', `popup,width=${Math.round(sz.w / 2)},height=${Math.round(sz.h / 2)}`);
+        if (!w) toast('別ウィンドウを開けませんでした（ポップアップを許可してください）');
+      });
 
       // ── 保存・コピー ──
       const pngBlob = () => new Promise((res, rej) => {

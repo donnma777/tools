@@ -8,6 +8,7 @@
   <title>配信スケジュール（OBS 用）</title>
   <!--
     OBS のブラウザソースに入れるページ。中身はすべて URL の d= から読む（index.html で作る）。
+    live=1 なら、同じブラウザの作るページが覚えている中身を読み、変わったら描き直す（別ウィンドウ・会場のモニター用）。
     今日の予定（1日の進行表なら今の枠）を目立たせ、過ぎたものを薄くする（15秒ごとに描き直す）。大きさはブラウザソースの幅・高さに合わせて縮める。
   -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,23 +51,36 @@
     (async () => {
       'use strict';
       const q = new URLSearchParams(location.search);
-      const data = ScheduleCore.decode(q.get('d') || '');
       const cv = document.getElementById('cv');
+      // live=1：作るページと同じブラウザで開いたとき（別ウィンドウ・会場のモニター）。
+      // URL ではなく、作るページが覚えている中身を読み、変わったらそのまま描き直す（選んだ画像のファイルも使える）
+      const live = q.get('live') === '1';
+      const STORE = 'donnma-schedule', IMG_STORE = 'donnma-schedule-img';
+      const readLive = () => { try { return ScheduleCore.normalize(JSON.parse(localStorage.getItem(STORE) || 'null')); } catch (e) { return ScheduleCore.defaults(); } };
+      let data = live ? readLive() : ScheduleCore.decode(q.get('d') || '');
+      if (!window.obsstudio) document.body.style.background = '#111';
       if (!data) {
         cv.remove();
         document.body.insertAdjacentHTML('beforeend', '<div class="msg">スケジュールの URL が正しくありません。作るページで URL をコピーし直してください。</div>');
         return;
       }
-      // キャラの画像（URL で決めたものだけ。ファイルは URL に入らない）
+      const loadImg = (src, cors) => new Promise(res => {
+        if (!src) { res(null); return; }
+        const img = new Image();
+        if (cors) img.crossOrigin = 'anonymous';
+        img.onload = () => res(img);
+        img.onerror = () => res(null);
+        img.src = src;
+      });
+      // キャラの画像：OBS では URL で決めたものだけ（ファイルは URL に入らない）。live なら選んだファイルも
       const images = {};
-      if (data.chara) {
-        images.chara = await new Promise(res => {
-          const img = new Image();
-          img.onload = () => res(img);
-          img.onerror = () => res(null);
-          img.src = data.chara;
-        });
-      }
+      const loadImages = async () => {
+        let files = {};
+        if (live) { try { files = JSON.parse(localStorage.getItem(IMG_STORE) || '{}'); } catch (e) { } }
+        images.chara = (files.chara && await loadImg(files.chara)) || (data.chara ? await loadImg(data.chara) : null);
+        images.bg = live && files.bg ? await loadImg(files.bg) : null;
+      };
+      await loadImages();
       await ScheduleCore.ensureFonts(data);
       // today=YYYY-MM-DD で「今日」を決められる（確かめる用）
       // now=YYYY-MM-DDTHH:MM で時刻まで決められる（1日の進行表を確かめる用）
@@ -78,6 +92,15 @@
       setInterval(paint, 15 * 1000);
       // 字体があとから届いたときも描き直す
       if (document.fonts) document.fonts.addEventListener('loadingdone', paint);
+      if (live) {
+        addEventListener('storage', async e => {
+          if (e.key !== STORE && e.key !== IMG_STORE) return;
+          data = readLive();
+          await loadImages();
+          ScheduleCore.ensureFonts(data).then(paint);
+          paint();
+        });
+      }
     })();
   </script>
 </body>

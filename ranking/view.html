@@ -45,6 +45,8 @@
       'use strict';
       const K = window.RankingCore;
       const cv = document.getElementById('cv');
+      // OBS の外（別ウィンドウ・会場のモニター）では、まわりを暗くする
+      if (!window.obsstudio) document.body.style.background = '#111';
       let data = K.load();
       const hash = new URLSearchParams(location.hash.slice(1));
       const fixedPage = Number(hash.get('page')) || 0;

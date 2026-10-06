@@ -1029,6 +1029,44 @@
       flex: none;
     }
 
+    /* 大きく見る */
+    .preview canvas {
+      cursor: zoom-in;
+    }
+
+    .fs {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(10, 4, 8, 0.94);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .fs canvas {
+      display: block;
+      max-width: 100%;
+      max-height: calc(100vh - 80px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .fs-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fs-hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
     [hidden] {
       display: none !important;
     }
@@ -1380,8 +1418,10 @@
           <option value="image">画像の見え方</option>
           <option value="obs">OBS の見え方（今を目立たせる）</option>
         </select>
+        <button class="btn btn-sm" type="button" id="fs-open" title="画面いっぱいに大きく見ます（見本を押しても開きます）">⛶ 大きく見る</button>
+        <button class="btn btn-sm" type="button" id="win-open" title="別のウィンドウで開きます。ここで変えるとそのまま変わるので、会場のモニターなどに出せます">↗ 別ウィンドウ</button>
       </div>
-      <div class="preview"><canvas id="cv" aria-label="スケジュールの見本"></canvas></div>
+      <div class="preview"><canvas id="cv" aria-label="スケジュールの見本" title="押すと大きく見られます"></canvas></div>
       <div class="save-row">
         <span class="size" id="size-text"></span>
         <button class="btn" type="button" id="copy-img">📋 画像をコピー</button>
@@ -1502,6 +1542,16 @@
     </div>
   </footer>
   <!-- /shared:footer -->
+
+  <!-- 大きく見る -->
+  <div class="fs" id="fs" hidden>
+    <canvas id="fs-cv" aria-label="スケジュール（大きく）"></canvas>
+    <div class="fs-bar">
+      <span class="fs-hint">ここで変えると、そのまま変わります。Esc で閉じる</span>
+      <button class="btn btn-sm" type="button" id="fs-full">全画面</button>
+      <button class="btn btn-sm btn-primary" type="button" id="fs-close">✕ 閉じる</button>
+    </div>
+  </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1902,8 +1952,33 @@
         const obsMode = $('pv-mode').value === 'obs';
         // OBS には URL の画像しか出ないので、見本もそれに合わせる
         const chara = obsMode ? images.charaUrl : (images.chara || images.charaUrl);
-        C.draw($('cv'), S, { images: { chara, bg: images.bg }, now: obsMode ? new Date() : null });
+        const o = { images: { chara, bg: images.bg }, now: obsMode ? new Date() : null };
+        C.draw($('cv'), S, o);
+        // 大きく見ているときは、そちらも描く
+        if (!$('fs').hidden) C.draw($('fs-cv'), S, o);
       }
+      // ── 大きく見る・別ウィンドウ ──
+      const openFs = () => { $('fs').hidden = false; document.body.style.overflow = 'hidden'; paint(); $('fs-close').focus(); };
+      const closeFs = () => {
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => { });
+        $('fs').hidden = true; document.body.style.overflow = '';
+      };
+      $('fs-open').addEventListener('click', openFs);
+      $('cv').addEventListener('click', openFs);
+      $('fs-close').addEventListener('click', closeFs);
+      $('fs-full').addEventListener('click', () => {
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => { });
+        else if ($('fs').requestFullscreen) $('fs').requestFullscreen().catch(() => toast('全画面にできませんでした'));
+      });
+      document.addEventListener('keydown', e => {
+        if (!$('fs').hidden && e.key === 'Escape' && !document.fullscreenElement) { e.preventDefault(); closeFs(); }
+      });
+      $('win-open').addEventListener('click', () => {
+        const sz = C.SIZES[S.size];
+        // 同じブラウザなら、ここで変えると storage イベントでそのまま変わる（view.html の live=1）
+        const w = window.open('view.html?live=1', 'donnma-schedule-view', `popup,width=${Math.round(sz.w / 2)},height=${Math.round(sz.h / 2)}`);
+        if (!w) toast('別ウィンドウを開けませんでした（ポップアップを許可してください）');
+      });
       const queuePaint = () => { if (!drawQueued) { drawQueued = true; requestAnimationFrame(paint); } };
       function update() {
         store();
