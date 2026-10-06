@@ -932,6 +932,12 @@
           <label class="check"><input type="checkbox" id="o-case">大文字・小文字を無視</label>
           <label class="check"><input type="checkbox" id="o-width">全角・半角を無視</label>
           <label class="check"><input type="checkbox" id="o-blank">空の行を無視</label>
+          <span class="sp"></span>
+          <span>行の中の違い</span>
+          <div class="seg" id="unit" role="group" aria-label="行の中の違いの見方">
+            <button type="button" data-v="char">文字ごと</button>
+            <button type="button" data-v="word">単語ごと</button>
+          </div>
         </div>
       </div>
     </div>
@@ -962,6 +968,7 @@
           <li>左に<b>変える前</b>、右に<b>変えた後</b>の文章を貼ります。ファイル（.txt・.md・.csv・.html など）をドロップしても入ります。</li>
           <li>下に違いが出ます。<span style="color:#ff9aa2">赤</span>が消えたところ、<span style="color:#8ee6ad">緑</span>が増えたところです。変わった行の中では、変わった文字だけが濃く出ます。</li>
           <li><b>「並べて」</b>は左右に、<b>「まとめて」</b>は1列に出します。同じ行が続くところはたたむので、押すと開きます。</li>
+          <li>変わった行の中は、<b>「文字ごと」</b>なら変わった文字を、<b>「単語ごと」</b>なら変わった単語をまるごと色分けします。英語やプログラムは単語ごとが読みやすく、日本語の細かい直しは文字ごとが分かりやすいです。</li>
           <li><b>「↓ 次の違い」</b>（F7）で、違うところを順に見られます。</li>
         </ol>
       </div>
@@ -1035,7 +1042,7 @@
       const MAX_D = 6000;      // これより違いが多いときは、残りをまとめて「消えた・増えた」にする
 
       // ── 設定・文章（このブラウザに覚えておく） ──
-      let opt = { space: false, case: false, width: false, blank: false, view: 'split', all: false };
+      let opt = { space: false, case: false, width: false, blank: false, view: 'split', all: false, unit: 'char' };
       try {
         const got = JSON.parse(localStorage.getItem(STORE) || 'null');
         if (got) { opt = { ...opt, ...got.opt }; $('a').value = got.a || ''; $('b').value = got.b || ''; }
@@ -1112,11 +1119,17 @@
       };
       const splitLines = t => (t === '' ? [] : t.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n'));
 
-      // 行の中の文字の違い（1文字ずつ。長すぎる行は行ごと）
+      // 単語に分ける。日本語はブラウザの単語の区切り（Intl.Segmenter）、使えなければ文字の種類のまとまりで
+      const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
+      const WORD_RE = /[\p{Script=Han}々〆ヶ]+|[\p{Script=Hiragana}ー]+|[\p{Script=Katakana}ー･ｰ]+|[\p{L}\p{N}_]+|\s+|./gsu;
+      const words = t => (segmenter ? [...segmenter.segment(t)].map(x => x.segment) : t.match(WORD_RE) || []);
+
+      // 行の中の違い（1文字ずつ、または単語ずつ。長すぎる行は行ごと）
       function charDiff(x, y) {
-        const ca = [...x], cb = [...y];
+        const byWord = opt.unit === 'word';
+        const ca = byWord ? words(x) : [...x], cb = byWord ? words(y) : [...y];
         if (ca.length * cb.length > 4e6) return null;
-        const k = c => { let s = c; if (opt.width) s = s.normalize('NFKC'); if (opt.case) s = s.toLowerCase(); if (opt.space && /[\s　]/.test(s)) s = ' '; return s; };
+        const k = c => { let s = c; if (opt.width) s = s.normalize('NFKC'); if (opt.case) s = s.toLowerCase(); if (opt.space && /^[\s　]+$/.test(s)) s = ' '; return s; };
         const ops = myers(ca.map(k), cb.map(k));
         // かたまりにする：{ eq: true, a, b }（同じ）／{ eq: false, a, b }（変わった）
         let segs = [];
@@ -1127,12 +1140,14 @@
           if (o.t !== '+') last.a += ca[o.i];
           if (o.t !== '-') last.b += cb[o.j];
         }
-        // 変わったところにはさまれた短い「同じ」（2文字まで）は、変わったところに入れる（日本語が細切れにならないように）
+        // 変わったところにはさまれた短い「同じ」は、変わったところに入れる（細切れにならないように）
+        // 文字ごとなら2文字まで、単語ごとなら空白・記号だけのもの
+        const tiny = t => (byWord ? /^[\s\p{P}\p{S}]*$/u.test(t) : [...t].length <= 2);
         for (let changed = true; changed;) {
           changed = false;
           for (let i = 1; i < segs.length - 1; i++) {
             const m = segs[i];
-            if (m.eq && [...m.a].length <= 2 && !segs[i - 1].eq && !segs[i + 1].eq) {
+            if (m.eq && tiny(m.a) && !segs[i - 1].eq && !segs[i + 1].eq) {
               const p = segs[i - 1], n = segs[i + 1];
               segs.splice(i - 1, 3, { eq: false, a: p.a + m.a + n.a, b: p.b + m.b + n.b });
               changed = true;
@@ -1146,8 +1161,8 @@
           else { if (g.a) ha += `<del>${esc(g.a)}</del>`; if (g.b) hb += `<ins>${esc(g.b)}</ins>`; }
         }
         // ほとんど全部ちがうなら、文字の色分けはしない（読みにくいので）
-        const same = ops.filter(o => o.t === '=').length;
-        if (same < Math.min(ca.length, cb.length) * 0.3) return null;
+        const same = ops.filter(o => o.t === '=').reduce((n, o) => n + [...ca[o.i]].length, 0);
+        if (same < Math.min([...x].length, [...y].length) * 0.3) return null;
         return [ha, hb];
       }
 
@@ -1320,7 +1335,11 @@
       // ── 設定 ──
       const bindCheck = (id, key) => { $(id).checked = opt[key]; $(id).addEventListener('change', () => { opt[key] = $(id).checked; compare(); }); };
       bindCheck('o-space', 'space'); bindCheck('o-case', 'case'); bindCheck('o-width', 'width'); bindCheck('o-blank', 'blank'); bindCheck('o-all', 'all');
-      const syncView = () => { for (const b of $('view').children) b.setAttribute('aria-pressed', String(b.dataset.v === opt.view)); };
+      const syncView = () => {
+        for (const b of $('view').children) b.setAttribute('aria-pressed', String(b.dataset.v === opt.view));
+        for (const b of $('unit').children) b.setAttribute('aria-pressed', String(b.dataset.v === opt.unit));
+      };
+      $('unit').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; opt.unit = b.dataset.v; syncView(); compare(); });
       $('view').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; opt.view = b.dataset.v; syncView(); compare(); });
       syncView();
       $('swap').addEventListener('click', () => { const t = $('a').value; $('a').value = $('b').value; $('b').value = t; opened.clear(); compare(); });
