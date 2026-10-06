@@ -9,6 +9,7 @@
  *   ScheduleCore.forUrl(data)                  URL に入れる分だけにする（1か月版は、その月の予定だけ）
  *
  * mode: 'week'（1週間。days[0..6] は start からの7日）/ 'month'（1か月。mdays['YYYY-MM-DD'] にその日の予定）
+ *       'timeline'（1週間の時間割。days を使い、枠の終わり e も見る）/ 'day'（1日の進行表。tday）
  */
 (function (global) {
   'use strict';
@@ -63,6 +64,8 @@
       start: ymd(weekStart(new Date(), 1)),
       month: ymd(new Date()).slice(0, 7),
       mdays: {},
+      trange: { from: -1, to: -1 },
+      tday: { date: ymd(new Date()), daily: false, end: '', items: [{ t: '', s: '', tag: '' }] },
       first: 1,
       title: 'WEEKLY SCHEDULE',
       sub: '',
@@ -86,9 +89,9 @@
   const normDay = x => {
     if (!x || typeof x !== 'object') return null;
     const items = Array.isArray(x.items) ? x.items.slice(0, 3).map(it => ({
-      t: str(it && it.t, 20), s: lines4(it && it.s), tag: str(it && it.tag, 12),
+      t: str(it && it.t, 20), e: str(it && it.e, 20), s: lines4(it && it.s), tag: str(it && it.tag, 12),
     })) : [];
-    return { off: !!x.off, items: items.length ? items : [{ t: '', s: '', tag: '' }] };
+    return { off: !!x.off, items: items.length ? items : [{ t: '', e: '', s: '', tag: '' }] };
   };
   const hasContent = day => !!day && (day.off || day.items.some(it => it.t || it.s || it.tag));
   // URL に入れる分だけ（1週間なら月の予定は要らない。1か月ならその月の予定だけ）
@@ -101,6 +104,11 @@
     } else {
       delete out.mdays;
     }
+    if (data.mode === 'day') delete out.days;
+    else delete out.tday;
+    if (data.mode !== 'timeline') delete out.trange;
+    // 1週間（時間割でないとき）は終わりの時刻は使わない
+    if (out.days && data.mode !== 'timeline') out.days = out.days.map(d => ({ off: d.off, items: d.items.map(({ e, ...it }) => it) }));
     return out;
   }
   function normalize(src) {
@@ -111,7 +119,23 @@
     out.first = src.first === 0 ? 0 : 1;
     for (const k of ['title', 'sub', 'note']) if (typeof src[k] === 'string') out[k] = str(src[k], 120);
     if (Array.isArray(src.days)) out.days = d.days.map((def, i) => normDay(src.days[i]) || def);
-    out.mode = src.mode === 'month' ? 'month' : 'week';
+    out.mode = ['week', 'month', 'timeline', 'day'].includes(src.mode) ? src.mode : 'week';
+    if (src.trange && typeof src.trange === 'object') {
+      const f = Number(src.trange.from), t = Number(src.trange.to);
+      out.trange = { from: f >= 0 && f <= 23 ? Math.floor(f) : -1, to: t >= 1 && t <= 30 ? Math.floor(t) : -1 };
+    }
+    if (src.tday && typeof src.tday === 'object') {
+      const x = src.tday;
+      const items = Array.isArray(x.items) ? x.items.slice(0, 12).map(it => ({
+        t: str(it && it.t, 20), s: lines4(it && it.s), tag: str(it && it.tag, 12),
+      })) : [];
+      out.tday = {
+        date: parseYmd(x.date) ? x.date : d.tday.date,
+        daily: !!x.daily,
+        end: str(x.end, 20),
+        items: items.length ? items : [{ t: '', s: '', tag: '' }],
+      };
+    }
     if (/^\d{4}-\d{2}$/.test(src.month || '')) out.month = src.month;
     if (src.mdays && typeof src.mdays === 'object') {
       Object.keys(src.mdays).filter(k => parseYmd(k)).sort().slice(-120).forEach(k => {
@@ -152,6 +176,8 @@
     const t = [data.title, data.sub, data.note, '0123456789/:-〜ー お休み未定TODAYOFF', ...WD.ja, ...WD.en];
     data.days.forEach(d => d.items.forEach(it => t.push(it.t, it.s, it.tag)));
     Object.values(data.mdays || {}).forEach(d => d.items.forEach(it => t.push(it.t, it.s, it.tag)));
+    if (data.tday) data.tday.items.forEach(it => t.push(it.s, it.tag));
+    t.push('NOWNEXTあと時間分で始まるleftin min');
     t.push('年月', ...MONTHS);
     return t.join('');
   }
@@ -286,6 +312,285 @@
     if (cur) out.push(cur);
     return out;
   };
+
+  // 「21:00」「9:30」「21時」「25:00」→ 0 時からの分。読めなければ null
+  const parseT = t => {
+    const m = /^\s*(\d{1,2})\s*(?:[:：時]\s*(\d{1,2})?\s*分?)?\s*$/.exec(t || '');
+    if (!m) return null;
+    const h = Number(m[1]), mi = Number(m[2] || 0);
+    if (h > 47 || mi > 59) return null;
+    return h * 60 + mi;
+  };
+  const fmtT = min => `${Math.floor(min / 60)}:${pad2(min % 60)}`;
+  const leftText = (min, en) => {
+    const h = Math.floor(min / 60), m = min % 60;
+    if (en) return h ? `${h}h ${m}m` : `${m} min`;
+    return h ? `${h}時間${m ? m + '分' : ''}` : `${m}分`;
+  };
+
+  // 1週間の予定から、時刻の読める枠だけを取り出す（終わりがなければ2時間。日をまたぐ終わりは +24 時間）
+  const timedItems = day => day.items.map(it => {
+    const s = parseT(it.t);
+    if (s == null) return null;
+    let e = parseT(it.e);
+    if (e == null) e = s + 120;
+    if (e <= s) e += 24 * 60;
+    return { it, s, e };
+  }).filter(Boolean);
+
+  // ── 時間割（縦が時刻、横が曜日） ──
+  function drawTimeline(L) {
+    const { ctx, data, P, A, u, x0, listW, top, bottom, fBold, now, days } = L;
+    const today = now ? ymd(now) : '';
+    const wdNames = WD[data.wd];
+    const all = data.days.map(d => (d.off ? [] : timedItems(d)));
+    // 出す時間：決めていなければ、予定から（前後に余白なし、1時間ごと）
+    let h0 = data.trange.from, h1 = data.trange.to;
+    const flat = all.flat();
+    if (h0 < 0) h0 = flat.length ? Math.floor(Math.min(...flat.map(x => x.s)) / 60) : 18;
+    if (h1 < 0) h1 = flat.length ? Math.ceil(Math.max(...flat.map(x => x.e)) / 60) : 24;
+    if (h1 <= h0) h1 = h0 + 1;
+    const ax = 92 * u;
+    const headH = 64 * u;
+    const gap = 6 * u;
+    const colW = (listW - ax - gap * 6) / 7;
+    const gTop = top + headH + gap;
+    const gH = bottom - gTop;
+    const perMin = gH / ((h1 - h0) * 60);
+    const radius = { pop: 14 * u, simple: 6 * u, neon: 6 * u, wa: 3 * u }[data.theme];
+
+    // 時刻の線と文字
+    ctx.textAlign = 'right';
+    const step = (h1 - h0) > 12 ? 2 : 1;
+    for (let h = h0; h <= h1; h++) {
+      const y = gTop + (h - h0) * 60 * perMin;
+      ctx.strokeStyle = data.theme === 'neon' ? rgba(A, 0.18) : 'rgba(0,0,0,0.08)';
+      if (data.theme === 'neon') ctx.strokeStyle = rgba(A, 0.18);
+      ctx.lineWidth = 1.5 * u;
+      ctx.beginPath(); ctx.moveTo(x0 + ax - 6 * u, y); ctx.lineTo(x0 + listW, y); ctx.stroke();
+      if ((h - h0) % step === 0) {
+        ctx.font = fBold(Math.min(24 * u, perMin * 60 * 0.6 + 8 * u));
+        ctx.fillStyle = P.muted;
+        ctx.fillText(`${h % 24}:00`, x0 + ax - 14 * u, y);
+      }
+    }
+
+    days.forEach((date, i) => {
+      const x = x0 + ax + i * (colW + gap);
+      const dow = date.getDay();
+      const key = ymd(date);
+      const isToday = now && data.today && key === today;
+      const isPast = now && data.past && key < today;
+      const color = dow === 6 ? P.sat : dow === 0 ? P.sun : null;
+      ctx.save();
+      if (isPast) ctx.globalAlpha = 0.42;
+      // 曜日
+      rr(ctx, x, top, colW, headH, radius);
+      if (data.theme === 'pop') { ctx.fillStyle = color || A; ctx.fill(); }
+      else { ctx.fillStyle = P.card; ctx.fill(); ctx.strokeStyle = P.cardLine; ctx.lineWidth = 1.5 * u; ctx.stroke(); }
+      ctx.textAlign = 'center';
+      const big = Math.min(26 * u, colW * 0.2);
+      ctx.font = fBold(big);
+      ctx.fillStyle = data.theme === 'pop' ? '#ffffff' : (color || (data.theme === 'neon' ? A : P.text));
+      ctx.fillText(wdNames[dow], x + colW / 2, top + headH * 0.36);
+      ctx.font = fBold(big * 0.72);
+      ctx.fillStyle = data.theme === 'pop' ? 'rgba(255,255,255,0.9)' : P.muted;
+      ctx.fillText(`${date.getMonth() + 1}/${date.getDate()}`, x + colW / 2, top + headH * 0.72);
+      // 列
+      rr(ctx, x, gTop, colW, gH, radius);
+      ctx.fillStyle = data.theme === 'pop' ? 'rgba(255,255,255,0.7)' : P.card;
+      ctx.fill();
+      if (data.theme !== 'pop') { ctx.strokeStyle = P.cardLine; ctx.lineWidth = 1.5 * u; ctx.stroke(); }
+      if (isToday) {
+        ctx.save();
+        rr(ctx, x - 2 * u, top - 2 * u, colW + 4 * u, bottom - top + 4 * u, radius);
+        ctx.strokeStyle = A; ctx.lineWidth = 4 * u;
+        if (data.theme === 'neon') { ctx.shadowColor = A; ctx.shadowBlur = 16 * u; }
+        ctx.stroke();
+        ctx.restore();
+      }
+      if (data.days[i].off) {
+        ctx.font = fBold(Math.min(26 * u, colW * 0.2));
+        ctx.fillStyle = P.muted;
+        ctx.fillText(data.wd === 'en' ? 'OFF' : 'お休み', x + colW / 2, gTop + gH / 2);
+      }
+      // 枠
+      all[i].forEach(({ it, s, e }) => {
+        const ys = gTop + Math.max(0, s - h0 * 60) * perMin;
+        const ye = gTop + Math.min((h1 - h0) * 60, e - h0 * 60) * perMin;
+        if (ye <= ys) return;
+        const bx = x + 4 * u, bw = colW - 8 * u, bh = Math.max(ye - ys - 3 * u, 18 * u);
+        const fill = it.tag ? tagColor(it.tag) : A;
+        ctx.save();
+        rr(ctx, bx, ys + 1.5 * u, bw, bh, Math.min(radius, 10 * u));
+        ctx.fillStyle = fill;
+        if (data.theme === 'neon') { ctx.shadowColor = fill; ctx.shadowBlur = 12 * u; }
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        rr(ctx, bx, ys + 1.5 * u, bw, bh, Math.min(radius, 10 * u));
+        ctx.clip();
+        ctx.textAlign = 'left';
+        const fs = Math.min(20 * u, bw * 0.15);
+        const lh = fs * 1.25;
+        let ty = ys + 1.5 * u + 6 * u + lh / 2;
+        ctx.font = fBold(fs * 0.85);
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.fillText(`${fmtT(s % 1440)}-${fmtT(e % 1440)}`, bx + 7 * u, ty);
+        ty += lh * 0.95;
+        ctx.font = fBold(fs);
+        ctx.fillStyle = '#ffffff';
+        const body = it.s || it.tag;
+        const rows = [];
+        body.split('\n').filter(l => l.trim()).forEach(l => rows.push(...wrap(ctx, l, bw - 14 * u)));
+        const maxRows = Math.max(0, Math.floor((ys + 1.5 * u + bh - ty + lh / 2 - 4 * u) / lh));
+        rows.slice(0, maxRows).forEach((r, j) => {
+          let t = r;
+          if (j === maxRows - 1 && rows.length > maxRows) {
+            while (t.length > 1 && ctx.measureText(t + '…').width > bw - 14 * u) t = t.slice(0, -1);
+            t += '…';
+          }
+          ctx.fillText(t, bx + 7 * u, ty + j * lh);
+        });
+        ctx.restore();
+      });
+      ctx.restore();
+    });
+    // 今の時刻の線
+    if (now && data.today) {
+      const i = days.findIndex(d => ymd(d) === today);
+      const m = now.getHours() * 60 + now.getMinutes();
+      if (i >= 0 && m >= h0 * 60 && m <= h1 * 60) {
+        const y = gTop + (m - h0 * 60) * perMin;
+        const x = x0 + ax + i * (colW + gap);
+        ctx.fillStyle = A;
+        ctx.fillRect(x, y - 1.5 * u, colW, 3 * u);
+        ctx.beginPath(); ctx.arc(x, y, 6 * u, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+
+  // ── 1日のタイムテーブル（進行表） ──
+  function drawDay(L) {
+    const { ctx, data, P, A, u, x0, listW, top, bottom, fBold, now } = L;
+    const td = data.tday;
+    const segs = td.items.map(it => ({ it, s: parseT(it.t) })).filter(x => x.s != null || x.it.s).sort((a, b) => (a.s ?? 9999) - (b.s ?? 9999));
+    // 終わり＝次の枠の始まり。いちばん最後は「終わりの時刻」か1時間
+    segs.forEach((g, i) => {
+      if (g.s == null) return;
+      const next = segs[i + 1] && segs[i + 1].s;
+      let e = next != null ? next : parseT(td.end);
+      if (e == null) e = g.s + 60;
+      if (e <= g.s) e += 24 * 60;
+      g.e = e;
+    });
+    // 今が何番目か（日付が決まっていれば、その日だけ）
+    const onDay = now && data.today && (td.daily || ymd(now) === td.date);
+    const nm = now ? now.getHours() * 60 + now.getMinutes() : 0;
+    const curIdx = onDay ? segs.findIndex(g => g.s != null && nm >= g.s && nm < g.e) : -1;
+    const nextIdx = onDay && curIdx < 0 ? segs.findIndex(g => g.s != null && g.s > nm) : -1;
+    const n = Math.max(1, segs.length);
+    const gap = 10 * u;
+    const rowH = Math.min((bottom - top - gap * (n - 1)) / n, 150 * u);
+    const radius = { pop: rowH * 0.3, simple: 10 * u, neon: 8 * u, wa: 4 * u }[data.theme];
+    const tw = Math.min(200 * u, listW * 0.22);
+    const lineX = x0 + tw + 22 * u;
+    if (!segs.length) {
+      ctx.textAlign = 'left';
+      ctx.font = fBold(32 * u);
+      ctx.fillStyle = P.muted;
+      ctx.fillText(data.wd === 'en' ? 'Add your time table' : '左で進行を入れてください', x0, top + 40 * u);
+      return;
+    }
+    // つなぐ線
+    ctx.fillStyle = data.theme === 'neon' ? rgba(A, 0.5) : rgba(A, 0.35);
+    ctx.fillRect(lineX - 2 * u, top + rowH / 2, 4 * u, (n - 1) * (rowH + gap));
+    segs.forEach((g, i) => {
+      const y = top + i * (rowH + gap);
+      const cy = y + rowH / 2;
+      const isCur = i === curIdx;
+      const isPast = onDay && data.past && g.e != null && nm >= g.e && !isCur;
+      ctx.save();
+      if (isPast) ctx.globalAlpha = 0.42;
+      // 時刻
+      ctx.textAlign = 'right';
+      const ts = Math.min(rowH * 0.36, 44 * u);
+      ctx.font = fBold(ts);
+      ctx.fillStyle = P.time;
+      if (data.theme === 'neon') { ctx.save(); ctx.shadowColor = A; ctx.shadowBlur = 12 * u; }
+      ctx.fillText(g.s != null ? fmtT(g.s % 1440) : '', x0 + tw, cy);
+      if (data.theme === 'neon') ctx.restore();
+      // 丸
+      ctx.beginPath(); ctx.arc(lineX, cy, (isCur ? 13 : 9) * u, 0, Math.PI * 2);
+      ctx.fillStyle = isCur ? A : (data.theme === 'neon' ? '#0b0f24' : '#ffffff');
+      ctx.fill();
+      ctx.lineWidth = 4 * u; ctx.strokeStyle = A; ctx.stroke();
+      // 中身の枠
+      const bx = lineX + 30 * u, bw = x0 + listW - bx;
+      rr(ctx, bx, y, bw, rowH, radius);
+      if (data.theme === 'pop') {
+        ctx.save();
+        ctx.shadowColor = 'rgba(120, 60, 90, 0.12)'; ctx.shadowBlur = 14 * u; ctx.shadowOffsetY = 4 * u;
+        ctx.fillStyle = P.card; ctx.fill();
+        ctx.restore();
+      } else {
+        ctx.fillStyle = P.card; ctx.fill();
+        ctx.strokeStyle = P.cardLine; ctx.lineWidth = 2 * u; ctx.stroke();
+      }
+      if (isCur) {
+        ctx.save();
+        rr(ctx, bx, y, bw, rowH, radius);
+        ctx.strokeStyle = A; ctx.lineWidth = 5 * u;
+        if (data.theme === 'neon') { ctx.shadowColor = A; ctx.shadowBlur = 20 * u; }
+        ctx.stroke();
+        ctx.restore();
+      }
+      // 右上の印（NOW と残り／次と始まるまで）
+      let badge = '', sub = '';
+      if (isCur) { badge = 'NOW'; sub = data.wd === 'en' ? `${leftText(g.e - nm, true)} left` : `あと ${leftText(g.e - nm)}`; }
+      else if (i === nextIdx) { badge = 'NEXT'; sub = data.wd === 'en' ? `in ${leftText(g.s - nm, true)}` : `あと ${leftText(g.s - nm)} で始まる`; }
+      let right = bx + bw - 22 * u;
+      if (badge) {
+        const bs = Math.min(rowH * 0.2, 22 * u);
+        ctx.font = fBold(bs);
+        const bwid = ctx.measureText(badge).width + bs * 1.2;
+        ctx.textAlign = 'center';
+        rr(ctx, right - bwid, cy - rowH * 0.22 - bs * 0.8, bwid, bs * 1.6, bs * 0.8);
+        ctx.fillStyle = A; ctx.fill();
+        ctx.fillStyle = data.theme === 'neon' ? '#0b0f24' : '#ffffff';
+        ctx.fillText(badge, right - bwid / 2, cy - rowH * 0.22 + 1 * u);
+        ctx.textAlign = 'right';
+        ctx.font = fBold(bs * 1.05);
+        ctx.fillStyle = A;
+        ctx.fillText(sub, right, cy + rowH * 0.2);
+        right -= Math.max(bwid, ctx.measureText(sub).width) + 20 * u;
+      }
+      // 種類と内容
+      ctx.textAlign = 'left';
+      let x = bx + 24 * u;
+      const base = Math.min(rowH * 0.34, 40 * u);
+      if (g.it.tag) {
+        const tsz = base * 0.62;
+        ctx.font = fBold(tsz);
+        const w = ctx.measureText(g.it.tag).width + tsz * 1.3;
+        rr(ctx, x, cy - tsz * 0.85, w, tsz * 1.7, tsz * 0.85);
+        ctx.fillStyle = tagColor(g.it.tag); ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(g.it.tag, x + tsz * 0.65, cy + 1 * u);
+        x += w + base * 0.45;
+      }
+      const ls = (g.it.s || '').split('\n').filter(l => l.trim());
+      const k = Math.max(1, ls.length);
+      const size = k > 1 ? Math.min(base, rowH * 0.86 / (k * 1.2)) : base;
+      ctx.fillStyle = P.text;
+      ls.forEach((l, j) => {
+        const f = fit(ctx, l, right - x, size, fBold, k > 1 ? 0.8 : 0.6);
+        ctx.font = fBold(f.size);
+        ctx.fillText(f.text, x, cy + (j - (k - 1) / 2) * size * 1.2);
+      });
+      ctx.restore();
+    });
+  }
 
   // ── 1か月（カレンダー） ──
   function drawMonth(L) {
@@ -490,9 +795,14 @@
     // ── 見出し ──
     const days = Array.from({ length: 7 }, (_, i) => { const d = parseYmd(data.start); d.setDate(d.getDate() + i); return d; });
     const [my, mm] = data.month.split('-').map(Number);
+    const tdd = parseYmd(data.tday.date) || new Date();
     const period = data.mode === 'month'
       ? (data.wd === 'en' ? `${MONTHS[mm - 1]} ${my}` : `${my}年${mm}月`)
-      : `${days[0].getMonth() + 1}/${days[0].getDate()} - ${days[6].getMonth() + 1}/${days[6].getDate()}`;
+      : data.mode === 'day'
+        ? (data.tday.daily ? '' : data.wd === 'en'
+          ? `${WD.en[tdd.getDay()]}, ${MONTHS[tdd.getMonth()].slice(0, 3)} ${tdd.getDate()}`
+          : `${tdd.getMonth() + 1}/${tdd.getDate()}（${WD.ja[tdd.getDay()]}）`)
+        : `${days[0].getMonth() + 1}/${days[0].getDate()} - ${days[6].getMonth() + 1}/${days[6].getDate()}`;
     const titleSize = (wide ? 84 : 76) * u;
     // 縦長でキャラがあるときは、見出しが高くなるので、文字を上下の真ん中に
     let y = headTop + (hh > 200 * u ? (hh - 150 * u) / 2 : 0);
@@ -556,8 +866,11 @@
 
     const top = headTop + hh + (wide ? 4 : 14) * u;
     const bottom = H - pad - nh;
-    if (data.mode === 'month') {
-      drawMonth({ ctx, data, P, A, u, x0, listW, top, bottom, fBold, now: opts.now || null });
+    if (data.mode !== 'week') {
+      const L = { ctx, data, P, A, u, x0, listW, top, bottom, fBold, now: opts.now || null, days };
+      if (data.mode === 'month') drawMonth(L);
+      else if (data.mode === 'timeline') drawTimeline(L);
+      else drawDay(L);
       return { w: W, h: H };
     }
 
@@ -722,5 +1035,5 @@
     return { w: W, h: H };
   }
 
-  global.ScheduleCore = { SIZES, THEMES, TAGS, WD, MONTHS, defaults, normalize, encode, decode, forUrl, hasContent, ensureFonts, draw, ymd, parseYmd, weekStart, tagColor };
+  global.ScheduleCore = { SIZES, THEMES, TAGS, WD, MONTHS, defaults, normalize, encode, decode, forUrl, hasContent, ensureFonts, draw, parseT, ymd, parseYmd, weekStart, tagColor };
 })(window);

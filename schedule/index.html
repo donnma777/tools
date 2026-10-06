@@ -753,6 +753,25 @@
       margin-top: 6px;
     }
 
+    #plan.with-end .item {
+      grid-template-columns: 52px 52px 64px minmax(0, 1fr) 22px;
+    }
+
+    #plan:not(.with-end) .item .e {
+      display: none;
+    }
+
+    .tday-end {
+      display: grid;
+      grid-template-columns: auto 90px;
+      gap: 8px;
+      align-items: center;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+      margin-top: 10px;
+    }
+
     .item textarea {
       font: inherit;
       font-size: 12.5px;
@@ -1227,6 +1246,8 @@
           <div class="seg" id="mode">
             <button type="button" data-v="week">1週間</button>
             <button type="button" data-v="month">1か月</button>
+            <button type="button" data-v="timeline">時間割</button>
+            <button type="button" data-v="day">1日</button>
           </div>
           <div class="inline pick" id="week-pick">
             <input type="date" id="start" aria-label="最初の日">
@@ -1240,7 +1261,22 @@
             <button class="btn btn-sm" type="button" id="mo-now">今月</button>
             <button class="btn btn-sm" type="button" id="mo-next" title="次の月">▶</button>
           </div>
-          <div class="field">
+          <div class="pick" id="day-pick">
+            <div class="inline">
+              <input type="date" id="tdate" aria-label="日にち">
+              <button class="btn btn-sm" type="button" id="td-today">今日</button>
+            </div>
+            <label class="toggle"><span>毎日使う（日付を出さない）</span><input type="checkbox" id="tdaily"><span class="sw"></span></label>
+          </div>
+          <div class="field" id="tl-range">
+            <span class="field-label"><span>出す時間</span></span>
+            <div class="inline">
+              <select id="tl-from" aria-label="何時から"></select>
+              <span>〜</span>
+              <select id="tl-to" aria-label="何時まで"></select>
+            </div>
+          </div>
+          <div class="field" id="first-row">
             <span class="field-label"><span>週のはじまり</span></span>
             <div class="seg" id="first">
               <button type="button" data-v="1">月曜日</button>
@@ -1260,6 +1296,7 @@
           <div class="days" id="days"></div>
           <div class="mcal" id="mcal"></div>
           <div class="days" id="mday"></div>
+          <div class="days" id="tday"></div>
           <datalist id="tag-list"></datalist>
           <p class="field-note" style="margin-top:8px" id="plan-note"></p>
         </div>
@@ -1341,7 +1378,7 @@
         <span class="sp"></span>
         <select id="pv-mode" aria-label="見本の出し方">
           <option value="image">画像の見え方</option>
-          <option value="obs">OBS の見え方（今日を目立たせる）</option>
+          <option value="obs">OBS の見え方（今を目立たせる）</option>
         </select>
       </div>
       <div class="preview"><canvas id="cv" aria-label="スケジュールの見本"></canvas></div>
@@ -1400,11 +1437,11 @@
       <summary><span class="sec-icon">🔍</span>使い方</summary>
       <div class="panel-body">
         <ol class="steps">
-          <li><b>1週間</b>か<b>1か月</b>かと、いつの予定かを選び、日ごとに<b>時刻・種類・内容</b>を入れます（内容は改行もできます）。配信しない日は「お休み」にチェック。1か月は、カレンダーの日を押して入れます。</li>
+          <li><b>1週間・1か月・時間割・1日</b>から作るものと、いつの予定かを選び、日ごとに<b>時刻・種類・内容</b>を入れます（内容は改行もできます）。配信しない日は「お休み」にチェック。1か月は、カレンダーの日を押して入れます。</li>
           <li><b>文字</b>と<b>見た目</b>（テーマ・色・大きさ・背景・キャラの画像）を選びます。右の見本がすぐ変わります。</li>
           <li><b>「⬇ PNG で保存」</b>で画像にして、X などに載せます。「📋 画像をコピー」なら、そのまま貼り付けられます。</li>
           <li>OBS に出すときは<b>「📋 URL をコピー」</b>を押し、OBS で <b>ソースを追加 → ブラウザ</b> の URL に貼ります。幅・高さは URL の下に出ている大きさにします。</li>
-          <li>OBS では、<b>今日の予定が目立ち、過ぎた日が薄く</b>なります（日付が変わると自動で切り替わります）。予定を変えたら、URL を貼り直すか、<b>OBS につないで反映</b>してください。</li>
+          <li>OBS では、<b>今日の予定が目立ち、過ぎた日が薄く</b>なります（日付が変わると自動で切り替わります）。<b>1日</b>の進行表なら、今の枠に NOW と残り時間、次の枠に始まるまでの時間が出ます。予定を変えたら、URL を貼り直すか、<b>OBS につないで反映</b>してください。</li>
         </ol>
       </div>
     </details>
@@ -1469,7 +1506,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="../common/ask.js?v=20260929a"></script>
-  <script src="schedule-core.js?v=20261007a"></script>
+  <script src="schedule-core.js?v=20261007b"></script>
   <script>
     (() => {
       'use strict';
@@ -1506,6 +1543,7 @@
       const blankDay = () => ({ off: false, items: [{ t: '', s: '', tag: '' }] });
       const dayDate = i => { const d = C.parseYmd(S.start); d.setDate(d.getDate() + i); return d; };
       const getDay = key => {
+        if (key === 'd') return S.tday;
         if (key[0] === 'w') return S.days[Number(key.slice(1))];
         const k = key.slice(1);
         if (!S.mdays[k]) S.mdays[k] = blankDay();
@@ -1513,6 +1551,7 @@
       };
       const setDay = (key, v) => { if (key[0] === 'w') S.days[Number(key.slice(1))] = v; else S.mdays[key.slice(1)] = v; };
       const prevKey = key => {
+        if (key === 'd') return '';
         if (key[0] === 'w') { const i = Number(key.slice(1)); return i > 0 ? 'w' + (i - 1) : ''; }
         const d = C.parseYmd(key.slice(1)); d.setDate(d.getDate() - 1);
         return 'm' + C.ymd(d);
@@ -1522,6 +1561,7 @@
         const items = day.items.map((it, k) => `
           <div class="item" data-k="${k}">
             <input type="text" class="t" value="${esc(it.t)}" placeholder="21:00" maxlength="20" aria-label="時刻">
+            <input type="text" class="e" value="${esc(it.e || '')}" placeholder="23:00" maxlength="20" aria-label="終わりの時刻">
             <input type="text" class="tag" value="${esc(it.tag)}" placeholder="種類" list="tag-list" maxlength="12" aria-label="種類">
             <textarea class="s" rows="1" placeholder="内容" maxlength="200" aria-label="内容（Enter で改行）">${esc(it.s)}</textarea>
             <button class="icon-btn del" type="button" title="この枠を消す" aria-label="この枠を消す">✕</button>
@@ -1534,8 +1574,15 @@
             <label class="mini"><input type="checkbox" class="off"${day.off ? ' checked' : ''}>お休み</label>
           </div>
           <div class="items">${items}</div>
-          <button class="btn btn-sm add" type="button"${day.items.length >= 3 ? ' hidden' : ''}>＋ 枠を足す</button>
+          <button class="btn btn-sm add" type="button"${day.items.length >= maxItems(key) ? ' hidden' : ''}>＋ 枠を足す</button>
         </div>`;
+      };
+      const maxItems = key => (key === 'd' ? 12 : 3);
+      // 1日の進行表（日付の見出し・お休みはなく、終わりの時刻を最後に）
+      const tdayHtml = () => {
+        const html = dayHtml('d', S.tday, C.parseYmd(S.tday.date) || new Date())
+          .replace(/<div class="day-head">[\s\S]*?<\/div>\s*<div class="items">/, '<div class="items">');
+        return html + `<label class="tday-end"><span>最後の枠の終わりの時刻（なければ1時間）</span><input type="text" id="tday-end" value="${esc(S.tday.end)}" placeholder="23:00" maxlength="20"></label>`;
       };
       // 内容の欄は、行の数に合わせて高くする
       const grow = ta => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 2 + 'px'; };
@@ -1569,7 +1616,12 @@
         $('mcal').innerHTML = h;
       }
       function buildPlan() {
-        if (S.mode === 'month') {
+        $('plan').classList.toggle('with-end', S.mode === 'timeline');
+        $('tday').innerHTML = '';
+        if (S.mode === 'day') {
+          $('tday').innerHTML = tdayHtml();
+          $('days').innerHTML = ''; $('mcal').innerHTML = ''; $('mday').innerHTML = '';
+        } else if (S.mode === 'month') {
           if (!selDate.startsWith(S.month + '-')) pickDefault();
           buildCal();
           const d = C.parseYmd(selDate);
@@ -1594,10 +1646,12 @@
       const edited = () => { if (S.mode === 'month') buildCal(); update(); };
 
       $('plan').addEventListener('input', e => {
+        if (e.target.id === 'tday-end') { S.tday.end = e.target.value; update(); return; }
         const el = e.target.closest('.item');
         if (!el) return;
         const it = getDay(e.target.closest('.day').dataset.key).items[Number(el.dataset.k)];
         if (e.target.classList.contains('t')) it.t = e.target.value;
+        else if (e.target.classList.contains('e')) it.e = e.target.value;
         else if (e.target.classList.contains('tag')) it.tag = e.target.value;
         else if (e.target.classList.contains('s')) {
           // 5行目からは入れない
@@ -1624,9 +1678,9 @@
         const key = dayEl.dataset.key;
         const day = getDay(key);
         if (e.target.closest('.add')) {
-          if (day.items.length >= 3) return;
+          if (day.items.length >= maxItems(key)) return;
           const last = day.items[day.items.length - 1];
-          day.items.push({ t: '', s: '', tag: last ? last.tag : '' });
+          day.items.push({ t: '', s: '', tag: key === 'd' ? '' : (last ? last.tag : '') });
           buildPlan(); edited();
           const t = document.querySelector(`#plan .day[data-key="${key}"] .item:last-child .t`);
           if (t) t.focus();
@@ -1642,7 +1696,10 @@
         }
       });
       $('clear').addEventListener('click', async () => {
-        if (S.mode === 'month') {
+        if (S.mode === 'day') {
+          if (!await ask('進行表を全部消しますか？', '消す')) return;
+          S.tday.items = [{ t: '', s: '', tag: '' }]; S.tday.end = '';
+        } else if (S.mode === 'month') {
           if (!await ask(`${Number(S.month.slice(5))}月の予定を全部消しますか？`, '消す')) return;
           Object.keys(S.mdays).forEach(k => { if (k.startsWith(S.month + '-')) delete S.mdays[k]; });
         } else {
@@ -1678,10 +1735,17 @@
         const b = e.target.closest('[data-v]'); if (!b) return;
         S.mode = b.dataset.v;
         // タイトルがはじめのままなら、合わせて変える
-        if (S.mode === 'month' && S.title === 'WEEKLY SCHEDULE') S.title = 'MONTHLY SCHEDULE';
-        if (S.mode === 'week' && S.title === 'MONTHLY SCHEDULE') S.title = 'WEEKLY SCHEDULE';
+        const TITLES = { week: 'WEEKLY SCHEDULE', month: 'MONTHLY SCHEDULE', timeline: 'WEEKLY SCHEDULE', day: 'TIME TABLE' };
+        if (Object.values(TITLES).includes(S.title)) S.title = TITLES[S.mode];
         buildPlan(); syncUI(); update();
       });
+      $('tdate').addEventListener('change', () => { if (C.parseYmd($('tdate').value)) { S.tday.date = $('tdate').value; update(); } });
+      $('td-today').addEventListener('click', () => { S.tday.date = C.ymd(new Date()); syncUI(); update(); });
+      $('tdaily').addEventListener('change', () => { S.tday.daily = $('tdaily').checked; syncUI(); update(); });
+      $('tl-from').innerHTML = '<option value="-1">自動</option>' + Array.from({ length: 24 }, (_, h) => `<option value="${h}">${h}:00</option>`).join('');
+      $('tl-to').innerHTML = '<option value="-1">自動</option>' + Array.from({ length: 30 }, (_, h) => `<option value="${h + 1}">${h + 1}:00</option>`).join('');
+      $('tl-from').addEventListener('change', () => { S.trange.from = Number($('tl-from').value); update(); });
+      $('tl-to').addEventListener('change', () => { S.trange.to = Number($('tl-to').value); update(); });
       const setStart = d => { S.start = C.ymd(d); syncUI(); relabelDays(); update(); };
       $('start').addEventListener('change', () => {
         const d = C.parseYmd($('start').value);
@@ -1735,14 +1799,27 @@
         press('themes', S.theme); press('size', S.size); press('bg', S.bg); press('wd', S.wd); press('first', S.first); press('mode', S.mode);
         $('start').value = S.start;
         $('month').value = S.month;
-        const month = S.mode === 'month';
-        $('week-pick').hidden = month; $('month-pick').hidden = !month;
-        $('days').hidden = month; $('mcal').hidden = !month; $('mday').hidden = !month;
+        const month = S.mode === 'month', dayMode = S.mode === 'day', weekly = !month && !dayMode;
+        $('week-pick').hidden = !weekly; $('month-pick').hidden = !month; $('day-pick').hidden = !dayMode;
+        $('tl-range').hidden = S.mode !== 'timeline'; $('first-row').hidden = dayMode;
+        $('days').hidden = !weekly; $('mcal').hidden = !month; $('mday').hidden = !month; $('tday').hidden = !dayMode;
         $('fill-week').hidden = !month;
-        $('when-note').textContent = month ? '日付ごとに覚えます。月を変えると、その月の予定が出ます。' : '週を変えても、予定はそのまま残ります（曜日ごとに覚えます）。';
-        $('plan-note').textContent = month
-          ? 'カレンダーの日を押して、その日の予定を入れます。毎週同じ予定なら、1週間のほうで曜日ごとに入れてから「週の予定から入れる」が早いです。'
-          : '左から「時刻」「種類」「内容」。内容は Enter で改行できます（4行まで）。種類は選ぶか自由に書けて、色は種類ごとに決まります。1日に3つまで入れられます。';
+        // 隠れていた欄は高さを測れないので、出してから測り直す
+        growAll();
+        $('tdate').value = S.tday.date; $('tdaily').checked = S.tday.daily; $('tdate').disabled = S.tday.daily;
+        $('tl-from').value = String(S.trange.from); $('tl-to').value = String(S.trange.to);
+        $('when-note').textContent = {
+          week: '週を変えても、予定はそのまま残ります（曜日ごとに覚えます）。',
+          timeline: '1週間と同じ予定を、縦が時刻の表で描きます。「出す時間」が自動なら、予定のいちばん早い時刻〜いちばん遅い終わりまで。',
+          month: '日付ごとに覚えます。月を変えると、その月の予定が出ます。',
+          day: '1回の配信やイベントの進行表です。OBS では、今の枠に NOW と残り時間、次の枠に始まるまでの時間が出ます。',
+        }[S.mode];
+        $('plan-note').textContent = {
+          week: '左から「時刻」「種類」「内容」。内容は Enter で改行できます（4行まで）。種類は選ぶか自由に書けて、色は種類ごとに決まります。1日に3つまで入れられます。',
+          timeline: '左から「始まり」「終わり」「種類」「内容」。終わりがなければ2時間にします。日をまたぐときは、終わりを 25:00 のように書いても、1:00 と書いてもかまいません。',
+          month: 'カレンダーの日を押して、その日の予定を入れます。毎週同じ予定なら、1週間のほうで曜日ごとに入れてから「週の予定から入れる」が早いです。',
+          day: '左から「始まる時刻」「種類」「内容」。12個まで。時刻の順に並べて描くので、入れる順はばらばらでもかまいません。枠の終わりは、次の枠の始まりです。',
+        }[S.mode];
         for (const k of ['title', 'sub', 'note']) if ($(k).value !== S[k]) $(k).value = S[k];
         $('tl').checked = S.tl; $('today').checked = S.today; $('past').checked = S.past;
         $('accent').value = S.accent || C.THEMES[S.theme].accent;
@@ -1851,7 +1928,7 @@
       if (document.fonts) document.fonts.addEventListener('loadingdone', () => { if (!drawQueued) { drawQueued = true; requestAnimationFrame(paint); } });
 
       // ── 保存・コピー ──
-      const fileName = () => `schedule-${(S.mode === 'month' ? S.month : S.start).replace(/-/g, '')}.png`;
+      const fileName = () => `schedule-${(S.mode === 'month' ? S.month : S.mode === 'day' ? (S.tday.daily ? 'timetable' : S.tday.date) : S.start).replace(/-/g, '')}.png`;
       const pngBlob = () => new Promise((res, rej) => {
         // 保存は「画像の見え方」で描く
         const cv = document.createElement('canvas');

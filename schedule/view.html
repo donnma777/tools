@@ -8,7 +8,7 @@
   <title>配信スケジュール（OBS 用）</title>
   <!--
     OBS のブラウザソースに入れるページ。中身はすべて URL の d= から読む（index.html で作る）。
-    今日の予定を目立たせ、過ぎた日を薄くする（1分ごとに描き直す）。大きさはブラウザソースの幅・高さに合わせて縮める。
+    今日の予定（1日の進行表なら今の枠）を目立たせ、過ぎたものを薄くする（15秒ごとに描き直す）。大きさはブラウザソースの幅・高さに合わせて縮める。
   -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,7 +45,7 @@
 
 <body>
   <canvas id="cv"></canvas>
-  <script src="schedule-core.js?v=20261007a"></script>
+  <script src="schedule-core.js?v=20261007b"></script>
   <script>
     (async () => {
       'use strict';
@@ -69,11 +69,13 @@
       }
       await ScheduleCore.ensureFonts(data);
       // today=YYYY-MM-DD で「今日」を決められる（確かめる用）
+      // now=YYYY-MM-DDTHH:MM で時刻まで決められる（1日の進行表を確かめる用）
       const fixed = ScheduleCore.parseYmd(q.get('today') || '');
-      const paint = () => ScheduleCore.draw(cv, data, { images, now: fixed || new Date() });
+      const fixedNow = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(q.get('now') || '') ? new Date(q.get('now')) : null;
+      const paint = () => ScheduleCore.draw(cv, data, { images, now: fixedNow || fixed || new Date() });
       paint();
-      // 日付が変わったら描き直す
-      setInterval(paint, 60 * 1000);
+      // 日付・今の枠・残り時間が変わるので、15秒ごとに描き直す
+      setInterval(paint, 15 * 1000);
       // 字体があとから届いたときも描き直す
       if (document.fonts) document.fonts.addEventListener('loadingdone', paint);
     })();
