@@ -6,6 +6,9 @@
  *   await ScheduleCore.ensureFonts(data)       使う字体を読み込む（canvas は読み込みを待ってくれないので）
  *   ScheduleCore.draw(canvas, data, opts)      描く。opts = { images: { chara, bg }, now: Date（OBS で今日を目立たせるとき） }
  *   ScheduleCore.encode(data) / decode(str)    URL に入れる文字（JSON → UTF-8 → base64url）
+ *   ScheduleCore.forUrl(data)                  URL に入れる分だけにする（1か月版は、その月の予定だけ）
+ *
+ * mode: 'week'（1週間。days[0..6] は start からの7日）/ 'month'（1か月。mdays['YYYY-MM-DD'] にその日の予定）
  */
 (function (global) {
   'use strict';
@@ -37,6 +40,7 @@
     return `hsl(${h}, 62%, 52%)`;
   };
 
+  const MONTHS = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
   const WD = { ja: ['日', '月', '火', '水', '木', '金', '土'], en: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] };
 
   const pad2 = n => String(n).padStart(2, '0');
@@ -55,7 +59,10 @@
   function defaults() {
     return {
       v: 1,
+      mode: 'week',
       start: ymd(weekStart(new Date(), 1)),
+      month: ymd(new Date()).slice(0, 7),
+      mdays: {},
       first: 1,
       title: 'WEEKLY SCHEDULE',
       sub: '',
@@ -74,6 +81,28 @@
   }
 
   const str = (v, max) => (typeof v === 'string' ? v : '').slice(0, max);
+  // 内容は4行まで
+  const lines4 = v => str(v, 200).replace(/\r\n?/g, '\n').split('\n').slice(0, 4).join('\n');
+  const normDay = x => {
+    if (!x || typeof x !== 'object') return null;
+    const items = Array.isArray(x.items) ? x.items.slice(0, 3).map(it => ({
+      t: str(it && it.t, 20), s: lines4(it && it.s), tag: str(it && it.tag, 12),
+    })) : [];
+    return { off: !!x.off, items: items.length ? items : [{ t: '', s: '', tag: '' }] };
+  };
+  const hasContent = day => !!day && (day.off || day.items.some(it => it.t || it.s || it.tag));
+  // URL に入れる分だけ（1週間なら月の予定は要らない。1か月ならその月の予定だけ）
+  function forUrl(data) {
+    const out = { ...data };
+    if (data.mode === 'month') {
+      out.mdays = {};
+      Object.keys(data.mdays || {}).forEach(k => { if (k.startsWith(data.month + '-') && hasContent(data.mdays[k])) out.mdays[k] = data.mdays[k]; });
+      delete out.days;
+    } else {
+      delete out.mdays;
+    }
+    return out;
+  }
   function normalize(src) {
     const d = defaults();
     if (!src || typeof src !== 'object') return d;
@@ -81,14 +110,13 @@
     if (parseYmd(src.start)) out.start = src.start;
     out.first = src.first === 0 ? 0 : 1;
     for (const k of ['title', 'sub', 'note']) if (typeof src[k] === 'string') out[k] = str(src[k], 120);
-    if (Array.isArray(src.days)) {
-      out.days = d.days.map((def, i) => {
-        const x = src.days[i];
-        if (!x || typeof x !== 'object') return def;
-        const items = Array.isArray(x.items) ? x.items.slice(0, 3).map(it => ({
-          t: str(it && it.t, 20), s: str(it && it.s, 80), tag: str(it && it.tag, 12),
-        })) : [];
-        return { off: !!x.off, items: items.length ? items : [{ t: '', s: '', tag: '' }] };
+    if (Array.isArray(src.days)) out.days = d.days.map((def, i) => normDay(src.days[i]) || def);
+    out.mode = src.mode === 'month' ? 'month' : 'week';
+    if (/^\d{4}-\d{2}$/.test(src.month || '')) out.month = src.month;
+    if (src.mdays && typeof src.mdays === 'object') {
+      Object.keys(src.mdays).filter(k => parseYmd(k)).sort().slice(-120).forEach(k => {
+        const x = normDay(src.mdays[k]);
+        if (x) out.mdays[k] = x;
       });
     }
     if (THEMES[src.theme]) out.theme = src.theme;
@@ -123,6 +151,8 @@
   function allText(data) {
     const t = [data.title, data.sub, data.note, '0123456789/:-〜ー お休み未定TODAYOFF', ...WD.ja, ...WD.en];
     data.days.forEach(d => d.items.forEach(it => t.push(it.t, it.s, it.tag)));
+    Object.values(data.mdays || {}).forEach(d => d.items.forEach(it => t.push(it.t, it.s, it.tag)));
+    t.push('年月', ...MONTHS);
     return t.join('');
   }
   async function ensureFonts(data) {
@@ -245,6 +275,172 @@
     }
   }
 
+  // 文字を幅で折り返す（日本語は1文字ずつ、英語は単語の途中でも）
+  const wrap = (ctx, text, maxW) => {
+    const out = [];
+    let cur = '';
+    for (const ch of text) {
+      if (cur && ctx.measureText(cur + ch).width > maxW) { out.push(cur); cur = ch.trim() ? ch : ''; }
+      else cur += ch;
+    }
+    if (cur) out.push(cur);
+    return out;
+  };
+
+  // ── 1か月（カレンダー） ──
+  function drawMonth(L) {
+    const { ctx, data, P, A, u, x0, listW, top, bottom, fBold, now } = L;
+    const today = now ? ymd(now) : '';
+    const [yy, mm] = data.month.split('-').map(Number);
+    const lead = (new Date(yy, mm - 1, 1).getDay() - data.first + 7) % 7;
+    const ndays = new Date(yy, mm, 0).getDate();
+    const weeks = Math.ceil((lead + ndays) / 7);
+    const gap = 8 * u;
+    const whH = 40 * u;
+    const cellW = (listW - gap * 6) / 7;
+    const gridTop = top + whH + gap;
+    const cellH = (bottom - gridTop - gap * (weeks - 1)) / weeks;
+    const radius = { pop: 16 * u, simple: 8 * u, neon: 6 * u, wa: 3 * u }[data.theme];
+    const wdNames = WD[data.wd];
+
+    // 曜日の行
+    for (let c = 0; c < 7; c++) {
+      const dow = (data.first + c) % 7;
+      const x = x0 + c * (cellW + gap);
+      const color = dow === 6 ? P.sat : dow === 0 ? P.sun : null;
+      ctx.textAlign = 'center';
+      ctx.font = fBold(Math.min(24 * u, cellW * 0.22));
+      if (data.theme === 'pop') {
+        rr(ctx, x, top, cellW, whH, whH / 2);
+        ctx.fillStyle = color || A; ctx.fill();
+        ctx.fillStyle = '#ffffff';
+      } else if (data.theme === 'wa') {
+        ctx.fillStyle = color || P.text;
+      } else {
+        ctx.fillStyle = color || (data.theme === 'neon' ? A : P.muted);
+      }
+      ctx.fillText(wdNames[dow], x + cellW / 2, top + whH / 2 + 1 * u);
+    }
+
+    for (let idx = 0; idx < weeks * 7; idx++) {
+      const dnum = idx - lead + 1;
+      if (dnum < 1 || dnum > ndays) continue;
+      const c = idx % 7, r = Math.floor(idx / 7);
+      const x = x0 + c * (cellW + gap), y = gridTop + r * (cellH + gap);
+      const date = new Date(yy, mm - 1, dnum);
+      const key = ymd(date);
+      const dow = date.getDay();
+      const day = data.mdays[key];
+      const isToday = now && data.today && key === today;
+      const isPast = now && data.past && key < today;
+      ctx.save();
+      if (isPast) ctx.globalAlpha = 0.42;
+      rr(ctx, x, y, cellW, cellH, radius);
+      if (data.theme === 'pop') {
+        ctx.save();
+        ctx.shadowColor = 'rgba(120, 60, 90, 0.12)'; ctx.shadowBlur = 10 * u; ctx.shadowOffsetY = 3 * u;
+        ctx.fillStyle = P.card; ctx.fill();
+        ctx.restore();
+      } else {
+        ctx.fillStyle = P.card; ctx.fill();
+        ctx.strokeStyle = P.cardLine; ctx.lineWidth = 1.5 * u; ctx.stroke();
+      }
+      if (isToday) {
+        ctx.save();
+        rr(ctx, x, y, cellW, cellH, radius);
+        ctx.strokeStyle = A; ctx.lineWidth = 4 * u;
+        if (data.theme === 'neon') { ctx.shadowColor = A; ctx.shadowBlur = 16 * u; }
+        ctx.stroke();
+        ctx.restore();
+      }
+      // 日にち
+      const pd = Math.min(10 * u, cellW * 0.07);
+      const ns = Math.min(cellH * 0.2, 30 * u, cellW * 0.2);
+      const holiday = dow === 6 ? P.sat : dow === 0 ? P.sun : null;
+      ctx.textAlign = 'left';
+      ctx.font = fBold(ns);
+      ctx.fillStyle = holiday || (data.theme === 'pop' || data.theme === 'wa' ? A : P.text);
+      ctx.fillText(String(dnum), x + pd, y + pd + ns * 0.55);
+      if (isToday) {
+        const nw = ctx.measureText(String(dnum)).width;
+        const ts = ns * 0.55;
+        ctx.font = fBold(ts);
+        const tw = ctx.measureText('TODAY').width + ts;
+        if (pd * 2 + nw + 6 * u + tw <= cellW) {
+          const bx = x + pd + nw + 6 * u, by = y + pd + ns * 0.55 - ts * 0.8;
+          rr(ctx, bx, by, tw, ts * 1.6, ts * 0.8);
+          ctx.fillStyle = A; ctx.fill();
+          ctx.fillStyle = data.theme === 'neon' ? '#0b0f24' : '#ffffff';
+          ctx.fillText('TODAY', bx + ts / 2, by + ts * 0.82);
+        }
+      }
+
+      // 中身
+      const cx = x + pd, cy0 = y + pd + ns * 1.15 + 4 * u;
+      const cw = cellW - pd * 2, ch = y + cellH - pd - cy0;
+      const items = day ? day.items.filter(it => it.t || it.s || it.tag) : [];
+      if (day && day.off) {
+        const os = Math.min(cellH * 0.14, 22 * u, cellW * 0.16);
+        ctx.font = fBold(os);
+        ctx.fillStyle = P.muted;
+        ctx.fillText(data.wd === 'en' ? 'OFF' : 'お休み', cx, cy0 + os * 0.6);
+      } else if (items.length && ch > 8 * u) {
+        // 入りきる大きさを探す（小さくしすぎたら、はみ出す行は … で切る）
+        const bar = 4 * u, tx = cx + bar + 5 * u, tw = cw - bar - 5 * u;
+        const start = Math.min(cellH * 0.15, 24 * u, cellW * 0.13);
+        let fs = start;
+        const layout = size => {
+          ctx.font = fBold(size);
+          return items.map(it => {
+            const tt = it.t ? it.t + (data.tl && /\d$/.test(it.t) ? '〜' : '') : '';
+            const ls = (it.s || it.tag).split('\n').filter(l => l.trim());
+            const first = [tt, ls[0] || ''].filter(Boolean).join(' ');
+            const rows = [];
+            [first, ...ls.slice(1)].forEach(l => rows.push(...wrap(ctx, l, tw)));
+            return { it, tt, rows };
+          });
+        };
+        const total = (b, size) => b.reduce((n, v) => n + v.rows.length, 0) * size * 1.25 + (b.length - 1) * 4 * u;
+        let blocks = layout(fs);
+        while (total(blocks, fs) > ch && fs > start * 0.62) { fs -= start * 0.04; blocks = layout(fs); }
+        const lh = fs * 1.25;
+        const maxRows = Math.max(1, Math.floor((ch + 2 * u) / lh));
+        let y2 = cy0, used = 0;
+        for (const b of blocks) {
+          if (used >= maxRows) break;
+          const take = Math.min(b.rows.length, maxRows - used);
+          const cut = take < b.rows.length;
+          ctx.fillStyle = b.it.tag ? tagColor(b.it.tag) : A;
+          rr(ctx, cx, y2 + 1 * u, bar, take * lh - 2 * u, bar / 2);
+          ctx.fill();
+          ctx.font = fBold(fs);
+          for (let j = 0; j < take; j++) {
+            let row = b.rows[j];
+            if (cut && j === take - 1) {
+              while (row.length > 1 && ctx.measureText(row + '…').width > tw) row = row.slice(0, -1);
+              row += '…';
+            }
+            const ly = y2 + lh * j + lh / 2;
+            if (j === 0 && b.tt && row.startsWith(b.tt)) {
+              ctx.fillStyle = P.time;
+              ctx.fillText(b.tt, tx, ly);
+              const w = ctx.measureText(b.tt).width;
+              ctx.fillStyle = P.text;
+              ctx.fillText(row.slice(b.tt.length), tx + w, ly);
+            } else {
+              ctx.fillStyle = P.text;
+              ctx.fillText(row, tx, ly);
+            }
+          }
+          used += take;
+          y2 += take * lh + 4 * u;
+        }
+      }
+      ctx.restore();
+    }
+  }
+
+
   function draw(canvas, raw, opts = {}) {
     const data = normalize(raw);
     const images = opts.images || {};
@@ -293,7 +489,10 @@
 
     // ── 見出し ──
     const days = Array.from({ length: 7 }, (_, i) => { const d = parseYmd(data.start); d.setDate(d.getDate() + i); return d; });
-    const period = `${days[0].getMonth() + 1}/${days[0].getDate()} - ${days[6].getMonth() + 1}/${days[6].getDate()}`;
+    const [my, mm] = data.month.split('-').map(Number);
+    const period = data.mode === 'month'
+      ? (data.wd === 'en' ? `${MONTHS[mm - 1]} ${my}` : `${my}年${mm}月`)
+      : `${days[0].getMonth() + 1}/${days[0].getDate()} - ${days[6].getMonth() + 1}/${days[6].getDate()}`;
     const titleSize = (wide ? 84 : 76) * u;
     // 縦長でキャラがあるときは、見出しが高くなるので、文字を上下の真ん中に
     let y = headTop + (hh > 200 * u ? (hh - 150 * u) / 2 : 0);
@@ -355,9 +554,14 @@
       ctx.fillText(nf.text, x0 + mw, ny);
     }
 
-    // ── 7日分 ──
     const top = headTop + hh + (wide ? 4 : 14) * u;
     const bottom = H - pad - nh;
+    if (data.mode === 'month') {
+      drawMonth({ ctx, data, P, A, u, x0, listW, top, bottom, fBold, now: opts.now || null });
+      return { w: W, h: H };
+    }
+
+    // ── 7日分 ──
     const gap = (wide ? 12 : 14) * u;
     const rowH = (bottom - top - gap * 6) / 7;
     const now = opts.now || null;
@@ -488,10 +692,16 @@
             x += tw + base * 0.45;
           }
           if (it.s) {
-            const f = fit(ctx, it.s, right - x, base, fBold, 0.6);
-            ctx.font = fBold(f.size);
+            // 複数行は、行の高さに収まる大きさで重ねる
+            const ls = it.s.split('\n').filter(l => l.trim());
+            const n = Math.max(1, ls.length);
+            const size = n > 1 ? Math.min(base, lh * 0.86 / (n * 1.2)) : base;
             ctx.fillStyle = P.text;
-            ctx.fillText(f.text, x, ly);
+            ls.forEach((l, j) => {
+              const f = fit(ctx, l, right - x, size, fBold, n > 1 ? 0.8 : 0.6);
+              ctx.font = fBold(f.size);
+              ctx.fillText(f.text, x, ly + (j - (n - 1) / 2) * size * 1.2);
+            });
           }
         });
       }
@@ -512,5 +722,5 @@
     return { w: W, h: H };
   }
 
-  global.ScheduleCore = { SIZES, THEMES, TAGS, WD, defaults, normalize, encode, decode, ensureFonts, draw, ymd, parseYmd, weekStart, tagColor };
+  global.ScheduleCore = { SIZES, THEMES, TAGS, WD, MONTHS, defaults, normalize, encode, decode, forUrl, hasContent, ensureFonts, draw, ymd, parseYmd, weekStart, tagColor };
 })(window);

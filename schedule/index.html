@@ -489,6 +489,7 @@
     input[type=text],
     input[type=url],
     input[type=date],
+    input[type=month],
     input[type=password] {
       font: inherit;
       font-size: 13px;
@@ -750,6 +751,106 @@
 
     .add {
       margin-top: 6px;
+    }
+
+    .item textarea {
+      font: inherit;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 6px 8px;
+      width: 100%;
+      min-width: 0;
+      resize: none;
+      overflow: hidden;
+      display: block;
+    }
+
+    .item {
+      align-items: start;
+    }
+
+    .item .del {
+      margin-top: 5px;
+    }
+
+    .pick {
+      margin-top: 10px;
+    }
+
+    /* 1か月：日を選ぶカレンダー */
+    .mcal {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+
+    .mcal .wd {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .mcal .wd.d6,
+    .mcal button .d6 {
+      color: #8fb8ff;
+    }
+
+    .mcal .wd.d0,
+    .mcal button .d0 {
+      color: #ff9a9a;
+    }
+
+    .mcal button {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 2px 5px;
+      min-height: 44px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .mcal button:hover {
+      border-color: var(--accent);
+    }
+
+    .mcal button[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .mcal button.today b {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .mcal .dots {
+      display: flex;
+      gap: 2px;
+      min-height: 7px;
+      font-size: 9.5px;
+      color: var(--muted);
+      line-height: 7px;
+    }
+
+    .mcal .dots i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
     }
 
     /* ── 見本 ── */
@@ -1122,12 +1223,22 @@
     <div class="settings">
       <div class="panel">
         <div class="panel-body">
-          <div class="panel-title"><span class="sec-icon">📅</span>いつの週か</div>
-          <div class="inline">
+          <div class="panel-title"><span class="sec-icon">📅</span>いつの予定か</div>
+          <div class="seg" id="mode">
+            <button type="button" data-v="week">1週間</button>
+            <button type="button" data-v="month">1か月</button>
+          </div>
+          <div class="inline pick" id="week-pick">
             <input type="date" id="start" aria-label="最初の日">
             <button class="btn btn-sm" type="button" id="wk-prev" title="前の週">◀</button>
             <button class="btn btn-sm" type="button" id="wk-now">今週</button>
             <button class="btn btn-sm" type="button" id="wk-next" title="次の週">▶</button>
+          </div>
+          <div class="inline pick" id="month-pick">
+            <input type="month" id="month" aria-label="月">
+            <button class="btn btn-sm" type="button" id="mo-prev" title="前の月">◀</button>
+            <button class="btn btn-sm" type="button" id="mo-now">今月</button>
+            <button class="btn btn-sm" type="button" id="mo-next" title="次の月">▶</button>
           </div>
           <div class="field">
             <span class="field-label"><span>週のはじまり</span></span>
@@ -1136,16 +1247,21 @@
               <button type="button" data-v="0">日曜日</button>
             </div>
           </div>
-          <p class="field-note">週を変えても、予定はそのまま残ります（曜日ごとに覚えます）。</p>
+          <p class="field-note" id="when-note"></p>
         </div>
       </div>
 
       <div class="panel">
-        <div class="panel-body">
-          <div class="panel-title"><span class="sec-icon">🗓️</span>予定<span class="sp"></span><button class="icon-btn" type="button" id="clear">全部消す</button></div>
+        <div class="panel-body" id="plan">
+          <div class="panel-title"><span class="sec-icon">🗓️</span>予定<span class="sp"></span>
+            <button class="icon-btn" type="button" id="fill-week" title="曜日ごとの予定（1週間のほう）を、まだ何も入れていない日に入れます">週の予定から入れる</button>
+            <button class="icon-btn" type="button" id="clear">全部消す</button>
+          </div>
           <div class="days" id="days"></div>
+          <div class="mcal" id="mcal"></div>
+          <div class="days" id="mday"></div>
           <datalist id="tag-list"></datalist>
-          <p class="field-note" style="margin-top:8px">左から「時刻」「種類」「内容」。種類は選ぶか、自由に書けます（色は種類ごとに決まります）。1日に3つまで入れられます。</p>
+          <p class="field-note" style="margin-top:8px" id="plan-note"></p>
         </div>
       </div>
 
@@ -1284,7 +1400,7 @@
       <summary><span class="sec-icon">🔍</span>使い方</summary>
       <div class="panel-body">
         <ol class="steps">
-          <li><b>いつの週か</b>を選び、曜日ごとに<b>時刻・種類・内容</b>を入れます。配信しない日は「お休み」にチェック。</li>
+          <li><b>1週間</b>か<b>1か月</b>かと、いつの予定かを選び、日ごとに<b>時刻・種類・内容</b>を入れます（内容は改行もできます）。配信しない日は「お休み」にチェック。1か月は、カレンダーの日を押して入れます。</li>
           <li><b>文字</b>と<b>見た目</b>（テーマ・色・大きさ・背景・キャラの画像）を選びます。右の見本がすぐ変わります。</li>
           <li><b>「⬇ PNG で保存」</b>で画像にして、X などに載せます。「📋 画像をコピー」なら、そのまま貼り付けられます。</li>
           <li>OBS に出すときは<b>「📋 URL をコピー」</b>を押し、OBS で <b>ソースを追加 → ブラウザ</b> の URL に貼ります。幅・高さは URL の下に出ている大きさにします。</li>
@@ -1353,7 +1469,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="../common/ask.js?v=20260929a"></script>
-  <script src="schedule-core.js?v=20261006a"></script>
+  <script src="schedule-core.js?v=20261007a"></script>
   <script>
     (() => {
       'use strict';
@@ -1383,89 +1499,189 @@
         img.src = src;
       });
 
-      // ── 曜日ごとの入力 ──
+      // ── 予定の入力（1週間は曜日の順に7つ、1か月は選んだ日の1つ。部品は同じ） ──
+      // key：'w0'〜'w6'（1週間の何日目か）／'m2026-10-05'（1か月の日付）
       $('tag-list').innerHTML = C.TAGS.map(t => `<option value="${esc(t[0])}">`).join('');
+      const WDJ = C.WD.ja;
+      const blankDay = () => ({ off: false, items: [{ t: '', s: '', tag: '' }] });
       const dayDate = i => { const d = C.parseYmd(S.start); d.setDate(d.getDate() + i); return d; };
-      function buildDays() {
-        const wd = C.WD.ja;
-        $('days').innerHTML = S.days.map((day, i) => {
-          const d = dayDate(i);
-          const items = day.items.map((it, k) => `
-            <div class="item" data-k="${k}">
-              <input type="text" class="t" value="${esc(it.t)}" placeholder="21:00" maxlength="20" aria-label="時刻">
-              <input type="text" class="tag" value="${esc(it.tag)}" placeholder="種類" list="tag-list" maxlength="12" aria-label="種類">
-              <input type="text" class="s" value="${esc(it.s)}" placeholder="内容" maxlength="80" aria-label="内容">
-              <button class="icon-btn del" type="button" title="この枠を消す" aria-label="この枠を消す">✕</button>
-            </div>`).join('');
-          return `<div class="day${day.off ? ' off' : ''}" data-i="${i}">
-            <div class="day-head">
-              <span class="d${d.getDay()}">${d.getMonth() + 1}/${d.getDate()}（${wd[d.getDay()]}）</span>
-              <span class="sp"></span>
-              ${i > 0 ? '<button class="icon-btn copy-prev" type="button" title="前の日と同じにする">↑ 前の日と同じ</button>' : ''}
-              <label class="mini"><input type="checkbox" class="off"${day.off ? ' checked' : ''}>お休み</label>
-            </div>
-            <div class="items">${items}</div>
-            <button class="btn btn-sm add" type="button"${day.items.length >= 3 ? ' hidden' : ''}>＋ 枠を足す</button>
-          </div>`;
+      const getDay = key => {
+        if (key[0] === 'w') return S.days[Number(key.slice(1))];
+        const k = key.slice(1);
+        if (!S.mdays[k]) S.mdays[k] = blankDay();
+        return S.mdays[k];
+      };
+      const setDay = (key, v) => { if (key[0] === 'w') S.days[Number(key.slice(1))] = v; else S.mdays[key.slice(1)] = v; };
+      const prevKey = key => {
+        if (key[0] === 'w') { const i = Number(key.slice(1)); return i > 0 ? 'w' + (i - 1) : ''; }
+        const d = C.parseYmd(key.slice(1)); d.setDate(d.getDate() - 1);
+        return 'm' + C.ymd(d);
+      };
+      const label = d => `${d.getMonth() + 1}/${d.getDate()}（${WDJ[d.getDay()]}）`;
+      const dayHtml = (key, day, d) => {
+        const items = day.items.map((it, k) => `
+          <div class="item" data-k="${k}">
+            <input type="text" class="t" value="${esc(it.t)}" placeholder="21:00" maxlength="20" aria-label="時刻">
+            <input type="text" class="tag" value="${esc(it.tag)}" placeholder="種類" list="tag-list" maxlength="12" aria-label="種類">
+            <textarea class="s" rows="1" placeholder="内容" maxlength="200" aria-label="内容（Enter で改行）">${esc(it.s)}</textarea>
+            <button class="icon-btn del" type="button" title="この枠を消す" aria-label="この枠を消す">✕</button>
+          </div>`).join('');
+        return `<div class="day${day.off ? ' off' : ''}" data-key="${key}">
+          <div class="day-head">
+            <span class="d${d.getDay()}">${label(d)}</span>
+            <span class="sp"></span>
+            ${prevKey(key) ? '<button class="icon-btn copy-prev" type="button" title="前の日と同じにする">↑ 前の日と同じ</button>' : ''}
+            <label class="mini"><input type="checkbox" class="off"${day.off ? ' checked' : ''}>お休み</label>
+          </div>
+          <div class="items">${items}</div>
+          <button class="btn btn-sm add" type="button"${day.items.length >= 3 ? ' hidden' : ''}>＋ 枠を足す</button>
+        </div>`;
+      };
+      // 内容の欄は、行の数に合わせて高くする
+      const grow = ta => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 2 + 'px'; };
+      const growAll = () => document.querySelectorAll('#plan textarea.s').forEach(grow);
+
+      // 1か月：選んでいる日
+      let selDate = '';
+      const monthDays = () => {
+        const [y, m] = S.month.split('-').map(Number);
+        return Array.from({ length: new Date(y, m, 0).getDate() }, (_, i) => new Date(y, m - 1, i + 1));
+      };
+      const pickDefault = () => {
+        const t = C.ymd(new Date());
+        selDate = t.startsWith(S.month + '-') ? t : S.month + '-01';
+      };
+      function buildCal() {
+        const days = monthDays();
+        const lead = (days[0].getDay() - S.first + 7) % 7;
+        const today = C.ymd(new Date());
+        let h = '';
+        for (let c = 0; c < 7; c++) { const w = (S.first + c) % 7; h += `<span class="wd d${w}">${WDJ[w]}</span>`; }
+        for (let i = 0; i < lead; i++) h += '<span></span>';
+        h += days.map(d => {
+          const k = C.ymd(d);
+          const day = S.mdays[k];
+          let dots = '';
+          if (day && day.off) dots = '休';
+          else if (day) dots = day.items.filter(it => it.t || it.s || it.tag).map(it => `<i style="background:${it.tag ? C.tagColor(it.tag) : 'var(--accent)'}"></i>`).join('');
+          return `<button type="button" data-date="${k}" aria-pressed="${k === selDate}" class="${k === today ? 'today' : ''}"><b class="d${d.getDay()}">${d.getDate()}</b><span class="dots">${dots}</span></button>`;
         }).join('');
+        $('mcal').innerHTML = h;
+      }
+      function buildPlan() {
+        if (S.mode === 'month') {
+          if (!selDate.startsWith(S.month + '-')) pickDefault();
+          buildCal();
+          const d = C.parseYmd(selDate);
+          $('mday').innerHTML = dayHtml('m' + selDate, S.mdays[selDate] || blankDay(), d);
+          $('days').innerHTML = '';
+        } else {
+          $('days').innerHTML = S.days.map((day, i) => dayHtml('w' + i, day, dayDate(i))).join('');
+          $('mcal').innerHTML = ''; $('mday').innerHTML = '';
+        }
+        growAll();
       }
       // 日付の見出しだけ書きかえる（入力中の欄を作り直さない）
       function relabelDays() {
-        const wd = C.WD.ja;
         document.querySelectorAll('#days .day').forEach(el => {
-          const d = dayDate(Number(el.dataset.i));
-          const s = el.querySelector('.day-head span');
-          s.className = 'd' + d.getDay();
-          s.textContent = `${d.getMonth() + 1}/${d.getDate()}（${wd[d.getDay()]}）`;
+          const d = dayDate(Number(el.dataset.key.slice(1)));
+          const sp = el.querySelector('.day-head span');
+          sp.className = 'd' + d.getDay();
+          sp.textContent = label(d);
         });
       }
-      $('days').addEventListener('input', e => {
+      // 予定を変えたら、1か月はカレンダーの点も直す
+      const edited = () => { if (S.mode === 'month') buildCal(); update(); };
+
+      $('plan').addEventListener('input', e => {
         const el = e.target.closest('.item');
         if (!el) return;
-        const i = Number(e.target.closest('.day').dataset.i), k = Number(el.dataset.k);
-        const it = S.days[i].items[k];
+        const it = getDay(e.target.closest('.day').dataset.key).items[Number(el.dataset.k)];
         if (e.target.classList.contains('t')) it.t = e.target.value;
         else if (e.target.classList.contains('tag')) it.tag = e.target.value;
-        else if (e.target.classList.contains('s')) it.s = e.target.value;
-        update();
+        else if (e.target.classList.contains('s')) {
+          // 5行目からは入れない
+          const ls = e.target.value.split('\n');
+          if (ls.length > 4) { e.target.value = ls.slice(0, 4).join('\n'); toast('内容は4行までです'); }
+          it.s = e.target.value;
+          grow(e.target);
+        }
+        edited();
       });
-      $('days').addEventListener('change', e => {
+      $('plan').addEventListener('change', e => {
         if (!e.target.classList.contains('off')) return;
         const dayEl = e.target.closest('.day');
-        S.days[Number(dayEl.dataset.i)].off = e.target.checked;
+        getDay(dayEl.dataset.key).off = e.target.checked;
         dayEl.classList.toggle('off', e.target.checked);
-        update();
+        growAll();
+        edited();
       });
-      $('days').addEventListener('click', e => {
+      $('plan').addEventListener('click', e => {
+        const cal = e.target.closest('#mcal button[data-date]');
+        if (cal) { selDate = cal.dataset.date; buildPlan(); const t = $('mday').querySelector('.t'); if (t) t.focus(); return; }
         const dayEl = e.target.closest('.day');
         if (!dayEl) return;
-        const i = Number(dayEl.dataset.i);
-        const day = S.days[i];
+        const key = dayEl.dataset.key;
+        const day = getDay(key);
         if (e.target.closest('.add')) {
           if (day.items.length >= 3) return;
           const last = day.items[day.items.length - 1];
           day.items.push({ t: '', s: '', tag: last ? last.tag : '' });
-          buildDays(); update();
-          const inputs = $('days').querySelectorAll(`.day[data-i="${i}"] .item:last-child .t`);
-          if (inputs[0]) inputs[0].focus();
+          buildPlan(); edited();
+          const t = document.querySelector(`#plan .day[data-key="${key}"] .item:last-child .t`);
+          if (t) t.focus();
         } else if (e.target.closest('.del')) {
           const k = Number(e.target.closest('.item').dataset.k);
           if (day.items.length > 1) day.items.splice(k, 1);
           else day.items[0] = { t: '', s: '', tag: '' };
-          buildDays(); update();
+          buildPlan(); edited();
         } else if (e.target.closest('.copy-prev')) {
-          const prev = S.days[i - 1];
-          S.days[i] = { off: prev.off, items: prev.items.map(it => ({ ...it })) };
-          buildDays(); update();
+          const prev = getDay(prevKey(key));
+          setDay(key, { off: prev.off, items: prev.items.map(it => ({ ...it })) });
+          buildPlan(); edited();
         }
       });
       $('clear').addEventListener('click', async () => {
-        if (!await ask('7日分の予定を全部消しますか？', '消す')) return;
-        S.days = C.defaults().days;
-        buildDays(); update();
+        if (S.mode === 'month') {
+          if (!await ask(`${Number(S.month.slice(5))}月の予定を全部消しますか？`, '消す')) return;
+          Object.keys(S.mdays).forEach(k => { if (k.startsWith(S.month + '-')) delete S.mdays[k]; });
+        } else {
+          if (!await ask('7日分の予定を全部消しますか？', '消す')) return;
+          S.days = C.defaults().days;
+        }
+        buildPlan(); update();
       });
+      // 1週間の曜日ごとの予定を、まだ何も入れていない日に入れる
+      $('fill-week').addEventListener('click', () => {
+        let n = 0;
+        monthDays().forEach(d => {
+          const k = C.ymd(d);
+          if (C.hasContent(S.mdays[k])) return;
+          const src = S.days[(d.getDay() - S.first + 7) % 7];
+          if (!C.hasContent(src)) return;
+          S.mdays[k] = { off: src.off, items: src.items.map(it => ({ ...it })) };
+          n++;
+        });
+        if (!n) { toast(S.days.some(C.hasContent) ? '入れられる日がありません（もう全部の日に予定があります）' : '1週間のほうに、まだ予定がありません'); return; }
+        buildPlan(); update();
+        toast(`${n} 日に、曜日ごとの予定を入れました`);
+      });
+      // 1か月の予定は、2か月より前のものを消しておく（覚えておく量を増やしすぎない）
+      const pruneMonths = () => {
+        const d = new Date(); d.setMonth(d.getMonth() - 2);
+        const keep = C.ymd(new Date(d.getFullYear(), d.getMonth(), 1));
+        Object.keys(S.mdays).forEach(k => { if (k < keep || !C.hasContent(S.mdays[k])) delete S.mdays[k]; });
+      };
 
-      // ── 週 ──
+      // ── いつ ──
+      $('mode').addEventListener('click', e => {
+        const b = e.target.closest('[data-v]'); if (!b) return;
+        S.mode = b.dataset.v;
+        // タイトルがはじめのままなら、合わせて変える
+        if (S.mode === 'month' && S.title === 'WEEKLY SCHEDULE') S.title = 'MONTHLY SCHEDULE';
+        if (S.mode === 'week' && S.title === 'MONTHLY SCHEDULE') S.title = 'WEEKLY SCHEDULE';
+        buildPlan(); syncUI(); update();
+      });
       const setStart = d => { S.start = C.ymd(d); syncUI(); relabelDays(); update(); };
       $('start').addEventListener('change', () => {
         const d = C.parseYmd($('start').value);
@@ -1474,10 +1690,25 @@
       $('wk-prev').addEventListener('click', () => { const d = C.parseYmd(S.start); d.setDate(d.getDate() - 7); setStart(d); });
       $('wk-next').addEventListener('click', () => { const d = C.parseYmd(S.start); d.setDate(d.getDate() + 7); setStart(d); });
       $('wk-now').addEventListener('click', () => setStart(C.weekStart(new Date(), S.first)));
+      const setMonth = (y, m) => {
+        const d = new Date(y, m, 1);
+        S.month = C.ymd(d).slice(0, 7);
+        pruneMonths();
+        buildPlan(); syncUI(); update();
+      };
+      const curMonth = () => S.month.split('-').map(Number);
+      $('month').addEventListener('change', () => {
+        const m = /^(\d{4})-(\d{2})$/.exec($('month').value);
+        if (m) setMonth(Number(m[1]), Number(m[2]) - 1);
+      });
+      $('mo-prev').addEventListener('click', () => { const [y, m] = curMonth(); setMonth(y, m - 2); });
+      $('mo-next').addEventListener('click', () => { const [y, m] = curMonth(); setMonth(y, m); });
+      $('mo-now').addEventListener('click', () => { const d = new Date(); setMonth(d.getFullYear(), d.getMonth()); });
       $('first').addEventListener('click', e => {
         const b = e.target.closest('[data-v]'); if (!b) return;
         S.first = Number(b.dataset.v);
-        setStart(C.weekStart(C.parseYmd(S.start), S.first));
+        S.start = C.ymd(C.weekStart(C.parseYmd(S.start), S.first));
+        buildPlan(); syncUI(); update();
       });
 
       // ── 文字・見た目 ──
@@ -1501,8 +1732,17 @@
 
       function syncUI() {
         const press = (id, v) => { for (const b of $(id).children) b.setAttribute('aria-pressed', String(b.dataset.v === String(v))); };
-        press('themes', S.theme); press('size', S.size); press('bg', S.bg); press('wd', S.wd); press('first', S.first);
+        press('themes', S.theme); press('size', S.size); press('bg', S.bg); press('wd', S.wd); press('first', S.first); press('mode', S.mode);
         $('start').value = S.start;
+        $('month').value = S.month;
+        const month = S.mode === 'month';
+        $('week-pick').hidden = month; $('month-pick').hidden = !month;
+        $('days').hidden = month; $('mcal').hidden = !month; $('mday').hidden = !month;
+        $('fill-week').hidden = !month;
+        $('when-note').textContent = month ? '日付ごとに覚えます。月を変えると、その月の予定が出ます。' : '週を変えても、予定はそのまま残ります（曜日ごとに覚えます）。';
+        $('plan-note').textContent = month
+          ? 'カレンダーの日を押して、その日の予定を入れます。毎週同じ予定なら、1週間のほうで曜日ごとに入れてから「週の予定から入れる」が早いです。'
+          : '左から「時刻」「種類」「内容」。内容は Enter で改行できます（4行まで）。種類は選ぶか自由に書けて、色は種類ごとに決まります。1日に3つまで入れられます。';
         for (const k of ['title', 'sub', 'note']) if ($(k).value !== S[k]) $(k).value = S[k];
         $('tl').checked = S.tl; $('today').checked = S.today; $('past').checked = S.past;
         $('accent').value = S.accent || C.THEMES[S.theme].accent;
@@ -1578,7 +1818,7 @@
 
       // ── 見本・URL ──
       const base = () => new URL('view.html', location.href).href;
-      const urlOf = () => base() + '?d=' + C.encode(S);
+      const urlOf = () => base() + '?d=' + C.encode(C.forUrl(S));
       let drawQueued = false;
       function paint() {
         drawQueued = false;
@@ -1611,7 +1851,7 @@
       if (document.fonts) document.fonts.addEventListener('loadingdone', () => { if (!drawQueued) { drawQueued = true; requestAnimationFrame(paint); } });
 
       // ── 保存・コピー ──
-      const fileName = () => `schedule-${S.start.replace(/-/g, '')}.png`;
+      const fileName = () => `schedule-${(S.mode === 'month' ? S.month : S.start).replace(/-/g, '')}.png`;
       const pngBlob = () => new Promise((res, rej) => {
         // 保存は「画像の見え方」で描く
         const cv = document.createElement('canvas');
@@ -1807,7 +2047,7 @@
       if (obsSaved.auto) connectFromUi();
 
       // ── はじめ ──
-      buildDays();
+      buildPlan();
       syncUI();
       loadImages().then(() => C.ensureFonts(S)).then(() => update());
       update();
