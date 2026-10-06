@@ -29,6 +29,7 @@
 | 配信スケジュールメーカー | [schedule/](schedule/README.md) | 1週間・1か月・週の時間割・1日の進行表から、スケジュール画像を作る（PNG）。OBS のブラウザソースに入れると今日の予定や今の枠を目立たせる（設定は URL） |
 | YouTube チャプターメーカー | [chapter/](chapter/README.md) | タイムスタンプを貼って、概要欄のチャプターに整える。YouTube の条件を確かめて直す・動画を見ながら区切る・時刻をずらす |
 | トーナメント表メーカー | [tournament/](tournament/README.md) | 大会のトーナメント表・試合テロップ・選曲をOBSや画像で使う |
+| スコアアタック集計 | [ranking/](ranking/README.md) | 予選の点数・タイムから順位を出す（合計・曲ごとの順位の合計・理論値比、本戦ライン）。OBS では点数を入れるたびに変わる順位表 |
 | ルーレット | [roulette/](roulette/README.md) | OBSのドックやChromeから回せるルーレット |
 | あみだくじ | [amida/](amida/README.md) | 横線を足したり1人ずつ開けたりできるあみだくじ。OBSにも出せる |
 | サムネイルメーカー | [thumbnail/](thumbnail/README.md) | アイキャッチ・サムネイル・SNS共有画像を作る |

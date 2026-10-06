@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>スコアアタック集計 | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="大会の予選（スコアアタック）の点数やタイムを入れると、合計・曲ごとの順位・理論値比で順位を自動で出す無料ツール。本戦に進む人の線、OBS で点数を入れるたびに変わる順位表、PNG 保存つき。Excel の表を貼り付けてまとめて入れられます。">
+  <link rel="canonical" href="https://donnma.com/tool/ranking/">
+  <meta property="og:title" content="スコアアタック集計 | どんまうんど-Tools">
+  <meta property="og:description" content="予選の点数・タイムから順位を自動で出す。本戦ライン・OBS でその場で変わる順位表・PNG 保存。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/ranking/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-ranking.jpg?v=20261007a">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="スコアアタック集計">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <meta name="twitter:image:alt" content="スコアアタック集計">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho+B1:wght@500;800&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --ok: #7fd8a4;
+      --warn: #ffc46b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace：左に設定、右に見本 ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 48px;
+      display: grid;
+      grid-template-columns: 420px minmax(0, 1fr);
+      grid-template-areas: "settings main";
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings {
+      grid-area: settings;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .main {
+      grid-area: main;
+      position: sticky;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      min-width: 0;
+      max-height: calc(100vh - 88px);
+      overflow-y: auto;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .panel-title .sp {
+      flex: 1;
+    }
+
+    .sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-size: 15px;
+      flex: none;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      border-color: var(--border-strong);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 7px 0;
+      min-width: 0;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .field-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    select,
+    input[type=text],
+    input[type=url],
+    input[type=date],
+    input[type=month],
+    input[type=password] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      min-width: 0;
+      color-scheme: dark;
+    }
+
+    select:focus,
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    input[type=color] {
+      width: 44px;
+      height: 32px;
+      padding: 2px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      background: var(--surface-2);
+      cursor: pointer;
+      flex: none;
+    }
+
+    .inline {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .seg {
+      display: flex;
+      gap: 6px;
+    }
+
+    .seg button {
+      flex: 1 1 0;
+      min-width: 0;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 7px 4px;
+      cursor: pointer;
+      line-height: 1.3;
+    }
+
+    .seg button small {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    .seg button:hover {
+      border-color: var(--accent);
+    }
+
+    .seg button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .themes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .themes button {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .themes button i {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex: none;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+    }
+
+    .themes button[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+      color: var(--text);
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+      cursor: pointer;
+      padding: 6px 0;
+      position: relative;
+    }
+
+    .toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle .sw {
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      position: relative;
+      flex: none;
+      transition: background 0.15s;
+    }
+
+    .toggle .sw::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .toggle input:checked+.sw {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .toggle input:checked+.sw::after {
+      transform: translateX(18px);
+      background: #fff;
+    }
+
+    .toggle input:focus-visible+.sw {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    /* ── 見本 ── */
+    .main-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .main-head .sp {
+      flex: 1;
+    }
+
+    .main-head select {
+      width: auto;
+    }
+
+    .preview {
+      padding: 14px;
+      background: repeating-conic-gradient(#3a2a33 0 25%, #2a1c24 0 50%) 0 0 / 20px 20px;
+      display: grid;
+      place-items: center;
+    }
+
+    .preview canvas {
+      display: block;
+      max-width: 100%;
+      max-height: 62vh;
+      height: auto;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .save-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .save-row .size {
+      font-size: 12px;
+      color: var(--muted);
+      margin-right: auto;
+    }
+
+    .obs-sec {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .obs-sec h3 {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .obs-toggles {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 16px;
+    }
+
+    .url-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
+    }
+
+    .url-row input {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .warn-note {
+      font-size: 11.5px;
+      color: var(--warn);
+    }
+
+    /* OBS につなぐ */
+    .obs-box {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .obs-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .obs-state {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--muted);
+    }
+
+    .obs-state.on {
+      background: rgba(127, 216, 164, 0.15);
+      color: #7fd8a4;
+    }
+
+    .obs-row {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #obs-linked .obs-row {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      margin-bottom: 8px;
+    }
+
+    #obs-linked .obs-mode-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    #obs-commit.dirty {
+      box-shadow: 0 0 0 3px rgba(255, 196, 107, 0.45);
+    }
+
+    #obs-commit:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .notes b {
+      color: var(--label);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 400;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1000px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "main" "settings";
+        padding: 40px 16px 40px;
+      }
+
+      .main {
+        position: static;
+        max-height: none;
+      }
+
+      .guide {
+        padding: 0 16px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      .item {
+        grid-template-columns: 62px 72px minmax(0, 1fr) 24px;
+      }
+
+      .obs-toggles {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      /* スマホでは OBS は動かないので、つなぐところは出さない */
+      .obs-box {
+        display: none;
+      }
+
+      .url-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .url-row #open {
+        display: none;
+      }
+    }
+  
+    /* ── ランキング：左に入力、右に見本 ── */
+    .workspace.rk {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 620px);
+      grid-template-areas: "settings main";
+    }
+
+    .main .preview canvas {
+      max-height: 52vh;
+    }
+
+    /* 点数の表 */
+    .score-wrap {
+      overflow: auto;
+      color-scheme: dark;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      max-height: 62vh;
+    }
+
+    table.scores {
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 100%;
+      font-size: 12.5px;
+    }
+
+    table.scores th,
+    table.scores td {
+      border-bottom: 1px solid var(--border);
+      padding: 0;
+      white-space: nowrap;
+    }
+
+    table.scores thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--bg-deep);
+      color: var(--label);
+      font-weight: 700;
+      padding: 7px 8px;
+      text-align: center;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    table.scores td.no {
+      color: var(--muted);
+      text-align: right;
+      padding: 0 6px;
+      font-variant-numeric: tabular-nums;
+      width: 28px;
+    }
+
+    table.scores input {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      outline: none;
+      padding: 7px 8px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    table.scores input:focus {
+      background: var(--accent-soft);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    table.scores td.name {
+      min-width: 140px;
+    }
+
+    table.scores td.sc {
+      min-width: 110px;
+    }
+
+    table.scores td.sc input {
+      text-align: right;
+      font-family: ui-monospace, Consolas, monospace;
+    }
+
+    table.scores td.sc input.bad {
+      color: var(--warn);
+    }
+
+    table.scores td.sc input.top1 {
+      color: var(--accent-2);
+      font-weight: 700;
+    }
+
+    table.scores td.tot,
+    table.scores td.rk {
+      text-align: right;
+      padding: 0 10px;
+      font-family: ui-monospace, Consolas, monospace;
+      color: var(--accent-2);
+      font-weight: 700;
+    }
+
+    table.scores td.rk {
+      color: var(--text);
+    }
+
+    table.scores tr.pass td.rk {
+      color: var(--ok);
+    }
+
+    table.scores tbody tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .score-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      align-items: center;
+    }
+
+    .score-tools .sp {
+      flex: 1;
+    }
+
+    .bulk-names {
+      margin-top: 10px;
+    }
+
+    .bulk-names textarea {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    /* 課題曲 */
+    .songs {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .song {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr) 130px auto;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .song .no {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .songs:not(.with-max) .song {
+      grid-template-columns: 22px minmax(0, 1fr) auto;
+    }
+
+    .songs:not(.with-max) .song .max {
+      display: none;
+    }
+
+    .icon-btn {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+    }
+
+    .icon-btn:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    .icon-btn:disabled {
+      opacity: 0.25;
+      cursor: default;
+      border-color: transparent;
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0 12px;
+    }
+
+    .pager {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .obs-row2 {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr) auto auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input[type=number] {
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      width: 100%;
+      color-scheme: dark;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topnav -->
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>スコアアタック集計</h1>
+      <p>大会の予選で、参加者ごとの点数（タイム）を入れると、合計や順位を自動で出します。OBS に入れれば、点数を入れるたびに順位表がその場で変わります。</p>
+    </div>
+  </header>
+
+  <div class="workspace rk">
+
+    <!-- 入力 -->
+    <div class="settings">
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">✏️</span>点数を入れる<span class="sp"></span><span class="field-note" id="played"></span></div>
+          <div class="score-wrap">
+            <table class="scores" id="scores"></table>
+          </div>
+          <div class="score-tools">
+            <button class="btn btn-sm btn-primary" type="button" id="add-player">＋ 参加者を足す</button>
+            <button class="btn btn-sm" type="button" id="bulk-toggle">👥 名前をまとめて入れる</button>
+            <span class="sp"></span>
+            <button class="icon-btn" type="button" id="clear-scores" title="点数だけを全部消す" style="width:auto;padding:0 8px">点数を消す</button>
+            <button class="icon-btn" type="button" id="clear-players" title="参加者を全部消す" style="width:auto;padding:0 8px">全部消す</button>
+          </div>
+          <div class="bulk-names" id="bulk-box" hidden>
+            <textarea id="bulk-names" placeholder="1行に1人ずつ書きます。&#10;Excel やスプレッドシートの「名前・点数…」の表を、上の表の名前の欄に貼り付けても入ります。"></textarea>
+            <div class="score-tools">
+              <button class="btn btn-sm btn-primary" type="button" id="bulk-add">下に足す</button>
+            </div>
+          </div>
+          <p class="field-note" style="margin-top:8px">Enter で下へ、Tab で右へ動きます。Excel やスプレッドシートからコピーした表は、貼りたいところの欄に貼り付けるとまとめて入ります（1行目が曲名なら、曲名も入ります）。</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🎵</span>課題曲</div>
+          <div class="songs" id="songs"></div>
+          <div class="score-tools">
+            <button class="btn btn-sm" type="button" id="add-song">＋ 曲を足す</button>
+            <span class="field-note" id="max-note"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🏆</span>大会</div>
+          <div class="field">
+            <span class="field-label"><span>点数かタイムか</span></span>
+            <div class="seg" id="kind">
+              <button type="button" data-v="score">点数（高いほど上）</button>
+              <button type="button" data-v="time">タイム（短いほど上）</button>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>順位の決め方</span></span>
+            <div class="seg" id="method">
+              <button type="button" data-v="sum">合計</button>
+              <button type="button" data-v="rank">曲ごとの順位の合計</button>
+              <button type="button" data-v="ratio">理論値比</button>
+            </div>
+            <span class="field-note" id="method-note"></span>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>本戦に進む人数（0 なら線を引かない）</span></span>
+            <input type="number" id="pass" min="0" max="999" step="1">
+          </div>
+          <div class="two">
+            <div class="field">
+              <span class="field-label"><span>タイトル</span></span>
+              <input type="text" id="title" maxlength="40" spellcheck="false">
+            </div>
+            <div class="field">
+              <span class="field-label"><span>大会名・ひとこと</span></span>
+              <input type="text" id="sub" maxlength="60" placeholder="例：第3回 〇〇杯 予選">
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>お知らせ（下に出す）</span></span>
+            <input type="text" id="note" maxlength="80" placeholder="例：同点のときは、1位を取った曲の数が多い人が上です">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🎨</span>見た目</div>
+          <div class="themes" id="themes"></div>
+          <div class="field">
+            <span class="field-label"><span>色</span></span>
+            <div class="inline">
+              <input type="color" id="accent" aria-label="色">
+              <button class="btn btn-sm" type="button" id="accent-reset">テーマの色に戻す</button>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>大きさ</span></span>
+            <div class="seg" id="size"></div>
+          </div>
+          <div class="field">
+            <span class="field-label"><span>背景</span></span>
+            <div class="seg" id="bg">
+              <button type="button" data-v="theme">テーマ</button>
+              <button type="button" data-v="transparent">透明</button>
+            </div>
+          </div>
+          <label class="toggle"><span>曲ごとの順位も出す</span><input type="checkbox" id="song-rank"><span class="sw"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 見本 -->
+    <div class="main">
+      <div class="main-head">
+        <span>見本</span>
+        <span class="sp"></span>
+        <span class="pager" id="pager" hidden>
+          <button class="btn btn-sm" type="button" id="pg-prev">◀</button>
+          <span id="pg-text"></span>
+          <button class="btn btn-sm" type="button" id="pg-next">▶</button>
+        </span>
+      </div>
+      <div class="preview"><canvas id="cv" aria-label="順位表の見本"></canvas></div>
+      <div class="save-row">
+        <span class="size" id="size-text"></span>
+        <button class="btn" type="button" id="copy-pass" title="本戦に進む人の名前を、順位の順にコピーします（トーナメント表メーカーの参加者にそのまま貼れます）">🏆 通過者をコピー</button>
+        <button class="btn" type="button" id="copy-img">📋 画像をコピー</button>
+        <button class="btn btn-primary" type="button" id="save">⬇ PNG で保存</button>
+      </div>
+
+      <div class="obs-sec">
+        <h3>📺 OBS に出す</h3>
+        <div class="url-row">
+          <input type="text" id="url" readonly aria-label="ブラウザソースの URL">
+          <button class="btn btn-primary" type="button" id="copy-url">📋 URL をコピー</button>
+          <a class="btn" id="open" target="_blank" rel="noopener">↗ 開く</a>
+        </div>
+        <p class="field-note" id="obs-size"></p>
+        <p class="field-note">OBS では、点数を入れた人が光り（NEW）、入りきらないときは 8 秒ごとにページをめくります。下の2つのどちらかで、ここで入れた点数を OBS に届けます。</p>
+        <p class="field-note">① <b>このページを OBS の「カスタムブラウザドック」で開く</b>（同じ OBS の中なので、そのまま届きます）。<br>② <b>Chrome などで開いたまま、下で OBS につなぐ</b>。</p>
+      </div>
+
+      <div class="obs-box">
+        <div class="obs-head"><span>🔌 OBS につなぐ（Chrome などで使うとき）</span><span class="obs-state" id="obs-state">つないでいません</span></div>
+        <div class="obs-row2">
+          <input type="text" id="obs-port" inputmode="numeric" placeholder="4455" aria-label="ポート">
+          <input type="password" id="obs-pass" placeholder="パスワード（なければ空）" aria-label="パスワード" autocomplete="off">
+          <button class="btn btn-primary" type="button" id="obs-connect">つなぐ</button>
+          <button class="btn" type="button" id="obs-disconnect" hidden>切る</button>
+        </div>
+        <p class="field-note" id="obs-msg"></p>
+        <p class="field-note">OBS の「ツール → WebSocket サーバー設定」で、サーバーを有効にしてから使います。つないでいる間は、点数を入れるたびに OBS の表示が変わります。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🔍</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li><b>課題曲</b>と<b>参加者</b>を入れます。名前は「名前をまとめて入れる」で1行ずつ、Excel の表なら貼り付けでも入れられます。</li>
+          <li><b>大会</b>で、点数かタイムか・順位の決め方・本戦に進む人数を決めます。</li>
+          <li>プレイが終わるたびに<b>点数を入れる</b>と、右の順位表がすぐ変わります。</li>
+          <li>OBS に出すときは「📋 URL をコピー」してブラウザソースに貼り、このページを OBS のドックで開くか、「OBS につなぐ」でつなぎます。</li>
+          <li>予選が終わったら<b>「🏆 通過者をコピー」</b>して、トーナメント表メーカーの参加者に貼れば、順位の順にシードが付きます。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">📊</span>順位の決め方</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li><b>合計</b>：全部の曲の点数（タイム）を足します。まだやっていない曲は 0 点です（タイムは、全部の曲をやった人を先に並べます）。</li>
+          <li><b>曲ごとの順位の合計</b>：曲ごとに順位を付けて、その順位を足します。小さいほど上です。曲によって点数の大きさが違っても、同じ重さで比べられます。まだやっていない曲は最下位として数えます。</li>
+          <li><b>理論値比</b>：曲ごとに「点数 ÷ 理論値」を出して平均します。理論値を入れていない曲は、その曲のいちばん高い点数を 100% にします（点数のときだけ）。</li>
+          <li>同じ値のときは同じ順位にして、1位を取った曲の数が多い人を上に並べます。</li>
+        </ul>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>ヒント・注意点</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>点数は「1,000,000」のようにカンマが入っていてもかまいません。タイムは「1:23.45」「83.45」のどちらでも入れられます。</li>
+          <li>入れた点数はこのブラウザに覚えておきます。別のパソコンで使うときは、同じように入れ直してください。</li>
+          <li>参加者が多くて1枚に入りきらないときは、見本の ◀ ▶ でページを切り替えて、ページごとに PNG で保存できます。OBS の URL の最後に <code>#page=1</code> を付けると、そのページだけを出します。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1400px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../common/ask.js?v=20260929a"></script>
+  <script src="ranking-core.js?v=20261007a"></script>
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const ask = (msg, yes) => window.DonnmaAsk.ask(msg, { yes }).then(r => r === true);
+      const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2400); };
+      const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const K = window.RankingCore;
+
+      let S = K.load();
+      let page = 0;
+
+      // ── 保存して、見本と OBS に届ける ──
+      let drawQueued = false;
+      const paint = () => {
+        drawQueued = false;
+        const r = K.draw($('cv'), S, { page, flash: S.last.id && Date.now() - S.last.at < 8000 ? S.last.id : '' });
+        page = r.page;
+        $('pager').hidden = r.pages <= 1;
+        $('pg-text').textContent = `${r.page + 1} / ${r.pages}`;
+      };
+      const queuePaint = () => { if (!drawQueued) { drawQueued = true; requestAnimationFrame(paint); } };
+      function changed() {
+        K.save(S);
+        queuePaint();
+        K.ensureFonts(S).then(queuePaint);
+        updateComputed();
+        scheduleObsPush();
+      }
+      // NEW の光が消えるのを見本にも出す
+      setInterval(() => { if (S.last.at && Date.now() - S.last.at < 9000) queuePaint(); }, 1000);
+
+      // ── 点数の表 ──
+      function buildTable() {
+        const head = `<thead><tr><th>#</th><th>名前</th>${S.songs.map((s, i) => `<th title="${esc(s.name)}">${esc(s.name || `${i + 1}曲目`)}</th>`).join('')}<th>${K.METHODS[S.method]}</th><th>順位</th><th></th></tr></thead>`;
+        const body = S.players.map((p, r) => `<tr data-r="${r}">
+          <td class="no">${r + 1}</td>
+          <td class="name"><input type="text" data-c="0" value="${esc(p.name)}" placeholder="名前" maxlength="40" aria-label="${r + 1}人目の名前"></td>
+          ${S.songs.map((s, i) => `<td class="sc"><input type="text" data-c="${i + 1}" value="${esc(p.scores[i] || '')}" inputmode="${S.kind === 'time' ? 'text' : 'numeric'}" maxlength="20" aria-label="${esc(p.name || (r + 1) + '人目')}・${esc(s.name || (i + 1) + '曲目')}"></td>`).join('')}
+          <td class="tot"></td><td class="rk"></td>
+          <td><button class="icon-btn del" type="button" title="この人を消す" aria-label="この人を消す">✕</button></td>
+        </tr>`).join('');
+        $('scores').innerHTML = head + `<tbody>${body}</tbody>`;
+        updateComputed();
+      }
+      // 合計・順位・入力の色だけ書きかえる（入力中の欄を作り直さない）
+      function updateComputed() {
+        const C = K.compute(S);
+        const byId = new Map(C.rows.map(r => [r.p.id, r]));
+        $('scores').querySelectorAll('tbody tr').forEach(tr => {
+          const p = S.players[Number(tr.dataset.r)];
+          const r = p && byId.get(p.id);
+          if (!r) return;
+          tr.querySelector('.tot').textContent = r.played ? r.show : '';
+          tr.querySelector('.rk').textContent = r.rank == null ? '' : `${r.rank}位`;
+          tr.classList.toggle('pass', S.pass > 0 && r.rank != null && r.rank <= S.pass);
+          tr.querySelectorAll('td.sc input').forEach((inp, i) => {
+            inp.classList.toggle('bad', !!inp.value.trim() && r.vals[i] == null);
+            inp.classList.toggle('top1', r.ranks[i] === 1);
+          });
+        });
+        $('played').textContent = `${C.played} / ${C.total} 人プレイ済み`;
+      }
+      const tbody = () => $('scores').querySelector('tbody');
+      $('scores').addEventListener('input', e => {
+        const inp = e.target; if (inp.dataset.c == null) return;
+        const p = S.players[Number(inp.closest('tr').dataset.r)];
+        const c = Number(inp.dataset.c);
+        if (c === 0) p.name = inp.value;
+        else { p.scores[c - 1] = inp.value; S.last = { id: p.id, at: Date.now() }; }
+        changed();
+      });
+      // Enter で下の人へ（いちばん下なら人を足す）
+      $('scores').addEventListener('keydown', e => {
+        const inp = e.target; if (inp.dataset.c == null || e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+        e.preventDefault();
+        const r = Number(inp.closest('tr').dataset.r), c = inp.dataset.c;
+        const go = rr => { const t = $('scores').querySelector(`tr[data-r="${rr}"] input[data-c="${c}"]`); if (t) { t.focus(); t.select(); return true; } return false; };
+        if (!go(e.shiftKey ? r - 1 : r + 1) && !e.shiftKey) {
+          S.players.push({ id: K.newId(), name: '', scores: S.songs.map(() => '') });
+          buildTable(); changed(); go(r + 1);
+        }
+      });
+      $('scores').addEventListener('click', async e => {
+        const b = e.target.closest('.del'); if (!b) return;
+        const r = Number(b.closest('tr').dataset.r);
+        const p = S.players[r];
+        if ((p.name || p.scores.some(Boolean)) && !await ask(`「${p.name || (r + 1) + '人目'}」を消しますか？`, '消す')) return;
+        S.players.splice(r, 1);
+        buildTable(); changed();
+      });
+      // Excel・スプレッドシートの表を貼る
+      const parseTsv = text => {
+        const t = text.replace(/\r\n?/g, '\n').replace(/\n$/, '');
+        if (!t.includes('\t') && !t.includes('\n')) return null;
+        return t.split('\n').map(l => l.split('\t').map(c => c.trim()));
+      };
+      $('scores').addEventListener('paste', e => {
+        const inp = e.target; if (inp.dataset.c == null) return;
+        const rows = parseTsv(e.clipboardData.getData('text/plain'));
+        if (!rows) return;
+        e.preventDefault();
+        let r0 = Number(inp.closest('tr').dataset.r);
+        const c0 = Number(inp.dataset.c);
+        // 1行目に数が1つもなく、名前の欄から貼ったなら、曲名の行として使う
+        if (c0 === 0 && rows.length > 1 && rows[0].length > 1 && rows[0].slice(1).every(x => K.parseVal(x, S.kind) == null)) {
+          const names = rows.shift().slice(1);
+          names.forEach((n, i) => { if (!S.songs[i]) S.songs.push({ name: '', max: '' }); if (n) S.songs[i].name = n; });
+          S.players.forEach(p => { while (p.scores.length < S.songs.length) p.scores.push(''); });
+        }
+        rows.forEach((row, k) => {
+          const r = r0 + k;
+          if (!S.players[r]) S.players.push({ id: K.newId(), name: '', scores: S.songs.map(() => '') });
+          row.forEach((v, j) => {
+            const c = c0 + j;
+            if (c === 0) S.players[r].name = v;
+            else if (c - 1 < S.songs.length) S.players[r].scores[c - 1] = v;
+          });
+        });
+        S.last = { id: '', at: 0 };
+        buildTable(); buildSongs(); changed();
+        toast(`${rows.length} 行を貼り付けました`);
+      });
+      $('add-player').addEventListener('click', () => {
+        S.players.push({ id: K.newId(), name: '', scores: S.songs.map(() => '') });
+        buildTable(); changed();
+        const t = $('scores').querySelector('tbody tr:last-child input[data-c="0"]'); if (t) t.focus();
+      });
+      $('bulk-toggle').addEventListener('click', () => { $('bulk-box').hidden = !$('bulk-box').hidden; if (!$('bulk-box').hidden) $('bulk-names').focus(); });
+      $('bulk-add').addEventListener('click', () => {
+        const names = $('bulk-names').value.split(/\r?\n/).map(s => s.split('\t')[0].trim()).filter(Boolean);
+        if (!names.length) { toast('名前を1行に1人ずつ書いてください'); return; }
+        // 名前も点数もない行は、先に使う
+        names.forEach(n => {
+          const empty = S.players.find(p => !p.name && !p.scores.some(Boolean));
+          if (empty) empty.name = n; else S.players.push({ id: K.newId(), name: n, scores: S.songs.map(() => '') });
+        });
+        $('bulk-names').value = ''; $('bulk-box').hidden = true;
+        buildTable(); changed();
+        toast(`${names.length} 人を入れました`);
+      });
+      $('clear-scores').addEventListener('click', async () => {
+        if (!await ask('全員の点数を消しますか？（名前と課題曲は残します）', '消す')) return;
+        S.players.forEach(p => { p.scores = S.songs.map(() => ''); });
+        S.last = { id: '', at: 0 };
+        buildTable(); changed();
+      });
+      $('clear-players').addEventListener('click', async () => {
+        if (!await ask('参加者と点数を全部消しますか？（課題曲は残します）', '消す')) return;
+        S.players = []; S.last = { id: '', at: 0 };
+        buildTable(); changed();
+      });
+
+      // ── 課題曲 ──
+      function buildSongs() {
+        $('songs').classList.toggle('with-max', S.kind === 'score' && S.method === 'ratio');
+        $('songs').innerHTML = S.songs.map((s, i) => `<div class="song" data-i="${i}">
+          <span class="no">${i + 1}</span>
+          <input type="text" class="nm" value="${esc(s.name)}" placeholder="曲名" maxlength="40" aria-label="${i + 1}曲目の曲名">
+          <input type="text" class="max" value="${esc(s.max)}" placeholder="理論値（なしでもよい）" maxlength="20" aria-label="${i + 1}曲目の理論値" inputmode="numeric">
+          <span><button class="icon-btn up" type="button" title="上へ" aria-label="上へ"${i ? '' : ' disabled'}>↑</button><button class="icon-btn del" type="button" title="この曲を消す" aria-label="この曲を消す"${S.songs.length > 1 ? '' : ' disabled'}>✕</button></span>
+        </div>`).join('');
+        $('max-note').textContent = S.kind === 'score' && S.method === 'ratio' ? '理論値がない曲は、いちばん高い点数を 100% にします' : '';
+      }
+      $('songs').addEventListener('input', e => {
+        const row = e.target.closest('.song'); if (!row) return;
+        const s = S.songs[Number(row.dataset.i)];
+        if (e.target.classList.contains('nm')) {
+          s.name = e.target.value;
+          const th = $('scores').querySelectorAll('thead th')[Number(row.dataset.i) + 2];
+          if (th) th.textContent = s.name || `${Number(row.dataset.i) + 1}曲目`;
+        } else s.max = e.target.value;
+        changed();
+      });
+      $('songs').addEventListener('click', async e => {
+        const row = e.target.closest('.song'); if (!row) return;
+        const i = Number(row.dataset.i);
+        if (e.target.closest('.up') && i > 0) {
+          [S.songs[i - 1], S.songs[i]] = [S.songs[i], S.songs[i - 1]];
+          S.players.forEach(p => { [p.scores[i - 1], p.scores[i]] = [p.scores[i], p.scores[i - 1]]; });
+        } else if (e.target.closest('.del') && S.songs.length > 1) {
+          if (S.players.some(p => p.scores[i]) && !await ask(`「${S.songs[i].name || (i + 1) + '曲目'}」と、その点数を消しますか？`, '消す')) return;
+          S.songs.splice(i, 1);
+          S.players.forEach(p => p.scores.splice(i, 1));
+        } else return;
+        buildSongs(); buildTable(); changed();
+      });
+      $('add-song').addEventListener('click', () => {
+        if (S.songs.length >= 20) { toast('課題曲は20曲までです'); return; }
+        S.songs.push({ name: `課題曲${S.songs.length + 1}`, max: '' });
+        S.players.forEach(p => p.scores.push(''));
+        buildSongs(); buildTable(); changed();
+      });
+
+      // ── 大会・見た目 ──
+      $('themes').innerHTML = Object.entries(K.THEMES).map(([k, t]) => `<button type="button" data-v="${k}"><i style="background:${t.accent}"></i>${t.name}</button>`).join('');
+      $('size').innerHTML = Object.entries(K.SIZES).map(([k, s]) => `<button type="button" data-v="${k}">${s.name}<small>${s.w}×${s.h}</small></button>`).join('');
+      const METHOD_NOTE = {
+        sum: '全部の曲の点数を足します。',
+        rank: '曲ごとに順位を付けて、順位を足します（小さいほど上）。曲によって点数の大きさが違っても、同じ重さで比べられます。',
+        ratio: '曲ごとに「点数 ÷ 理論値」を出して平均します。理論値は「課題曲」で入れます。',
+      };
+      function syncUI() {
+        const press = (id, v) => { for (const b of $(id).children) b.setAttribute('aria-pressed', String(b.dataset.v === String(v))); };
+        press('kind', S.kind); press('method', S.method); press('themes', S.theme); press('size', S.size); press('bg', S.bg);
+        $('method').querySelector('[data-v="ratio"]').disabled = S.kind === 'time';
+        $('method-note').textContent = METHOD_NOTE[S.method];
+        $('pass').value = S.pass;
+        for (const k of ['title', 'sub', 'note']) if ($(k).value !== S[k]) $(k).value = S[k];
+        $('accent').value = S.accent || K.THEMES[S.theme].accent;
+        $('song-rank').checked = S.songRank;
+        const sz = K.SIZES[S.size];
+        $('size-text').textContent = `${sz.w}×${sz.h}`;
+        $('obs-size').textContent = `OBS のブラウザソースの大きさ：幅 ${sz.w}・高さ ${sz.h}`;
+      }
+      const bindSeg = (id, key, after) => $(id).addEventListener('click', e => {
+        const b = e.target.closest('[data-v]'); if (!b || b.disabled) return;
+        S[key] = b.dataset.v;
+        if (after) after();
+        syncUI(); changed();
+      });
+      bindSeg('kind', 'kind', () => { if (S.kind === 'time' && S.method === 'ratio') S.method = 'sum'; buildSongs(); buildTable(); });
+      bindSeg('method', 'method', () => { buildSongs(); buildTable(); });
+      bindSeg('themes', 'theme', () => { S.accent = ''; });
+      bindSeg('size', 'size', () => { page = 0; });
+      bindSeg('bg', 'bg');
+      $('pass').addEventListener('input', () => { const n = Number($('pass').value); S.pass = n >= 0 ? Math.floor(n) : 0; changed(); });
+      for (const k of ['title', 'sub', 'note']) $(k).addEventListener('input', () => { S[k] = $(k).value; changed(); });
+      $('accent').addEventListener('input', () => { S.accent = $('accent').value; changed(); });
+      $('accent-reset').addEventListener('click', () => { S.accent = ''; syncUI(); changed(); });
+      $('song-rank').addEventListener('change', () => { S.songRank = $('song-rank').checked; changed(); });
+      $('pg-prev').addEventListener('click', () => { page = Math.max(0, page - 1); paint(); });
+      $('pg-next').addEventListener('click', () => { page++; paint(); });
+
+      // ── 保存・コピー ──
+      const pngBlob = () => new Promise((res, rej) => {
+        const cv = document.createElement('canvas');
+        K.draw(cv, S, { page });
+        cv.toBlob(b => (b ? res(b) : rej(new Error('blob'))), 'image/png');
+      });
+      $('save').addEventListener('click', async () => {
+        const pages = K.draw(document.createElement('canvas'), S, {}).pages;
+        const one = async (pg, suffix) => {
+          const cv = document.createElement('canvas');
+          K.draw(cv, S, { page: pg });
+          const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = `ranking${suffix}.png`;
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        };
+        if (pages > 1 && await ask(`${pages} ページあります。全部のページを保存しますか？\n（「いいえ」なら、見本に出しているページだけ）`, '全部保存')) {
+          for (let i = 0; i < pages; i++) await one(i, `-${i + 1}`);
+        } else await one(page, pages > 1 ? `-${page + 1}` : '');
+      });
+      $('copy-img').addEventListener('click', async () => {
+        try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob() })]); toast('画像をコピーしました'); }
+        catch (e) { toast('このブラウザでは画像をコピーできません。「PNG で保存」を使ってください'); }
+      });
+      $('copy-pass').addEventListener('click', async () => {
+        const C = K.compute(S);
+        const names = C.rows.filter(r => r.rank != null && (S.pass <= 0 || r.rank <= S.pass)).map(r => r.p.name).filter(Boolean);
+        if (!names.length) { toast('まだ順位の付いた人がいません'); return; }
+        const text = names.join('\n');
+        try { await navigator.clipboard.writeText(text); } catch (e) { }
+        toast(`${names.length} 人をコピーしました。トーナメント表メーカーの参加者に貼れます`);
+      });
+      const base = () => new URL('view.html', location.href).href;
+      $('url').value = base(); $('open').href = base();
+      $('copy-url').addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText($('url').value); } catch (e) { $('url').select(); document.execCommand('copy'); }
+        toast('URL をコピーしました。OBS のブラウザソースに貼ってください');
+      });
+
+      // ── OBS につなぐ（obs-websocket v5 の emit_event で、view.html に届ける。トーナメント表メーカーと同じ作り） ──
+      const OBS_KEY = 'donnma-ranking-obs';
+      const obs = { ws: null, ready: false, id: 1, pending: new Map(), timer: 0 };
+      let obsSaved = { port: 4455, password: '', auto: false };
+      try { obsSaved = { ...obsSaved, ...JSON.parse(localStorage.getItem(OBS_KEY) || '{}') }; } catch (e) { }
+      const obsStore = () => { try { localStorage.setItem(OBS_KEY, JSON.stringify(obsSaved)); } catch (e) { } };
+      const obsMsg = t => { $('obs-msg').textContent = t || ''; };
+      function obsUi() {
+        $('obs-state').textContent = obs.ready ? 'つないでいます' : 'つないでいません';
+        $('obs-state').classList.toggle('on', obs.ready);
+        $('obs-connect').hidden = obs.ready;
+        $('obs-disconnect').hidden = !obs.ready;
+      }
+      async function obsAuth(password, salt, challenge) {
+        const enc = new TextEncoder();
+        const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+        const secret = b64(await crypto.subtle.digest('SHA-256', enc.encode(password + salt)));
+        return b64(await crypto.subtle.digest('SHA-256', enc.encode(secret + challenge)));
+      }
+      function obsClose() { if (obs.ws) { const ws = obs.ws; obs.ws = null; obs.ready = false; ws.close(); } obsUi(); }
+      function obsConnect(port, password) {
+        obsClose();
+        return new Promise((resolve, reject) => {
+          let ws;
+          try { ws = new WebSocket(`ws://127.0.0.1:${port}`, 'obswebsocket.json'); } catch (e) { reject(new Error('ポートが正しくありません')); return; }
+          obs.ws = ws;
+          ws.onmessage = async ev => {
+            const msg = JSON.parse(ev.data);
+            if (msg.op === 0) {
+              const identify = { rpcVersion: 1, eventSubscriptions: 0 };
+              const a = msg.d.authentication;
+              if (a) {
+                if (!password) { reject(new Error('パスワードが要ります')); ws.close(); return; }
+                identify.authentication = await obsAuth(password, a.salt, a.challenge);
+              }
+              ws.send(JSON.stringify({ op: 1, d: identify }));
+            } else if (msg.op === 2) { obs.ready = true; obsUi(); resolve(); }
+            else if (msg.op === 7) {
+              const pr = obs.pending.get(msg.d.requestId);
+              if (!pr) return;
+              obs.pending.delete(msg.d.requestId);
+              msg.d.requestStatus.result ? pr.resolve() : pr.reject(new Error(msg.d.requestStatus.comment || `エラー ${msg.d.requestStatus.code}`));
+            }
+          };
+          ws.onclose = ev => {
+            const was = obs.ready;
+            if (obs.ws === ws) { obs.ws = null; obs.ready = false; }
+            obs.pending.forEach(pr => pr.reject(new Error('切れました'))); obs.pending.clear();
+            obsUi();
+            if (ev.code === 4009) reject(new Error('パスワードが違います'));
+            else if (!was) reject(new Error('OBS につながりません（OBS が起動しているか、WebSocket サーバーが有効か確かめてください）'));
+            else obsMsg('OBS との接続が切れました');
+          };
+        });
+      }
+      function obsPush() {
+        if (!obs.ready) return;
+        const requestId = String(obs.id++);
+        obs.pending.set(requestId, { resolve() { }, reject(err) { obsMsg('送れませんでした：' + err.message); } });
+        obs.ws.send(JSON.stringify({ op: 6, d: { requestType: 'CallVendorRequest', requestId, requestData: {
+          vendorName: 'obs-browser', requestType: 'emit_event',
+          requestData: { event_name: 'donnmaRankingUpdate', event_data: S },
+        } } }));
+      }
+      function scheduleObsPush() { if (!obs.ready) return; clearTimeout(obs.timer); obs.timer = setTimeout(obsPush, 250); }
+      async function connectFromUi(silent) {
+        const port = +$('obs-port').value || 4455, password = $('obs-pass').value;
+        $('obs-connect').disabled = true; obsMsg('つないでいます…');
+        try {
+          await obsConnect(port, password);
+          obsSaved = { port, password, auto: true }; obsStore();
+          obsPush();
+          obsMsg('つなぎました。点数を入れるたびに OBS の表示が変わります');
+        } catch (e) { obsMsg(e.message); }
+        $('obs-connect').disabled = false;
+      }
+      $('obs-port').value = obsSaved.port || 4455;
+      $('obs-pass').value = obsSaved.password || '';
+      $('obs-connect').addEventListener('click', () => connectFromUi(false));
+      $('obs-pass').addEventListener('keydown', e => { if (e.key === 'Enter') connectFromUi(false); });
+      $('obs-disconnect').addEventListener('click', () => { obsSaved.auto = false; obsStore(); obsClose(); obsMsg(''); });
+      obsUi();
+      // 前につないでいたら、つなぎ直す（OBS のドックの中で開いているときは、つながなくても届くのでつながない）
+      if (obsSaved.auto && !window.obsstudio) connectFromUi(true);
+
+      // 別の場所（ドックなど）で点数が変わったら、こちらも読み直す
+      addEventListener('storage', e => {
+        if (e.key !== K.STORE_KEY) return;
+        S = K.load();
+        syncUI(); buildSongs(); buildTable(); queuePaint();
+        scheduleObsPush();
+      });
+
+      // ── はじめ ──
+      if (!S.players.length) {
+        // はじめての人向けの見本
+        S.players = ['プレイヤーA', 'プレイヤーB', 'プレイヤーC'].map(n => ({ id: K.newId(), name: n, scores: S.songs.map(() => '') }));
+      }
+      syncUI();
+      buildSongs();
+      buildTable();
+      changed();
+    })();
+  </script>
+</body>
+
+</html>

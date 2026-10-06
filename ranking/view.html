@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>スコアアタック集計（OBS 用）</title>
+  <!--
+    OBS のブラウザソースに入れるページ。
+    中身は、同じ OBS の中で開いた作るページ（カスタムブラウザドック）が保存したもの（storage イベント）か、
+    Chrome の作るページから obs-websocket の emit_event（donnmaRankingUpdate）で届いたものを使う。
+    #page=1 などでページを決める（なければ、入りきらないときに 8 秒ごとにめくる）。
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Shippori+Mincho+B1:wght@500;800&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100vw;
+      max-height: 100vh;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="cv"></canvas>
+  <script src="ranking-core.js?v=20261007a"></script>
+  <script>
+    (async () => {
+      'use strict';
+      const K = window.RankingCore;
+      const cv = document.getElementById('cv');
+      let data = K.load();
+      const hash = new URLSearchParams(location.hash.slice(1));
+      const fixedPage = Number(hash.get('page')) || 0;
+      let page = fixedPage ? fixedPage - 1 : 0;
+      let pages = 1;
+      let holdUntil = 0;
+      // 最後に点数を入れた人を、しばらく光らせる
+      const FLASH_MS = 8000;
+      const flashId = () => (data.last && data.last.id && Date.now() - data.last.at < FLASH_MS ? data.last.id : '');
+
+      const paint = () => { pages = K.draw(cv, data, { page, flash: flashId() }).pages; };
+      const apply = d => {
+        const prevLast = data.last && data.last.at;
+        data = K.normalize(d);
+        // 点数が入ったら、その人のいるページを出す
+        if (!fixedPage && data.last && data.last.at !== prevLast && data.last.id) {
+          const C = K.compute(data);
+          const idx = C.rows.findIndex(r => r.p.id === data.last.id);
+          const first = K.draw(document.createElement('canvas'), data, {});
+          if (idx >= 0 && first.pages > 1) {
+            page = Math.floor(idx / first.perPage);
+            holdUntil = Date.now() + FLASH_MS;
+          }
+        }
+        K.ensureFonts(data).then(paint);
+        paint();
+      };
+
+      // 同じ OBS の中の作るページが保存したとき
+      addEventListener('storage', e => { if (e.key === K.STORE_KEY) apply(K.load()); });
+      // Chrome の作るページから、obs-websocket で届いたとき（届いたものはここにも保存しておく）
+      addEventListener('donnmaRankingUpdate', e => {
+        if (!e.detail) return;
+        apply(e.detail);
+        K.save(data);
+      });
+
+      // 入りきらないときは、8 秒ごとにめくる（点数が入った直後は、その人のページで止める）
+      setInterval(() => {
+        if (fixedPage || pages <= 1 || Date.now() < holdUntil) return;
+        page = (page + 1) % pages;
+        paint();
+      }, 8000);
+      // NEW の光を消すため
+      setInterval(paint, 2000);
+
+      await K.ensureFonts(data);
+      paint();
+      if (document.fonts) document.fonts.addEventListener('loadingdone', paint);
+    })();
+  </script>
+</body>
+
+</html>
