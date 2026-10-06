@@ -1616,6 +1616,7 @@
           <li>各サービスは、一度取った OGP をしばらく覚えています。直したあとは、URL の後ろに <b>?a=1</b> のような、意味のない文字を付けて貼ると、取り直してくれます。</li>
           <li>Mastodon・Misskey は、投稿した人のサーバーがそれぞれ取りに行って覚えます。サーバーごとに、新しくなるまでの時間が違います。</li>
           <li>Facebook は <a href="https://developers.facebook.com/tools/debug/" target="_blank" rel="noopener">シェアデバッガー</a> で「もう一度スクレイピング」すると、すぐ新しくなります。</li>
+          <li>画像のファイル名に日本語や空白が入っていると、画像が出ないサービスがあります。OGP 画像のファイル名は半角英数字にしてください。</li>
           <li>画像を同じ名前で差し替えたときは、画像の URL の後ろに <b>?v=2</b> などを付けて、別のファイルとして読ませてください。</li>
           <li>WordPress などで、CSS をページの中にまとめて書き込む「高速化」の設定を使っていると、ページの頭が重くなって、OGP まで読まれないことがあります。チェックの「タグの位置」を見てください。</li>
         </ul>
@@ -1955,6 +1956,7 @@
           const where = i.for.join('・');
           if (!/^https?:\/\//i.test(i.raw)) add('warn', `${where} が「${esc(i.raw)}」のように、https:// から始まっていません`, 'このツールは補って読みましたが、そのままでは読めないサービスがあります。https:// から始まる URL で書いてください。');
           else if (/^http:\/\//i.test(i.raw)) add('warn', `${where} の URL が http:// です`, 'https:// でないと出ないサービスがあります。');
+          if (/[^\x21-\x7e]/.test(i.raw)) add('warn', `${where} の URL に、日本語や空白が入っています`, `そのままだと画像が出ないサービスがあります（このツールやブラウザでは出ても、です）。ファイル名を ${code('ogp.jpg')} のような半角英数字にするのがいちばん確実です。変えられないときは ${code(i.raw.replace(/[^\x21-\x7e]+/g, s => encodeURIComponent(s)))} のように、% の形に直して書いてください。`);
           const imgBlocked = blockedFor(i.robotsBlocked);
           if (imgBlocked.length) {
             let path = i.url; try { const u = new URL(i.url); path = u.pathname + u.search; } catch { /* そのまま */ }
