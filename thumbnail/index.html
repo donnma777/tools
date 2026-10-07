@@ -2158,6 +2158,17 @@
       padding-top: 8px;
     }
 
+    /* 後ろの色の「角の丸み」：見出しは上の行のスイッチの文字と同じ大きさ */
+    .plate-round .hl-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--label);
+    }
+
+    .plate-round .field-val {
+      text-align: right;
+    }
+
     .extra-vert {
       display: flex;
       padding-top: 8px;
@@ -2552,9 +2563,9 @@
         textScale: 1, textAlign: 'center', textX: 0, textY: 0,
         titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
         extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0, subScale: 1, titleRot: 0, subRot: 0, titleArc: 0, titleVert: false,
-        imgPos: 'left', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart',
+        imgPos: 'left', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart', picPlate: false, picPlateColor: '#ffffff', picPlateAlpha: 0.85, picPlateRound: 40,
         subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subBoxAlpha: 1, subArc: 0,
-        logoMode: 'none', logoCorner: 'br', logoScale: 1,
+        logoMode: 'none', logoCorner: 'br', logoScale: 1, plateRound: 40,
         bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, bandLayer: 'front', bandEdge: 'straight', bandAccent: '#ff85a1', logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
         hidden: [], padOn: false, padSize: 4, padColor: '#ffffff', padRound: 0, padShape: 'square', padT: true, padB: true, padL: true, padR: true, padLine: false, padAccent: '#ff85a1', guideOn: false,
@@ -2587,6 +2598,31 @@
         ['right', '右・真ん中（文字は左）'], ['right-bottom', '右・下（文字は左）'], ['right-top', '右・上（文字は左）'],
         ['top', '上（文字は下）'], ['bottom', '下（文字は上）'], ['center', '真ん中（文字の後ろ）'],
         ['free', '自由に置く（文字はよけない）'], ['none', '置かない（文字だけ）']];
+      // ロゴの帯を敷くか（帯の中にロゴ・帯だけ）
+      const isBand = s => s.logoMode === 'band' || s.logoMode === 'bandonly';
+      // 画像の後ろに色を敷く1行（スイッチ・色・濃さ）
+      const PLATE_ROW = '<div class="plate-box"><div class="extra-stroke extra-plate"><label class="toggle"><span>後ろに色</span><input type="checkbox"><span class="sw"></span></label>'
+        + '<input type="color" aria-label="後ろの色" title="後ろの色"><input type="range" class="shape-alpha" min="0.1" max="1" step="0.05" aria-label="後ろの色の濃さ" title="後ろの色の濃さ"><span class="field-val shape-alpha-val"></span></div>'
+        + '<div class="extra-arc plate-round"><span class="hl-label">角の丸み</span><input type="range" min="0" max="100" step="5" aria-label="後ろの色の角の丸み（0 で四角）" title="0 で四角、100 でいちばん丸い"><span class="field-val"></span></div></div>';
+      function plateRow(row, ex) {
+        // 前からある画像・足したばかりの画像には値がないので、ここで入れる
+        ex.plateOn = !!ex.plateOn; ex.plateColor = ex.plateColor || '#ffffff'; ex.plateAlpha = ex.plateAlpha || 0.85;
+        if (!(ex.plateRound >= 0)) ex.plateRound = 40;
+        const el = row.querySelector('.extra-plate'), rEl = row.querySelector('.plate-round');
+        const [on, col] = el.querySelectorAll('input');
+        const rIn = rEl.querySelector('input'), rVal = rEl.querySelector('.field-val');
+        shapeAlpha(el, () => ex.plateAlpha, v => { ex.plateAlpha = v; redraw(); }, () => ex.plateOn);
+        const ui = () => {
+          on.checked = ex.plateOn; col.value = ex.plateColor; col.style.visibility = ex.plateOn ? '' : 'hidden'; el.alphaUi();
+          rIn.value = ex.plateRound; rVal.textContent = `${ex.plateRound}%`;
+          rEl.style.display = ex.plateOn ? '' : 'none';
+        };
+        ui();
+        on.onchange = () => { ex.plateOn = on.checked; ui(); redraw(); };
+        col.oninput = () => { ex.plateColor = col.value; redraw(); };
+        rIn.oninput = () => { ex.plateRound = parseInt(rIn.value, 10); rVal.textContent = `${ex.plateRound}%`; redraw(); };
+        return ui;
+      }
       function sanitize(o) {
         const out = { ...DEFAULTS };
         if (!o || typeof o !== 'object') return out;
@@ -2603,9 +2639,14 @@
         out.bgBright = Math.max(-80, Math.min(80, out.bgBright));
         out.padSize = Math.max(1, Math.min(15, out.padSize));
         out.padRound = Math.max(0, Math.min(10, out.padRound));
+        out.picPlateAlpha = Math.max(0.1, Math.min(1, out.picPlateAlpha));
+        out.picPlateRound = Math.max(0, Math.min(100, Math.round(out.picPlateRound)));
+        out.plateRound = Math.max(0, Math.min(100, Math.round(out.plateRound)));
         if (!['square', 'scallop', 'lace'].includes(out.padShape)) out.padShape = 'square';
         if (!['straight', 'scallop', 'lace'].includes(out.bandEdge)) out.bandEdge = 'straight';
         if (!['bottom', 'top', 'left', 'right'].includes(out.bandPos)) out.bandPos = 'bottom';
+        // 「自由に置く」は選んだときに追加した画像へ移すので、置き方としては残さない
+        if (!['none', 'replace', 'above', 'below', 'corner', 'band', 'bandonly'].includes(out.logoMode)) out.logoMode = 'none';
         // 前の「縦の位置」を置き場所に入れ込む
         if (o.imgAnchor === 'bottom' && (out.imgPos === 'left' || out.imgPos === 'right')) out.imgPos += '-bottom';
         if (!['heart', 'star', 'bunny'].includes(out.sample)) out.sample = 'heart';
@@ -2629,6 +2670,12 @@
             align: ['left', 'center', 'right'].includes(e.align) ? e.align : 'center',
             arc: +e.arc >= -1 && +e.arc <= 1 ? +e.arc : 0, vert: e.vert === true,
             hlColor: hex(e.hlColor, '#f0325a'), hlScale: +e.hlScale >= 0.8 && +e.hlScale <= 1.6 ? +e.hlScale : 1.15,
+          });
+          // 画像の後ろに敷く色（ロゴの後ろの色と同じ形）
+          else Object.assign(base, {
+            plateOn: e.plateOn === true, plateColor: hex(e.plateColor, '#ffffff'),
+            plateAlpha: +e.plateAlpha >= 0.1 && +e.plateAlpha <= 1 ? +e.plateAlpha : 0.85,
+            plateRound: +e.plateRound >= 0 && +e.plateRound <= 100 ? Math.round(+e.plateRound) : 40,
           });
           return base;
         }) : [];
@@ -2760,19 +2807,20 @@
           title: 'ロゴ', icon: '🏷️', open: true, fields: [
             {
               k: 'logoMode', l: 'ロゴの置き方', t: 'select', o: [['none', '使わない'], ['replace', 'タイトルの代わりに大きく（下にサブタイトル）'],
-              ['above', 'タイトルの上に'], ['below', 'タイトルの下に'], ['corner', '隅に小さく'], ['band', '帯の中に（上下左右のどこかに帯を敷く）']]
+              ['above', 'タイトルの上に'], ['below', 'タイトルの下に'], ['corner', '隅に小さく'], ['band', '帯の中に（上下左右のどこかに帯を敷く）'],
+              ['bandonly', '帯だけ（ロゴは入れない）'], ['free', '自由に置く（追加した画像にする）']]
             },
             { k: 'logoCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], when: s => s.logoMode === 'corner' },
-            { k: 'logoScale', l: 'ロゴの大きさ', t: 'range', min: 0.3, max: 1.6, step: 0.05, u: '倍', when: s => s.logoMode !== 'none' },
-            { k: 'bandPos', l: '帯の位置', t: 'select', o: [['bottom', '下'], ['top', '上'], ['left', '左（縦のロゴに）'], ['right', '右（縦のロゴに）']], when: s => s.logoMode === 'band' },
-            { k: 'bandColor', l: '帯の色', t: 'color', when: s => s.logoMode === 'band' },
-            { k: 'bandSize', l: '帯の太さ', t: 'range', min: 0.5, max: 2.5, step: 0.05, u: '倍', when: s => s.logoMode === 'band' },
-            { k: 'bandEdge', l: '帯のふちの形', t: 'select', o: [['straight', 'まっすぐ'], ['scallop', '波（スカラップ）'], ['lace', 'レース']], when: s => s.logoMode === 'band' },
-            { k: 'bandAccent', l: 'レースの穴の色', t: 'color', when: s => s.logoMode === 'band' && s.bandEdge === 'lace' },
-            { k: 'bandLayer', l: '帯の重なり', t: 'select', o: [['front', 'いちばん上（画像や文字を隠す）'], ['back', '背景のすぐ上（画像や文字を上に重ねられる）']], when: s => s.logoMode === 'band' },
-            { k: 'logoPlate', l: 'ロゴの後ろに色を敷く', t: 'check', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' },
-            { k: 'plateColor', l: 'ロゴの後ろの色', t: 'color', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
-            { k: 'plateAlpha', l: 'ロゴの後ろの色の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', when: s => s.logoMode !== 'none' && s.logoMode !== 'band' && s.logoPlate },
+            { k: 'logoScale', l: 'ロゴの大きさ', t: 'range', min: 0.3, max: 1.6, step: 0.05, u: '倍', home: 'none' },
+            { k: 'bandPos', l: '帯の位置', t: 'select', o: [['bottom', '下'], ['top', '上'], ['left', '左（縦のロゴに）'], ['right', '右（縦のロゴに）']], when: isBand },
+            { k: 'bandColor', l: '帯の色', t: 'color', when: isBand },
+            { k: 'bandSize', l: '帯の太さ', t: 'range', min: 0.5, max: 2.5, step: 0.05, u: '倍', when: isBand },
+            { k: 'bandEdge', l: '帯のふちの形', t: 'select', o: [['straight', 'まっすぐ'], ['scallop', '波（スカラップ）'], ['lace', 'レース']], when: isBand },
+            { k: 'bandAccent', l: 'レースの穴の色', t: 'color', when: s => isBand(s) && s.bandEdge === 'lace' },
+            { k: 'bandLayer', l: '帯の重なり', t: 'select', o: [['front', 'いちばん上（画像や文字を隠す）'], ['back', '背景のすぐ上（画像や文字を上に重ねられる）']], when: isBand },
+            { k: 'logoPlate', l: 'ロゴの後ろに色を敷く', t: 'check', home: 'none' },
+            { k: 'plateColor', l: 'ロゴの後ろの色', t: 'color', home: 'none' },
+            { k: 'plateAlpha', l: 'ロゴの後ろの色の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', home: 'none' },
           ]
         },
         {
@@ -2967,6 +3015,16 @@
           box.append(...d.querySelector(':scope > .fields').children);
           d.remove();
         }
+        // ロゴの後ろの色：追加の画像と同じ1行（値は S.logoPlate・plateColor・plateAlpha）
+        logoOpts.insertAdjacentHTML('beforeend', PLATE_ROW);
+        logoPlateRow = logoOpts.lastElementChild;
+        logoPlateRow.classList.add('field-full');
+        logoPlateUi = plateRow(logoOpts, {
+          get plateOn() { return S.logoPlate; }, set plateOn(v) { S.logoPlate = v; },
+          get plateColor() { return S.plateColor; }, set plateColor(v) { S.plateColor = v; },
+          get plateAlpha() { return S.plateAlpha; }, set plateAlpha(v) { S.plateAlpha = v; },
+          get plateRound() { return S.plateRound; }, set plateRound(v) { S.plateRound = v; },
+        });
         // メインの画像の置き方は、メインのカードの中に
         $('main-opts').append(inputs.imgPos.wrap, inputs.sample.wrap);
         // 1枚目の画像のバー（追加の画像と同じ形）
@@ -2983,12 +3041,15 @@
           hiddenBin.appendChild(f);
         }
       }
+      let logoPlateRow = null, logoPlateUi = null;
       function refreshVisibility() {
         for (const k in inputs) {
           const { f, wrap, labelEl } = inputs[k];
           wrap.hidden = f.when ? !f.when(S) : false;
           if (typeof f.l === 'function') labelEl.textContent = f.l(S);
         }
+        // ロゴの後ろの色は、ロゴを帯以外に置くときだけ
+        if (logoPlateRow) { logoPlateUi(); logoPlateRow.style.display = S.logoMode !== 'none' && !isBand(S) ? '' : 'none'; }
       }
       function syncUI() {
         for (const k in inputs) if (!k.startsWith('_')) inputs[k].set(S[k]);
@@ -3004,6 +3065,7 @@
       function update(k, v) {
         // 「自由に置く」は、メインの画像を追加した画像に変える（置き場所としては残さない）
         if (k === 'imgPos' && v === 'free') { freeMain(); return; }
+        if (k === 'logoMode' && v === 'free') { freeLogo(); return; }
         if (k === 'sample' && (v === 'own' || v === 'pick' || img.side || S.imgPos === 'none')) { pickSample(v); return; }
         S[k] = v;
         refreshVisibility();
@@ -3134,7 +3196,7 @@
       const dims = () => S.size === 'custom' ? [S.customW, S.customH] : SIZES[S.size].slice(0, 2);
 
       // プレビューでドラッグするための、画像・文字・追加の画像の場所（canvas の座標）
-      let lastHit = { pic: null, text: null, sub: null, extras: [] };
+      let lastHit = { pic: null, text: null, sub: null, extras: [], logo: null };
       // まわりの余白の幅（辺ごと。付けない辺は 0）。p は1辺の幅
       function padOf(W0, H0) {
         const p = S.padOn ? Math.round(Math.min(W0, H0) * S.padSize / 100) : 0;
@@ -3149,7 +3211,8 @@
         if (!S.order.includes('@frame')) fixOrder(S);
         const W = W0 - P.l - P.r, H = H0 - P.t - P.b;
         const B = bandOf(W, H), band = B.size;
-        // 帯とロゴ（canvas 全体の座標で描く）。左右の帯は縦のロゴ用
+        // 帯とロゴ（canvas 全体の座標で描く）。左右の帯は縦のロゴ用。bandLogo は帯の中のロゴの場所
+        let bandLogo = null;
         const drawBand = c => {
           c.save();
           c.setTransform(1, 0, 0, 1, 0, 0);
@@ -3169,12 +3232,12 @@
               c.restore();
             } else drawEdgeBumps(c, P.l, W, edge, dir, rb, lace, S.bandColor, S.bandAccent);
           }
-          if (img.logo) {
+          if (img.logo && S.logoMode === 'band') {
             const lw = img.logo.width, lh = img.logo.height;
             const r = B.side ? Math.min(band * 0.56 * S.logoScale / lw, H * 0.7 / lh) : Math.min(W * 0.5 / lw, band * 0.56 * S.logoScale / lh);
             const w = lw * r, h = lh * r;
-            if (B.side) c.drawImage(img.logo, x + band / 2 - w / 2, P.t + H / 2 - h / 2, w, h);
-            else c.drawImage(img.logo, P.l + W / 2 - w / 2, y + band / 2 - h / 2, w, h);
+            bandLogo = B.side ? { x: x + band / 2 - w / 2, y: P.t + H / 2 - h / 2, w, h } : { x: P.l + W / 2 - w / 2, y: y + band / 2 - h / 2, w, h };
+            c.drawImage(img.logo, bandLogo.x, bandLogo.y, w, h);
           }
           c.restore();
         };
@@ -3186,12 +3249,12 @@
         });
         if (cv === $('cv')) {
           const sh = r => r && { ...r, x: r.x + P.l + B.dx, y: r.y + P.t + B.dy };
-          lastHit = { pic: sh(hit.pic), text: sh(hit.text), sub: sh(hit.sub), extras: hit.extras.map(sh) };
+          lastHit = { pic: sh(hit.pic), text: sh(hit.text), sub: sh(hit.sub), extras: hit.extras.map(sh), logo: sh(hit.logo) || bandLogo };
         }
       }
       // ロゴの帯の太さと場所（W×H は余白の内側）。w・h は中身から引く幅・高さ、dx・dy は中身をずらす量
       function bandOf(W, H) {
-        const size = S.logoMode === 'band' && !S.hidden.includes('@logo') ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
+        const size = isBand(S) && !S.hidden.includes('@logo') ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
         const pos = S.bandPos, side = pos === 'left' || pos === 'right';
         return { size, pos, side, w: side ? size : 0, h: side ? 0 : size, dx: pos === 'left' ? size : 0, dy: pos === 'top' ? size : 0 };
       }
@@ -3399,7 +3462,7 @@
 
         // ---- 文字（とロゴ）：上から ロゴ → タイトル → サブタイトル を、帯の中で上下の真ん中にそろえる
         const logo = S.logoMode !== 'none' && !S.hidden.includes('@logo') ? img.logo : null;
-        const mode = logo && S.logoMode !== 'band' ? S.logoMode : 'none';
+        const mode = logo && !isBand(S) ? S.logoMode : 'none';
         const lines = mode === 'replace' || S.hidden.includes('@text') ? [] : S.title.replace(/\s+$/, '').split('\n');
         const aw = area.r - area.l, bh = band.b - band.t, mid = (area.l + area.r) / 2;
         const lh = 1.14, gap = 14 * k;
@@ -3467,11 +3530,14 @@
           c.save();
           c.translate(pic.x + pic.w / 2, pic.y + pic.h / 2);
           c.rotate(S.imgRot * Math.PI / 180);
+          plate(-pic.w / 2, -pic.h / 2, pic.w, pic.h, S.picPlate, S.picPlateColor, S.picPlateAlpha, 20 * k, S.picPlateRound);
           c.drawImage(side, -pic.w / 2, -pic.h / 2, pic.w, pic.h);
           c.restore();
         };
         // ---- 追加の画像・文字。位置は中心の %。画像の大きさは短い辺の 30% が 1倍、文字は 64px（1200×630 のとき）が 1倍
         const extras = [];
+        // 描いたロゴの場所（ロゴを「自由に置く」に移すときに使う）
+        let logoR = null;
         const drawExtra = e => {
           const cx = e.x / 100 * W, cy = e.y / 100 * H;
           if (e.type === 'text') {
@@ -3535,18 +3601,22 @@
           c.save();
           c.translate(cx, cy);
           c.rotate((e.rot || 0) * Math.PI / 180);
+          plate(-w / 2, -h / 2, w, h, e.plateOn, e.plateColor, e.plateAlpha, 20 * k, e.plateRound);
           c.drawImage(im, -w / 2, -h / 2, w, h);
           c.restore();
           extras.push({ id: e.id, x: cx - w / 2, y: cy - h / 2, w, h });
         };
-        const plate = (x, y, w, h) => {
-          if (!S.logoPlate) return;
-          const pad = Math.max(8 * k, h * 0.2);
+        // 画像の後ろに色を敷く。省くとロゴの設定。maxPad はまわりの余白の上限（大きな画像で広がりすぎないように）
+        // round は角の丸み（0 で四角、100 で短い辺の半分）
+        const plate = (x, y, w, h, on = S.logoPlate, color = S.plateColor, alpha = S.plateAlpha, maxPad = Infinity, round = S.plateRound) => {
+          if (!on) return;
+          const pad = Math.max(8 * k, Math.min(h * 0.2, maxPad));
+          const pw = w + pad * 2, ph = h + pad * 1.4;
           c.save();
-          c.globalAlpha = S.plateAlpha;
-          c.fillStyle = S.plateColor;
+          c.globalAlpha = alpha;
+          c.fillStyle = color;
           c.beginPath();
-          c.roundRect(x - pad, y - pad * 0.7, w + pad * 2, h + pad * 1.4, Math.min(h * 0.45 + pad, 40 * k));
+          c.roundRect(x - pad, y - pad * 0.7, pw, ph, Math.min(pw, ph) / 2 * (round ?? 40) / 100);
           c.fill();
           c.restore();
         };
@@ -3554,6 +3624,7 @@
           if (paint) {
             const lx = cxOf(lg.w) - lg.w / 2;
             plate(lx, y, lg.w, lg.h);
+            logoR = { x: lx, y, w: lg.w, h: lg.h };
             c.save();
             if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = 10 * k; c.shadowOffsetY = 5 * k; }
             c.drawImage(logo, lx, y, lg.w, lg.h);
@@ -3637,6 +3708,7 @@
             const x = S.logoCorner.endsWith('l') ? m : S.logoCorner.endsWith('c') ? (W - w) / 2 : W - m - w;
             const yy = S.logoCorner.startsWith('t') ? m : H - m - h;
             plate(x, yy, w, h);
+            logoR = { x, y: yy, w, h };
             c.save();
             if (S.shadow) { c.shadowColor = 'rgba(0, 0, 0, 0.25)'; c.shadowBlur = 8 * k; c.shadowOffsetY = 3 * k; }
             c.drawImage(logo, x, yy, w, h);
@@ -3705,7 +3777,7 @@
         }
         c.restore();
         if (opt.overLayers) opt.overLayers(c);
-        return { pic, text: titleRect, sub: subRect, extras };
+        return { pic, text: titleRect, sub: subRect, extras, logo: logoR };
       }
 
       // 背景の明るさ：背景（と、まわりを明るくする分）の上に黒か白を重ねる
@@ -4350,7 +4422,7 @@
           const { url, im } = await readImage(f, 1600);
           img.logo = im;
           keep(LOGO_KEY, url);
-          if (S.logoMode === 'none') { S.logoMode = 'replace'; syncUI(); }
+          if (S.logoMode === 'none' || S.logoMode === 'bandonly') { S.logoMode = S.logoMode === 'none' ? 'replace' : 'band'; syncUI(); }
           setLogoThumb();
           redraw();
         } catch (err) { toast(err.message); }
@@ -4445,7 +4517,19 @@
       const titleOpts = $('title-opts'), subOpts = $('sub-opts'), frameOpts = $('frame-opts');
       const logoOpts = $('logo-opts'), bgOpts = $('bg-opts');
       let subBars = null;
+      const mainPlate = {
+        get plateOn() { return S.picPlate; }, set plateOn(v) { S.picPlate = v; },
+        get plateColor() { return S.picPlateColor; }, set plateColor(v) { S.picPlateColor = v; },
+        get plateAlpha() { return S.picPlateAlpha; }, set plateAlpha(v) { S.picPlateAlpha = v; },
+        get plateRound() { return S.picPlateRound; }, set plateRound(v) { S.picPlateRound = v; },
+      };
+      let mainPlateUi = null;
       function renderMain() {
+        if (!mainPlateUi) {
+          $('main-opts').insertAdjacentHTML('beforeend', PLATE_ROW);
+          $('main-opts').lastElementChild.classList.add('field-full');
+          mainPlateUi = plateRow($('main-opts'), mainPlate);
+        } else mainPlateUi();
         const has = !!img.side;
         $('main-name').textContent = 'メインの画像';
         $('img-clear').style.display = S.imgPos === 'none' ? 'none' : '';
@@ -4955,7 +5039,8 @@
             bcIn.oninput = () => { ex.boxColor = bcIn.value; redraw(); };
           } else {
             row.innerHTML = `<div class="extra-head"><button class="img-thumb thumb-pick" type="button" title="クリックで画像を変える" aria-label="この画像を変える"></button><span class="nm">画像</span>`
-              + orderBtns(rank, n) + `<button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>`;
+              + orderBtns(rank, n) + `<button class="btn btn-sm btn-danger" type="button" data-a="del">削除</button></div>` + PLATE_ROW;
+            plateRow(row, ex);
             const im = img.extras[ex.id];
             if (im) row.querySelector('.img-thumb').style.backgroundImage = `url("${im.src}")`;
             row.querySelector('.img-thumb').onclick = () => pickFile(async f => {
@@ -5010,6 +5095,7 @@
           ? { id, type: 'image', x: (pic.x + pic.w / 2) / W * 100, y: (pic.y + pic.h / 2) / H * 100, scale: Math.max(pic.w, pic.h) / (Math.min(W, H) * 0.3), rot: S.imgRot }
           : { id, type: 'image', x: 50, y: 50, scale: 1, rot: 0 };
         e.x = Math.round(e.x); e.y = Math.round(e.y); e.scale = Math.round(e.scale * 100) / 100;
+        Object.assign(e, { plateOn: S.picPlate, plateColor: S.picPlateColor, plateAlpha: S.picPlateAlpha, plateRound: S.picPlateRound });
         return e;
       }
       function freeMain() {
@@ -5024,6 +5110,26 @@
         S.imgPos = 'none';
         syncUI(); setThumb(); renderExtras(); redraw();
         toast('自由に置く画像にしました');
+      }
+      // ロゴを追加した画像に移す（今の場所・大きさのまま。ロゴの欄は「使わない」に戻す）
+      function freeLogo() {
+        if (!img.logo) { toast('先にロゴの画像を選んでください'); inputs.logoMode.set(S.logoMode); return; }
+        const [W0, H0] = dims(), P = padOf(W0, H0), iw = W0 - P.l - P.r, ih = H0 - P.t - P.b;
+        const r = lastHit.logo, id = newId();
+        img.extras[id] = img.logo;
+        keep(EXTRA_KEY(id), img.logo.src);
+        const e = r
+          ? { id, type: 'image', x: (r.x + r.w / 2 - P.l) / iw * 100, y: (r.y + r.h / 2 - P.t) / ih * 100, scale: Math.max(r.w, r.h) / (Math.min(iw, ih) * 0.3), rot: 0 }
+          : { id, type: 'image', x: 50, y: 20, scale: 0.6, rot: 0 };
+        e.x = Math.round(e.x); e.y = Math.round(e.y); e.scale = Math.min(8, Math.max(0.05, Math.round(e.scale * 100) / 100));
+        Object.assign(e, { plateOn: S.logoPlate && !isBand(S), plateColor: S.plateColor, plateAlpha: S.plateAlpha, plateRound: S.plateRound });
+        S.extras.push(e);
+        pushLayer(id);
+        img.logo = null;
+        try { localStorage.removeItem(LOGO_KEY); } catch (er) { /* ignore */ }
+        S.logoMode = 'none';
+        setLogoThumb(); syncUI(); renderExtras(); redraw();
+        toast('ロゴを自由に置く画像にしました');
       }
       $('extra-add').addEventListener('click', () => $('extra-file').click());
       // ファイルを1つ選んで fn に渡す（追加した画像の差し替え用）
