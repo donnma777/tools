@@ -2564,7 +2564,7 @@
         titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
         extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0, subScale: 1, titleRot: 0, subRot: 0, titleArc: 0, titleVert: false,
         imgPos: 'left', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart', picPlate: false, picPlateColor: '#ffffff', picPlateAlpha: 0.85, picPlateRound: 40,
-        subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subBoxAlpha: 1, subArc: 0,
+        subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subBoxAlpha: 1, subArc: 0, subVert: false,
         logoMode: 'none', logoCorner: 'br', logoScale: 1, plateRound: 40,
         bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, bandLayer: 'front', bandEdge: 'straight', bandAccent: '#ff85a1', logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
@@ -3073,7 +3073,7 @@
         if (k === 'font') refreshWeights();
         if (k === 'imgPos') renderMain();
         if (k === 'padOn') renderExtras();
-        if ((k === 'subBox' || k === 'subArc') && subStrokeUi) subStrokeUi();
+        if ((k === 'subBox' || k === 'subArc' || k === 'subVert') && subStrokeUi) subStrokeUi();
         redraw();
       }
       function redraw() {
@@ -3470,9 +3470,27 @@
         const vertT = !!S.titleVert;
         const colsW = f => lines.reduce((a, l) => a + f * lh * (hasHL(l) ? Math.max(1, S.hlScale) : 1), 0) + titleStroke0() * k;
         const sub = S.hidden.includes('@sub') ? '' : S.sub.trim();
-        let subFs = sub ? fit(c, [sub], (mode === 'replace' ? 84 : 60) * k * S.subScale, aw, subStroke0() * k * 2) : 0;
+        // サブタイトルの縦書き：1列。曲げない。タイトルも縦書きなら、上＝タイトルの右・下＝タイトルの左に並べる（beside）
+        const subV = !!S.subVert && !!sub, subArc = subV ? 0 : S.subArc;
+        const subSt = () => ({ role: 'sub', color: S.subColor, hlColor: S.subColor, hlScale: 1, strokeColor: S.subStrokeColor, noHL: true });
+        const subLen = f => vertItems(c, sub, f, subSt()).reduce((a, it) => a + it.adv, 0);
+        const subIn = !!sub && S.subPos !== 'corner';
+        const subAbove = subIn && S.subPos === 'above', subBelow = subIn && S.subPos === 'below';
+        const boxed = S.subBox !== 'none' && !subArc;
+        const beside = subV && subIn && vertT && lines.length > 0;
+        let subFs = (mode === 'replace' ? 84 : 60) * k * S.subScale;
+        if (!sub) subFs = 0;
+        else if (subV) { while (subLen(subFs) + (boxed ? subFs * 1.3 : subStroke0() * k) > bh && subFs > 12) subFs -= 2; }
+        else subFs = fit(c, [sub], subFs, aw, subStroke0() * k * 2);
+        const subWidth = f => {
+          if (subV) return f * (boxed ? 1.55 : 1.3);
+          c.font = fontOf('sub', f);
+          return c.measureText(sub).width + (boxed ? f * 1.3 : subStroke0() * k);
+        };
+        // タイトルの横に並べるときの、サブタイトルの幅（すきまを含む）
+        const besideW = f => beside ? Math.min(subFs, f * 0.55) * 0.5 + subWidth(Math.min(subFs, f * 0.55)) : 0;
         let fs = lines.length ? (stacked || !side || pos === 'center' ? 150 : 124) * k * S.textScale : 0;
-        if (vertT) { while (lines.length && colsW(fs) > aw && fs > 12) fs -= 2; }
+        if (vertT) { while (lines.length && colsW(fs) + besideW(fs) > aw && fs > 12) fs -= 2; }
         else if (lines.length) fs = fitTitle(c, lines, fs, aw);
         let lg = null;
         if (mode === 'replace' || mode === 'above' || mode === 'below') {
@@ -3480,28 +3498,26 @@
           lg = { w: logo.width * r, h: logo.height * r };
           if (lg.w > aw) { const t = aw / lg.w; lg.w *= t; lg.h *= t; }
         }
-        // サブタイトル：タイトルの上か下（ブロックの中）、または隅（ブロックの外）
-        const subIn = !!sub && S.subPos !== 'corner';
-        const subAbove = subIn && S.subPos === 'above', subBelow = subIn && S.subPos === 'below';
-        const boxed = S.subBox !== 'none' && !S.subArc;
+        // サブタイトル：タイトルの上か下（ブロックの中）、または隅（ブロックの外）。subIn などは上で決めた
         // 曲げたときに、反りのぶん高くなる量（サブタイトルの文字の大きさに対して）
         const arcLift = f => {
-          if (!S.subArc) return 0;
+          if (!subArc) return 0;
           c.font = fontOf('sub', f);
-          const a = Math.abs(S.subArc) * 1.4, R = c.measureText(sub).width / a;
+          const a = Math.abs(subArc) * 1.4, R = c.measureText(sub).width / a;
           return R * (1 - Math.cos(a / 2));
         };
         // サブタイトルの高さ（タイトルとの間は、サブタイトルの「上下」のずらしで空ける）
         const gapPx = 0;
-        const subBody = () => subFs * (boxed ? 1.9 : 1.35) + arcLift(subFs);
-        const subH = () => subIn ? subBody() + gapPx : 0;
+        const subBody = () => subV ? subLen(subFs) + (boxed ? subFs * 1.3 : subStroke0() * k) : subFs * (boxed ? 1.9 : 1.35) + arcLift(subFs);
+        const subH = () => subIn && !beside ? subBody() + gapPx : 0;
         // ロゴの前後のすきま：タイトルの下なら「タイトルとの間」と「サブタイトルとの間」、それ以外は「次との間」
         const logoGaps = () => !lg ? 0 : mode === 'below' ? (lines.length ? 1 : 0) + (subBelow ? 1 : 0) : (lines.length || subBelow ? 1 : 0);
         // 行の高さ（強調を大きくした行は、そのぶん高く）
         const lineH = l => fs * lh * (hasHL(l) ? Math.max(1, S.hlScale) : 1);
         // 縦書きのタイトルの高さ：いちばん長い列
         const vertH = () => Math.max(...lines.map(l => vertItems(c, l, fs, titleStyle()).reduce((a, it) => a + it.adv, 0))) + titleStroke0() * k;
-        const titleH = () => !lines.length ? 0 : vertT ? vertH() : lines.reduce((a, l) => a + lineH(l), 0);
+        // タイトルの高さ。サブタイトルを横に並べるときは、長いほうの列
+        const titleH = () => !lines.length ? 0 : vertT ? Math.max(vertH(), beside ? subBody() : 0) : lines.reduce((a, l) => a + lineH(l), 0);
         const total = () => (lg ? lg.h + logoGaps() * gap : 0) + titleH() + subH();
         while (total() > bh && (fs > 12 || (lg && lg.h > 20))) {
           if (fs > 12) fs -= 2;
@@ -3516,11 +3532,7 @@
           if (vertT || S.textAlign === 'center') return bc;
           return S.textAlign === 'left' ? bc - blockW / 2 + w / 2 : bc + blockW / 2 - w / 2;
         };
-        const subWidth = f => {
-          c.font = fontOf('sub', f);
-          return c.measureText(sub).width + (S.subBox !== 'none' && !S.subArc ? f * 1.3 : subStroke0() * k);
-        };
-        const titleWs = vertT ? (lines.length ? [colsW(fs)] : []) : lines.map(l => lineW(c, l, fs) + titleStroke0() * k);
+        const titleWs = vertT ? (lines.length ? [colsW(fs) + (beside ? subFs * 0.5 + subWidth(subFs) : 0)] : []) : lines.map(l => lineW(c, l, fs) + titleStroke0() * k);
         const blockW = Math.max(0, ...titleWs, lg ? lg.w : 0, subIn ? subWidth(subFs) : 0);
         let y = (band.t + band.b) / 2 - total() / 2 + ty;
         const textRect = blockW > 0 ? { x: cxOf(blockW) - blockW / 2, y, w: blockW, h: total() } : null;
@@ -3636,26 +3648,29 @@
         const subStroke = boxed ? 0 : subStroke0() * k;
         // サブタイトル：形を敷くなら、文字の幅に合わせて楕円／角丸の四角を描いてから文字
         const subText = (x, yy, f) => {
+          // 縦書きは (x, yy) を列の真ん中にして、上から1文字ずつ
+          const items = subV ? vertItems(c, sub, f, subSt()) : null, len = items ? items.reduce((a, it) => a + it.adv, 0) : 0;
           if (boxed) {
             c.font = fontOf('sub', f);
-            const w = c.measureText(sub).width + f * 1.3, h = f * 1.55;
+            const w = subV ? f * 1.55 : c.measureText(sub).width + f * 1.3, h = subV ? len + f * 1.3 : f * 1.55;
             c.save();
             if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.25)'; c.shadowBlur = f * 0.25; c.shadowOffsetY = f * 0.08; }
             c.fillStyle = S.subBoxColor;
             c.globalAlpha = S.subBoxAlpha;
             c.beginPath();
-            c.roundRect(x - w / 2, yy - h / 2, w, h, S.subBox === 'pill' ? h / 2 : h * 0.22);
+            c.roundRect(x - w / 2, yy - h / 2, w, h, S.subBox === 'pill' ? Math.min(w, h) / 2 : Math.min(w, h) * 0.22);
             c.fill();
             c.restore();
           }
-          if (S.subArc) { arcText(sub, x, yy, f); return; }
+          if (subArc) { arcText(sub, x, yy, f); return; }
           const keep = S.shadow;
           if (boxed) S.shadow = false;   // 札の上の文字には影を付けない
-          text(c, sub, x, yy + (boxed ? f * 0.03 : 0), f, S.subColor, subStroke, S.subStrokeColor);
+          if (subV) drawVert(c, items, x, yy - len / 2, f, subStroke, subSt());
+          else text(c, sub, x, yy + (boxed ? f * 0.03 : 0), f, S.subColor, subStroke, S.subStrokeColor);
           S.shadow = keep;
         };
         const arcText = (str, x, yy, f) => {
-          arcRun(c, [...str].map(ch => ({ t: ch, font: fontOf('sub', f), color: S.subColor })), x, yy, S.subArc, subStroke, S.subStrokeColor, f);
+          arcRun(c, [...str].map(ch => ({ t: ch, font: fontOf('sub', f), color: S.subColor })), x, yy, subArc, subStroke, S.subStrokeColor, f);
         };
         // ---- メインの文字（タイトル・サブタイトル・ロゴ）
         // タイトル（とロゴ）を描く。paint が false なら場所だけ決める（サブタイトルの場所 subAt・タイトルの範囲も）
@@ -3666,19 +3681,26 @@
           const bodyOn = paint === true || paint === 'body', cornerOn = paint === true || paint === 'corner';
           y = y0;
           subAt = null;
-          if (subAbove) { subAt = { x: cxOf(subWidth(subFs)), y: y + subBody() / 2, f: subFs, w: subWidth(subFs), h: subBody() }; y += subH(); }
+          if (subAbove && !beside) { subAt = { x: cxOf(subWidth(subFs)), y: y + subBody() / 2, f: subFs, w: subWidth(subFs), h: subBody() }; y += subH(); }
           titleTop = y;
           if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow), bodyOn);
           if (vertT && lines.length) {
-            const th = vertH(), cw = colsW(fs), sw = titleStroke0() * k;
+            // th はタイトルとサブタイトル（横に並べるとき）の長いほう。列はその中で上・中央・下にそろえる
+            const th = titleH(), cw = colsW(fs), sw = titleStroke0() * k;
+            const sW = beside ? subWidth(subFs) : 0, g = beside ? subFs * 0.5 : 0, TW = cw + g + sW;
+            const left = cxOf(TW) - TW / 2, tLeft = beside && subBelow ? left + sW + g : left;
+            const colTop = len => S.textAlign === 'left' ? y + sw / 2 : S.textAlign === 'right' ? y + th - sw / 2 - len : y + (th - len) / 2;
             if (bodyOn) {
-              let x = cxOf(cw) + cw / 2 - sw / 2;
+              let x = tLeft + cw - sw / 2;
               for (const line of lines) {
                 const items = vertItems(c, line, fs, titleStyle()), ch = items.reduce((a, it) => a + it.adv, 0);
-                const top = S.textAlign === 'left' ? y + sw / 2 : S.textAlign === 'right' ? y + th - sw / 2 - ch : y + (th - ch) / 2;
-                drawVert(c, items, x - lineH(line) / 2, top, fs, sw, titleStyle());
+                drawVert(c, items, x - lineH(line) / 2, colTop(ch), fs, sw, titleStyle());
                 x -= lineH(line);
               }
+            }
+            if (beside) {
+              const sb = subBody(), sx = subBelow ? left + sW / 2 : left + cw + g + sW / 2;
+              subAt = { x: sx, y: S.textAlign === 'left' ? y + sb / 2 : S.textAlign === 'right' ? y + th - sb / 2 : y + th / 2, f: subFs, w: sW, h: sb };
             }
             y += th;
           } else for (const line of lines) {
@@ -3687,14 +3709,16 @@
           }
           if (lg && mode === 'below') { if (lines.length) y += gap; drawLogo(!subBelow, bodyOn); }
           titleBot = y;
-          if (subBelow) subAt = { x: cxOf(subWidth(subFs)), y: y + gapPx + subBody() / 2, f: subFs, w: subWidth(subFs), h: subBody() };
+          if (subBelow && !beside) subAt = { x: cxOf(subWidth(subFs)), y: y + gapPx + subBody() / 2, f: subFs, w: subWidth(subFs), h: subBody() };
 
           // ---- 隅に小さくサブタイトル（隅の文字は、枠の端にそろえる）
           if (sub && S.subPos === 'corner') {
-            const cfs = fit(c, [sub], 44 * k * S.subScale, W * 0.45, subStroke0() * k * 2);
+            let cfs = 44 * k * S.subScale;
+            if (subV) { while (subLen(cfs) > H * 0.45 && cfs > 12) cfs -= 2; }
+            else cfs = fit(c, [sub], cfs, W * 0.45, subStroke0() * k * 2);
             c.font = fontOf('sub', cfs);
-            const w = c.measureText(sub).width + (boxed ? cfs * 1.3 : subStroke);
-            const hh = (boxed ? cfs * 1.55 : cfs * 1.2) + arcLift(cfs);
+            const w = subV ? subWidth(cfs) : c.measureText(sub).width + (boxed ? cfs * 1.3 : subStroke);
+            const hh = subV ? subLen(cfs) + (boxed ? cfs * 1.3 : subStroke) : (boxed ? cfs * 1.55 : cfs * 1.2) + arcLift(cfs);
             const m = Math.min(W, H) * 0.045 + subStroke / 2;
             const x = S.subCorner.endsWith('l') ? m + w / 2 : S.subCorner.endsWith('c') ? W / 2 : W - m - w / 2;
             const yy = S.subCorner.startsWith('t') ? m + hh / 2 : H - m - hh / 2;
@@ -3986,7 +4010,7 @@
         c.save();
         c.textAlign = 'center';
         c.textBaseline = 'middle';
-        for (const sg of splitHL(line)) {
+        for (const sg of st.noHL ? [{ t: line, hl: false }] : splitHL(line)) {
           const f = sg.hl ? fs * st.hlScale : fs, font = fontOf(st.role, f);
           c.font = font;
           for (const ch of sg.t) {
@@ -4973,7 +4997,7 @@
               + '<div class="main-text-slot fields"></div>' + FONT_ROW
               + '<div class="extra-text sub-box-row"><select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option></select>'
               + '<input type="color" aria-label="形の色" title="形の色"><input type="range" class="shape-alpha" min="0.1" max="1" step="0.05" aria-label="形の濃さ" title="形の濃さ"><span class="field-val shape-alpha-val"></span></div>'
-              + STROKE_ROW + ARC_ROW
+              + STROKE_ROW + VERT_ROW + ARC_ROW
               + '<div class="opts-slot"></div>';
             row.querySelector('.main-text-slot').appendChild(subField);
             fontRow(row, key => S[key === 'font' ? 'subFont' : 'subWeight'], (key, v) => {
@@ -4988,8 +5012,13 @@
               bSel.onchange = () => { bCol.style.display = bSel.value === 'none' ? 'none' : ''; inputs.subBox.set(bSel.value); update('subBox', bSel.value); row.querySelector('.sub-box-row').alphaUi(); };
               const K = { on: 'subStrokeOn', color: 'subStrokeColor', w: 'subStrokeW' };
               subStrokeUi = strokeRow(row, key => S[K[key]], (key, v) => { inputs[K[key]].set(v); update(K[key], v); },
-                () => S.subBox === 'none' || !!S.subArc);
+                () => S.subBox === 'none' || (!!S.subArc && !S.subVert));
               arcRow(row, () => S.subArc, v => { inputs.subArc.set(v); update('subArc', v); });
+              // 縦書きのときは曲げられないので、曲げるの行を隠す
+              const arcEl = row.querySelector('.extra-arc'), vIn = row.querySelector('.extra-vert input');
+              const vertUi = () => { vIn.checked = !!S.subVert; arcEl.style.display = S.subVert ? 'none' : ''; };
+              vertUi();
+              vIn.onchange = () => { update('subVert', vIn.checked); vertUi(); };
               bCol.oninput = () => { inputs.subBoxColor.set(bCol.value); update('subBoxColor', bCol.value); };
             }
             row.querySelector('.opts-slot').appendChild(subOpts);
