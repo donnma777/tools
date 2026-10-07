@@ -4926,7 +4926,7 @@
       $('text-add').addEventListener('click', () => {
         const id = newId();
         const n = S.extras.length;
-        S.extras.push({ id, type: 'text', text: 'テキスト', color: S.titleColor, box: 'none', boxColor: '#ff7fa0', boxAlpha: 1, strokeOn: true, strokeW: 11, strokeColor: '#ffffff', font: '@inherit', weight: '@inherit', align: 'center', arc: 0, hlColor: '#f0325a', hlScale: 1.15, x: 50, y: 18 + (n % 4) * 8, scale: 0.8, rot: 0 });
+        S.extras.push({ id, type: 'text', text: '*テキスト*を入れる', color: S.titleColor, box: 'none', boxColor: '#ff7fa0', boxAlpha: 1, strokeOn: true, strokeW: 11, strokeColor: '#ffffff', font: '@inherit', weight: '@inherit', align: 'center', arc: 0, hlColor: '#f0325a', hlScale: 1.15, x: 50, y: 18 + (n % 4) * 8, scale: 0.8, rot: 0 });
         pushLayer(id);
         renderExtras(); redraw();
         select(id);   // 足したものは選んで、設定を開く
