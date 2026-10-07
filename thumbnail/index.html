@@ -2575,7 +2575,7 @@
         extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0, subScale: 1, titleRot: 0, subRot: 0, titleArc: 0, titleVert: false,
         imgPos: 'left', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart', picPlate: false, picPlateColor: '#ffffff', picPlateAlpha: 0.85, picPlateRound: 40,
         subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subBoxAlpha: 1, subArc: 0, subVert: false,
-        logoMode: 'none', logoCorner: 'br', logoScale: 1, plateRound: 40,
+        logoMode: 'none', logoCorner: 'br', logoScale: 1, logoX: 0, logoY: 0, plateRound: 40,
         bandPos: 'bottom', bandLen: 'full', bandAlign: 'center', bandLine: false, bandLineColor: '#ff85a1', bandLineW: 4, bandColor: '#ffffff', bandSize: 1, bandLayer: 'front', bandEdge: 'straight', bandAccent: '#ff85a1', logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
         hidden: [], padOn: false, padSize: 4, padColor: '#ffffff', padRound: 0, padShape: 'square', padT: true, padB: true, padL: true, padR: true, padLine: false, padAccent: '#ff85a1', guideOn: false,
@@ -2658,6 +2658,7 @@
         if (!['full', 'tab'].includes(out.bandLen)) out.bandLen = 'full';
         if (!['center', 'start', 'end'].includes(out.bandAlign)) out.bandAlign = 'center';
         out.bandLineW = Math.max(1, Math.min(20, Math.round(out.bandLineW)));
+        out.logoX = Math.max(-50, Math.min(50, out.logoX)); out.logoY = Math.max(-50, Math.min(50, out.logoY));
         // 「自由に置く」は選んだときに追加した画像へ移すので、置き方としては残さない
         if (!['none', 'replace', 'above', 'below', 'corner', 'band', 'bandonly'].includes(out.logoMode)) out.logoMode = 'none';
         // 前の「縦の位置」を置き場所に入れ込む
@@ -3275,6 +3276,8 @@
             const sl = band * 0.45, m = band * 0.6, logoLen = B.side ? lh : lw;
             L = Math.min(along, (logoLen ? logoLen + band * 1.2 : band * 4) + sl * 2);
             u0 = S.bandAlign === 'start' ? ue + m : S.bandAlign === 'end' ? ue + along - m - L : ue + (along - L) / 2;
+            // ロゴのずらし：タブは端に沿う向きだけ、タブごと動かす
+            u0 += B.side ? S.logoY / 100 * H : S.logoX / 100 * W;
             c.beginPath();
             c.moveTo(...pt(u0, 0));
             c.arcTo(...pt(u0 + sl, band), ...pt(u0 + L - sl, band), band * 0.35);
@@ -3319,7 +3322,9 @@
           }
           if (lw) {
             const [mx, my] = pt(u0 + L / 2, band / 2);
-            bandLogo = { x: mx - lw / 2, y: my - lh / 2, w: lw, h: lh };
+            // 端から端までの帯は、帯の中でロゴだけをずらす
+            const ox = tab ? 0 : S.logoX / 100 * W, oy = tab ? 0 : S.logoY / 100 * H;
+            bandLogo = { x: mx - lw / 2 + ox, y: my - lh / 2 + oy, w: lw, h: lh };
             c.drawImage(img.logo, bandLogo.x, bandLogo.y, lw, lh);
           }
           c.restore();
@@ -3719,12 +3724,13 @@
         };
         const drawLogo = (last, paint) => {
           if (paint) {
-            const lx = cxOf(lg.w) - lg.w / 2;
-            plate(lx, y, lg.w, lg.h);
-            logoR = { x: lx, y, w: lg.w, h: lg.h };
+            // ロゴのずらし（logoX・logoY）は、決まった場所からロゴだけを動かす
+            const lx = cxOf(lg.w) - lg.w / 2 + S.logoX / 100 * W, ly = y + S.logoY / 100 * H;
+            plate(lx, ly, lg.w, lg.h);
+            logoR = { x: lx, y: ly, w: lg.w, h: lg.h };
             c.save();
             if (S.shadow) { c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = 10 * k; c.shadowOffsetY = 5 * k; }
-            c.drawImage(logo, lx, y, lg.w, lg.h);
+            c.drawImage(logo, lx, ly, lg.w, lg.h);
             c.restore();
           }
           y += lg.h + (last ? 0 : gap);
@@ -3814,8 +3820,8 @@
           if (cornerOn && mode === 'corner') {
             const r = Math.min(W * 0.2 / logo.width, H * 0.14 / logo.height) * S.logoScale;
             const w = logo.width * r, h = logo.height * r, m = Math.min(W, H) * (S.logoPlate ? 0.06 : 0.04);
-            const x = S.logoCorner.endsWith('l') ? m : S.logoCorner.endsWith('c') ? (W - w) / 2 : W - m - w;
-            const yy = S.logoCorner.startsWith('t') ? m : H - m - h;
+            const x = (S.logoCorner.endsWith('l') ? m : S.logoCorner.endsWith('c') ? (W - w) / 2 : W - m - w) + S.logoX / 100 * W;
+            const yy = (S.logoCorner.startsWith('t') ? m : H - m - h) + S.logoY / 100 * H;
             plate(x, yy, w, h);
             logoR = { x, y: yy, w, h };
             c.save();
@@ -4276,7 +4282,7 @@
       };
       function render() {
         draw(cv);
-        const rectOf = id => id === '@pic' ? lastHit.pic : id === '@text' ? lastHit.text : id === '@sub' ? lastHit.sub : id && lastHit.extras.find(r => r.id === id);
+        const rectOf = id => id === '@logo' ? lastHit.logo : id === '@pic' ? lastHit.pic : id === '@text' ? lastHit.text : id === '@sub' ? lastHit.sub : id && lastHit.extras.find(r => r.id === id);
         const sr = rectOf(selId);
         if (sr) {
           const c = cv.getContext('2d'), lw = Math.max(3, cv.width / 320);
@@ -4287,7 +4293,7 @@
           c.restore();
         }
         refreshSel();
-        const hv = hoverId === '@pic' ? lastHit.pic : hoverId === '@text' ? lastHit.text : hoverId === '@sub' ? lastHit.sub : hoverId && lastHit.extras.find(r => r.id === hoverId);
+        const hv = hoverId === '@logo' ? lastHit.logo : hoverId === '@pic' ? lastHit.pic : hoverId === '@text' ? lastHit.text : hoverId === '@sub' ? lastHit.sub : hoverId && lastHit.extras.find(r => r.id === hoverId);
         if (hv) {
           const c = cv.getContext('2d'), lw = Math.max(3, cv.width / 300);
           c.save();
@@ -4551,6 +4557,8 @@
       };
       const inRect = (p, r) => r && p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
       function hitAt(p) {
+        // ロゴはタイトルや帯といっしょに描くので、先につかむ
+        if (inRect(p, lastHit.logo)) return { kind: 'logo' };
         // 上に重なっているものから順につかむ
         for (let i = S.order.length - 1; i >= 0; i--) {
           const id = S.order[i];
@@ -4568,9 +4576,9 @@
         const p = toCanvas(e);
         const h = hitAt(p);
         if (!h) { select(null); return; }
-        select({ text: '@text', sub: '@sub', pic: '@pic' }[h.kind] || h.id);
+        select({ text: '@text', sub: '@sub', pic: '@pic', logo: '@logo' }[h.kind] || h.id);
         const ex = h.kind === 'extra' ? S.extras.find(x => x.id === h.id) : null;
-        const xy = { text: [S.textX, S.textY], sub: [S.subX, S.subY], pic: [S.imgX, S.imgY] }[h.kind] || [ex.x, ex.y];
+        const xy = { text: [S.textX, S.textY], sub: [S.subX, S.subY], pic: [S.imgX, S.imgY], logo: [S.logoX, S.logoY] }[h.kind] || [ex.x, ex.y];
         drag = { p, h, x: xy[0], y: xy[1] };
         cv.setPointerCapture(e.pointerId);
         e.preventDefault();
@@ -4590,6 +4598,8 @@
         } else if (drag.h.kind === 'text') {
           S.textX = clamp(drag.x + dx, -50, 50); S.textY = clamp(drag.y + dy, -50, 50);
           inputs.textX.set(S.textX); inputs.textY.set(S.textY);
+        } else if (drag.h.kind === 'logo') {
+          S.logoX = clamp(drag.x + dx, -50, 50); S.logoY = clamp(drag.y + dy, -50, 50);
         } else if (drag.h.kind === 'sub') {
           S.subX = clamp(drag.x + dx, -60, 60); S.subY = clamp(drag.y + dy, -60, 60);
           if (subBars) { subBars.subX(S.subX); subBars.subY(S.subY); }
@@ -4674,8 +4684,8 @@
           bars: [['textScale', '大きさ', 0.5, 1.3, 0.05, '倍'], ['textX', '左右', -50, 50, 1, '%'], ['textY', '上下', -50, 50, 1, '%'], ['titleRot', '回転', -180, 180, 1, '°']],
         };
         if (id === '@logo') return {
-          name: 'ロゴ', get obj() { return S; }, reset() { S.logoScale = 1; },
-          bars: [['logoScale', 'ロゴの大きさ', 0.3, 1.6, 0.05, '倍']],
+          name: 'ロゴ', get obj() { return S; }, reset() { S.logoScale = 1; S.logoX = 0; S.logoY = 0; },
+          bars: [['logoScale', 'ロゴの大きさ', 0.3, 1.6, 0.05, '倍'], ['logoX', '左右', -50, 50, 1, '%'], ['logoY', '上下', -50, 50, 1, '%']],
         };
         if (id === '@bg') return {
           name: '背景', get obj() { return S; }, reset() { S.bgBright = 0; },
