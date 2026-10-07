@@ -20,11 +20,23 @@
   home  ロゴをリンクにしない（トップページ用）
   note  フッターの GitHub の横に足す一言
 
+トップページのツール一覧（見出しへ飛ぶリンク・見出し・カード）は _shared/tools.json から作る:
+  <!-- shared:tools -->
+  <!-- /shared:tools -->
+tools.json の書き方:
+  sections  見出しごとに id・title・en（英語の小見出し）・cards。前の URL の #名前 を残すときは alias・aliasNote
+  cards     id（目印のコメント）・name・tag・kind（右上の札）・desc・icon（SVG の中身を1行ずつ）
+            ページを開くカードは href（ボタンの文字を変えるときは open）。ボタンを並べるカードは links（label・href・external）
+            obs  "専用"（OBS で使うもの）か "対応"（ブラウザでも OBS でも使えるもの）
+            pc   true で「PC向け」を付ける
+
 テンプレートの書き方:
   {{名前}}         設定の値に置き換える
   {{#名前}}行      設定があるときだけ、その行を出す
   {{^名前}}行      設定がないときだけ、その行を出す
 """
+import html
+import json
 import pathlib
 import re
 import sys
@@ -60,6 +72,60 @@ def render(name, ext, opts, indent, nl):
     return nl.join(out) + nl
 
 
+def esc(t):
+    return html.escape(str(t), quote=False)
+
+
+def attr(t):
+    return html.escape(str(t), quote=True)
+
+
+def tools_list(opts):
+    """トップページのツール一覧を _shared/tools.json から作る（行のリストで返す）"""
+    data = json.loads((SHARED / 'tools.json').read_text(encoding='utf-8'))
+    secs = data['sections']
+    out = ['<!-- 見出しへ飛ぶ -->', '<nav class="jump-nav" aria-label="このページの見出し">']
+    out += [f'  <a href="#{s["id"]}">{esc(s["title"])}</a>' for s in secs]
+    out.append('</nav>')
+    for s in secs:
+        out.append('')
+        if s.get('alias'):
+            out += [f'<!-- {s.get("aliasNote", "")} -->', f'<span id="{s["alias"]}"></span>']
+        out += [f'<h2 class="section-title" id="{s["id"]}">{esc(s["title"])}<small>{esc(s["en"])}</small></h2>', '', '<div class="tool-list">']
+        for c in s['cards']:
+            tags = ''
+            if c.get('obs'):
+                tags += f'<span class="pc-tag obs-tag">OBS{esc(c["obs"])}</span>'
+            if c.get('pc'):
+                tags += '<span class="pc-tag">PC向け</span>'
+            head, tail = (f'<a class="tool-card" href="{attr(c["href"])}">', '</a>') if c.get('href') else ('<div class="tool-card">', '</div>')
+            out += ['', f'  <!-- {c["id"]} -->', f'  {head}',
+                    '    <div class="tool-head">',
+                    '      <div class="tool-icon">',
+                    '        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">']
+            out += [f'          {x}' for x in c['icon']]
+            out += ['        </svg>', '      </div>', '      <div>',
+                    f'        <div class="tool-tag">{esc(c["tag"])}{tags}</div>',
+                    f'        <div class="tool-name">{esc(c["name"])}</div>',
+                    '      </div>',
+                    f'      <span class="kind-badge">{esc(c["kind"])}</span>',
+                    '    </div>',
+                    f'    <div class="tool-desc">{esc(c["desc"])}</div>',
+                    '    <div class="card-actions">']
+            if c.get('href'):
+                out.append(f'      <span class="btn btn-primary">{esc(c.get("open", "ツールを開く →"))}</span>')
+            for i, l in enumerate(c.get('links', [])):
+                ext = ' target="_blank" rel="noopener"' if l.get('external') else ''
+                out.append(f'      <a class="btn {"btn-primary" if i == 0 else "btn-secondary"}" href="{attr(l["href"])}"{ext}>{esc(l["label"])}</a>')
+            out += ['    </div>', f'  {tail}']
+        out += ['', '</div>']
+    return out
+
+
+# テンプレートのファイルではなく、プログラムで中身を作る目印
+GENERATORS = {'tools': tools_list}
+
+
 def build(text):
     for ext, start, end, mark in MARKS:
         def repl(m):
@@ -67,7 +133,11 @@ def build(text):
             opts = {o.group(1): '1' if o.group(2) is None else o.group(2) for o in OPT.finditer(m.group('opts'))}
             ind, name = m.group('indent'), m.group('name')
             head = f"{ind}{start} shared:{name}{m.group('opts')}{end}{m.group('nl')}"
-            body = render(name, ext, opts, ind, m.group('nl'))
+            if name in GENERATORS:
+                nl = m.group('nl')
+                body = nl.join(ind + x if x else x for x in GENERATORS[name](opts)) + nl
+            else:
+                body = render(name, ext, opts, ind, m.group('nl'))
             return f"{head}{body}{ind}{start} /shared:{name} {end}"
         text = mark.sub(repl, text)
     return text

@@ -53,6 +53,7 @@
 - **`confirm()` / `alert()` を使わない**：OBSのドックでは出ないことがあるので、`common/ask.js` を使います。
 - **オーバーレイの共通部分は直接編集しない**：live-tool-local の `overlay/_shared/` から `build.py` で流し込んでいます。
 - **ヘッダー・フッターは `_shared/` で直す**：各ページの `<!-- shared:header -->`・`<!-- shared:footer -->` の間は `_shared/header.html`・`_shared/footer.html` から、`<style>` の中の `/* shared:header-footer */` の間は `_shared/header-footer.css` から流し込んでいます（全ページ同じ見た目）。直したら `python _shared/build.py` を実行してください（`--check` で書き換えが要るページだけを確認できます）。新しいページにも、ほかのページと同じ目印を置いてから実行します。目印に書ける設定は `_shared/build.py` の先頭にあります。
+- **トップページのツール一覧は `_shared/tools.json` で直す**：`index.html` の `<!-- shared:tools -->` の間（見出しへ飛ぶリンク・見出し・カード）は、`tools.json` から `build.py` で書き出しています。ツールを足すときは `tools.json` にカードを1つ足して `python _shared/build.py` を実行します。札（OBS専用・OBS対応・PC向け）も `tools.json` の `obs`・`pc` で付けます。書き方は `_shared/build.py` の先頭にあります。
 
 ---
 
