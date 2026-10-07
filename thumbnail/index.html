@@ -2117,7 +2117,8 @@
       padding-top: 8px;
     }
 
-    .extra-stroke input[type=color] {
+    .extra-stroke input[type=color],
+    .band-line input[type=color] {
       width: 36px;
       height: 30px;
       padding: 2px;
@@ -2165,7 +2166,16 @@
       color: var(--label);
     }
 
-    .plate-round .field-val {
+    /* 帯のふちの線：スイッチ・色・太さ・px */
+    .band-line {
+      display: grid;
+      grid-template-columns: auto 36px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .plate-round .field-val,
+    .band-line .field-val {
       text-align: right;
     }
 
@@ -2566,7 +2576,7 @@
         imgPos: 'left', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart', picPlate: false, picPlateColor: '#ffffff', picPlateAlpha: 0.85, picPlateRound: 40,
         subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subBoxAlpha: 1, subArc: 0, subVert: false,
         logoMode: 'none', logoCorner: 'br', logoScale: 1, plateRound: 40,
-        bandPos: 'bottom', bandColor: '#ffffff', bandSize: 1, bandLayer: 'front', bandEdge: 'straight', bandAccent: '#ff85a1', logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
+        bandPos: 'bottom', bandLen: 'full', bandAlign: 'center', bandLine: false, bandLineColor: '#ff85a1', bandLineW: 4, bandColor: '#ffffff', bandSize: 1, bandLayer: 'front', bandEdge: 'straight', bandAccent: '#ff85a1', logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
         frameOn: false, frameColor: '#ffffff',
         hidden: [], padOn: false, padSize: 4, padColor: '#ffffff', padRound: 0, padShape: 'square', padT: true, padB: true, padL: true, padR: true, padLine: false, padAccent: '#ff85a1', guideOn: false,
         bgFit: 'cover', bgBright: 0, bgTile: 300,
@@ -2645,6 +2655,9 @@
         if (!['square', 'scallop', 'lace'].includes(out.padShape)) out.padShape = 'square';
         if (!['straight', 'scallop', 'lace'].includes(out.bandEdge)) out.bandEdge = 'straight';
         if (!['bottom', 'top', 'left', 'right'].includes(out.bandPos)) out.bandPos = 'bottom';
+        if (!['full', 'tab'].includes(out.bandLen)) out.bandLen = 'full';
+        if (!['center', 'start', 'end'].includes(out.bandAlign)) out.bandAlign = 'center';
+        out.bandLineW = Math.max(1, Math.min(20, Math.round(out.bandLineW)));
         // 「自由に置く」は選んだときに追加した画像へ移すので、置き方としては残さない
         if (!['none', 'replace', 'above', 'below', 'corner', 'band', 'bandonly'].includes(out.logoMode)) out.logoMode = 'none';
         // 前の「縦の位置」を置き場所に入れ込む
@@ -2813,10 +2826,16 @@
             { k: 'logoCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], when: s => s.logoMode === 'corner' },
             { k: 'logoScale', l: 'ロゴの大きさ', t: 'range', min: 0.3, max: 1.6, step: 0.05, u: '倍', home: 'none' },
             { k: 'bandPos', l: '帯の位置', t: 'select', o: [['bottom', '下'], ['top', '上'], ['left', '左（縦のロゴに）'], ['right', '右（縦のロゴに）']], when: isBand },
+            { k: 'bandLen', l: '帯の長さ', t: 'select', o: [['full', '端から端まで'], ['tab', 'ロゴの幅だけ（タブ）']], when: isBand },
+            { k: 'bandAlign', l: 'タブの場所', t: 'select', o: [['center', '真ん中'], ['start', '左・上の端'], ['end', '右・下の端']], when: s => isBand(s) && s.bandLen === 'tab' },
             { k: 'bandColor', l: '帯の色', t: 'color', when: isBand },
             { k: 'bandSize', l: '帯の太さ', t: 'range', min: 0.5, max: 2.5, step: 0.05, u: '倍', when: isBand },
-            { k: 'bandEdge', l: '帯のふちの形', t: 'select', o: [['straight', 'まっすぐ'], ['scallop', '波（スカラップ）'], ['lace', 'レース']], when: isBand },
-            { k: 'bandAccent', l: 'レースの穴の色', t: 'color', when: s => isBand(s) && s.bandEdge === 'lace' },
+            { k: 'bandEdge', l: '帯のふちの形', t: 'select', o: [['straight', 'まっすぐ'], ['scallop', '波（スカラップ）'], ['lace', 'レース']], when: s => isBand(s) && s.bandLen !== 'tab' },
+            { k: 'bandAccent', l: 'レースの穴の色', t: 'color', when: s => isBand(s) && s.bandLen !== 'tab' && s.bandEdge === 'lace' },
+            // ふちの線は、ロゴのカードの中の1行（オン・オフ・色・太さ）。値だけここに置く
+            { k: 'bandLine', l: 'ふちの線', t: 'check', home: 'none' },
+            { k: 'bandLineColor', l: '線の色', t: 'color', home: 'none' },
+            { k: 'bandLineW', l: '線の太さ', t: 'range', min: 1, max: 20, step: 1, u: 'px', home: 'none' },
             { k: 'bandLayer', l: '帯の重なり', t: 'select', o: [['front', 'いちばん上（画像や文字を隠す）'], ['back', '背景のすぐ上（画像や文字を上に重ねられる）']], when: isBand },
             { k: 'logoPlate', l: 'ロゴの後ろに色を敷く', t: 'check', home: 'none' },
             { k: 'plateColor', l: 'ロゴの後ろの色', t: 'color', home: 'none' },
@@ -3025,6 +3044,24 @@
           get plateAlpha() { return S.plateAlpha; }, set plateAlpha(v) { S.plateAlpha = v; },
           get plateRound() { return S.plateRound; }, set plateRound(v) { S.plateRound = v; },
         });
+        // 帯のふちの線：見出しの下に、オン・オフ・色・太さの1行。帯の重なりの前に置き、帯の重なりは1行まるごと使う
+        {
+          const field = document.createElement('div');
+          field.className = 'field field-full';
+          field.innerHTML = '<span class="field-label"><span>ふちの線</span></span><div class="band-line"><label class="toggle"><input type="checkbox" aria-label="帯のふちに線を引く"><span class="sw"></span></label>'
+            + '<input type="color" aria-label="帯のふちの線の色" title="線の色"><input type="range" min="1" max="20" step="1" aria-label="帯のふちの線の太さ" title="線の太さ"><span class="field-val"></span></div>';
+          const [on, col, rIn] = field.querySelectorAll('input'), val = field.querySelector('.field-val');
+          bandLineUi = () => {
+            on.checked = S.bandLine; col.value = S.bandLineColor; rIn.value = S.bandLineW; val.textContent = `${S.bandLineW}px`;
+            for (const el of [col, rIn, val]) el.style.visibility = S.bandLine ? '' : 'hidden';
+            field.style.display = isBand(S) && (S.bandLen === 'tab' || S.bandEdge === 'straight') ? '' : 'none';
+          };
+          on.onchange = () => { inputs.bandLine.set(on.checked); update('bandLine', on.checked); };
+          col.oninput = () => { inputs.bandLineColor.set(col.value); update('bandLineColor', col.value); };
+          rIn.oninput = () => { const v = parseInt(rIn.value, 10); inputs.bandLineW.set(v); update('bandLineW', v); val.textContent = `${v}px`; };
+          inputs.bandLayer.wrap.before(field);
+          inputs.bandLayer.wrap.classList.add('field-full');
+        }
         // メインの画像の置き方は、メインのカードの中に
         $('main-opts').append(inputs.imgPos.wrap, inputs.sample.wrap);
         // 1枚目の画像のバー（追加の画像と同じ形）
@@ -3041,7 +3078,7 @@
           hiddenBin.appendChild(f);
         }
       }
-      let logoPlateRow = null, logoPlateUi = null;
+      let logoPlateRow = null, logoPlateUi = null, bandLineUi = null;
       function refreshVisibility() {
         for (const k in inputs) {
           const { f, wrap, labelEl } = inputs[k];
@@ -3050,6 +3087,7 @@
         }
         // ロゴの後ろの色は、ロゴを帯以外に置くときだけ
         if (logoPlateRow) { logoPlateUi(); logoPlateRow.style.display = S.logoMode !== 'none' && !isBand(S) ? '' : 'none'; }
+        if (bandLineUi) bandLineUi();
       }
       function syncUI() {
         for (const k in inputs) if (!k.startsWith('_')) inputs[k].set(S[k]);
@@ -3217,27 +3255,72 @@
           c.save();
           c.setTransform(1, 0, 0, 1, 0, 0);
           c.fillStyle = S.bandColor;
-          const x = P.l + (B.pos === 'right' ? W - band : 0), y = P.t + (B.pos === 'bottom' ? H - band : 0);
-          if (B.side) c.fillRect(x, P.t, band, H);
-          else c.fillRect(P.l, y, W, band);
-          // 帯のふち（中身の側）に波・レース。中身の側へはみ出す向き。左右の帯は x と y を入れ替えて横と同じに描く
-          if (S.bandEdge !== 'straight') {
-            const lace = S.bandEdge === 'lace', rb = band * (lace ? 0.3 : 0.2);
-            const dir = B.pos === 'top' || B.pos === 'left' ? 1 : -1;
-            const edge = B.side ? (dir > 0 ? x + band : x) : (dir > 0 ? y + band : y);
-            if (B.side) {
-              c.save();
-              c.transform(0, 1, 1, 0, 0, 0);
-              drawEdgeBumps(c, P.t, H, edge, dir, rb, lace, S.bandColor, S.bandAccent);
-              c.restore();
-            } else drawEdgeBumps(c, P.l, W, edge, dir, rb, lace, S.bandColor, S.bandAccent);
-          }
+          const tab = S.bandLen === 'tab';
+          // ロゴの大きさ（帯の太さに合わせる）
+          let lw = 0, lh = 0;
           if (img.logo && S.logoMode === 'band') {
-            const lw = img.logo.width, lh = img.logo.height;
-            const r = B.side ? Math.min(band * 0.56 * S.logoScale / lw, H * 0.7 / lh) : Math.min(W * 0.5 / lw, band * 0.56 * S.logoScale / lh);
-            const w = lw * r, h = lh * r;
-            bandLogo = B.side ? { x: x + band / 2 - w / 2, y: P.t + H / 2 - h / 2, w, h } : { x: P.l + W / 2 - w / 2, y: y + band / 2 - h / 2, w, h };
-            c.drawImage(img.logo, bandLogo.x, bandLogo.y, w, h);
+            const iw = img.logo.width, ih = img.logo.height;
+            const r = B.side ? Math.min(band * 0.56 * S.logoScale / iw, H * (tab ? 0.5 : 0.7) / ih) : Math.min(W * 0.5 / iw, band * 0.56 * S.logoScale / ih);
+            lw = iw * r; lh = ih * r;
+          }
+          // u は端に沿う向き、v は端から中身へ入る向き。pt(u, v) で canvas の座標にする
+          const along = B.side ? H : W, ue = B.side ? P.t : P.l;
+          const pt = (u, v) => B.side ? [B.pos === 'left' ? P.l + v : P.l + W - v, u] : [u, B.pos === 'top' ? P.t + v : P.t + H - v];
+          let u0 = ue, L = along;
+          // ふちの線（太さは 1200×630 のときの px）
+          const lineOn = S.bandLine && (tab || S.bandEdge === 'straight');
+          const lineUp = () => { c.lineWidth = S.bandLineW * Math.min(W / 1200, H / 630); c.strokeStyle = S.bandLineColor; c.lineJoin = 'round'; c.lineCap = 'round'; };
+          if (tab) {
+            // タブ：端にくっついた台形で、中身の側の角を丸める。長さはロゴ＋左右のゆとり
+            const sl = band * 0.45, m = band * 0.6, logoLen = B.side ? lh : lw;
+            L = Math.min(along, (logoLen ? logoLen + band * 1.2 : band * 4) + sl * 2);
+            u0 = S.bandAlign === 'start' ? ue + m : S.bandAlign === 'end' ? ue + along - m - L : ue + (along - L) / 2;
+            c.beginPath();
+            c.moveTo(...pt(u0, 0));
+            c.arcTo(...pt(u0 + sl, band), ...pt(u0 + L - sl, band), band * 0.35);
+            c.arcTo(...pt(u0 + L - sl, band), ...pt(u0 + L, 0), band * 0.35);
+            c.lineTo(...pt(u0 + L, 0));
+            c.closePath();
+            c.fill();
+            if (lineOn) {
+              // 端に沿う辺には引かない（中身の側の3辺だけ）
+              c.beginPath();
+              c.moveTo(...pt(u0, 0));
+              c.arcTo(...pt(u0 + sl, band), ...pt(u0 + L - sl, band), band * 0.35);
+              c.arcTo(...pt(u0 + L - sl, band), ...pt(u0 + L, 0), band * 0.35);
+              c.lineTo(...pt(u0 + L, 0));
+              lineUp();
+              c.stroke();
+            }
+          } else {
+            const x = P.l + (B.pos === 'right' ? W - band : 0), y = P.t + (B.pos === 'bottom' ? H - band : 0);
+            if (B.side) c.fillRect(x, P.t, band, H);
+            else c.fillRect(P.l, y, W, band);
+            if (lineOn) {
+              c.beginPath();
+              c.moveTo(...pt(ue, band));
+              c.lineTo(...pt(ue + along, band));
+              lineUp();
+              c.lineCap = 'butt';
+              c.stroke();
+            }
+            // 帯のふち（中身の側）に波・レース。中身の側へはみ出す向き。左右の帯は x と y を入れ替えて横と同じに描く
+            if (S.bandEdge !== 'straight') {
+              const lace = S.bandEdge === 'lace', rb = band * (lace ? 0.3 : 0.2);
+              const dir = B.pos === 'top' || B.pos === 'left' ? 1 : -1;
+              const edge = B.side ? (dir > 0 ? x + band : x) : (dir > 0 ? y + band : y);
+              if (B.side) {
+                c.save();
+                c.transform(0, 1, 1, 0, 0, 0);
+                drawEdgeBumps(c, P.t, H, edge, dir, rb, lace, S.bandColor, S.bandAccent);
+                c.restore();
+              } else drawEdgeBumps(c, P.l, W, edge, dir, rb, lace, S.bandColor, S.bandAccent);
+            }
+          }
+          if (lw) {
+            const [mx, my] = pt(u0 + L / 2, band / 2);
+            bandLogo = { x: mx - lw / 2, y: my - lh / 2, w: lw, h: lh };
+            c.drawImage(img.logo, bandLogo.x, bandLogo.y, lw, lh);
           }
           c.restore();
         };
@@ -3256,7 +3339,9 @@
       function bandOf(W, H) {
         const size = isBand(S) && !S.hidden.includes('@logo') ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
         const pos = S.bandPos, side = pos === 'left' || pos === 'right';
-        return { size, pos, side, w: side ? size : 0, h: side ? 0 : size, dx: pos === 'left' ? size : 0, dy: pos === 'top' ? size : 0 };
+        // タブ（ロゴの幅だけ）は中身の上に重ねるだけで、中身の場所は減らさない
+        const cut = S.bandLen === 'tab' ? 0 : size;
+        return { size, pos, side, w: side ? cut : 0, h: side ? 0 : cut, dx: pos === 'left' ? cut : 0, dy: pos === 'top' ? cut : 0 };
       }
 
       // ふちの内側の形（canvas の座標）。波・レースのときは、波の真ん中と外向きの向きを返す
