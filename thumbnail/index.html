@@ -2411,7 +2411,7 @@
             <div class="sel-head" id="sel-head" hidden>
               <span class="sel-name" id="sel-name"></span>
               <input type="color" class="sel-color" id="sel-color" title="文字の色" aria-label="選んでいる文字の色">
-              <select class="sel-align" id="sel-align" title="そろえ方" aria-label="そろえ方"><option value="left">左寄せ</option><option value="center">中央</option><option value="right">右寄せ</option></select>
+              <select class="sel-align" id="sel-align" title="そろえ方" aria-label="そろえ方"><option value="left">左揃え</option><option value="center">中央揃え</option><option value="right">右揃え</option></select>
               <button class="btn btn-sm" type="button" id="sel-up" title="1つ前に重ねる">↑ 前へ</button>
               <button class="btn btn-sm" type="button" id="sel-down" title="1つ後ろに重ねる">↓ 後ろへ</button>
               <button class="btn btn-sm sel-icon" type="button" id="sel-reset" title="位置・回転を元に戻す" aria-label="位置・回転を元に戻す">↺</button>
@@ -2551,7 +2551,7 @@
         subStrokeOn: true, subStrokeW: 11, subStrokeColor: '#ffffff',
         textScale: 1, textAlign: 'center', textX: 0, textY: 0,
         titlePlate: 'none', tpColor: '#ffffff', tpAlpha: 0.8,
-        extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0, subScale: 1, titleRot: 0, subRot: 0, titleArc: 0,
+        extras: [], order: ['@pic', '@text', '@sub'], subX: 0, subY: 0, subScale: 1, titleRot: 0, subRot: 0, titleArc: 0, titleVert: false,
         imgPos: 'left', imgScale: 1, imgX: 0, imgY: 0, imgRot: 0, sample: 'heart',
         subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subBoxAlpha: 1, subArc: 0,
         logoMode: 'none', logoCorner: 'br', logoScale: 1,
@@ -2723,7 +2723,7 @@
             { k: 'titleWeight', l: '文字の太さ', t: 'select', o: [['@inherit', '全体と同じ'], ...C.WEIGHTS], home: 'none' },
             { k: 'textScale', l: '大きさ', t: 'range', min: 0.5, max: 1.3, step: 0.05, u: '倍', home: 'none' },
             { k: 'titleColor', l: '色', t: 'color', home: 'none' },
-            { k: 'textAlign', l: 'そろえ方', t: 'select', o: [['center', '中央'], ['left', '左寄せ'], ['right', '右寄せ']], home: 'none' },
+            { k: 'textAlign', l: 'そろえ方', t: 'select', o: [['center', '中央揃え'], ['left', '左揃え'], ['right', '右揃え']], home: 'none' },
             { k: 'textX', l: '左右にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', home: 'none' },
             { k: 'textY', l: '上下にずらす', t: 'range', min: -50, max: 50, step: 1, u: '%', home: 'none' },
             { k: 'hlColor', l: '強調（*〜*）の色', t: 'color', home: 'none' },
@@ -2731,7 +2731,7 @@
             { k: 'titleStrokeOn', l: '縁取り', t: 'check', home: 'none' },
             { k: 'titleStrokeColor', l: '縁取りの色', t: 'color', home: 'none', when: s => s.titleStrokeOn },
             { k: 'titleStrokeW', l: '縁取りの太さ', t: 'range', min: 1, max: 40, step: 1, u: 'px', home: 'none', when: s => s.titleStrokeOn },
-            { k: 'titlePlate', l: '後ろの形', t: 'select', o: [['none', '形なし'], ['pill', '楕円'], ['round', '角丸'], ['band', '横いっぱいの帯']], home: 'none' },
+            { k: 'titlePlate', l: '後ろの形', t: 'select', o: [['none', '形なし'], ['pill', '楕円'], ['round', '角丸'], ['band', '端から端までの帯']], home: 'none' },
             { k: 'tpColor', l: '形の色', t: 'color', home: 'none' },
             { k: 'tpAlpha', l: '形の濃さ', t: 'range', min: 0.1, max: 1, step: 0.05, u: '', home: 'none' },
             { k: 'subFont', l: 'フォント', t: 'select', o: [['@inherit', '全体と同じ'], ...BASE_FONTS], home: 'none' },
@@ -3403,9 +3403,14 @@
         const lines = mode === 'replace' || S.hidden.includes('@text') ? [] : S.title.replace(/\s+$/, '').split('\n');
         const aw = area.r - area.l, bh = band.b - band.t, mid = (area.l + area.r) / 2;
         const lh = 1.14, gap = 14 * k;
+        // 縦書きのタイトル：行は右から左への列。列の幅は横書きの行の高さと同じ。曲げない
+        const vertT = !!S.titleVert;
+        const colsW = f => lines.reduce((a, l) => a + f * lh * (hasHL(l) ? Math.max(1, S.hlScale) : 1), 0) + titleStroke0() * k;
         const sub = S.hidden.includes('@sub') ? '' : S.sub.trim();
         let subFs = sub ? fit(c, [sub], (mode === 'replace' ? 84 : 60) * k * S.subScale, aw, subStroke0() * k * 2) : 0;
-        let fs = lines.length ? fitTitle(c, lines, (stacked || !side || pos === 'center' ? 150 : 124) * k * S.textScale, aw) : 0;
+        let fs = lines.length ? (stacked || !side || pos === 'center' ? 150 : 124) * k * S.textScale : 0;
+        if (vertT) { while (lines.length && colsW(fs) > aw && fs > 12) fs -= 2; }
+        else if (lines.length) fs = fitTitle(c, lines, fs, aw);
         let lg = null;
         if (mode === 'replace' || mode === 'above' || mode === 'below') {
           const r = Math.min(aw * 0.9 / logo.width, bh * (mode === 'replace' ? 0.62 : 0.3) / logo.height) * S.logoScale;
@@ -3431,20 +3436,29 @@
         const logoGaps = () => !lg ? 0 : mode === 'below' ? (lines.length ? 1 : 0) + (subBelow ? 1 : 0) : (lines.length || subBelow ? 1 : 0);
         // 行の高さ（強調を大きくした行は、そのぶん高く）
         const lineH = l => fs * lh * (hasHL(l) ? Math.max(1, S.hlScale) : 1);
-        const total = () => (lg ? lg.h + logoGaps() * gap : 0) + lines.reduce((a, l) => a + lineH(l), 0) + subH();
+        // 縦書きのタイトルの高さ：いちばん長い列
+        const vertH = () => Math.max(...lines.map(l => vertItems(c, l, fs, titleStyle()).reduce((a, it) => a + it.adv, 0))) + titleStroke0() * k;
+        const titleH = () => !lines.length ? 0 : vertT ? vertH() : lines.reduce((a, l) => a + lineH(l), 0);
+        const total = () => (lg ? lg.h + logoGaps() * gap : 0) + titleH() + subH();
         while (total() > bh && (fs > 12 || (lg && lg.h > 20))) {
           if (fs > 12) fs -= 2;
           else { lg.w *= 0.95; lg.h *= 0.95; }
           subFs = Math.min(subFs, fs ? fs * 0.55 : subFs * 0.95);
         }
-        // 文字のまとまり：そろえ方（中央・左・右）と、ずらし（textX・textY）
+        // 文字のまとまりは、文字の場所の真ん中から textX・textY だけずらして置く。
+        // そろえ方（左・中央・右）は、まとまりの幅の中で行・ロゴ・サブタイトルの端をそろえるだけ（まとまりは動かさない）。縦書きは列の上・中央・下
         const tx = S.textX / 100 * W, ty = S.textY / 100 * H;
-        const cxOf = w => (S.textAlign === 'left' ? area.l + w / 2 : S.textAlign === 'right' ? area.r - w / 2 : mid) + tx;
+        const cxOf = w => {
+          const bc = mid + tx;
+          if (vertT || S.textAlign === 'center') return bc;
+          return S.textAlign === 'left' ? bc - blockW / 2 + w / 2 : bc + blockW / 2 - w / 2;
+        };
         const subWidth = f => {
           c.font = fontOf('sub', f);
           return c.measureText(sub).width + (S.subBox !== 'none' && !S.subArc ? f * 1.3 : subStroke0() * k);
         };
-        const blockW = Math.max(0, ...lines.map(l => lineW(c, l, fs) + titleStroke0() * k), lg ? lg.w : 0, subIn ? subWidth(subFs) : 0);
+        const titleWs = vertT ? (lines.length ? [colsW(fs)] : []) : lines.map(l => lineW(c, l, fs) + titleStroke0() * k);
+        const blockW = Math.max(0, ...titleWs, lg ? lg.w : 0, subIn ? subWidth(subFs) : 0);
         let y = (band.t + band.b) / 2 - total() / 2 + ty;
         const textRect = blockW > 0 ? { x: cxOf(blockW) - blockW / 2, y, w: blockW, h: total() } : null;
         // ---- メインの画像
@@ -3476,14 +3490,14 @@
               const colH = cl => cl.reduce((a, it) => a + it.adv, 0);
               w = tlh * (cols.length - 1) + f * (boxedT ? 1.55 : 1.3);
               h = Math.max(...cols.map(colH)) + (boxedT ? f * 1.3 : eStroke);
-              // そろえ方：左寄せ＝上、右寄せ＝下
+              // そろえ方：左揃え＝上、右揃え＝下
               const colY = cl => e.align === 'left' ? -h / 2 + tPad : e.align === 'right' ? h / 2 - tPad - colH(cl) : -colH(cl) / 2;
               paint = stroke => cols.forEach((cl, i) => drawVert(c, cl, ((cols.length - 1) / 2 - i) * tlh, colY(cl), f, stroke, est));
             } else {
               w = Math.max(...tLines.map(l => lineW(c, l, f, est))) + (boxedT ? f * 1.3 : eStroke);
               h = tlh * (tLines.length - 1) + f * (boxedT ? 1.55 : 1.3) + arcSag(w, arc);
               const lineY = i => (i - (tLines.length - 1) / 2) * tlh;
-              // 行のそろえ方：いちばん長い行の幅の中で、左・中央・右に寄せる
+              // 行のそろえ方：いちばん長い行の幅の中で、左・中央・右にそろえる
               const lineX = l => {
                 if (e.align === 'center' || arc) return 0;
                 const lw = lineW(c, l, f, est);
@@ -3584,7 +3598,19 @@
           if (subAbove) { subAt = { x: cxOf(subWidth(subFs)), y: y + subBody() / 2, f: subFs, w: subWidth(subFs), h: subBody() }; y += subH(); }
           titleTop = y;
           if (lg && mode !== 'below') drawLogo(!(lines.length || subBelow), bodyOn);
-          for (const line of lines) {
+          if (vertT && lines.length) {
+            const th = vertH(), cw = colsW(fs), sw = titleStroke0() * k;
+            if (bodyOn) {
+              let x = cxOf(cw) + cw / 2 - sw / 2;
+              for (const line of lines) {
+                const items = vertItems(c, line, fs, titleStyle()), ch = items.reduce((a, it) => a + it.adv, 0);
+                const top = S.textAlign === 'left' ? y + sw / 2 : S.textAlign === 'right' ? y + th - sw / 2 - ch : y + (th - ch) / 2;
+                drawVert(c, items, x - lineH(line) / 2, top, fs, sw, titleStyle());
+                x -= lineH(line);
+              }
+            }
+            y += th;
+          } else for (const line of lines) {
             if (bodyOn) drawLine(c, line, cxOf(lineW(c, line, fs)), y + lineH(line) / 2, fs, titleStroke0() * k);
             y += lineH(line);
           }
@@ -3644,10 +3670,12 @@
           c.globalAlpha = S.tpAlpha;
           c.fillStyle = S.tpColor;
           c.beginPath();
-          if (S.titlePlate === 'band') c.rect(-W, r.y - pad, W * 3, r.h + pad * 2);
+          // 縦書きのときは、帯は縦に端から端まで、楕円・角丸は縦に長く
+          if (S.titlePlate === 'band') { if (vertT) c.rect(r.x - pad, -H, r.w + pad * 2, H * 3); else c.rect(-W, r.y - pad, W * 3, r.h + pad * 2); }
           else {
-            const h = r.h + pad * 2, w = r.w + pad * (S.titlePlate === 'pill' ? 3.6 : 2.8);
-            c.roundRect(r.x + r.w / 2 - w / 2, r.y - pad, w, h, S.titlePlate === 'pill' ? h / 2 : pad * 1.2);
+            const ex = S.titlePlate === 'pill' ? 3.6 : 2.8;
+            const w = r.w + pad * (vertT ? 2 : ex), h = r.h + pad * (vertT ? ex : 2);
+            c.roundRect(r.x + r.w / 2 - w / 2, r.y + r.h / 2 - h / 2, w, h, S.titlePlate === 'pill' ? Math.min(w, h) / 2 : pad * 1.2);
           }
           c.fill();
           c.restore();
@@ -4521,7 +4549,7 @@
         if (ak) {
           $('sel-align').value = ak.obj[ak.key];
           // 縦書きの文字は、上・中央・下にそろえる
-          const labels = ak.obj.vert ? ['上寄せ', '中央', '下寄せ'] : ['左寄せ', '中央', '右寄せ'];
+          const labels = (ak.obj === S ? S.titleVert : ak.obj.vert) ? ['上揃え', '中央揃え', '下揃え'] : ['左揃え', '中央揃え', '右揃え'];
           [...$('sel-align').options].forEach((o, i) => { o.textContent = labels[i]; });
         }
         const ck = selColorKey();
@@ -4802,10 +4830,10 @@
             row.innerHTML = `<div class="extra-head"><span class="img-thumb text-thumb">T</span><span class="nm">タイトル</span>`
               + orderBtns(rank, n) + `</div>`
               + '<div class="main-text-slot fields"></div>' + FONT_ROW
-              + '<div class="extra-text sub-box-row title-shape-row"><select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option><option value="band">横いっぱいの帯</option></select>'
+              + '<div class="extra-text sub-box-row title-shape-row"><select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option><option value="band">端から端までの帯</option></select>'
               + '<input type="color" aria-label="形の色" title="形の色">'
               + '<input type="range" class="shape-alpha" min="0.1" max="1" step="0.05" aria-label="形の濃さ" title="形の濃さ（写真の上では少し薄くするとなじみます）"><span class="field-val shape-alpha-val"></span></div>'
-              + STROKE_ROW + ARC_ROW + HL_ROW + '<div class="opts-slot"></div>';
+              + STROKE_ROW + VERT_ROW + ARC_ROW + HL_ROW + '<div class="opts-slot"></div>';
             row.querySelector('.main-text-slot').appendChild(titleField);
             titleHlUi = hlRow(row, key => S[key === 'color' ? 'hlColor' : 'hlScale'], (key, v) => {
               const k2 = key === 'color' ? 'hlColor' : 'hlScale';
@@ -4830,6 +4858,11 @@
               const K = { on: 'titleStrokeOn', color: 'titleStrokeColor', w: 'titleStrokeW' };
               strokeRow(row, key => S[K[key]], (key, v) => { inputs[K[key]].set(v); update(K[key], v); }, () => true);
               arcRow(row, () => S.titleArc, v => update('titleArc', v));
+              // 縦書きのときは曲げられないので、曲げるの行を隠す
+              const arcEl = row.querySelector('.extra-arc'), vIn = row.querySelector('.extra-vert input');
+              const vertUi = () => { vIn.checked = !!S.titleVert; arcEl.style.display = S.titleVert ? 'none' : ''; };
+              vertUi();
+              vIn.onchange = () => { update('titleVert', vIn.checked); vertUi(); refreshSel(); };
             }
             row.querySelector('.opts-slot').appendChild(titleOpts);
             hookRow(row, '@text');
