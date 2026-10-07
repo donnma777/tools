@@ -156,7 +156,8 @@
       text-shadow: 0 calc(2px * var(--k)) calc(6px * var(--k)) rgba(0, 0, 0, 0.7);
     }
 
-    .t-simple.panel #stage {
+    .t-simple.panel #stage,
+    .t-simple.panel .face {
       background: rgba(0, 0, 0, 0.5);
       border-radius: calc(18px * var(--k));
     }
@@ -168,7 +169,8 @@
     }
 
     /* GAMING */
-    .t-gaming #stage {
+    .t-gaming #stage,
+    .t-gaming .face {
       font-family: 'Orbitron', sans-serif;
       font-weight: 900;
       color: #fff;
@@ -200,7 +202,8 @@
     }
 
     /* CYBERPUNK */
-    .t-cyber #stage {
+    .t-cyber #stage,
+    .t-cyber .face {
       font-family: 'Fira Code', monospace;
       font-weight: 700;
       color: #fff;
@@ -227,7 +230,8 @@
     }
 
     /* GIRLY NEON */
-    .t-neon #stage {
+    .t-neon #stage,
+    .t-neon .face {
       font-family: 'Outfit', sans-serif;
       font-weight: 900;
       color: #fff;
@@ -248,7 +252,8 @@
     }
 
     /* SWEET LOLITA ROSE */
-    .t-rose #stage {
+    .t-rose #stage,
+    .t-rose .face {
       font-family: 'Outfit', sans-serif;
       font-weight: 900;
       color: #df6ba6;
@@ -267,7 +272,8 @@
     }
 
     /* 和 */
-    .t-wa #stage {
+    .t-wa #stage,
+    .t-wa .face {
       font-family: 'Noto Serif JP', serif;
       font-weight: 900;
       color: #3a2a20;
@@ -286,7 +292,8 @@
     }
 
     /* POP */
-    .t-pop #stage {
+    .t-pop #stage,
+    .t-pop .face {
       font-family: 'Nunito', 'Zen Maru Gothic', sans-serif;
       font-weight: 900;
       color: #2a4a5a;
@@ -305,7 +312,8 @@
     }
 
     /* CITY POP */
-    .t-city #stage {
+    .t-city #stage,
+    .t-city .face {
       font-family: 'Josefin Sans', sans-serif;
       font-weight: 700;
       color: #fff;
@@ -331,6 +339,210 @@
       font-weight: 600;
       color: #fcd34d;
       letter-spacing: 0.14em;
+    }
+
+    /* ── 円（アナログ）：1つずつ丸い文字盤にする。台の見た目は .face に移す ── */
+    .f-dial #stage {
+      align-items: center;
+      background: none !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      outline: 0 !important;
+      padding: calc(14px * var(--k)) calc(26px * var(--k));
+      --ink: #fff;
+      --hand: #fff;
+      --sec: var(--a);
+    }
+
+    .f-dial.al-left #stage.col {
+      align-items: flex-start;
+    }
+
+    .f-dial.al-right #stage.col {
+      align-items: flex-end;
+    }
+
+    .f-dial .box {
+      position: relative;
+      display: block;
+      flex: none;
+      width: calc(240px * var(--k));
+      height: calc(240px * var(--k));
+    }
+
+    .f-dial .box.sub {
+      width: calc(180px * var(--k));
+      height: calc(180px * var(--k));
+    }
+
+    .f-dial .box:not([hidden])~.box:not([hidden]) {
+      border: 0;
+      padding: 0;
+    }
+
+    .f-dial .face {
+      position: absolute;
+      inset: 0;
+      border-radius: 50% !important;
+    }
+
+    .f-dial .box svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .f-dial .box>.lab,
+    .f-dial .box>.date,
+    .f-dial .box>.time {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .f-dial .box>.lab {
+      top: 31%;
+      font-size: calc(15px * var(--k));
+    }
+
+    .f-dial .box>.date {
+      top: 69%;
+      font-size: calc(15px * var(--k));
+    }
+
+    .f-dial .box.sub>.lab,
+    .f-dial .box.sub>.date {
+      font-size: calc(12px * var(--k));
+    }
+
+    .f-dial #t-clock,
+    .f-dial #t-tz {
+      display: none;
+    }
+
+    .f-dial #b-el>.lab {
+      top: 33%;
+    }
+
+    .f-dial #b-el>.time {
+      top: 53%;
+      font-size: calc(40px * var(--k));
+    }
+
+    .t-gaming.f-dial #b-el>.time {
+      font-size: calc(32px * var(--k));
+    }
+
+    .f-dial .tk {
+      stroke: var(--ink);
+      stroke-width: 1.4;
+      opacity: 0.7;
+    }
+
+    .f-dial .tk.b {
+      stroke-width: 3.6;
+      stroke-linecap: round;
+      opacity: 1;
+    }
+
+    .f-dial .num {
+      fill: var(--num, var(--ink));
+      font-size: 17px;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    .f-dial .num.q {
+      font-size: 21px;
+    }
+
+    .f-dial .hand {
+      stroke: var(--hand);
+      stroke-linecap: round;
+    }
+
+    .f-dial .hh {
+      stroke-width: 7;
+    }
+
+    .f-dial .mh {
+      stroke-width: 4.5;
+    }
+
+    .f-dial .sh {
+      stroke: var(--sec);
+      stroke-width: 1.8;
+    }
+
+    .f-dial .cap {
+      fill: var(--sec);
+    }
+
+    .f-dial .ring {
+      fill: none;
+      stroke-width: 7;
+    }
+
+    .f-dial .ring.bg {
+      stroke: var(--ink);
+      opacity: 0.18;
+    }
+
+    .f-dial .ring.fg {
+      stroke: var(--sec);
+      stroke-linecap: round;
+      transform: rotate(-90deg);
+    }
+
+    /* テーマごとの目盛り・針の色と光り方 */
+    .t-simple.f-dial .box svg {
+      filter: drop-shadow(0 calc(2px * var(--k)) calc(3px * var(--k)) rgba(0, 0, 0, 0.7));
+    }
+
+    .t-gaming.f-dial #stage,
+    .t-neon.f-dial #stage {
+      --ink: var(--a);
+      --num: #fff;
+    }
+
+    .t-gaming.f-dial .box svg,
+    .t-neon.f-dial .box svg {
+      filter: drop-shadow(0 0 calc(4px * var(--k)) var(--a));
+    }
+
+    .t-cyber.f-dial #stage {
+      --ink: #ffee00;
+    }
+
+    .t-rose.f-dial #stage {
+      --ink: #7a4d6a;
+      --hand: #df6ba6;
+    }
+
+    .t-wa.f-dial #stage {
+      --ink: #3a2a20;
+      --hand: #3a2a20;
+    }
+
+    .t-wa.f-dial .num {
+      font-size: 14px;
+    }
+
+    .t-wa.f-dial .num.q {
+      font-size: 19px;
+    }
+
+    .t-pop.f-dial #stage {
+      --ink: color-mix(in srgb, var(--a) 70%, #000);
+      --hand: #2a4a5a;
+      --sec: color-mix(in srgb, var(--a) 70%, #000);
+    }
+
+    .t-city.f-dial #stage {
+      --ink: #fcd34d;
+      --sec: #ec4899;
     }
   </style>
 </head>
@@ -370,6 +582,8 @@
         panel: get('p', '0') === '1',
         lang: get('wd', 'ja'),
         demo: get('demo', '0') === '1', // 編集ページの見本：OBS がなくても数える
+        dial: get('f', '') === 'dial',  // 円（アナログ）
+        nums: get('n', 'q'),            // 文字盤の数字：all（12個）/ q（4つ）/ none
       };
       const THEMES = ['simple', 'gaming', 'cyber', 'neon', 'rose', 'wa', 'pop', 'city'];
       document.body.classList.add('t-' + (THEMES.includes(C.theme) ? C.theme : 'simple'), 'al-' + C.align);
@@ -385,6 +599,40 @@
       $('l-clock').textContent = C.lab1;
       $('l-tz').textContent = C.tzLab;
       $('l-el').textContent = C.elLab;
+
+      // ---- 円（アナログ）：文字盤（後ろ）と針（前）を足す。上の文字・日付は間にはさむ
+      const RING = 2 * Math.PI * 86;
+      if (C.dial) {
+        document.body.classList.add('f-dial');
+        const KANJI = ['十二', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一'];
+        const ticks = Array.from({ length: 60 }, (_, i) => {
+          const big = i % 5 === 0;
+          return `<line class="tk${big ? ' b' : ''}" x1="0" y1="${big ? (C.nums === 'all' ? -80 : -77) : -84}" x2="0" y2="-89" transform="rotate(${i * 6})"/>`;
+        }).join('');
+        const hours = C.nums === 'all' ? [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] : C.nums === 'none' ? [] : [0, 3, 6, 9];
+        const nums = hours.map(i => {
+          const a = i * Math.PI / 6, r = C.nums === 'all' ? 66 : 64;
+          const label = C.theme === 'wa' ? KANJI[i] : String(i || 12);
+          return `<text class="num${C.nums === 'q' ? ' q' : ''}" x="${(Math.sin(a) * r).toFixed(1)}" y="${(-Math.cos(a) * r).toFixed(1)}">${label}</text>`;
+        }).join('');
+        const svg = (cls, body) => `<svg class="${cls}" viewBox="-100 -100 200 200" aria-hidden="true">${body}</svg>`;
+        for (const id of ['clock', 'tz']) {
+          const b = $('b-' + id);
+          b.insertAdjacentHTML('afterbegin', '<div class="face"></div>' + svg('back', ticks + nums));
+          b.insertAdjacentHTML('beforeend', svg('front',
+            '<line class="hand hh" x1="0" y1="12" x2="0" y2="-48"/><line class="hand mh" x1="0" y1="14" x2="0" y2="-70"/>' +
+            (C.sec && id === 'clock' ? '<line class="hand sh" x1="0" y1="20" x2="0" y2="-78"/>' : '') + '<circle class="cap" r="4.5"/>'));
+        }
+        $('b-el').insertAdjacentHTML('afterbegin', '<div class="face"></div>' + svg('back',
+          `<circle class="ring bg" r="86"/><circle class="ring fg" r="86" stroke-dasharray="${RING.toFixed(2)}" stroke-dashoffset="${RING.toFixed(2)}"/>`));
+      }
+      // 針を回す（時は分の分だけ、分は秒の分だけ進める）
+      function hands(box, t) {
+        const set = (sel, deg) => { const el = box.querySelector(sel); if (el) el.setAttribute('transform', `rotate(${deg})`); };
+        set('.hh', (t.h % 12 + t.mi / 60) * 30);
+        set('.mh', (t.mi + t.s / 60) * 6);
+        set('.sh', t.s * 6);
+      }
 
       // ---- 数字を、幅をそろえた文字にする
       const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -466,12 +714,12 @@
           const now = new Date();
           const s = new Date(now); s.setHours(hh || 0, mm || 0, 0, 0);
           // 決めた時刻より前なら、まだ始まっていない
-          if (now < s) return { html: chars('0:00:00'), idle: true };
-          return { html: chars(fmtDur(now - s)), idle: false };
+          if (now < s) return { html: chars('0:00:00'), idle: true, ms: 0 };
+          return { html: chars(fmtDur(now - s)), idle: false, ms: now - s };
         }
-        if (!running || !start) return { html: chars('0:00:00'), idle: true };
+        if (!running || !start) return { html: chars('0:00:00'), idle: true, ms: 0 };
         const now = pausedAt || Date.now();
-        return { html: chars(fmtDur(now - start)), idle: !!pausedAt };
+        return { html: chars(fmtDur(now - start)), idle: !!pausedAt, ms: now - start };
       }
       function fmtDur(ms) {
         const t = Math.max(0, Math.floor(ms / 1000));
@@ -483,12 +731,14 @@
         if (C.clock) {
           const t = parts('');
           setHTML($('t-clock'), timeHTML(t, C.sec));
+          if (C.dial) hands($('b-clock'), t);
           $('d-clock').textContent = dateText(t);
         }
         if (C.tz) {
           let t = null;
           try { t = parts(C.tz); } catch (e) { /* 知らないタイムゾーン */ }
           setHTML($('t-tz'), t ? timeHTML(t, false) : '--:--');
+          if (C.dial && t) hands($('b-tz'), t);
           $('d-tz').textContent = t && C.date !== 'none' ? dateText(t) : '';
         }
         if (C.el !== 'none') {
@@ -496,6 +746,13 @@
           setHTML($('t-el'), e.html);
           $('b-el').classList.toggle('idle', e.idle);
           $('b-el').hidden = e.idle && C.hideIdle;
+          // 円：1時間で1周するリング（まだ 0 のときは点も出さない）
+          if (C.dial) {
+            const sec = Math.floor(Math.max(0, e.ms) / 1000) % 3600;
+            const fg = $('b-el').querySelector('.ring.fg');
+            fg.setAttribute('stroke-dashoffset', (RING * (1 - sec / 3600)).toFixed(2));
+            fg.style.visibility = sec ? '' : 'hidden';
+          }
         }
         setTimeout(tick, 1000 - (Date.now() % 1000) + 5);
       }

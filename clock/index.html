@@ -997,12 +997,20 @@
       <div class="panel">
         <div class="panel-body">
           <div class="panel-title"><span class="sec-icon">🎨</span>見た目</div>
+          <div class="field">
+            <span class="field-label"><span>形</span></span>
+            <div class="seg" id="form"><button type="button" data-v="digit">数字</button><button type="button" data-v="dial">円（アナログ）</button></div>
+          </div>
+          <div class="field" id="nums-row">
+            <span class="field-label"><span>文字盤の数字</span></span>
+            <div class="seg" id="nums"><button type="button" data-v="all">12個</button><button type="button" data-v="q">12・3・6・9</button><button type="button" data-v="none">なし</button></div>
+          </div>
           <div class="themes" id="themes"></div>
           <div class="field">
             <span class="field-label"><span>色</span></span>
             <div class="inline"><input type="color" id="accent" aria-label="色"><button class="btn btn-sm" type="button" id="accent-reset">テーマの色に戻す</button></div>
           </div>
-          <label class="toggle" id="panel-row"><span>文字の後ろに台を付ける</span><input type="checkbox" id="panel"><span class="sw"></span></label>
+          <label class="toggle" id="panel-row"><span id="panel-text">文字の後ろに台を付ける</span><input type="checkbox" id="panel"><span class="sw"></span></label>
           <div class="two">
             <div class="field">
               <span class="field-label"><span>並べ方</span></span>
@@ -1026,7 +1034,7 @@
           <label class="toggle"><span>時計を出す</span><input type="checkbox" id="clock"><span class="sw"></span></label>
           <div id="clock-opts">
             <div class="two">
-              <div class="field">
+              <div class="field" id="h-row">
                 <span class="field-label"><span>表し方</span></span>
                 <div class="seg" id="h"><button type="button" data-v="24">24時間</button><button type="button" data-v="12">12時間</button></div>
               </div>
@@ -1252,7 +1260,7 @@
 
       // ---- 設定（このブラウザに覚えておく）
       const STORE = 'donnma-clock-editor';
-      const DEF = { t: 'gaming', a: '', p: false, ly: 'row', al: 'center', sz: 100, c: true, h: '24', wd: 'ja', s: true, d: 'md', l1: '', z: '', zl: '', e: 'stream', em: 'stream', el: '配信時間', et: '20:00', eh: false };
+      const DEF = { f: 'digit', n: 'q', t: 'gaming', a: '', p: false, ly: 'row', al: 'center', sz: 100, c: true, h: '24', wd: 'ja', s: true, d: 'md', l1: '', z: '', zl: '', e: 'stream', em: 'stream', el: '配信時間', et: '20:00', eh: false };
       let S = { ...DEF };
       try { S = { ...DEF, ...JSON.parse(localStorage.getItem(STORE) || '{}') }; } catch (e) { /* 初めの設定 */ }
       const store = () => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) { /* ignore */ } };
@@ -1264,6 +1272,7 @@
       function params(demo) {
         const p = new URLSearchParams();
         p.set('t', S.t);
+        if (S.f === 'dial') { p.set('f', 'dial'); if (S.n !== 'q') p.set('n', S.n); }
         const themeColor = THEMES.find(x => x[0] === S.t)[2];
         if (S.a && S.a.toLowerCase() !== themeColor) p.set('a', S.a.replace('#', ''));
         if (S.t === 'simple' && S.p) p.set('p', '1');
@@ -1298,6 +1307,7 @@
         const e = g('e', 'none');
         return {
           ...S,
+          f: g('f') === 'dial' ? 'dial' : 'digit', n: ['all', 'q', 'none'].includes(g('n')) ? g('n') : 'q',
           t, a: /^[0-9a-f]{6}$/i.test(g('a', '')) ? '#' + g('a') : '', p: g('p') === '1',
           ly: g('ly', 'row'), al: g('al', 'center'), sz: +g('sz', '100') || 100,
           c: g('c', '1') === '1', h: g('h', '24'), s: g('s', '1') === '1', d: g('d', 'md'), l1: g('l1', ''), wd: g('wd', 'ja'),
@@ -1312,7 +1322,11 @@
       function syncUI() {
         for (const b of $('show').children) b.setAttribute('aria-pressed', String(b.dataset.v === showing()));
         for (const b of $('themes').children) b.setAttribute('aria-pressed', String(b.dataset.v === S.t));
-        for (const [id, key] of [['layout', 'ly'], ['align', 'al'], ['h', 'h'], ['lang', 'wd']]) for (const b of $(id).children) b.setAttribute('aria-pressed', String(b.dataset.v === S[key]));
+        for (const [id, key] of [['form', 'f'], ['nums', 'n'], ['layout', 'ly'], ['align', 'al'], ['h', 'h'], ['lang', 'wd']]) for (const b of $(id).children) b.setAttribute('aria-pressed', String(b.dataset.v === S[key]));
+        const dial = S.f === 'dial';
+        $('nums-row').hidden = !dial;
+        $('h-row').hidden = dial;
+        $('panel-text').textContent = dial ? '円の中を暗く塗る' : '文字の後ろに台を付ける';
         $('accent').value = S.a || THEMES.find(x => x[0] === S.t)[2];
         $('panel-row').hidden = S.t !== 'simple'; $('panel').checked = S.p;
         $('size').value = S.sz; $('size-val').textContent = S.sz + '%';
@@ -1338,8 +1352,18 @@
         $('open').href = url;
         const n = (S.c ? 1 : 0) + (S.z ? 1 : 0) + (S.e !== 'none' ? 1 : 0);
         const k = S.sz / 100;
-        const vw = S.ly === 'row' ? Math.round((80 + Math.max(1, n) * 330) * k) : Math.round(480 * k);
-        const vh = S.ly === 'row' ? Math.round(170 * k) : Math.round((40 + Math.max(1, n) * 130) * k);
+        let vw, vh;
+        if (S.f === 'dial') {
+          // 円の直径（もう1つの時刻は小さめ）＋すき間・余白・光の分
+          const ds = [S.c ? 240 : 0, S.z ? 180 : 0, S.e !== 'none' ? 240 : 0].filter(Boolean);
+          if (!ds.length) ds.push(240);
+          const sum = ds.reduce((a, b) => a + b, 0);
+          vw = S.ly === 'row' ? Math.round((96 + sum + 26 * (ds.length - 1)) * k) : Math.round(336 * k);
+          vh = S.ly === 'row' ? Math.round(312 * k) : Math.round((72 + sum + 12 * (ds.length - 1)) * k);
+        } else {
+          vw = S.ly === 'row' ? Math.round((80 + Math.max(1, n) * 330) * k) : Math.round(480 * k);
+          vh = S.ly === 'row' ? Math.round(170 * k) : Math.round((40 + Math.max(1, n) * 130) * k);
+        }
         $('size-hint').textContent = `OBS のブラウザソースの大きさの目安：幅 ${vw}・高さ ${vh}（はみ出すときは大きくしてください。余白は透明です）`;
         const box = $('preview');
         const s = Math.min(1, (box.clientWidth || 600) / vw);
@@ -1534,7 +1558,7 @@
         changed();
       });
       $('themes').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; S.t = b.dataset.v; S.a = ''; changed(); });
-      for (const [id, key] of [['layout', 'ly'], ['align', 'al'], ['h', 'h'], ['lang', 'wd']]) {
+      for (const [id, key] of [['form', 'f'], ['nums', 'n'], ['layout', 'ly'], ['align', 'al'], ['h', 'h'], ['lang', 'wd']]) {
         $(id).addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; S[key] = b.dataset.v; changed(); });
       }
       $('accent').addEventListener('input', () => { S.a = $('accent').value; update(); });
