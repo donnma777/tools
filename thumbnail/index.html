@@ -2600,6 +2600,7 @@
         out.padRound = Math.max(0, Math.min(10, out.padRound));
         if (!['square', 'scallop', 'lace'].includes(out.padShape)) out.padShape = 'square';
         if (!['straight', 'scallop', 'lace'].includes(out.bandEdge)) out.bandEdge = 'straight';
+        if (!['bottom', 'top', 'left', 'right'].includes(out.bandPos)) out.bandPos = 'bottom';
         // 前の「縦の位置」を置き場所に入れ込む
         if (o.imgAnchor === 'bottom' && (out.imgPos === 'left' || out.imgPos === 'right')) out.imgPos += '-bottom';
         if (!['heart', 'star', 'bunny'].includes(out.sample)) out.sample = 'heart';
@@ -2754,11 +2755,11 @@
           title: 'ロゴ', icon: '🏷️', open: true, fields: [
             {
               k: 'logoMode', l: 'ロゴの置き方', t: 'select', o: [['none', '使わない'], ['replace', 'タイトルの代わりに大きく（下にサブタイトル）'],
-              ['above', 'タイトルの上に'], ['below', 'タイトルの下に'], ['corner', '隅に小さく'], ['band', '帯の中に（下か上に帯を敷く）']]
+              ['above', 'タイトルの上に'], ['below', 'タイトルの下に'], ['corner', '隅に小さく'], ['band', '帯の中に（上下左右のどこかに帯を敷く）']]
             },
             { k: 'logoCorner', l: '隅の位置', t: 'select', o: [['tl', '左上'], ['tc', '上の真ん中'], ['tr', '右上'], ['bl', '左下'], ['bc', '下の真ん中'], ['br', '右下']], when: s => s.logoMode === 'corner' },
             { k: 'logoScale', l: 'ロゴの大きさ', t: 'range', min: 0.3, max: 1.6, step: 0.05, u: '倍', when: s => s.logoMode !== 'none' },
-            { k: 'bandPos', l: '帯の位置', t: 'select', o: [['bottom', '下'], ['top', '上']], when: s => s.logoMode === 'band' },
+            { k: 'bandPos', l: '帯の位置', t: 'select', o: [['bottom', '下'], ['top', '上'], ['left', '左（縦のロゴに）'], ['right', '右（縦のロゴに）']], when: s => s.logoMode === 'band' },
             { k: 'bandColor', l: '帯の色', t: 'color', when: s => s.logoMode === 'band' },
             { k: 'bandSize', l: '帯の太さ', t: 'range', min: 0.5, max: 2.5, step: 0.05, u: '倍', when: s => s.logoMode === 'band' },
             { k: 'bandEdge', l: '帯のふちの形', t: 'select', o: [['straight', 'まっすぐ'], ['scallop', '波（スカラップ）'], ['lace', 'レース']], when: s => s.logoMode === 'band' },
@@ -3142,37 +3143,52 @@
         const P = padOf(W0, H0);
         if (!S.order.includes('@frame')) fixOrder(S);
         const W = W0 - P.l - P.r, H = H0 - P.t - P.b;
-        const band = S.logoMode === 'band' && !S.hidden.includes('@logo') ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
-        const top = band && S.bandPos === 'top' ? band : 0;
-        // 帯とロゴ（canvas 全体の座標で描く）
+        const B = bandOf(W, H), band = B.size;
+        // 帯とロゴ（canvas 全体の座標で描く）。左右の帯は縦のロゴ用
         const drawBand = c => {
           c.save();
           c.setTransform(1, 0, 0, 1, 0, 0);
           c.fillStyle = S.bandColor;
-          const y = P.t + (top ? 0 : H - band);
-          c.fillRect(P.l, y, W, band);
-          // 帯のふち（中身の側）に波・レース。帯が下なら上のふちから上へ、帯が上なら下のふちから下へ
+          const x = P.l + (B.pos === 'right' ? W - band : 0), y = P.t + (B.pos === 'bottom' ? H - band : 0);
+          if (B.side) c.fillRect(x, P.t, band, H);
+          else c.fillRect(P.l, y, W, band);
+          // 帯のふち（中身の側）に波・レース。中身の側へはみ出す向き。左右の帯は x と y を入れ替えて横と同じに描く
           if (S.bandEdge !== 'straight') {
-            const lace = S.bandEdge === 'lace';
-            drawEdgeBumps(c, P.l, W, top ? y + band : y, top ? 1 : -1, band * (lace ? 0.3 : 0.2), lace, S.bandColor, S.bandAccent);
+            const lace = S.bandEdge === 'lace', rb = band * (lace ? 0.3 : 0.2);
+            const dir = B.pos === 'top' || B.pos === 'left' ? 1 : -1;
+            const edge = B.side ? (dir > 0 ? x + band : x) : (dir > 0 ? y + band : y);
+            if (B.side) {
+              c.save();
+              c.transform(0, 1, 1, 0, 0, 0);
+              drawEdgeBumps(c, P.t, H, edge, dir, rb, lace, S.bandColor, S.bandAccent);
+              c.restore();
+            } else drawEdgeBumps(c, P.l, W, edge, dir, rb, lace, S.bandColor, S.bandAccent);
           }
           if (img.logo) {
-            const r = Math.min(W * 0.5 / img.logo.width, band * 0.56 * S.logoScale / img.logo.height);
-            const w = img.logo.width * r, h = img.logo.height * r;
-            c.drawImage(img.logo, P.l + W / 2 - w / 2, y + band / 2 - h / 2, w, h);
+            const lw = img.logo.width, lh = img.logo.height;
+            const r = B.side ? Math.min(band * 0.56 * S.logoScale / lw, H * 0.7 / lh) : Math.min(W * 0.5 / lw, band * 0.56 * S.logoScale / lh);
+            const w = lw * r, h = lh * r;
+            if (B.side) c.drawImage(img.logo, x + band / 2 - w / 2, P.t + H / 2 - h / 2, w, h);
+            else c.drawImage(img.logo, P.l + W / 2 - w / 2, y + band / 2 - h / 2, w, h);
           }
           c.restore();
         };
         // 帯：「いちばん上」なら画像や文字のあと、「背景のすぐ上」なら背景のあとに描く。配置は帯を除いた部分で決める
-        const hit = drawContent(cv, W, H - band, {
-          pad: P, dy: top, fullH: H,
+        const hit = drawContent(cv, W - B.w, H - B.h, {
+          pad: P, dx: B.dx, dy: B.dy, fullW: W, fullH: H,
           underLayers: band && S.bandLayer === 'back' ? drawBand : null,
           overLayers: band && S.bandLayer !== 'back' ? drawBand : null,
         });
         if (cv === $('cv')) {
-          const sh = r => r && { ...r, x: r.x + P.l, y: r.y + P.t + top };
+          const sh = r => r && { ...r, x: r.x + P.l + B.dx, y: r.y + P.t + B.dy };
           lastHit = { pic: sh(hit.pic), text: sh(hit.text), sub: sh(hit.sub), extras: hit.extras.map(sh) };
         }
+      }
+      // ロゴの帯の太さと場所（W×H は余白の内側）。w・h は中身から引く幅・高さ、dx・dy は中身をずらす量
+      function bandOf(W, H) {
+        const size = S.logoMode === 'band' && !S.hidden.includes('@logo') ? Math.round(Math.min(W / 1200, H / 630) * 64 * S.bandSize) : 0;
+        const pos = S.bandPos, side = pos === 'left' || pos === 'right';
+        return { size, pos, side, w: side ? size : 0, h: side ? 0 : size, dx: pos === 'left' ? size : 0, dy: pos === 'top' ? size : 0 };
       }
 
       // ふちの内側の形（canvas の座標）。波・レースのときは、波の真ん中と外向きの向きを返す
@@ -3309,11 +3325,11 @@
         c.restore();
       }
 
-      // opt.fullH：canvas の本当の高さ（帯を背景のすぐ上に敷くとき）。opt.dy だけ下にずらして描き、
+      // opt.fullW・opt.fullH：canvas の本当の幅・高さ（ロゴの帯があるとき）。opt.dx・opt.dy だけずらして描き、
       // 背景のあと・画像や文字の前に opt.underLayers(c) を呼ぶ
       function drawContent(cv, W, H, opt = {}) {
         const P = opt.pad || { p: 0, t: 0, r: 0, b: 0, l: 0 };
-        cv.width = W + P.l + P.r; cv.height = (opt.fullH || H) + P.t + P.b;
+        cv.width = (opt.fullW || W) + P.l + P.r; cv.height = (opt.fullH || H) + P.t + P.b;
         const c = cv.getContext('2d');
         // 余白があるときは、背景・帯（背景のすぐ上）・光などを内側の形の中だけに描く
         c.save();
@@ -3324,7 +3340,7 @@
           else padInnerPath(c, P.l, P.t, iw, ih, P);
           c.clip();
         }
-        c.translate(P.l, P.t + (opt.dy || 0));
+        c.translate(P.l + (opt.dx || 0), P.t + (opt.dy || 0));
         const k = Math.min(W / 1200, H / 630);
         const stacked = W / H < 1.4;
         const side = S.imgPos === 'none' || S.hidden.includes('@pic') ? null : (img.side || sampleImg());
@@ -3633,7 +3649,7 @@
         // ---- 重なりの順に描く（下から）。ここからは切り抜かない（ふちより上のものは、ふちにはみ出す）
         c.restore();
         c.save();
-        c.translate(P.l, P.t + (opt.dy || 0));
+        c.translate(P.l + (opt.dx || 0), P.t + (opt.dy || 0));
         const byId = Object.fromEntries(S.extras.map(e => [e.id, e]));
         for (const id of S.order) {
           if (id === '@frame') { if (P.p) drawFrame(c, cv.width, cv.height, P); }
@@ -4280,9 +4296,10 @@
         const p = toCanvas(e);
         cv.style.cursor = drag || hitAt(p) ? 'move' : '';
         if (!drag) return;
-        // 位置は中身（余白の内側）の大きさに対する %
+        // 位置は中身（余白の内側から帯を除いた部分）の大きさに対する %
         const P = padOf(cv.width, cv.height);
-        const dx = (p.x - drag.p.x) / (cv.width - P.l - P.r) * 100, dy = (p.y - drag.p.y) / (cv.height - P.t - P.b) * 100;
+        const iw = cv.width - P.l - P.r, ih = cv.height - P.t - P.b, B = bandOf(iw, ih);
+        const dx = (p.x - drag.p.x) / (iw - B.w) * 100, dy = (p.y - drag.p.y) / (ih - B.h) * 100;
         const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
         if (drag.h.kind === 'pic') {
           S.imgX = clamp(drag.x + dx, -50, 50); S.imgY = clamp(drag.y + dy, -50, 50);
