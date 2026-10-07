@@ -2158,6 +2158,11 @@
       padding-top: 8px;
     }
 
+    .extra-vert {
+      display: flex;
+      padding-top: 8px;
+    }
+
     .extra-arc .field-val {
       text-align: right;
     }
@@ -2622,7 +2627,7 @@
             strokeOn: e.strokeOn !== false, strokeW: +e.strokeW >= 1 && +e.strokeW <= 40 ? +e.strokeW : 11, strokeColor: hex(e.strokeColor, '#ffffff'),
             font: typeof e.font === 'string' ? e.font : '@inherit', weight: typeof e.weight === 'string' ? e.weight : '@inherit',
             align: ['left', 'center', 'right'].includes(e.align) ? e.align : 'center',
-            arc: +e.arc >= -1 && +e.arc <= 1 ? +e.arc : 0,
+            arc: +e.arc >= -1 && +e.arc <= 1 ? +e.arc : 0, vert: e.vert === true,
             hlColor: hex(e.hlColor, '#f0325a'), hlScale: +e.hlScale >= 0.8 && +e.hlScale <= 1.6 ? +e.hlScale : 1.15,
           });
           return base;
@@ -3457,22 +3462,35 @@
           const cx = e.x / 100 * W, cy = e.y / 100 * H;
           if (e.type === 'text') {
             if (!e.text.trim()) return;
-            // 複数行：行ごとに真ん中そろえ。形はいちばん長い行と行数に合わせる
+            // 複数行：行ごとに真ん中そろえ。形はいちばん長い行と行数に合わせる。縦書きは行を右から左へ並べ、曲げない
             const tLines = e.text.replace(/\s+$/, '').split('\n');
-            const f = 64 * k * e.scale, boxedT = e.box !== 'none' && !e.arc, tlh = f * 1.2;
+            const vert = !!e.vert, arc = vert ? 0 : e.arc;
+            const f = 64 * k * e.scale, boxedT = e.box !== 'none' && !arc, tlh = f * 1.2;
             c.font = fontOf(e, f);
             const eStroke = e.strokeOn ? e.strokeW * k : 0;
             const est = extraStyle(e);
-            const w = Math.max(...tLines.map(l => lineW(c, l, f, est))) + (boxedT ? f * 1.3 : eStroke);
-            const h = tlh * (tLines.length - 1) + f * (boxedT ? 1.55 : 1.3) + arcSag(w, e.arc);
-            const lineY = i => (i - (tLines.length - 1) / 2) * tlh;
-            // 行のそろえ方：いちばん長い行の幅の中で、左・中央・右に寄せる
             const tPad = boxedT ? f * 0.65 : eStroke / 2;
-            const lineX = l => {
-              if (e.align === 'center') return 0;
-              const lw = lineW(c, l, f, est);
-              return e.align === 'left' ? -w / 2 + tPad + lw / 2 : w / 2 - tPad - lw / 2;
-            };
+            let w, h, paint;
+            if (vert) {
+              const cols = tLines.map(l => vertItems(c, l, f, est));
+              const colH = cl => cl.reduce((a, it) => a + it.adv, 0);
+              w = tlh * (cols.length - 1) + f * (boxedT ? 1.55 : 1.3);
+              h = Math.max(...cols.map(colH)) + (boxedT ? f * 1.3 : eStroke);
+              // そろえ方：左寄せ＝上、右寄せ＝下
+              const colY = cl => e.align === 'left' ? -h / 2 + tPad : e.align === 'right' ? h / 2 - tPad - colH(cl) : -colH(cl) / 2;
+              paint = stroke => cols.forEach((cl, i) => drawVert(c, cl, ((cols.length - 1) / 2 - i) * tlh, colY(cl), f, stroke, est));
+            } else {
+              w = Math.max(...tLines.map(l => lineW(c, l, f, est))) + (boxedT ? f * 1.3 : eStroke);
+              h = tlh * (tLines.length - 1) + f * (boxedT ? 1.55 : 1.3) + arcSag(w, arc);
+              const lineY = i => (i - (tLines.length - 1) / 2) * tlh;
+              // 行のそろえ方：いちばん長い行の幅の中で、左・中央・右に寄せる
+              const lineX = l => {
+                if (e.align === 'center' || arc) return 0;
+                const lw = lineW(c, l, f, est);
+                return e.align === 'left' ? -w / 2 + tPad + lw / 2 : w / 2 - tPad - lw / 2;
+              };
+              paint = stroke => tLines.forEach((l, i) => drawLine(c, l, lineX(l), lineY(i) + (boxedT ? f * 0.03 : 0), f, stroke, est));
+            }
             c.save();
             c.translate(cx, cy);
             c.rotate((e.rot || 0) * Math.PI / 180);
@@ -3482,16 +3500,15 @@
               c.fillStyle = e.boxColor;
               c.globalAlpha = e.boxAlpha;
               c.beginPath();
-              c.roundRect(-w / 2, -h / 2, w, h, e.box === 'pill' ? h / 2 : h * 0.22);
+              const rr = Math.min(w, h);
+              c.roundRect(-w / 2, -h / 2, w, h, e.box === 'pill' ? rr / 2 : rr * 0.22);
               c.fill();
               c.restore();
               const keepShadow = S.shadow;
               S.shadow = false;
-              tLines.forEach((l, i) => drawLine(c, l, lineX(l), lineY(i) + f * 0.03, f, 0, est));
+              paint(0);
               S.shadow = keepShadow;
-            } else if (e.arc) {
-              tLines.forEach((l, i) => drawLine(c, l, 0, lineY(i), f, eStroke, est));
-            } else tLines.forEach((l, i) => drawLine(c, l, lineX(l), lineY(i), f, eStroke, est));
+            } else paint(eStroke);
             c.restore();
             extras.push({ id: e.id, x: cx - w / 2, y: cy - h / 2, w, h });
             return;
@@ -3759,7 +3776,7 @@
       const hasHL = line => /\*[^*]+\*/.test(line);
       // 1行の見た目：role（フォント）・色・強調の色と大きさ・曲がり・縁取りの色。省くとタイトル
       const titleStyle = () => ({ role: 'title', color: S.titleColor, hlColor: S.hlColor, hlScale: S.hlScale, arc: S.titleArc, strokeColor: S.titleStrokeColor });
-      const extraStyle = e => ({ role: e, color: e.color, hlColor: e.hlColor, hlScale: e.hlScale, arc: e.arc, strokeColor: e.strokeColor });
+      const extraStyle = e => ({ role: e, color: e.color, hlColor: e.hlColor, hlScale: e.hlScale, arc: e.vert ? 0 : e.arc, strokeColor: e.strokeColor });
       function lineW(c, line, fs, st = titleStyle()) {
         return splitHL(line).reduce((a, sg) => {
           c.font = fontOf(st.role, sg.hl ? fs * st.hlScale : fs);
@@ -3857,6 +3874,63 @@
         if (!arc) return 0;
         const a = Math.abs(arc) * 1.4, R = width / a;
         return R * (1 - Math.cos(a / 2));
+      }
+
+      // 縦書き：横書きの字形を回して使う文字（長音・波線・かっこ・矢印など）と、右上に寄せる文字
+      const VERT_ROT = /[ー－―—‐\-〜～~…‥＝=（）()「」『』【】〔〕［］\[\]｛｝{}〈〉《》<>＜＞→←]/;
+      const VERT_PUNCT = /[、。，．,.]/;
+      const VERT_SMALL = /[ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ]/;
+      // 1行（縦の1列）を、1文字ずつ { t, font, color, adv（縦に進む量）, dx, dy, rot } にする
+      function vertItems(c, line, fs, st) {
+        const out = [];
+        c.save();
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        for (const sg of splitHL(line)) {
+          const f = sg.hl ? fs * st.hlScale : fs, font = fontOf(st.role, f);
+          c.font = font;
+          for (const ch of sg.t) {
+            const m = c.measureText(ch), rot = VERT_ROT.test(ch);
+            // 字形の墨の真ん中（描く点からのずれ）。フォントで位置がちがうので、はかって合わせる
+            const ix = (m.actualBoundingBoxRight - m.actualBoundingBoxLeft) / 2, iy = (m.actualBoundingBoxDescent - m.actualBoundingBoxAscent) / 2;
+            // 全角は1文字ぶん、半角は少し詰める。回す文字は横幅がそのまま縦の長さになる
+            const adv = rot ? Math.max(m.width, f * 0.5) : m.width > f * 0.8 ? f : ch === ' ' ? f * 0.4 : f * 0.8;
+            // 句読点は右上、小さい字は少し右上へ。回す文字は列の真ん中にそろえる（回したあとの横のずれは iy）
+            let dx = 0, dy = 0;
+            if (VERT_PUNCT.test(ch)) { dx = f * 0.28 - ix; dy = -f * 0.28 - iy; }
+            else if (VERT_SMALL.test(ch)) { dx = f * 0.1; dy = -f * 0.1; }
+            out.push({ t: ch, font, color: sg.hl ? st.hlColor : st.color, adv, dx, dy, rot, ry: rot ? -iy : 0 });
+          }
+        }
+        c.restore();
+        return out;
+      }
+      // 縦の1列を描く（x は列の真ん中、y は列の上の端）。縁取りを全部描いてから文字を描く
+      function drawVert(c, items, x, y, fs, stroke, st) {
+        c.save();
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.lineJoin = 'round';
+        const shadow = () => {
+          if (!S.shadow) return;
+          c.shadowColor = 'rgba(120, 40, 70, 0.28)'; c.shadowBlur = Math.max(4, fs * 0.08); c.shadowOffsetY = Math.max(2, fs * 0.05);
+        };
+        for (const pass of (stroke > 0 ? ['stroke', 'fill'] : ['fill'])) {
+          let yy = y;
+          for (const it of items) {
+            const my = yy + it.adv / 2;
+            yy += it.adv;
+            if (!it.t.trim()) continue;
+            c.save();
+            c.translate(x + it.dx, my + it.dy);
+            if (it.rot) c.rotate(Math.PI / 2);
+            c.font = it.font;
+            if (pass === 'stroke') { shadow(); c.lineWidth = stroke; c.strokeStyle = st.strokeColor; c.strokeText(it.t, 0, it.ry); }
+            else { if (stroke <= 0) shadow(); c.fillStyle = it.color; c.fillText(it.t, 0, it.ry); }
+            c.restore();
+          }
+        }
+        c.restore();
       }
 
       // pad は縁取りのぶんの余白（px）
@@ -4444,7 +4518,12 @@
         $('sel-name').textContent = '選択中：' + def.name;
         const ak = selAlignKey();
         $('sel-align').hidden = !ak;
-        if (ak) $('sel-align').value = ak.obj[ak.key];
+        if (ak) {
+          $('sel-align').value = ak.obj[ak.key];
+          // 縦書きの文字は、上・中央・下にそろえる
+          const labels = ak.obj.vert ? ['上寄せ', '中央', '下寄せ'] : ['左寄せ', '中央', '右寄せ'];
+          [...$('sel-align').options].forEach((o, i) => { o.textContent = labels[i]; });
+        }
         const ck = selColorKey();
         $('sel-color').hidden = !ck;
         if (ck && document.activeElement !== $('sel-color')) $('sel-color').value = ck.obj[ck.key];
@@ -4552,6 +4631,7 @@
         el.alphaUi();
         r.oninput = () => { set(parseFloat(r.value)); show(); };
       }
+      const VERT_ROW = '<div class="extra-vert"><label class="toggle"><span>縦書き</span><input type="checkbox"><span class="sw"></span></label></div>';
       const ARC_ROW = '<div class="extra-arc"><label class="toggle"><span>曲げる</span><input type="checkbox"><span class="sw"></span></label>'
         + '<input type="range" min="-1" max="1" step="0.05" aria-label="曲がり（プラスで上に反る・マイナスで下に反る）" title="プラスで上に反る（アーチ）、マイナスで下に反る"><span class="field-val"></span></div>';
       // 曲げるの1行：オンで 0.4 から、オフで 0（まっすぐ）
@@ -4809,14 +4889,19 @@
               + FONT_ROW
               + '<div class="extra-text extra-shape"><select aria-label="後ろの形"><option value="none">形なし</option><option value="pill">楕円</option><option value="round">角丸</option></select>'
               + '<input type="color" aria-label="形の色" title="形の色" data-k="boxColor"><input type="range" class="shape-alpha" min="0.1" max="1" step="0.05" aria-label="形の濃さ" title="形の濃さ"><span class="field-val shape-alpha-val"></span></div>'
-              + STROKE_ROW + ARC_ROW + HL_ROW
+              + STROKE_ROW + VERT_ROW + ARC_ROW + HL_ROW
               ;
             const tIn = row.querySelector('.extra-text textarea');
             fontRow(row, key => ex[key], (key, v) => { ex[key] = v; redraw(); });
             // 形を敷いたときは縁取りを付けないので、出さない
             const XK = { on: 'strokeOn', color: 'strokeColor', w: 'strokeW' };
-            const strokeUi = strokeRow(row, key => ex[XK[key]], (key, v) => { ex[XK[key]] = v; redraw(); }, () => ex.box === 'none' || !!ex.arc);
+            const strokeUi = strokeRow(row, key => ex[XK[key]], (key, v) => { ex[XK[key]] = v; redraw(); }, () => ex.box === 'none' || (!!ex.arc && !ex.vert));
             arcRow(row, () => ex.arc, v => { ex.arc = v; strokeUi(); redraw(); });
+            // 縦書きのときは曲げられないので、曲げるの行を隠す
+            const arcEl = row.querySelector('.extra-arc'), vIn = row.querySelector('.extra-vert input');
+            const vertUi = () => { vIn.checked = !!ex.vert; arcEl.style.display = ex.vert ? 'none' : ''; };
+            vertUi();
+            vIn.onchange = () => { ex.vert = vIn.checked; vertUi(); strokeUi(); refreshSel(); redraw(); };
             const bIn = row.querySelector('.extra-text select'), bcIn = row.querySelector('[data-k="boxColor"]');
             shapeAlpha(row.querySelector('.extra-shape'), () => ex.boxAlpha, v => { ex.boxAlpha = v; redraw(); }, () => ex.box !== 'none');
             tIn.value = ex.text; bIn.value = ex.box; bcIn.value = ex.boxColor;
@@ -4926,7 +5011,7 @@
       $('text-add').addEventListener('click', () => {
         const id = newId();
         const n = S.extras.length;
-        S.extras.push({ id, type: 'text', text: '*テキスト*を入れる', color: S.titleColor, box: 'none', boxColor: '#ff7fa0', boxAlpha: 1, strokeOn: true, strokeW: 11, strokeColor: '#ffffff', font: '@inherit', weight: '@inherit', align: 'center', arc: 0, hlColor: '#f0325a', hlScale: 1.15, x: 50, y: 18 + (n % 4) * 8, scale: 0.8, rot: 0 });
+        S.extras.push({ id, type: 'text', text: '*テキスト*を入れる', color: S.titleColor, box: 'none', boxColor: '#ff7fa0', boxAlpha: 1, strokeOn: true, strokeW: 11, strokeColor: '#ffffff', font: '@inherit', weight: '@inherit', align: 'center', arc: 0, vert: false, hlColor: '#f0325a', hlScale: 1.15, x: 50, y: 18 + (n % 4) * 8, scale: 0.8, rot: 0 });
         pushLayer(id);
         renderExtras(); redraw();
         select(id);   // 足したものは選んで、設定を開く
