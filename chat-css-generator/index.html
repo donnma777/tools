@@ -2448,7 +2448,8 @@
           b.className = 'chip-btn';
           b.textContent = name;
           b.addEventListener('click', () => {
-            applyAll({ ...DEFAULTS, ...p, ...keepLocal() });
+            const pinnedTheme = p.bubble ? { pinnedBg: p.bubbleColor, pinnedBgAlpha: p.bubbleAlpha } : {};
+            applyAll({ ...DEFAULTS, ...pinnedTheme, ...p, ...keepLocal() });
             toast(`テンプレート「${name}」を適用しました`);
           });
           el.appendChild(b);
