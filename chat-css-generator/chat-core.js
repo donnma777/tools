@@ -92,12 +92,12 @@
 
     itemGap: 6, sidePad: 10,
 
-    showSuperchat: true, scMode: 'youtube',
+    showSuperchat: true, scMode: 'youtube', scChatStyle: false,
     scHeader: '#ff4fa3', scBody: '#ff78b9', scText: '#ffffff',
     scRadius: 10, scNameSize: 14, scAmountSize: 16, scMsgSize: 16,
     showStickers: true,
 
-    showMembership: true, memHeaderText: true,
+    showMembership: true, memHeaderText: true, memChatStyle: false,
 
     // スパチャの演出（YouTube）。金額帯ごとの設定は下の SC_GROUPS から追加
     scAnimDur: 0.7, scGlowColor: '#ffd54f',
@@ -758,6 +758,42 @@
       rule(`${P} #purchase-amount, ${P} #purchase-amount-chip`, { 'font-size': px(s.scAmountSize), 'font-weight': '700' });
       rule(`${P} #message`, { 'font-size': px(s.scMsgSize), 'line-height': String(s.lineHeight) });
       rule(`${P} #message img`, { width: px(s.emojiSize), height: px(s.emojiSize), 'vertical-align': 'middle' });
+      if (s.scChatStyle) {
+        const bubbleBg = s.bubble ? hexToRgba(s.bubbleColor, s.bubbleAlpha) : 'transparent';
+        const cardProps = {
+          'background-color': bubbleBg,
+          'border-radius': px(s.bubbleRadius),
+          'border-left': `4px solid ${s.scMode === 'custom' ? s.scHeader : SC_TIERS[0][2]}`,
+          color: s.msgColor,
+          ...bubbleDepthProps(s),
+        };
+        rule(`${P} #card`, cardProps);
+        rule(`${P} #header`, {
+          'background-color': 'transparent', color: s.msgColor,
+          gap: px(s.showIcon ? 8 : 0), padding: `${px(s.bubblePadding / 2)} ${px(s.bubblePadding)}`,
+        });
+        rule(`${P} #content`, {
+          'background-color': 'transparent', color: s.msgColor,
+          padding: `0 ${px(s.bubblePadding)} ${px(s.bubblePadding)}`,
+        });
+        rule(`${P} #author-name`, { color: s.nameColor, 'font-weight': s.nameWeight });
+        rule(`${P} #message`, { color: s.msgColor });
+        if (!s.showName) hide(`${P} #author-name`);
+        if (!s.showIcon) hide(`${P} #author-photo`);
+        else rule(`${P} #author-photo`, {
+          width: px(s.iconSize), height: px(s.iconSize), 'border-radius': ({ circle: '50%', rounded: '25%', square: '0' }[s.iconShape] || '50%'),
+        });
+        const amountProps = (color, textColor) => ({
+          display: 'inline-block', 'margin-top': '3px', padding: '2px 7px',
+          'border-radius': '999px', 'background-color': color,
+          color: textColor,
+        });
+        if (s.scMode === 'custom') rule(`${P} #purchase-amount`, amountProps(s.scHeader, s.scText));
+        else SC_TIERS.forEach((t, i) => rule(`${tierSel(P, i)} #purchase-amount`, amountProps(t[2], t[3])));
+        if (s.scMode !== 'custom') {
+          SC_TIERS.forEach((t, i) => rule(`${tierSel(P, i)} #card`, { 'border-left-color': t[2] }));
+        }
+      }
     }
     if (!s.showStickers) hide(ST);
     else {
@@ -773,6 +809,34 @@
       if (!s.memHeaderText) hide(`${M} #header-primary-text`);
       rule(`${M} #message`, { 'font-size': px(s.scMsgSize) });
       rule(`${M} #message img`, { width: px(s.emojiSize), height: px(s.emojiSize), 'vertical-align': 'middle' });
+      if (s.memChatStyle) {
+        rule(`${M} #card`, {
+          'background-color': s.bubble ? hexToRgba(s.bubbleColor, s.bubbleAlpha) : 'transparent',
+          'border-radius': px(s.bubbleRadius),
+          'border-left': `4px solid ${s.memberColor}`,
+          color: s.msgColor,
+          ...bubbleDepthProps(s),
+        });
+        rule(`${M} #header`, {
+          'background-color': 'transparent', color: s.msgColor,
+          gap: px(s.showIcon ? 8 : 0), padding: `${px(s.bubblePadding / 2)} ${px(s.bubblePadding)}`,
+        });
+        rule(`${M} #content`, {
+          'background-color': 'transparent', color: s.msgColor,
+          padding: `0 ${px(s.bubblePadding)} ${px(s.bubblePadding)}`,
+        });
+        rule(`${M} #author-name`, { color: s.memberColor, 'font-size': px(s.nameSize), 'font-weight': s.nameWeight });
+        rule(`${M} #header-primary-text`, {
+          display: 'inline-block', width: 'fit-content', 'margin-top': '3px', padding: '2px 7px',
+          'border-radius': '999px', 'background-color': hexToRgba(s.memberBg, 0.9), color: '#ffffff',
+        });
+        rule(`${M} #header-subtext, ${M} #message`, { color: s.msgColor });
+        if (!s.showName) hide(`${M} #author-name`);
+        if (!s.showIcon) hide(`${M} #author-photo`);
+        else rule(`${M} #author-photo`, {
+          width: px(s.iconSize), height: px(s.iconSize), 'border-radius': ({ circle: '50%', rounded: '25%', square: '0' }[s.iconShape] || '50%'),
+        });
+      }
     }
 
     writeStamps(s, w, '#message', true);

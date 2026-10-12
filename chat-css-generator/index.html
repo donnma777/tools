@@ -1414,7 +1414,7 @@
   <!-- chat-core.js を変えたら v を上げる（サーバーとブラウザのキャッシュ対策） -->
   <!-- 確認はページの中に出す（OBSのドックでは confirm() が出ないことがあるので） -->
   <script src="../common/ask.js?v=20260929a"></script>
-  <script src="chat-core.js?v=20261012a"></script>
+  <script src="chat-core.js?v=20261012c"></script>
   <script>
     (() => {
       'use strict';
@@ -1702,10 +1702,12 @@
             { k: 'showStickers', l: 'スーパーステッカーを表示', t: 'check', when: isYT },
             { k: 'showMembership', l: s => isTW(s) ? 'サブスク・ギフト・レイドの通知を表示' : 'メンバー加入・マイルストーンを表示', t: 'check' },
             { k: 'memHeaderText', l: 'マイルストーンの「○か月」表示', t: 'check', when: s => s.showMembership && isYT(s) },
+            { k: 'memChatStyle', l: 'メンバー通知を通常コメント風にする（緑の色帯は残す）', t: 'check', when: s => s.showMembership && isYT(s) },
             { k: 'scMode', l: '色', t: 'select', o: [['youtube', '標準（金額ごとの色）'], ['custom', 'すべて同じ色にする']], when: showSC },
             { k: 'scHeader', l: '上部（名前・金額）の背景', t: 'color', when: s => showSC(s) && s.scMode === 'custom' },
             { k: 'scBody', l: '下部（メッセージ）の背景', t: 'color', when: s => showSC(s) && s.scMode === 'custom' },
             { k: 'scText', l: '文字色', t: 'color', when: s => showSC(s) && s.scMode === 'custom' },
+            { k: 'scChatStyle', l: 'スパチャを通常コメント風にする（色帯と金額ラベルは残す）', t: 'check', when: showSC },
             { k: 'scRadius', l: '角の丸み', t: 'range', min: 0, max: 30, step: 1, u: 'px', when: s => showSC(s) || s.showMembership },
             { k: 'scNameSize', l: '名前の文字サイズ', t: 'range', min: 10, max: 36, step: 1, u: 'px', when: showSC },
             { k: 'scAmountSize', l: '金額の文字サイズ', t: 'range', min: 10, max: 40, step: 1, u: 'px', when: showSC },
