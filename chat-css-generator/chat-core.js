@@ -92,12 +92,12 @@
 
     itemGap: 6, sidePad: 10,
 
-    showSuperchat: true, scMode: 'youtube', scChatStyle: false,
+    showSuperchat: true, scMode: 'youtube', scChatStyle: true,
     scHeader: '#ff4fa3', scBody: '#ff78b9', scText: '#ffffff',
     scRadius: 10, scNameSize: 14, scAmountSize: 16, scMsgSize: 16,
-    showStickers: true,
+    showStickers: true, stickerChatStyle: true,
 
-    showMembership: true, memHeaderText: true, memChatStyle: false,
+    showMembership: true, memHeaderText: true, memChatStyle: true,
 
     // スパチャの演出（YouTube）。金額帯ごとの設定は下の SC_GROUPS から追加
     scAnimDur: 0.7, scGlowColor: '#ffd54f',
@@ -799,6 +799,31 @@
     else {
       rule(ST, { padding: rowPad });
       rule(`${ST} #card`, { 'border-radius': px(s.scRadius) });
+      if (s.stickerChatStyle) {
+        const stickerAccent = s.scMode === 'custom' ? s.scHeader : '#00b8d4';
+        const stickerAccentText = s.scMode === 'custom' ? s.scText : '#000000';
+        rule(`${ST} #card`, {
+          'justify-content': 'flex-start', gap: px(s.showIcon ? 8 : 10),
+          padding: `${px(s.bubblePadding)} ${px(s.bubblePadding * 1.5)}`,
+          'background-color': s.bubble ? hexToRgba(s.bubbleColor, s.bubbleAlpha) : 'transparent',
+          'border-radius': px(s.bubbleRadius),
+          'border-left': `4px solid ${stickerAccent}`,
+          color: s.msgColor,
+          ...bubbleDepthProps(s),
+        });
+        rule(`${ST} #author-name`, { color: s.nameColor, 'font-size': px(s.nameSize), 'font-weight': s.nameWeight });
+        rule(`${ST} #purchase-amount-chip`, {
+          display: 'inline-block', 'margin-top': '3px', padding: '2px 7px',
+          'border-radius': '999px', 'background-color': stickerAccent, color: stickerAccentText,
+          'font-size': px(s.scAmountSize), 'font-weight': '700',
+        });
+        rule(`${ST} #sticker`, { 'font-size': px(Math.max(32, s.emojiSize * 2)), 'margin-left': 'auto' });
+        if (!s.showName) hide(`${ST} #author-name`);
+        if (!s.showIcon) hide(`${ST} #author-photo`);
+        else rule(`${ST} #author-photo`, {
+          width: px(s.iconSize), height: px(s.iconSize), 'border-radius': ({ circle: '50%', rounded: '25%', square: '0' }[s.iconShape] || '50%'),
+        });
+      }
     }
     if (!s.showMembership) {
       hide([M, 'ytd-sponsorships-live-chat-gift-purchase-announcement-renderer',

@@ -1414,7 +1414,7 @@
   <!-- chat-core.js を変えたら v を上げる（サーバーとブラウザのキャッシュ対策） -->
   <!-- 確認はページの中に出す（OBSのドックでは confirm() が出ないことがあるので） -->
   <script src="../common/ask.js?v=20260929a"></script>
-  <script src="chat-core.js?v=20261012c"></script>
+  <script src="chat-core.js?v=20261012e"></script>
   <script>
     (() => {
       'use strict';
@@ -1447,6 +1447,17 @@
           bubbleBorder: true, bubbleBorderWidth: 2, bubbleBorderStyle: 'solid', bubbleBorderColor: '#f0b4d1',
           bubbleDepth: true, bubbleDepthOffset: 3, bubbleDepthColor: '#d5c8ff', bubbleDepthColor2: '#f6d0de',
           itemGap: 9, animIn: 'jelly',
+        }],
+        ['プリクラ', {
+          font: 'Hachi Maru Pop', msgWeight: '400', nameWeight: '700', textEffect: 'outline',
+          effectWidth: 1.5, effectColor: '#ffffff', msgColor: '#754c77',
+          nameColor: '#e84f9b', memberColor: '#50a998', modColor: '#8b75d7', ownerColor: '#ef9e38',
+          bubble: true, bubbleTail: false, bubbleColor: '#fff7fd', bubbleAlpha: 1, bubbleRadius: 18, bubblePadding: 10,
+          bubbleBorder: true, bubbleBorderWidth: 3, bubbleBorderStyle: 'double', bubbleBorderColor: '#f28ac0',
+          bubbleDepth: true, bubbleDepthOffset: 3, bubbleDepthColor: '#9ce8df', bubbleDepthColor2: '#d8b8ff',
+          itemGap: 10, animIn: 'jelly',
+          scMode: 'custom', scHeader: '#e84393', scBody: '#f48fbd', scText: '#ffffff',
+          scChatStyle: true, memChatStyle: true, stickerChatStyle: true,
         }],
         ['手描きノート', {
           font: 'Klee One', msgWeight: '600', nameWeight: '700', textEffect: 'none',
@@ -1700,6 +1711,7 @@
           title: 'スパチャ・Bits／メンバー・サブスク', icon: '💰', fields: [
             { k: 'showSuperchat', l: 'スーパーチャットを表示', t: 'check', when: isYT },
             { k: 'showStickers', l: 'スーパーステッカーを表示', t: 'check', when: isYT },
+            { k: 'stickerChatStyle', l: 'ステッカーを通常コメント風にする（画像と金額は残す）', t: 'check', when: s => isYT(s) && s.showStickers },
             { k: 'showMembership', l: s => isTW(s) ? 'サブスク・ギフト・レイドの通知を表示' : 'メンバー加入・マイルストーンを表示', t: 'check' },
             { k: 'memHeaderText', l: 'マイルストーンの「○か月」表示', t: 'check', when: s => s.showMembership && isYT(s) },
             { k: 'memChatStyle', l: 'メンバー通知を通常コメント風にする（緑の色帯は残す）', t: 'check', when: s => s.showMembership && isYT(s) },
