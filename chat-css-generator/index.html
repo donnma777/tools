@@ -1414,7 +1414,7 @@
   <!-- chat-core.js を変えたら v を上げる（サーバーとブラウザのキャッシュ対策） -->
   <!-- 確認はページの中に出す（OBSのドックでは confirm() が出ないことがあるので） -->
   <script src="../common/ask.js?v=20260929a"></script>
-  <script src="chat-core.js?v=20260924g"></script>
+  <script src="chat-core.js?v=20261012a"></script>
   <script>
     (() => {
       'use strict';
@@ -1430,6 +1430,65 @@
         ['吹き出し', {
           font: 'Zen Maru Gothic', textEffect: 'none', bubble: true, bubbleColor: '#000000', bubbleAlpha: 0.55,
           bubbleRadius: 14, bubblePadding: 8, msgSize: 17, iconSize: 36, nameColor: '#b8c4ff',
+        }],
+        ['レトロ立体', {
+          font: 'M PLUS Rounded 1c', textEffect: 'none', showIcon: false, showName: false,
+          msgSize: 19, msgWeight: '700', msgColor: '#554236',
+          bubble: true, bubbleTail: false, bubbleColor: '#fffdf7', bubbleAlpha: 1,
+          bubbleRadius: 14, bubblePadding: 9,
+          bubbleBorder: true, bubbleBorderWidth: 2, bubbleBorderStyle: 'dashed', bubbleBorderColor: '#8b624a',
+          bubbleDepth: true, bubbleDepthOffset: 4, bubbleDepthColor: '#79cfc2', bubbleDepthColor2: '#e9b66b',
+          itemGap: 10, animIn: 'pop',
+        }],
+        ['ふわもこパステル', {
+          font: 'Zen Maru Gothic', textEffect: 'none', msgColor: '#594b67', nameColor: '#c35d91',
+          memberColor: '#558e83', modColor: '#7186bb', ownerColor: '#d28a43',
+          bubble: true, bubbleTail: false, bubbleColor: '#fff8fc', bubbleAlpha: 1, bubbleRadius: 22, bubblePadding: 10,
+          bubbleBorder: true, bubbleBorderWidth: 2, bubbleBorderStyle: 'solid', bubbleBorderColor: '#f0b4d1',
+          bubbleDepth: true, bubbleDepthOffset: 3, bubbleDepthColor: '#d5c8ff', bubbleDepthColor2: '#f6d0de',
+          itemGap: 9, animIn: 'jelly',
+        }],
+        ['手描きノート', {
+          font: 'Klee One', msgWeight: '600', nameWeight: '700', textEffect: 'none',
+          msgColor: '#514638', nameColor: '#bf654f', memberColor: '#6b8e63', modColor: '#657fa2', ownerColor: '#bd8a43',
+          bubble: true, bubbleTail: true, bubbleColor: '#fffdf3', bubbleAlpha: 1, bubbleRadius: 12, bubblePadding: 9,
+          bubbleBorder: true, bubbleBorderWidth: 2, bubbleBorderStyle: 'dotted', bubbleBorderColor: '#a78b68',
+          bubbleDepth: true, bubbleDepthOffset: 3, bubbleDepthColor: '#d2e9d1', bubbleDepthColor2: '#f5dfbd',
+          itemGap: 8, animIn: 'slide-up',
+        }],
+        ['ピクセルゲーム', {
+          font: 'DotGothic16', msgWeight: '400', nameWeight: '700', textEffect: 'none',
+          msgColor: '#f7f3ff', nameColor: '#73fbd3', memberColor: '#9bff72', modColor: '#78bbff', ownerColor: '#ffe66d',
+          bubble: true, bubbleTail: false, bubbleColor: '#211b3b', bubbleAlpha: 0.96, bubbleRadius: 2, bubblePadding: 9,
+          bubbleBorder: true, bubbleBorderWidth: 3, bubbleBorderStyle: 'double', bubbleBorderColor: '#b6a0ff',
+          bubbleDepth: true, bubbleDepthOffset: 3, bubbleDepthColor: '#fb5ec5', bubbleDepthColor2: '#38d9ff',
+          itemGap: 9, animIn: 'pop',
+        }],
+        ['カフェボード', {
+          font: 'Shippori Mincho', msgWeight: '500', nameWeight: '700', textEffect: 'none',
+          msgColor: '#f4e9d2', nameColor: '#edbb74', memberColor: '#add0a0', modColor: '#a8c5db', ownerColor: '#f5d77b',
+          bubble: true, bubbleTail: false, bubbleColor: '#302a24', bubbleAlpha: 0.96, bubbleRadius: 8, bubblePadding: 10,
+          bubbleBorder: true, bubbleBorderWidth: 1.5, bubbleBorderStyle: 'solid', bubbleBorderColor: '#b78d58',
+          itemGap: 8, animIn: 'fade', animDur: 0.6,
+          scMode: 'custom', scHeader: '#987145', scBody: '#6d5135', scText: '#fff2d8',
+        }],
+        ['クリアソーダ', {
+          font: 'M PLUS Rounded 1c', textEffect: 'none', msgColor: '#28536b', nameColor: '#387da0',
+          memberColor: '#4d8b6b', modColor: '#6b71ac', ownerColor: '#bc7850',
+          bubble: true, bubbleTail: false, bubbleColor: '#e9fbff', bubbleAlpha: 0.92, bubbleRadius: 18, bubblePadding: 10,
+          bubbleBorder: true, bubbleBorderWidth: 2, bubbleBorderStyle: 'solid', bubbleBorderColor: '#8bd7e8',
+          bubbleDepth: true, bubbleDepthOffset: 3, bubbleDepthColor: '#a6e8e2', bubbleDepthColor2: '#c8d9ff',
+          itemGap: 8, animIn: 'pop',
+          scMode: 'custom', scHeader: '#54b9d0', scBody: '#8bd7e8', scText: '#ffffff',
+        }],
+        ['ヴィンテージ', {
+          font: 'Kaisei Decol', msgWeight: '500', nameWeight: '700', textEffect: 'none',
+          msgColor: '#503e43', nameColor: '#9e5262', memberColor: '#66815d', modColor: '#63738e', ownerColor: '#ad7b37',
+          bubble: true, bubbleTail: false, bubbleColor: '#fbf0dc', bubbleAlpha: 1, bubbleRadius: 6, bubblePadding: 9,
+          bubbleBorder: true, bubbleBorderWidth: 2, bubbleBorderStyle: 'double', bubbleBorderColor: '#a97560',
+          bubbleDepth: true, bubbleDepthOffset: 3, bubbleDepthColor: '#c7d6c0', bubbleDepthColor2: '#e7c6a7',
+          itemGap: 9, animIn: 'slide-left',
+          scMode: 'custom', scHeader: '#b47b64', scBody: '#d7ad85', scText: '#fff9eb',
         }],
         ['ネオン', {
           font: 'Zen Kaku Gothic New', textEffect: 'glow', effectWidth: 3, effectColor: '#ff00c8',
@@ -1545,6 +1604,10 @@
             { k: 'bubbleAlpha', l: '吹き出しの不透明度', t: 'range', min: 0, max: 1, step: 0.05, u: '', when: s => s.bubble },
             { k: 'bubbleRadius', l: '角の丸み', t: 'range', min: 0, max: 30, step: 1, u: 'px', when: s => s.bubble || s.roleBg },
             { k: 'bubblePadding', l: '吹き出しの内側の余白', t: 'range', min: 2, max: 24, step: 1, u: 'px', when: s => s.bubble },
+            { k: 'bubbleDepth', l: '色をずらして立体的にする', t: 'check', when: s => s.bubble },
+            { k: 'bubbleDepthOffset', l: '立体感の強さ', t: 'range', min: 1, max: 12, step: 1, u: 'px', when: s => s.bubble && s.bubbleDepth },
+            { k: 'bubbleDepthColor', l: '立体の色（手前）', t: 'color', when: s => s.bubble && s.bubbleDepth },
+            { k: 'bubbleDepthColor2', l: '立体の色（奥）', t: 'color', when: s => s.bubble && s.bubbleDepth },
             { k: 'roleBg', l: '配信者・モデレーター・メンバーの背景色を変える', t: 'check' },
             { k: 'ownerBg', l: '背景色（配信者本人）', t: 'color', when: s => s.roleBg },
             { k: 'modBg', l: '背景色（モデレーター）', t: 'color', when: s => s.roleBg },

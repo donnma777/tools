@@ -86,6 +86,7 @@
     showTime: false, timeSize: 12, timeColor: '#bbbbbb',
 
     bubble: false, bubbleTail: true, bubbleColor: '#000000', bubbleAlpha: 0.5, bubbleRadius: 12, bubblePadding: 8,
+    bubbleDepth: false, bubbleDepthOffset: 4, bubbleDepthColor: '#79cfc2', bubbleDepthColor2: '#e9b66b',
     roleBg: false, ownerBg: '#b58900', modBg: '#2b4fb8', memberBg: '#1d7a37', roleBgAlpha: 0.6,
     chatBg: '#000000', chatBgAlpha: 0,
 
@@ -539,6 +540,10 @@
     };
   };
 
+  const bubbleDepthProps = s => s.bubble && s.bubbleDepth ? {
+    'box-shadow': `${px(s.bubbleDepthOffset)} ${px(s.bubbleDepthOffset)} 0 ${s.bubbleDepthColor}, ${px(s.bubbleDepthOffset * 2)} ${px(s.bubbleDepthOffset * 2)} 0 ${s.bubbleDepthColor2}`,
+  } : {};
+
   // 吹き出しのしっぽ（左向きの三角）。吹き出しの左外側に付きます
   const TAIL_W = 8;
   const tailProps = (color, top, w = TAIL_W, h = 6, left = -TAIL_W) => ({
@@ -691,6 +696,7 @@
         position: s.bubbleTail ? 'relative' : null,
         ...bubbleImage(s),
         ...bubbleBorderProps(s),
+        ...bubbleDepthProps(s),
       });
     }
     rule(`${T} #content`, content);
@@ -882,6 +888,7 @@
         padding: `${px(s.bubblePadding)} ${px(s.bubblePadding * 1.5)}`,
         ...bubbleImage(s),
         ...bubbleBorderProps(s),
+        ...bubbleDepthProps(s),
       });
     }
     rule(LINE, line);
