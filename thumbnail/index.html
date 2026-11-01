@@ -2577,10 +2577,10 @@
         subPos: 'below', subCorner: 'tl', subBox: 'none', subBoxColor: '#ff7fa0', subBoxAlpha: 1, subArc: 0, subVert: false,
         logoMode: 'none', logoCorner: 'br', logoScale: 1, logoX: 0, logoY: 0, plateRound: 40,
         bandPos: 'bottom', bandLen: 'full', bandAlign: 'center', bandLine: false, bandLineColor: '#ff85a1', bandLineW: 4, bandColor: '#ffffff', bandSize: 1, bandLayer: 'front', bandEdge: 'straight', bandAccent: '#ff85a1', logoPlate: false, plateColor: '#ffffff', plateAlpha: 0.85,
-        frameOn: false, frameColor: '#ffffff',
+        frameWidth: 0, frameColor: '#ffffff',
         hidden: [], padOn: false, padSize: 4, padColor: '#ffffff', padRound: 0, padShape: 'square', padT: true, padB: true, padL: true, padR: true, padLine: false, padAccent: '#ff85a1', guideOn: false,
-        bgFit: 'cover', bgBright: 0, bgTile: 300,
-        bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glow: true,
+        bgFit: 'cover', bgScale: 100, bgX: 50, bgY: 50, bgBright: 0, bgTile: 300,
+        bg: 'dots', bgColor: '#f6f2e2', bgColor2: '#ffd6e0', patColor: '#ffc2d1', patScale: 1, glowStrength: 100,
       };
       const COLOR_KEYS = Object.keys(DEFAULTS).filter(k => /^#[0-9a-f]{6}$/i.test(String(DEFAULTS[k])));
       // order を extras に合わせる（なくなったものは外し、足りないものは上に足す。'@pic'・'@text'・'@sub' は必ず入れる）
@@ -2643,10 +2643,17 @@
           else if (typeof d === 'boolean' && typeof v === 'boolean') out[k] = v;
           else if (typeof d === 'string' && typeof v === 'string' && (!COLOR_KEYS.includes(k) || /^#[0-9a-f]{6}$/i.test(v))) out[k] = v;
         }
+        if (o.frameWidth === undefined && o.frameOn) out.frameWidth = 2.5;
+        out.frameWidth = Math.max(0, Math.min(20, out.frameWidth));
         if (!SIZES[out.size]) out.size = 'ogp';
         // 前の「背景画像を暗くする」（0〜0.8）→ 明るさのマイナス
         if (o.bgBright === undefined && +o.bgDim > 0) out.bgBright = -Math.round(Math.min(0.8, +o.bgDim) * 100);
+        if (o.glowStrength === undefined && o.glow === false) out.glowStrength = 0;
         out.bgBright = Math.max(-80, Math.min(80, out.bgBright));
+        out.bgScale = Math.max(50, Math.min(200, out.bgScale));
+        out.bgX = Math.max(0, Math.min(100, out.bgX));
+        out.bgY = Math.max(0, Math.min(100, out.bgY));
+        out.glowStrength = Math.max(0, Math.min(100, out.glowStrength));
         out.padSize = Math.max(1, Math.min(15, out.padSize));
         out.padRound = Math.max(0, Math.min(10, out.padRound));
         out.picPlateAlpha = Math.max(0.1, Math.min(1, out.picPlateAlpha));
@@ -2850,16 +2857,19 @@
               k: 'bg', l: '背景の種類', t: 'chips', full: true, o: [['dots', '水玉'], ['stripe', 'ストライプ'], ['check', 'チェック'],
               ['gradient', 'グラデーション'], ['plain', '無地'], ['image', '自分の画像'], ['none', 'なし（透明）']]
             },
-            { k: 'bgColor', l: s => s.bg === 'gradient' ? '色 1' : '背景の色', t: 'color', when: s => s.bg !== 'none' && !(s.bg === 'image' && s.bgFit === 'cover'), note: '透明な部分がある画像を並べるときは、この色が下に見えます' },
+            { k: 'bgColor', l: s => s.bg === 'gradient' ? '色 1' : '背景の色', t: 'color', when: s => s.bg !== 'none' && !(s.bg === 'image' && s.bgFit === 'cover' && s.bgScale >= 100), note: '透明な部分や、縮小した画像の外側に表示されます' },
             { k: 'bgColor2', l: '色 2', t: 'color', when: s => s.bg === 'gradient' },
             { k: 'patColor', l: '柄の色', t: 'color', when: s => ['dots', 'stripe', 'check'].includes(s.bg) },
             { k: 'patScale', l: '柄の大きさ', t: 'range', min: 0.4, max: 2, step: 0.05, u: '倍', when: bgPat },
             { k: 'bgFit', l: '背景画像の合わせ方', t: 'select', o: [['cover', '画面いっぱい（はみ出す分は切る）'], ['contain', '全体が入るように（余白は背景の色）'], ['tile', '並べる（タイル）']], when: s => s.bg === 'image' },
+            { k: 'bgScale', l: '背景画像の大きさ', t: 'range', min: 50, max: 200, step: 5, u: '%', home: 'none', when: s => s.bg === 'image' && s.bgFit !== 'tile', note: '100% は合わせ方の標準サイズ' },
+            { k: 'bgX', l: '背景画像の左右位置', t: 'range', min: 0, max: 100, step: 1, u: '%', home: 'none', when: s => s.bg === 'image' && s.bgFit !== 'tile', note: '0%＝左、50%＝中央、100%＝右' },
+            { k: 'bgY', l: '背景画像の上下位置', t: 'range', min: 0, max: 100, step: 1, u: '%', home: 'none', when: s => s.bg === 'image' && s.bgFit !== 'tile', note: '0%＝上、50%＝中央、100%＝下' },
             { k: 'bgTile', l: '1枚の大きさ（横幅）', t: 'range', min: 40, max: 800, step: 10, u: 'px', when: s => s.bg === 'image' && s.bgFit === 'tile', note: '1280×720 のときの大きさ。ほかの大きさでは合わせて変わります' },
-            { k: 'bgBright', l: '背景の明るさ', t: 'range', min: -80, max: 80, step: 5, u: '%', when: s => s.bg !== 'none', note: 'マイナスで暗く、プラスで明るく。写真の上に白い文字をのせるときは暗めに' },
-            { k: 'glow', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'check', when: s => s.bg !== 'none' },
-            { k: 'frameOn', l: '内側に細い枠を付ける', t: 'check' },
-            { k: 'frameColor', l: '枠の色', t: 'color', when: s => s.frameOn },
+            { k: 'bgBright', l: '背景の明るさ', t: 'range', min: -80, max: 80, step: 5, u: '%', home: 'none', when: s => s.bg !== 'none', note: 'マイナスで暗く、プラスで明るく。写真の上に白い文字をのせるときは暗めに' },
+            { k: 'glowStrength', l: '文字と画像のまわりを明るくする（柄を薄くする）', t: 'range', min: 0, max: 100, step: 5, u: '%', full: true, when: s => s.bg !== 'none', note: '0% で効果なし、上げるほど強くなります' },
+            { k: 'frameWidth', l: '内側の枠の太さ', t: 'range', min: 0, max: 20, step: 0.5, u: 'px', full: true, note: '0 で枠なし。1200×630 を基準にした太さです' },
+            { k: 'frameColor', l: '枠の色', t: 'color', full: true, when: s => s.frameWidth > 0 },
             { k: 'padOn', l: 'まわりに余白（ふち）を付ける', t: 'check', home: 'none' },
             { k: 'padSize', l: '余白の幅', t: 'range', min: 1, max: 15, step: 0.5, u: '%', home: 'frame' },
             { k: 'padT', l: '上に付ける', t: 'check', home: 'none' },
@@ -3508,12 +3518,12 @@
 
         // ---- 背景（と内側の細い枠）
         if (!S.hidden.includes('@bg')) drawBackground(c, W, H, k);
-        if (S.frameOn) {
+        if (S.frameWidth > 0) {
           const m = Math.min(W, H) * 0.045;
           c.save();
           c.strokeStyle = S.frameColor;
           c.globalAlpha = 0.75;
-          c.lineWidth = Math.max(1.5, 2.5 * k);
+          c.lineWidth = S.frameWidth * k;
           c.strokeRect(m, m, W - m * 2, H - m * 2);
           c.restore();
         }
@@ -3544,7 +3554,7 @@
           pic = { x: W / 2 - w / 2, y: H / 2 - h / 2, w, h };
         }
         if (pic) { pic.x += S.imgX / 100 * W; pic.y += S.imgY / 100 * H; }
-        if (S.glow && S.bg !== 'none' && !S.hidden.includes('@bg')) {
+        if (S.glowStrength > 0 && S.bg !== 'none' && !S.hidden.includes('@bg')) {
           const all = pic && pos !== 'center' ? { l: Math.min(area.l, pic.x), r: Math.max(area.r, pic.x + pic.w) } : area;
           glow(c, (all.l + all.r) / 2, H / 2, (all.r - all.l) * 0.62, H * 0.62);
         }
@@ -3916,10 +3926,10 @@
             for (let y = 0; y < H; y += th) for (let x = 0; x < W; x += tw) c.drawImage(img.bg, x, y, tw, th);
             return;
           }
-          if (contain) { c.fillStyle = S.bgColor; c.fillRect(0, 0, W, H); }
-          const r = (contain ? Math.min : Math.max)(W / img.bg.width, H / img.bg.height);
+          if (contain || S.bgScale < 100) { c.fillStyle = S.bgColor; c.fillRect(0, 0, W, H); }
+          const r = (contain ? Math.min : Math.max)(W / img.bg.width, H / img.bg.height) * S.bgScale / 100;
           const w = img.bg.width * r, h = img.bg.height * r;
-          c.drawImage(img.bg, (W - w) / 2, (H - h) / 2, w, h);
+          c.drawImage(img.bg, (W - w) * S.bgX / 100, (H - h) * S.bgY / 100, w, h);
           return;
         }
         if (S.bg === 'gradient') {
@@ -3967,7 +3977,7 @@
         c.translate(x, y);
         c.scale(rx / ry, 1);
         const gr = c.createRadialGradient(0, 0, 0, 0, 0, ry);
-        const a = S.bg === 'image' ? 0.55 : 0.95;
+        const a = (S.bg === 'image' ? 0.55 : 0.95) * S.glowStrength / 100;
         gr.addColorStop(0, `rgba(${r},${g},${b},${a})`);
         gr.addColorStop(0.5, `rgba(${r},${g},${b},${a})`);
         gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
@@ -4688,8 +4698,8 @@
           bars: [['logoScale', 'ロゴの大きさ', 0.3, 1.6, 0.05, '倍'], ['logoX', '左右', -50, 50, 1, '%'], ['logoY', '上下', -50, 50, 1, '%']],
         };
         if (id === '@bg') return {
-          name: '背景', get obj() { return S; }, reset() { S.bgBright = 0; },
-          bars: [['bgBright', '背景の明るさ', -80, 80, 5, '%']],
+          name: '背景', get obj() { return S; }, reset() { S.bgScale = 100; S.bgX = 50; S.bgY = 50; S.bgBright = 0; },
+          bars: [['bgScale', '大きさ', 50, 200, 5, '%'], ['bgX', '左右', 0, 100, 1, '%'], ['bgY', '上下', 0, 100, 1, '%'], ['bgBright', '背景の明るさ', -80, 80, 5, '%']],
         };
         if (id === '@frame') return {
           name: '余白（ふち）', get obj() { return S; }, reset() { S.padSize = 4; },
