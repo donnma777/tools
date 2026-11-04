@@ -339,6 +339,11 @@
               "label": "GitHub",
               "href": "https://github.com/donnma777/feature-browser-benri-tools",
               "external": true
+            },
+            {
+              "label": "解説ページ",
+              "href": "benri-tools/",
+              "external": false
             }
           ],
           "tag": "Chrome 拡張機能",
@@ -354,8 +359,13 @@
           "links": [
             {
               "label": "GitHub",
-              "href": "https://github.com/donnma777/authenticator-autofill",
+              "href": "https://github.com/donnma777/authenticator-autofill/releases/latest",
               "external": true
+            },
+            {
+              "label": "解説ページ",
+              "href": "authenticator-autofill/",
+              "external": false
             }
           ],
           "tag": "Chrome 拡張機能",
@@ -405,6 +415,11 @@
               "label": "GitHub",
               "href": "https://github.com/donnma777/discord-post-notify/releases/latest",
               "external": true
+            },
+            {
+              "label": "解説ページ",
+              "href": "discord-post-notify/",
+              "external": false
             }
           ],
           "tag": "WordPress プラグイン",
@@ -423,6 +438,11 @@
               "label": "GitHub",
               "href": "https://github.com/donnma777/wp-folder-upload/releases/latest",
               "external": true
+            },
+            {
+              "label": "解説ページ",
+              "href": "wp-folder-upload/",
+              "external": false
             }
           ],
           "tag": "WordPress プラグイン",
@@ -442,6 +462,11 @@
               "label": "GitHub",
               "href": "https://github.com/donnma777/wp-webp-upload/releases/latest",
               "external": true
+            },
+            {
+              "label": "解説ページ",
+              "href": "wp-webp-upload/",
+              "external": false
             }
           ],
           "tag": "WordPress プラグイン",

@@ -141,6 +141,31 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://donnma.com/tool/authenticator-autofill/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://donnma.com/tool/benri-tools/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://donnma.com/tool/discord-post-notify/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://donnma.com/tool/wp-folder-upload/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://donnma.com/tool/wp-webp-upload/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://donnma.com/tool/terms/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

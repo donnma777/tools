@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Folder Upload｜WordPressのuploadsの好きなフォルダへアップロードできるプラグイン | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description" content="WordPress の wp-content/uploads の中の好きなフォルダへ、ファイルやフォルダごとアップロードできる無料プラグイン。メディアライブラリへの登録、同じ名前の扱い、ファイル名の変更（記事の URL もまとめて書き換え）に対応。管理者だけが使え、危ないファイルは置けません。">
+  <link rel="canonical" href="https://donnma.com/tool/wp-folder-upload/">
+  <meta property="og:title" content="Folder Upload｜WordPressのuploadsの好きなフォルダへアップロードできるプラグイン | どんまうんど-Tools">
+  <meta property="og:description" content="WordPress の uploads の好きなフォルダへ、ファイルやフォルダごとアップロードできる無料プラグイン。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/wp-folder-upload/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-wp-folder-upload.jpg?v=20261104a">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Folder Upload">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <meta name="twitter:image:alt" content="Folder Upload">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Folder Upload", "description": "WordPress の wp-content/uploads の中の好きなフォルダへ、ファイルやフォルダごとアップロードできる無料プラグイン。メディアライブラリへの登録、同じ名前の扱い、ファイル名の変更（記事の URL もまとめて書き換え）に対応。管理者だけが使え、危ないファイルは置けません。", "url": "https://donnma.com/tool/wp-folder-upload/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "WordPress", "downloadUrl": "https://github.com/donnma777/wp-folder-upload/releases/latest", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "JPY"}, "author": {"@type": "Person", "name": "どんま", "url": "https://donnma.com/"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "どんまうんど-Tools", "item": "https://donnma.com/tool/"}, {"@type": "ListItem", "position": 2, "name": "WordPress プラグイン", "item": "https://donnma.com/tool/#wordpress"}, {"@type": "ListItem", "position": 3, "name": "Folder Upload", "item": "https://donnma.com/tool/wp-folder-upload/"}]}
+  </script>
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "無料で使えますか？", "acceptedAnswer": {"@type": "Answer", "text": "はい、無料です（GPLv2 or later）。"}}, {"@type": "Question", "name": "「上書きする」を選ぶと元のファイルはどうなりますか？", "acceptedAnswer": {"@type": "Answer", "text": "置き換わって、元には戻せません。心配なときは「別の名前で置く」を選んでください。"}}, {"@type": "Question", "name": "WebP Upload と一緒に使えますか？", "acceptedAnswer": {"@type": "Answer", "text": "使えます。Folder Upload で置いたファイルは、置いたままの形で使うため WebP に変換されません。"}}, {"@type": "Question", "name": "編集者や投稿者も使えますか？", "acceptedAnswer": {"@type": "Answer", "text": "いいえ、管理者だけです。"}}]}
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --border: #46162e;
+      --border-strong: #a03060;
+      --accent: #ff85a1;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --text: #f6e9ef;
+      --muted: #c4a2b3;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --accent-ink: #c2345e;
+      --line-ink: rgba(110, 53, 81, 0.18);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    main {
+      flex: 1;
+      padding: 40px 24px 64px;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    /* 解説ページの台紙 */
+    .guide {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 44px 40px;
+      background: rgba(246, 242, 226, 0.97);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+      color: var(--plum-ink);
+      line-height: 1.9;
+    }
+
+    .guide a { color: var(--accent-ink); font-weight: 700; }
+
+    .g-crumbs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .g-crumbs a { text-decoration: none; }
+    .g-crumbs span { color: rgba(110, 53, 81, 0.6); }
+
+    /* いちばん上 */
+    .g-hero { text-align: center; padding-bottom: 8px; }
+
+    .g-kind {
+      display: inline-block;
+      padding: 2px 12px;
+      border-radius: 999px;
+      background: rgba(194, 52, 94, 0.1);
+      color: var(--accent-ink);
+      font-size: 0.8rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+    }
+
+    .g-hero h1 {
+      margin: 8px 0 6px;
+      font-size: clamp(1.6rem, 5vw, 2.3rem);
+      font-weight: 900;
+      color: var(--accent-ink);
+      line-height: 1.3;
+    }
+
+    .g-lead { max-width: 620px; margin: 0 auto; font-weight: 700; }
+
+    .g-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 18px 0 8px;
+    }
+
+    .g-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 8px 22px;
+      border-radius: 999px;
+      font-weight: 900;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .guide a.g-btn-primary { background: var(--accent); color: var(--on-accent); box-shadow: 0 4px 0 #e0607f; }
+    .guide a.g-btn-secondary { background: #fff; color: var(--plum-ink); border: 2px solid var(--line-ink); }
+    .g-btn:hover { transform: translateY(-1px); }
+
+    .g-meta { font-size: 0.82rem; color: rgba(110, 53, 81, 0.8); }
+
+    .g-figures {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 300px));
+      justify-content: center;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .g-figures figure { margin: 0; }
+
+    .g-figures img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      border: 1px solid var(--line-ink);
+      box-shadow: 0 8px 24px rgba(110, 53, 81, 0.18);
+      background: #f5f7fb;
+    }
+
+    .g-figures figcaption { margin-top: 8px; font-size: 0.82rem; font-weight: 700; }
+
+    /* 目次 */
+    .g-toc {
+      margin: 28px 0 8px;
+      padding: 14px 22px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--line-ink);
+    }
+
+    .g-toc p { font-weight: 900; font-size: 0.9rem; }
+    .g-toc ol { display: flex; flex-wrap: wrap; gap: 2px 18px; padding-left: 1.2em; font-size: 0.9rem; }
+    .g-toc a { text-decoration: none; }
+
+    /* 見出しと本文 */
+    .g-section { scroll-margin-top: 72px; }
+
+    .g-section h2 {
+      font-size: 1.2rem;
+      font-weight: 900;
+      border-left: 5px solid var(--accent);
+      padding: 2px 0 2px 12px;
+      margin: 36px 0 12px;
+      color: var(--plum-ink);
+    }
+
+    .g-section h3 { font-size: 1rem; font-weight: 900; margin: 18px 0 6px; }
+    .g-section ul { padding-left: 1.4em; }
+    .g-section li + li { margin-top: 4px; }
+    .g-section p + p, .g-section p + ul, .g-section ul + p, .g-section p + ol, .g-section ol + p { margin-top: 8px; }
+    .g-note { font-size: 0.88rem; padding: 10px 14px; border-radius: 12px; background: rgba(194, 52, 94, 0.07); }
+
+    .g-section code {
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: rgba(110, 53, 81, 0.08);
+      font-family: Consolas, 'Courier New', monospace;
+      font-size: 0.88em;
+      word-break: break-all;
+    }
+
+    .g-code {
+      margin-top: 8px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: #2a1020;
+      color: #f6e9ef;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .g-code code { padding: 0; background: none; color: inherit; }
+
+    /* できること */
+    .g-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+    }
+
+    .g-feature {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line-ink);
+    }
+
+    .g-feature h3 { margin: 0 0 4px; color: var(--accent-ink); font-size: 0.98rem; }
+    .g-feature p { font-size: 0.9rem; line-height: 1.75; }
+
+    /* 手順 */
+    .g-steps { counter-reset: step; list-style: none; padding-left: 0; }
+
+    .g-steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 40px;
+      min-height: 30px;
+    }
+
+    .g-steps li + li { margin-top: 10px; }
+
+    .g-steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 2px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--on-accent);
+      font-weight: 900;
+      font-size: 0.9rem;
+      line-height: 28px;
+      text-align: center;
+    }
+
+    /* 表 */
+    .g-table-wrap { overflow-x: auto; }
+
+    .g-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .g-table th, .g-table td { padding: 8px 12px; border-bottom: 1px solid var(--line-ink); text-align: left; vertical-align: top; }
+    .g-table th { background: rgba(194, 52, 94, 0.08); font-weight: 900; white-space: nowrap; }
+    .g-table tr:last-child td { border-bottom: 0; }
+
+    /* よくある質問 */
+    .g-faq {
+      border-radius: 14px;
+      background: #fff;
+      border: 1px solid var(--line-ink);
+    }
+
+    .g-faq + .g-faq { margin-top: 8px; }
+
+    .g-faq summary {
+      padding: 12px 16px 12px 44px;
+      position: relative;
+      font-weight: 900;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .g-faq summary::-webkit-details-marker { display: none; }
+
+    .g-faq summary::before {
+      content: "Q";
+      position: absolute;
+      left: 16px;
+      top: 12px;
+      color: var(--accent-ink);
+    }
+
+    .g-faq[open] summary { border-bottom: 1px dashed var(--line-ink); }
+    .g-faq p { padding: 10px 16px 14px 44px; font-size: 0.92rem; }
+
+    /* ほかのツール */
+    .g-related ul { list-style: none; padding-left: 0; display: grid; gap: 8px; }
+    .g-related li { padding: 10px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.6); }
+    .g-related li + li { margin-top: 0; }
+    .g-related li span { display: block; font-size: 0.85rem; line-height: 1.6; }
+
+    .g-date { margin-top: 32px; font-size: 0.85rem; text-align: right; }
+
+    @media (max-width: 600px) {
+      main { padding: 24px 12px 40px; }
+      .guide { padding: 22px 18px 30px; border-radius: 22px; }
+      .g-toc { padding: 12px 16px; }
+      .g-faq summary { padding-left: 38px; }
+      .g-faq summary::before { left: 14px; }
+      .g-faq p { padding-left: 16px; }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <main>
+    <article class="guide">
+      <nav class="g-crumbs" aria-label="パンくずリスト">
+        <a href="../">Tools</a><span aria-hidden="true">›</span><a href="../#wordpress">WordPress プラグイン</a><span aria-hidden="true">›</span><span>Folder Upload</span>
+      </nav>
+
+      <header class="g-hero">
+        <span class="g-kind">WordPress プラグイン</span>
+        <h1>Folder Upload</h1>
+        <p class="g-lead">WordPress の <code>wp-content/uploads</code> の中の <strong>好きなフォルダ</strong>へ、ファイルやフォルダごとアップロードできるプラグインです。標準の「年/月」フォルダとは別に、決まった場所にファイルを置きたいときに使います。</p>
+        <div class="g-actions">
+          <a class="g-btn g-btn-primary" href="https://github.com/donnma777/wp-folder-upload/releases/latest" target="_blank" rel="noopener">ダウンロード（GitHub Releases）</a>
+          <a class="g-btn g-btn-secondary" href="https://github.com/donnma777/wp-folder-upload" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <p class="g-meta">無料・WordPress 6.0 以上・PHP 8.0 以上・GPLv2 or later</p>
+      </header>
+
+      <nav class="g-toc" aria-label="このページの目次">
+        <p>目次</p>
+        <ol>
+          <li><a href="#features">できること</a></li>
+          <li><a href="#security">安全のために</a></li>
+          <li><a href="#install">インストール</a></li>
+          <li><a href="#faq">よくある質問</a></li>
+          <li><a href="#env">動作環境・注意</a></li>
+          <li><a href="#license">ライセンス</a></li>
+        </ol>
+      </nav>
+
+      <section class="g-section" id="features">
+        <h2>できること</h2>
+        <div class="g-features">
+          <div class="g-feature"><h3>好きなフォルダへ置く</h3><p>uploads の中のフォルダを選んでファイルを置けます。フォルダをドラッグすると、中の構成ごと置けます。</p></div>
+          <div class="g-feature"><h3>メディアライブラリにも登録</h3><p>置いたファイルを、メディアライブラリにも登録するか選べます。</p></div>
+          <div class="g-feature"><h3>同じ名前のとき</h3><p>「別の名前で置く」か「上書きする」かを選べます。</p></div>
+          <div class="g-feature"><h3>名前を変える</h3><p>ファイル名を変えると、サイズ違いのファイルと記事の本文の URL もまとめて書き換えます。メディアの詳細画面からも変えられます。</p></div>
+        </div>
+        <p>管理画面の「メディア」→「フォルダにアップロード」から使います。</p>
+      </section>
+
+      <section class="g-section" id="security">
+        <h2>安全のために</h2>
+        <ul>
+          <li>使えるのは管理者だけです。送信のたびに nonce も確かめます。</li>
+          <li>置き場所は uploads の中だけです。<code>..</code> やシンボリックリンクで外に出られないよう、実際のパスでも確かめます。</li>
+          <li>置けるのは画像・PDF・動画・音声・フォント・CSS・SVG の決まった拡張子だけです。中身（MIME・画像として読めるか）も確かめます。</li>
+          <li>PHP のコードが入ったファイルは置けません。SVG は script や外部の読み込みなど、危ないものが1つでもあれば断ります。</li>
+        </ul>
+      </section>
+
+      <section class="g-section" id="install">
+        <h2>インストール</h2>
+        <ol class="g-steps">
+          <li><a href="https://github.com/donnma777/wp-folder-upload/releases/latest" target="_blank" rel="noopener">Releases</a> から zip をダウンロードします。</li>
+          <li>WordPress の管理画面で「プラグイン」→「新規追加」→「プラグインのアップロード」を開き、ダウンロードした zip を選んで「今すぐインストール」を押します。</li>
+          <li>プラグインを有効化すると、「メディア」の中に「フォルダにアップロード」が出ます。</li>
+        </ol>
+      </section>
+
+      <section class="g-section" id="faq">
+        <h2>よくある質問</h2>
+        <details class="g-faq">
+          <summary>無料で使えますか？</summary>
+          <p>はい、無料です（GPLv2 or later）。</p>
+        </details>
+        <details class="g-faq">
+          <summary>「上書きする」を選ぶと元のファイルはどうなりますか？</summary>
+          <p>置き換わって、元には戻せません。心配なときは「別の名前で置く」を選んでください。</p>
+        </details>
+        <details class="g-faq">
+          <summary>WebP Upload と一緒に使えますか？</summary>
+          <p>使えます。Folder Upload で置いたファイルは、置いたままの形で使うため WebP に変換されません。</p>
+        </details>
+        <details class="g-faq">
+          <summary>編集者や投稿者も使えますか？</summary>
+          <p>いいえ、管理者だけです。</p>
+        </details>
+      </section>
+
+      <section class="g-section" id="env">
+        <h2>動作環境・注意</h2>
+        <ul>
+          <li>WordPress 6.0 以上、PHP 8.0 以上（<code>fileinfo</code> 拡張が必要）</li>
+          <li>管理画面は日本語だけです</li>
+          <li>個人で作ったものです。サポートや不具合の対応はお約束できません</li>
+        </ul>
+      </section>
+
+      <section class="g-section" id="license">
+        <h2>ライセンス</h2>
+        <p>GPLv2 or later です。</p>
+      </section>
+
+      <section class="g-section g-related">
+        <h2>ほかのツール</h2>
+        <ul>
+          <li><a href="../discord-post-notify/">Discord Post Notify</a><span>投稿・フォーム・コメントを Discord に通知する WordPress プラグイン</span></li>
+          <li><a href="../wp-webp-upload/">WebP Upload</a><span>画像を自動で WebP に変換する WordPress プラグイン</span></li>
+          <li><a href="../">どんまうんど-Tools のツール一覧</a><span>配信オーバーレイ・画像づくり・サイトづくりなど、ブラウザで使える無料ツール</span></li>
+        </ul>
+      </section>
+
+      <p class="g-date">2026年11月4日 更新</p>
+    </article>
+  </main>
+
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+</body>
+
+</html>
