@@ -90,6 +90,12 @@ Chrome拡張機能をまとめたリポジトリ。広告ブロック・強制�
 
 - GitHub: https://github.com/donnma777/feature-browser-benri-tools
 
+### Authenticator Autofill
+
+Chrome拡張機能。2段階認証のコード・ログイン情報・個人情報・カード・メモを端末内で暗号化して保存します。Google認証システムの移行QR、Chrome・Bitwardenのパスワードの取り込みと、ほかのアプリ向けの書き出しに対応。通信はしません。
+
+- GitHub: https://github.com/donnma777/authenticator-autofill
+
 ---
 
 © 2026 [donnma.com](https://donnma.com/)

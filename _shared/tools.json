@@ -347,6 +347,25 @@
           "icon": [
             "<path d=\"M10 4a2 2 0 1 1 4 0v2h4a1 1 0 0 1 1 1v4h-2a2 2 0 1 0 0 4h2v4a1 1 0 0 1-1 1h-4v-2a2 2 0 1 0-4 0v2H6a1 1 0 0 1-1-1v-4h2a2 2 0 1 0 0-4H5V7a1 1 0 0 1 1-1h4z\" />"
           ]
+        },
+        {
+          "id": "authenticator-autofill",
+          "name": "Authenticator Autofill",
+          "links": [
+            {
+              "label": "GitHub",
+              "href": "https://github.com/donnma777/authenticator-autofill",
+              "external": true
+            }
+          ],
+          "tag": "Chrome 拡張機能",
+          "kind": "Chrome拡張",
+          "desc": "2段階認証のコード・ログイン情報・住所などの個人情報・カード・メモを、端末内で暗号化して保存するChrome拡張機能。Google認証システムのQRや、Chrome・Bitwardenのパスワードを取り込めます。通信はしません。",
+          "icon": [
+            "<rect x=\"5\" y=\"11\" width=\"14\" height=\"10\" rx=\"2\" />",
+            "<path d=\"M8 11V7a4 4 0 0 1 8 0v4\" />",
+            "<path d=\"M12 15v2\" />"
+          ]
         }
       ]
     },
