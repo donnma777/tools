@@ -732,6 +732,61 @@
             </div>
         </div>
 
+        <!-- 待機画面 -->
+        <div class="section">
+            <div class="section-title">STANDBY SCREEN — 待機画面</div>
+            <div class="card">
+                <div class="card-title">⏳ 配信の前・休憩中・終わりに出す画面</div>
+                <p>このテーマと同じ見た目の待機画面を用意しています。オーバーレイ本体とは別のページ（同じフォルダの <a href="waiting.html">waiting.html</a>）です。</p>
+            </div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body">OBS に待機用のシーンを作り、ブラウザソースで同じフォルダの <strong>waiting.html</strong> を読み込む（幅 1920・高さ 1080）。</div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body">ソースを右クリック →「対話」で開いた画面をダブルクリックすると、設定画面が開きます（Chrome で開いたときは右下の ⚙ でも開けます）。</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body">場面を選び、文字や開始時刻を入れる。</div>
+                </li>
+            </ul>
+            <div class="card">
+                <div class="card-title">場面</div>
+                <p>「まもなく開始」「休憩中」「配信終了」「おしらせ」の4つ。設定画面のボタンか、キーボードの 1〜4 で切り替えます。4つ目は名前も自由に変えられます。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">残り時間</div>
+                <p>開始・再開の時刻を入れると残り時間を表示し、時間になると「まもなく始まります」などに変わります。「+5分後」「+10分後」「+15分後」のボタンで入れられます。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">背景</div>
+                <p>テーマの柄・画像・単色・なし（透明）から選べます。画像は画面にドラッグしても入れられ、並べる・流す（スクロール）・うすめる・ぼかしもできます。場面ごとに別の背景にもできます。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">表示する部品</div>
+                <p>場面のバッジ・日付・時刻・アイコン・英字・残り時間・配信タイトル・プロフィール・流れる文字を、それぞれ出す／出さないにできます。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">保存</div>
+                <p>変えた内容は自動で保存されます。名前を付けたプリセットや、ファイルへの書き出し・読み込みもできます。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">OBS接続</div>
+                <p>Chrome で開いた待機画面から OBS に接続すると、Chrome での変更（場面の切り替えも）を OBS の待機画面にそのまま反映できます。ポート・パスワードはオーバーレイ本体で入れたものを使います。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">OBS 用の URL</div>
+                <p>設定画面の「OBS」タブで、場面を決めた URL（例：<code>waiting.html?mode=break</code>）をコピーできます。場面ごとにシーンを分けたいときに使います。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">注意</div>
+                <p>待機画面の設定は、オーバーレイ本体とは別に保存されます（同じブラウザ、OBS なら OBS の中）。背景の画像は大きいと保存できないことがあるので、そのときは小さめの画像にしてください。</p>
+            </div>
+        </div>
+
         <!-- カスタマイズ -->
         <div class="section">
             <div class="section-title">CUSTOMIZE — カスタマイズ</div>

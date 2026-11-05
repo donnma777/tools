@@ -330,6 +330,7 @@
         <a href="#live">リアルタイムプレビュー</a>
         <a href="#save">保存・プリセット</a>
         <a href="#obs-link">OBS接続</a>
+        <a href="#waiting">待機画面</a>
         <a href="#config">カスタマイズ</a>
         <a href="#trouble">トラブル対処</a>
     </nav>
@@ -608,6 +609,58 @@
             </table>
             <div class="note">
                 ChromeとOBSは同じPCで動かしてください（スマホなど別の機器からは接続できません）。Chromeが「ローカルネットワークへのアクセス」を確認してきたら許可してください。ポート・パスワードはこのブラウザに保存され、次に開いたときは自動で再接続します。OBS 28 以降が必要です。
+            </div>
+        </section>
+
+        <section id="waiting">
+            <div class="section-header">
+                <h2>待機画面</h2>
+                <span class="en">STANDBY SCREEN</span>
+            </div>
+            <p>配信の前・休憩中・終わったあとに出す画面を、このテーマと同じ見た目で用意しています。オーバーレイ本体とは別のページ（同じフォルダの <a href="waiting.html">waiting.html</a>）です。<br><span class="en-sub">A matching standby screen for before, during breaks and after the stream.</span></p>
+            <h3>使い方 / HOW TO USE</h3>
+            <ol class="steps">
+                <li><div>OBS に待機用のシーンを作り、ブラウザソースで同じフォルダの <strong>waiting.html</strong> を読み込む（幅 1920・高さ 1080）。<br><span class="en-sub">Add <strong>waiting.html</strong> as a Browser Source (1920×1080) in a standby scene.</span></div></li>
+                <li><div>ソースを右クリック →「対話」で開いた画面をダブルクリックすると、設定画面が開きます（Chrome で開いたときは右下の ⚙ でも開けます）。<br><span class="en-sub">Double-click the screen (via "Interact" in OBS) to open the settings.</span></div></li>
+                <li><div>場面を選び、文字や開始時刻を入れる。<br><span class="en-sub">Pick a scene and enter the text and start time.</span></div></li>
+            </ol>
+            <h3>できること / FEATURES</h3>
+            <table>
+                <tr>
+                    <th>機能 / Feature</th>
+                    <th>説明 / Description</th>
+                </tr>
+                <tr>
+                    <td>場面<br><code>Scenes</code></td>
+                    <td>「まもなく開始」「休憩中」「配信終了」「おしらせ」の4つ。設定画面のボタンか、キーボードの 1〜4 で切り替えます。4つ目は名前も自由に変えられます。<br><span class="en-sub">Four scenes. Switch with the buttons or keys 1–4.</span></td>
+                </tr>
+                <tr>
+                    <td>残り時間<br><code>Countdown</code></td>
+                    <td>開始・再開の時刻を入れると残り時間を表示し、時間になると「まもなく始まります」などに変わります。「+5分後」「+10分後」「+15分後」のボタンで入れられます。<br><span class="en-sub">Enter a start time to show a countdown.</span></td>
+                </tr>
+                <tr>
+                    <td>背景<br><code>Background</code></td>
+                    <td>テーマの柄・画像・単色・なし（透明）から選べます。画像は画面にドラッグしても入れられ、並べる・流す（スクロール）・うすめる・ぼかしもできます。場面ごとに別の背景にもできます。<br><span class="en-sub">Pattern, image (tile / scroll), solid color or transparent. Can differ per scene.</span></td>
+                </tr>
+                <tr>
+                    <td>表示する部品<br><code>Parts</code></td>
+                    <td>場面のバッジ・日付・時刻・アイコン・英字・残り時間・配信タイトル・プロフィール・流れる文字を、それぞれ出す／出さないにできます。<br><span class="en-sub">Show or hide each part.</span></td>
+                </tr>
+                <tr>
+                    <td>保存<br><code>Save</code></td>
+                    <td>変えた内容は自動で保存されます。名前を付けたプリセットや、ファイルへの書き出し・読み込みもできます。<br><span class="en-sub">Auto-save, presets, export / import.</span></td>
+                </tr>
+                <tr>
+                    <td>OBS接続<br><code>OBS Connect</code></td>
+                    <td>Chrome で開いた待機画面から OBS に接続すると、Chrome での変更（場面の切り替えも）を OBS の待機画面にそのまま反映できます。ポート・パスワードはオーバーレイ本体で入れたものを使います。<br><span class="en-sub">Connect from Chrome to control the OBS screen.</span></td>
+                </tr>
+                <tr>
+                    <td>OBS 用の URL<br><code>URL</code></td>
+                    <td>設定画面の「OBS」タブで、場面を決めた URL（例：<code>waiting.html?mode=break</code>）をコピーできます。場面ごとにシーンを分けたいときに使います。<br><span class="en-sub">Copy a URL fixed to one scene.</span></td>
+                </tr>
+            </table>
+            <div class="note">
+                待機画面の設定は、オーバーレイ本体とは別に保存されます（同じブラウザ、OBS なら OBS の中）。背景の画像は大きいと保存できないことがあるので、そのときは小さめの画像にしてください。
             </div>
         </section>
 
