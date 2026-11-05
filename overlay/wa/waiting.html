@@ -960,6 +960,76 @@
             margin-top: 16px;
         }
 
+        /* OBS の中のプルダウンの代わり（enhanceSelectsForObs） */
+        .fake-select-wrap {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .fake-select {
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .fake-select-list {
+            display: flex;
+            flex-direction: column;
+            margin-top: 4px;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .fake-select-list[hidden] {
+            display: none;
+        }
+
+        .fake-select-list button {
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            padding: 7px 10px;
+        }
+
+        /* 一覧を開いても、左の項目名は上にそろえる */
+        #panel .row:has(.fake-select-wrap) {
+            align-items: start;
+        }
+
+        #panel .row:has(.fake-select-wrap) > label {
+            padding-top: 8px;
+        }
+
+        #panel .fake-select {
+            padding: 7px 10px;
+            border: 1.5px solid color-mix(in srgb, var(--accent) 35%, transparent);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--input-fg);
+            font-size: 15px;
+        }
+
+        #panel .fake-select-list {
+            border: 1.5px solid color-mix(in srgb, var(--accent) 35%, transparent);
+            border-radius: 8px;
+            background: var(--input-bg);
+        }
+
+        #panel .fake-select-list button {
+            background: transparent;
+            color: var(--input-fg);
+            font-size: 14px;
+        }
+
+        #panel .fake-select-list button.on,
+        #panel .fake-select-list button:hover {
+            background: color-mix(in srgb, var(--accent) 18%, transparent);
+        }
+
         #panel .p-foot {
             display: flex;
             gap: 10px;
@@ -2430,6 +2500,65 @@
                 // 前回つないでいたら、開いたときに自動で再接続する（OBS の中ではつながない）
                 if (!inObs && l.auto) connectFromPanel(true);
             }
+
+
+            /* ---- OBS の中のプルダウン（<select>）
+             *  OBS のブラウザソースの「対話」では、プルダウンを開いても選択肢が出ないことがある。
+             *  OBS の中で開いたときだけ、ボタン＋選択肢の一覧に置き換える（元の select は隠して残し、値はそこに入れる。
+             *  選んだら input / change を送るので、ほかの処理はそのまま）。一覧は場所を取って開く（スクロールする枠に切られないように） */
+            function enhanceSelectsForObs(root) {
+                if (!window.obsstudio) return;
+                const valueProp = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+                root.querySelectorAll('select').forEach((sel) => {
+                    if (sel._fakeSelect) return;
+                    const wrap = document.createElement('span');
+                    wrap.className = 'fake-select-wrap';
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'fake-select';
+                    const list = document.createElement('div');
+                    list.className = 'fake-select-list';
+                    list.hidden = true;
+                    sel.parentNode.insertBefore(wrap, sel);
+                    wrap.append(sel, btn, list);
+                    sel.style.display = 'none';
+                    const label = () => {
+                        const o = sel.options[sel.selectedIndex];
+                        btn.textContent = (o ? o.textContent : '') + ' ▾';
+                    };
+                    // コードから value を入れたときも、ボタンの文字を合わせる
+                    Object.defineProperty(sel, 'value', {
+                        configurable: true,
+                        get() { return valueProp.get.call(this); },
+                        set(v) { valueProp.set.call(this, v); label(); },
+                    });
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (!list.hidden) { list.hidden = true; return; }
+                        document.querySelectorAll('.fake-select-list').forEach((l) => { l.hidden = true; });
+                        list.textContent = '';
+                        Array.from(sel.options).forEach((o) => {
+                            const b = document.createElement('button');
+                            b.type = 'button';
+                            b.textContent = o.textContent;
+                            if (o.value === sel.value) b.className = 'on';
+                            b.addEventListener('click', (ev) => {
+                                ev.stopPropagation();
+                                sel.value = o.value;
+                                list.hidden = true;
+                                sel.dispatchEvent(new Event('input', { bubbles: true }));
+                                sel.dispatchEvent(new Event('change', { bubbles: true }));
+                            });
+                            list.appendChild(b);
+                        });
+                        list.hidden = false;
+                    });
+                    sel._fakeSelect = true;
+                    label();
+                });
+            }
+            document.addEventListener('click', () => { document.querySelectorAll('.fake-select-list').forEach((l) => { l.hidden = true; }); });
+            enhanceSelectsForObs(document.getElementById('panel'));
 
             render();
             // フォントが届いたら幅が変わるので、もう一度合わせる
