@@ -12,6 +12,7 @@
         /**
          * =====================================================
          *  ★ 待機画面の初期値 ★（和 WA）
+         *  OBS の「ブラウザソース」に、幅 1920・高さ 1080（おすすめの大きさ）で置いて使います。
          *  画面をダブルクリック（OBS ではソースの「対話」）で開く設定画面から変えられます。
          *  変えた内容はブラウザに保存されるので、ここを書き換えるのは最初の値を変えたいときだけ。
          *  URL に ?mode=break のように付けると、そのソースはいつもその場面を出します（soon / break / end / free）。
@@ -1271,6 +1272,14 @@
                 </div>
 
                 <div class="tab-pane" data-pane="obs" hidden>
+                <fieldset id="size-set">
+                    <legend>OBS に置くとき</legend>
+                    <div class="row"><span>おすすめの大きさ</span><div><strong>幅 1920・高さ 1080</strong></div></div>
+                    <div class="row"><span>いまの大きさ</span><div id="size-now"></div></div>
+                    <div class="hint">OBS の「ブラウザソース」のプロパティで、幅と高さをこの大きさにしてください（配信の解像度が 1920×1080 のとき）。ほかの大きさでも画面に合わせて縮みますが、16:9 でないと上下か左右にすき間ができます。</div>
+                    <div class="warn" id="size-warn" hidden></div>
+                </fieldset>
+
                 <fieldset id="obs-link-set">
                     <legend>OBS接続（WebSocket）</legend>
                     <div class="hint">OBS の「ツール → WebSocketサーバー設定」で「WebSocketサーバーを有効にする」をオンにし、「接続情報を表示」のポートとパスワードを入れてください。接続すると、Chrome での変更（場面の切り替えも）を OBS のこのページに送ります。</div>
@@ -1463,8 +1472,20 @@
                 st.style.left = (window.innerWidth - 1920 * sc) / 2 + 'px';
                 st.style.top = (window.innerHeight - 1080 * sc) / 2 + 'px';
             }
-            window.addEventListener('resize', fit);
+            window.addEventListener('resize', () => { fit(); showSize(); });
             fit();
+            // 設定画面の「OBS に置くとき」：いまの大きさと、16:9 でないときの知らせ
+            function showSize() {
+                const w = window.innerWidth, h = window.innerHeight;
+                const el = document.getElementById('size-now');
+                if (!el) return;
+                el.textContent = `幅 ${w}・高さ ${h}` + (w === 1920 && h === 1080 ? '（ちょうど）' : '');
+                const warn = document.getElementById('size-warn');
+                const off = Math.abs(w / h - 16 / 9) > 0.01;
+                warn.hidden = !off;
+                if (off) warn.textContent = `16:9 ではないので、${w / h > 16 / 9 ? '左右' : '上下'}にすき間ができます。OBS のブラウザソースの幅と高さを 1920・1080 にしてください。`;
+            }
+            showSize();
 
             // ---- 描画 ----
             function setMain(text) {
