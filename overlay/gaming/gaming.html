@@ -1742,12 +1742,12 @@
 
         /* 設定画面：左に保存・読み込み、右にOBS接続。使い方・リセットは下の段 */
         #obs-modal .help-popup {
-            width: 900px;
+            width: 1120px;
         }
 
         .help-body.settings-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
             gap: 0 32px;
         }
 
@@ -1826,6 +1826,34 @@
             font-size: 13px;
         }
 
+        /* プリセットの並べ替え（↑↓）・名前の変更（✎）の小さなボタン */
+        .settings-btn.small.icon {
+            min-width: 26px;
+            padding: 0 6px;
+        }
+
+        .settings-btn:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        /* OBS 用の URL：名前の札は幅をそろえ、長い名前は … で切る */
+        #obs-url-rows .help-key {
+            flex: none;
+            width: 140px;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 名前を入れる確認画面の入力欄 */
+        #ask-input {
+            display: block;
+            width: 100%;
+            margin-top: 12px;
+        }
+
         /* 入力欄 */
         .obs-field {
             display: flex;
@@ -1836,7 +1864,8 @@
 
         .obs-field input[type=text],
         .obs-field input[type=password],
-        .preset-add input {
+        .preset-add input,
+        #ask-input {
             flex: 1;
             min-width: 0;
             background: color-mix(in srgb, var(--color-accent) 6%, transparent);
@@ -1850,7 +1879,8 @@
         }
 
         .obs-field input:focus,
-        .preset-add input:focus {
+        .preset-add input:focus,
+        #ask-input:focus {
             border-color: var(--color-accent);
         }
 
@@ -1910,6 +1940,11 @@
             flex-direction: column;
             gap: 6px;
             margin-top: 6px;
+            /* 多いときは一覧の中だけスクロール（設定画面ごと下へスクロールしなくて済むように） */
+            max-height: 36vh;
+            overflow-y: auto;
+            padding-right: 4px;
+            scrollbar-width: thin;
         }
 
         .preset-item {
@@ -1936,6 +1971,69 @@
             font-size: 12px;
             opacity: 0.6;
             white-space: nowrap;
+        }
+
+        /* プリセットの行：1行目に番号・名前・日時、2行目にボタン */
+        .preset-item {
+            flex-wrap: wrap;
+            row-gap: 6px;
+        }
+
+        .preset-break {
+            flex-basis: 100%;
+            height: 0;
+        }
+
+        .preset-break + .settings-btn {
+            margin-left: 30px;
+        }
+
+        .preset-item .settings-btn {
+            white-space: nowrap;
+        }
+
+        /* 数字キーで読み込める番号（1〜9） */
+        .preset-key {
+            flex: none;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 4px;
+            border-radius: 4px;
+            border: 1px solid color-mix(in srgb, var(--color-accent) 60%, transparent);
+            color: var(--color-accent);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 20px;
+            text-align: center;
+        }
+
+        .preset-key.none {
+            visibility: hidden;
+        }
+
+        /* 数字キーで切り替えたときの知らせ（Chrome で開いたときだけ。OBS の中では出さない） */
+        #preset-toast {
+            position: fixed;
+            left: 50%;
+            bottom: 48px;
+            transform: translateX(-50%) translateY(10px);
+            z-index: 6000;
+            padding: 10px 24px;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--color-accent) 68%, #000);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        #preset-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
 
         /* ---- ストップウォッチ：画面には時間だけ（開始・停止・リセット・連動は ≡ メニューと、時間を押す） */
@@ -2200,6 +2298,7 @@
                         <button class="settings-btn" id="preset-save-btn" type="button">＋ プリセットに保存</button>
                     </div>
                     <div class="preset-list" id="preset-list"></div>
+                    <div class="help-desc" style="opacity:0.7" id="preset-key-note">キーボードの 1〜9 で、上から順にプリセットを読み込めます（↑↓ で並べ替え、✎ で名前の変更。文字の入力中は効きません）。</div>
                     <div class="obs-status help-desc" id="settings-status" role="status"></div>
                     <div class="settings-row" id="file-row">
                         <button class="settings-btn" id="set-export-btn" type="button">⬇️ ファイルに書き出す</button>
@@ -2224,6 +2323,12 @@
                         <button class="settings-btn" id="obs-connect-btn" type="button">🔌 接続</button>
                         <button class="settings-btn" id="obs-disconnect-btn" type="button" style="display:none">切断</button>
                     </div>
+
+                    <div class="help-section">OBS 用の URL</div>
+                    <div class="help-desc" style="opacity:0.7">OBS の「ブラウザソース」→「URL」に貼ります（「ローカルファイル」のチェックは外す）。幅 1920・高さ 1080 で置いてください。</div>
+                    <div id="obs-url-rows"></div>
+                    <div class="help-desc" style="opacity:0.7" id="obs-url-note">プリセットごとの URL は、プリセットの一覧の「URL」でコピーできます。そのプリセットを出し続けるので、シーンごとに置き分けるとき向けです。Chrome から OBS に接続すると、プリセットが OBS にも届きます（OBS の中のプリセットは Chrome と同じになります）。名前を変えても URL は変わりません。</div>
+                    <div class="obs-status help-desc" id="fixed-preset-note"></div>
                 </div>
             </div>
             <div class="settings-footer">
@@ -2239,6 +2344,7 @@
     <div id="ask-modal">
         <div class="help-popup" role="alertdialog" aria-modal="true" aria-labelledby="ask-msg">
             <div class="help-desc" id="ask-msg"></div>
+            <input type="text" id="ask-input" maxlength="40" spellcheck="false" autocomplete="off" style="display:none">
             <div class="settings-row">
                 <button class="settings-btn" id="ask-no" type="button"></button>
                 <button class="settings-btn" id="ask-yes" type="button"></button>
@@ -4060,12 +4166,17 @@
         const OVERLAY_THEME = 'gaming';
         const OVERLAY_KEY = 'gamingOverlay';   // localStorage のキーの頭（例: gamingOverlay → gamingOverlayConfig）
         const OBS_EVENT = 'donnmaOverlayUpdate';
+        const OBS_PRESET_EVENT = 'donnmaOverlayPresets';   // プリセットを OBS に届ける合図
+        // このページの印（自分が送った合図が戻ってきても、受け取らないように）
+        const PAGE_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        // URL の ?preset=ID（または名前）：そのプリセットを出し続けるソース。今の画面としては保存しない
+        const FIXED_PRESET = new URLSearchParams(location.search).get('preset') || '';
         const OBS_LINK_KEY = OVERLAY_KEY + 'ObsLink';
         const LIVE_PING_KEY = OVERLAY_KEY + 'LivePing';
         const OLD_CONFIG_KEY = OVERLAY_KEY + 'Config';   // 以前のバージョンの保存先（localStorage）
 
         // 自動保存するかどうか（CONFIG.features.saveConfigEnabled。isSaveConfigEnabled がないテーマもある）
-        const overlaySaveEnabled = () => CONFIG.features?.saveConfigEnabled !== false;
+        const overlaySaveEnabled = () => CONFIG.features?.saveConfigEnabled !== false && !FIXED_PRESET;
         // 設定画面に出す機能（CONFIG.features の presetSave / presetLoad / obsSettings / fileExport / fileImport / resetButton。
         // 項目がない古い CONFIG では全部出す）
         const featureOn = (name) => CONFIG.features?.[name] !== false;
@@ -4094,16 +4205,23 @@
             askModal.classList.remove('open');
             d(v);
         }
-        function overlayAsk(msg, { yes = 'OK', no = 'やめる' } = {}) {
+        // input に文字を渡すと入力欄を出し、OK で入れた文字を返す（いいえ → false / Esc・外側 → null）
+        function overlayAsk(msg, { yes = 'OK', no = 'やめる', input = null } = {}) {
             askFinish(null);
             document.getElementById('ask-msg').textContent = msg;
             const yesEl = document.getElementById('ask-yes'), noEl = document.getElementById('ask-no');
+            const inputEl = document.getElementById('ask-input');
             yesEl.textContent = yes;
             noEl.textContent = no || '';
             noEl.style.display = no ? '' : 'none';
+            inputEl.style.display = input === null ? 'none' : '';
+            if (input !== null) inputEl.value = input;
             askModal.classList.add('open');
-            (no ? noEl : yesEl).focus();
-            return new Promise(resolve => { askDone = resolve; });
+            if (input !== null) { inputEl.focus(); inputEl.select(); }
+            else (no ? noEl : yesEl).focus();
+            return new Promise(resolve => {
+                askDone = (v) => resolve(input !== null && v === true ? inputEl.value : v);
+            });
         }
         const overlayNotice = (msg) => overlayAsk(msg, { yes: 'OK', no: '' });
         document.getElementById('ask-yes').addEventListener('click', () => askFinish(true));
@@ -4113,6 +4231,12 @@
         window.addEventListener('keydown', (e) => {
             if (!askDone) return;
             if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); askFinish(null); return; }
+            // 入力欄では文字を打てるようにし、Enter で OK（日本語の変換中の Enter は除く）
+            if (e.target instanceof Element && e.target.id === 'ask-input') {
+                e.stopImmediatePropagation();
+                if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); askFinish(true); }
+                return;
+            }
             if (!(e.target instanceof Element && e.target.closest('#ask-modal button'))) { e.preventDefault(); e.stopImmediatePropagation(); }
         }, true);
 
@@ -4187,7 +4311,19 @@
             return statePut(state).catch(notifySaveFailed);
         }
 
+        // URL の ?preset= に合うプリセット（ID が合うもの、なければ名前が合うもの）
+        async function findFixedPreset() {
+            let list = [];
+            try { list = await presetAll(); } catch (err) { return null; }
+            return list.find(p => p.id === FIXED_PRESET) || list.find(p => p.name === FIXED_PRESET) || null;
+        }
+
         async function loadSavedConfig() {
+            if (FIXED_PRESET) {
+                const p = await findFixedPreset();
+                if (p) { applyLoadedConfig(p.state); return; }
+                // まだ届いていなければ、ふだんの「今の画面」を出しておく（届いたら切り替わる）
+            }
             let state = null;
             try {
                 state = await stateGet();
@@ -4271,7 +4407,7 @@
                 version: 2,
                 exportedAt: new Date().toISOString(),
                 current: buildObsState().state,
-                presets: presets.map(p => ({ name: p.name, savedAt: p.savedAt, state: p.state })),
+                presets: (await presetsInOrder().catch(() => presets)).map(p => ({ id: p.id, name: p.name, savedAt: p.savedAt, order: p.order, state: p.state })),
             };
             const json = JSON.stringify(data, null, 2);
             const blob = new Blob([json], { type: 'application/json' });
@@ -4299,7 +4435,7 @@
                     applyLoadedConfig(data.current);
                     saveCurrentConfig();
                 }
-                const incoming = Array.isArray(data.presets) ? data.presets.filter(p => p && p.name && p.state) : [];
+                const incoming = Array.isArray(data.presets) ? data.presets.filter(p => p && p.name && p.state).sort(presetOrder) : [];
                 let existing = [];
                 try { existing = (await presetAll()).map(p => p.name); } catch (err) { /* ignore */ }
                 const dup = incoming.filter(p => existing.includes(p.name));
@@ -4312,9 +4448,10 @@
                 let added = 0;
                 for (const p of incoming) {
                     if (!overwrite && existing.includes(p.name)) continue;
-                    await presetPut({ name: p.name, savedAt: p.savedAt || Date.now(), state: p.state });
+                    await presetPut({ id: await presetIdFor(p.name, p.id), name: p.name, savedAt: p.savedAt || Date.now(), order: await presetSlot(p.name), state: p.state });
                     added++;
                 }
+                syncAllPresetsToObs();
                 return `ファイルから読み込みました（プリセット ${added}件）`;
             }
             // 以前の形式
@@ -4352,12 +4489,45 @@
          *  OBS 側のこのページは 'donnmaOverlayUpdate' イベントで受け取って反映・保存する。
          * ===================================================== */
 
+        // 中身は JSON の文字列（json）で送る。obs-websocket は途中で内容を OBS の形式（obs_data）に変えるが、
+        // その形式の配列は「まとまり（オブジェクト）」しか入らず、profileItems のような文字の配列が空になってしまうため。
+        // （前の版の state もそのまま読めるようにしておく）
+        function obsPayload(d) {
+            if (!d || d.theme !== OVERLAY_THEME || d.from === PAGE_ID) return null;
+            if (typeof d.json === 'string') { try { return JSON.parse(d.json); } catch (err) { return null; } }
+            return d.state || null;
+        }
+
         // ---- OBS 側：届いた内容を反映して、このブラウザソースにも保存しておく
         window.addEventListener(OBS_EVENT, (e) => {
-            const d = e.detail;
-            if (!d || d.theme !== OVERLAY_THEME || !d.state) return;
-            applyLoadedConfig(d.state);
-            statePut(d.state).catch(notifySaveFailed);
+            const state = obsPayload(e.detail);
+            if (!state) return;
+            if (FIXED_PRESET) return; // プリセットの URL のソースは、今の画面の送信では変えない
+            applyLoadedConfig(state);
+            statePut(state).catch(notifySaveFailed);
+        });
+
+        // ---- OBS 側：プリセットを受け取る（op: 'all' = この一覧にないものは消す / 'put' = 1件入れる / 'delete' = 1件消す）
+        window.addEventListener(OBS_PRESET_EVENT, async (e) => {
+            const v = obsPayload(e.detail);
+            if (!v) return;
+            const op = e.detail.op;
+            try {
+                const list = await presetAll();
+                if (op === 'all' && Array.isArray(v.ids)) {
+                    for (const p of list) if (!v.ids.includes(p.id)) await presetDelete(p.name);
+                } else if (op === 'put' && v.name && v.state) {
+                    // 名前が変わっていたら、前の名前のものを消す（ID が同じもの）
+                    for (const p of list) if (p.id && p.id === v.id && p.name !== v.name) await presetDelete(p.name);
+                    await presetPut({ id: v.id, name: v.name, savedAt: v.savedAt || Date.now(), order: v.order, state: v.state });
+                    if (FIXED_PRESET && (v.id === FIXED_PRESET || v.name === FIXED_PRESET)) applyLoadedConfig(v.state);
+                } else if (op === 'delete' && v.name) {
+                    await presetDelete(v.name);
+                }
+            } catch (err) {
+                notifySaveFailed(err);
+            }
+            if (obsModal.classList.contains('open')) renderPresets();
         });
 
         // ---- Chrome 側：接続と送信
@@ -4474,7 +4644,7 @@
                 await obsRequest('CallVendorRequest', {
                     vendorName: 'obs-browser',
                     requestType: 'emit_event',
-                    requestData: { event_name: OBS_EVENT, event_data: { theme: OVERLAY_THEME, state } }
+                    requestData: { event_name: OBS_EVENT, event_data: { theme: OVERLAY_THEME, from: PAGE_ID, json: JSON.stringify(state) } }
                 });
                 setObsStatus('✅ OBSに反映しました（' + new Date().toLocaleTimeString() + '）');
             } catch (err) {
@@ -4483,6 +4653,36 @@
                 refreshObsUi();
                 setObsStatus('⚠️ 送れませんでした：' + err.message);
             }
+        }
+
+        // ---- プリセットを OBS に届ける（OBS の中のプリセットを Chrome と同じにする。プリセットの URL のソースで使う）
+        //      1件ずつ送る（画像入りだと1件で数MBになるので、まとめて1通にはしない）
+        async function sendPresetOp(op, value) {
+            if (!obsLink.ready) return;
+            try {
+                await obsRequest('CallVendorRequest', {
+                    vendorName: 'obs-browser',
+                    requestType: 'emit_event',
+                    requestData: { event_name: OBS_PRESET_EVENT, event_data: { theme: OVERLAY_THEME, from: PAGE_ID, op, json: JSON.stringify(value) } }
+                });
+            } catch (err) {
+                setObsStatus('⚠️ プリセットを送れませんでした：' + err.message);
+            }
+        }
+        const presetForObs = (p) => ({ id: p.id, name: p.name, savedAt: p.savedAt, order: p.order, state: p.state });
+        async function syncAllPresetsToObs() {
+            if (!obsLink.ready) return;
+            let list = [];
+            try { list = await presetsInOrder(); } catch (err) { return; }
+            await sendPresetOp('all', { ids: list.map(p => p.id) });
+            for (const p of list) await sendPresetOp('put', presetForObs(p));
+        }
+        async function syncPresetToObs(name) {
+            if (!obsLink.ready) return;
+            let list = [];
+            try { list = await presetsInOrder(); } catch (err) { return; }
+            const p = list.find(x => x.name === name);
+            if (p) await sendPresetOp('put', presetForObs(p));
         }
 
         // 確定モード：OBS に送った内容から変わっているかだけを調べる
@@ -4527,6 +4727,7 @@
             try {
                 await obsConnect(port, password);
                 try { localStorage.setItem(OBS_LINK_KEY, JSON.stringify({ port, password, auto: true, mode: obsLink.mode })); } catch (err) { /* ignore */ }
+                syncAllPresetsToObs();
                 if (obsLink.mode === 'auto') {
                     setObsStatus('✅ 接続しました。編集するとOBSに自動で反映されます');
                     pushToObs(true);
@@ -4544,6 +4745,58 @@
         /* =====================================================
          *  設定画面（保存・読み込み／OBS接続／使い方・リセット）
          * ===================================================== */
+        // OBS 用の URL：今の画面（切り替え用）と、プリセットごと（?preset=ID）
+        const obsUrlBase = () => location.href.split(/[?#]/)[0];
+        async function copyUrl(input, btn) {
+            let ok = false;
+            try { await navigator.clipboard.writeText(input.value); ok = true; } catch (err) { /* 下のやり方で */ }
+            if (!ok) {
+                input.focus();
+                input.select();
+                try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+            }
+            btn.textContent = ok ? 'コピーしました' : '選んで Ctrl+C';
+            setTimeout(() => { btn.textContent = 'コピー'; }, 1800);
+        }
+        // 「URL」：プリセットの URL をコピー（できなければ、URL を入れた欄を出して Ctrl+C でコピーしてもらう）
+        const presetUrl = (p) => obsUrlBase() + '?preset=' + encodeURIComponent(p.id);
+        async function copyPresetUrl(p) {
+            const url = presetUrl(p);
+            let ok = false;
+            try { await navigator.clipboard.writeText(url); ok = true; } catch (err) { /* 下で */ }
+            if (ok) { settingsDone(`「${p.name}」の OBS 用の URL をコピーしました`); return; }
+            await overlayAsk(`「${p.name}」の OBS 用の URL です。Ctrl+C でコピーして、OBS のブラウザソースの URL に貼ってください。`, { yes: '閉じる', no: '', input: url });
+        }
+
+        function renderObsUrls(presets) {
+            const box = document.getElementById('obs-url-rows');
+            box.textContent = '';
+            // プリセットごとの URL は、一覧の各行の「URL」でコピーする（ここは今の画面だけ）
+            const rows = [['今の画面', obsUrlBase(), '切り替えて使う（数字キー・OBS接続で変わる）']];
+            for (const [label, url, title] of rows) {
+                const row = document.createElement('div');
+                row.className = 'obs-field help-desc';
+                const key = document.createElement('span');
+                key.className = 'help-key';
+                key.textContent = label;
+                key.title = title;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.readOnly = true;
+                input.spellcheck = false;
+                input.value = url;
+                input.addEventListener('focus', () => input.select());
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'settings-btn small';
+                btn.textContent = 'コピー';
+                btn.addEventListener('click', () => copyUrl(input, btn));
+                row.append(key, input, btn);
+                box.appendChild(row);
+            }
+            document.getElementById('obs-url-note').style.display = featureOn('presetLoad') && presets.length ? '' : 'none';
+        }
+
         function openObsModal() {
             renderPresets();
             const saved = loadObsLinkSettings();
@@ -4558,13 +4811,17 @@
 
         // CONFIG.features で、設定画面に出す機能を切り替える
         document.getElementById('autosave-note').textContent =
+            FIXED_PRESET ? `このページは URL でプリセット（${FIXED_PRESET}）に決めてあるので、今の画面としては保存しません。` :
             (overlaySaveEnabled()
                 ? '今の画面は自動で保存され、次に開いたときは続きから始まります。'
                 : '自動保存はオフになっています（CONFIG.features.saveConfigEnabled）。')
             + (!featureOn('presetSave') ? ''
                 : overlaySaveEnabled() ? '取っておきたい画面は、名前を付けてプリセットにできます。' : '残したい画面はプリセットに保存してください。');
         if (!featureOn('presetSave')) document.querySelector('#obs-modal .preset-add').style.display = 'none';
-        if (!featureOn('presetLoad')) document.getElementById('preset-list').style.display = 'none';
+        if (!featureOn('presetLoad')) {
+            document.getElementById('preset-list').style.display = 'none';
+            document.getElementById('preset-key-note').style.display = 'none';
+        }
         const hide = (id) => { document.getElementById(id).style.display = 'none'; };
         if (!featureOn('fileExport')) hide('set-export-btn');
         if (!featureOn('fileImport')) hide('set-import-btn');
@@ -4584,9 +4841,75 @@
             return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
         };
 
-        function presetRow(nameText, dateText, buttons) {
+        // プリセットの並び：order（↑↓ で入れ替える番号）の順。order がないもの（前のバージョンで保存したもの）は名前順で後ろに付ける
+        const presetOrder = (a, b) => {
+            const ao = Number.isFinite(a.order) ? a.order : Infinity, bo = Number.isFinite(b.order) ? b.order : Infinity;
+            return (ao - bo) || String(a.name).localeCompare(String(b.name), 'ja', { numeric: true });
+        };
+        // プリセットの ID（URL の ?preset= に使う。名前を変えても変わらない）
+        const newPresetId = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4);
+        // 保存するときの ID：同じ名前があればその ID、なければ want（ファイルの ID など、ほかと重ならなければ）か新しい ID
+        async function presetIdFor(name, want) {
+            let list = [];
+            try { list = await presetAll(); } catch (err) { /* ignore */ }
+            const same = list.find(p => p.name === name);
+            if (same && same.id) return same.id;
+            if (want && !list.some(p => p.id === want)) return want;
+            return newPresetId();
+        }
+        // 並べた順に order を 0, 1, 2… と振り直して返す（番号が抜けたり重なったりしないように）。ID のないもの（前の版）には付ける
+        async function presetsInOrder() {
+            const list = await presetAll();
+            list.sort(presetOrder);
+            const fix = list.filter((p, i) => p.order !== i || !p.id);
+            list.forEach((p, i) => { p.order = i; if (!p.id) p.id = newPresetId(); });
+            for (const p of fix) await presetPut(p);
+            return list;
+        }
+        // 保存するときの order：同じ名前があればその場所（上書きしても並びは変わらない）、なければいちばん下
+        async function presetSlot(name) {
+            let list = [];
+            try { list = await presetAll(); } catch (err) { /* ignore */ }
+            const same = list.find(p => p.name === name);
+            if (same && Number.isFinite(same.order)) return same.order;
+            return list.reduce((m, p) => Math.max(m, Number.isFinite(p.order) ? p.order : -1), -1) + 1;
+        }
+        // ↑↓：となりと入れ替える
+        async function movePreset(name, dir) {
+            const list = await presetsInOrder();
+            const i = list.findIndex(p => p.name === name), j = i + dir;
+            if (i < 0 || j < 0 || j >= list.length) return;
+            [list[i].order, list[j].order] = [list[j].order, list[i].order];
+            await presetPut(list[i]);
+            await presetPut(list[j]);
+            renderPresets();
+            syncPresetToObs(list[i].name);
+            syncPresetToObs(list[j].name);
+        }
+        // ✎：名前を変える（同じ名前がほかにあれば変えない）
+        async function renamePreset(preset) {
+            const v = await overlayAsk(`「${preset.name}」の新しい名前`, { yes: '変える', input: preset.name });
+            if (typeof v !== 'string') return;
+            const name = v.trim();
+            if (!name || name === preset.name) return;
+            let list = [];
+            try { list = await presetAll(); } catch (err) { /* ignore */ }
+            if (list.some(p => p.name === name)) { await overlayNotice(`「${name}」はすでにあります。別の名前にしてください。`); return; }
+            await presetPut({ ...preset, name });
+            await presetDelete(preset.name);
+            settingsDone(`「${preset.name}」を「${name}」に変えました`);
+            renderPresets();
+            syncPresetToObs(name);
+        }
+
+        function presetRow(nameText, dateText, buttons, keyNum) {
             const row = document.createElement('div');
             row.className = 'preset-item';
+            const key = document.createElement('span');
+            key.className = 'preset-key help-desc' + (keyNum ? '' : ' none');
+            key.textContent = keyNum || '';
+            if (keyNum) key.title = `キーボードの ${keyNum} で読み込めます`;
+            row.appendChild(key);
             const name = document.createElement('span');
             name.className = 'preset-name help-desc';
             name.textContent = nameText;
@@ -4594,12 +4917,16 @@
             const date = document.createElement('span');
             date.className = 'preset-date help-desc';
             date.textContent = dateText;
-            row.append(name, date);
-            for (const [label, onClick] of buttons) {
+            const br = document.createElement('span');
+            br.className = 'preset-break';
+            row.append(name, date, br);
+            for (const [label, onClick, title, disabled, icon] of buttons) {
                 const b = document.createElement('button');
                 b.type = 'button';
-                b.className = 'settings-btn small';
+                b.className = 'settings-btn small' + (icon ? ' icon' : '');
                 b.textContent = label;
+                if (title) { b.title = title; b.setAttribute('aria-label', title); }
+                b.disabled = !!disabled;
                 b.addEventListener('click', onClick);
                 row.appendChild(b);
             }
@@ -4608,8 +4935,13 @@
 
         async function renderPresets() {
             let presets = [];
-            try { presets = await presetAll(); } catch (err) { console.error(err); }
-            presets.sort((a, b) => b.savedAt - a.savedAt);
+            try { presets = await presetsInOrder(); } catch (err) { console.error(err); }
+            renderObsUrls(presets);
+            const fixedNote = document.getElementById('fixed-preset-note');
+            if (FIXED_PRESET) {
+                const fp = presets.find(p => p.id === FIXED_PRESET) || presets.find(p => p.name === FIXED_PRESET);
+                fixedNote.textContent = fp ? `このページはプリセット「${fp.name}」を出しています（URL の preset）。` : `URL のプリセット（${FIXED_PRESET}）がまだ届いていません。Chrome で OBS に接続すると届きます。`;
+            } else fixedNote.textContent = '';
             presetListEl.textContent = '';
             let legacy = null;
             try { legacy = localStorage.getItem(LEGACY_KEY); } catch (err) { /* ignore */ }
@@ -4637,7 +4969,7 @@
                 presetListEl.appendChild(empty);
                 return;
             }
-            for (const preset of presets) {
+            for (const [i, preset] of presets.entries()) {
                 presetListEl.appendChild(presetRow(preset.name, fmtDate(preset.savedAt), [
                     ['読み込む', () => {
                         applyLoadedConfig(preset.state);
@@ -4654,15 +4986,59 @@
                         await presetDelete(preset.name);
                         settingsDone(`「${preset.name}」を削除しました`);
                         renderPresets();
+                        sendPresetOp('delete', { id: preset.id, name: preset.name });
                     }],
-                ]));
+                    // 並べ替え・名前の変更（プリセットに保存できるときだけ）
+                    ...(featureOn('presetSave') ? [
+                        ['↑', () => movePreset(preset.name, -1), '上へ', i === 0, true],
+                        ['↓', () => movePreset(preset.name, 1), '下へ', i === presets.length - 1, true],
+                        ['✎', () => renamePreset(preset), '名前を変える', false, true],
+                    ] : []),
+                    ['URL', () => copyPresetUrl(preset), 'OBS 用の URL をコピー（このプリセットを出し続ける）'],
+                ], i < 9 ? i + 1 : 0));
             }
         }
 
+        /* ---- 数字キー（1〜9）でプリセットを読み込む（並びは一覧と同じ。↑↓ で入れ替えられる）
+         *  文字の入力中・Ctrl などと一緒・表示専用（editLock）・プリセットの一覧を出さない設定のときは動かさない。
+         *  OBS 接続中は、キーを離したあとの送信（keyup）で OBS にも届く */
+        let presetToastTimer = 0;
+        function showPresetToast(text) {
+            if (window.obsstudio) return; // OBS の中では配信に映るので出さない
+            let el = document.getElementById('preset-toast');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'preset-toast';
+                el.setAttribute('role', 'status');
+                document.body.appendChild(el);
+            }
+            el.textContent = text;
+            el.classList.add('show');
+            clearTimeout(presetToastTimer);
+            presetToastTimer = setTimeout(() => el.classList.remove('show'), 1600);
+        }
+        document.addEventListener('keydown', async (e) => {
+            if (EDIT_LOCK || FIXED_PRESET || !featureOn('presetLoad') || askDone) return;
+            if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing || e.repeat) return;
+            if (!/^[1-9]$/.test(e.key)) return;
+            const t = e.target;
+            if (t instanceof Element && t.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
+            let presets = [];
+            try { presets = await presetsInOrder(); } catch (err) { console.error(err); return; }
+            const preset = presets[+e.key - 1];
+            if (!preset) { showPresetToast(`${e.key} 番のプリセットはありません`); return; }
+            applyLoadedConfig(preset.state);
+            saveCurrentConfig();
+            schedulePushToObs();
+            showPresetToast(`${e.key}：「${preset.name}」`);
+            if (obsModal.classList.contains('open')) settingsDone(`「${preset.name}」を読み込みました`);
+        });
+
         async function savePreset(name) {
             try {
-                await presetPut({ name, savedAt: Date.now(), state: buildObsState().state });
+                await presetPut({ id: await presetIdFor(name), name, savedAt: Date.now(), order: await presetSlot(name), state: buildObsState().state });
                 settingsDone(`「${name}」を保存しました`);
+                syncPresetToObs(name);
             } catch (err) {
                 console.error(err);
                 settingsStatus.textContent = '⚠️ 保存できませんでした（ブラウザの空き容量が足りない可能性があります。「ファイルに書き出す」も使えます）';
