@@ -1976,6 +1976,87 @@
             white-space: nowrap;
         }
 
+        /* ---- 背景画像（#uploaded-bg の中の .ubg-layer に画像。合わせ方・並べる・流すは data-* と inline style） */
+        #uploaded-bg {
+            overflow: hidden;
+        }
+
+        #uploaded-bg .ubg-layer {
+            position: absolute;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* 流す：1マスぶん動かしてくり返す（動く量は --ubg-dx / --ubg-dy、時間は inline の animation） */
+        @keyframes ubg-scroll {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(var(--ubg-dx, 0px), var(--ubg-dy, 0px));
+            }
+        }
+
+        /* 背景画像の設定画面（画面を見ながら変えられるよう、右に寄せて後ろは暗くしすぎない） */
+        #ubg-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.15);
+            z-index: 4500;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 3vw;
+        }
+
+        #ubg-modal.open {
+            display: flex;
+        }
+
+        #ubg-modal .help-popup {
+            width: 460px;
+        }
+
+        #ubg-modal select,
+        #ubg-modal input[type=range] {
+            flex: 1;
+            min-width: 0;
+        }
+
+        #ubg-modal select {
+            background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+            border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+            border-radius: 4px;
+            color: inherit;
+            font-family: inherit;
+            font-size: 14px;
+            padding: 5px 6px;
+        }
+
+        #ubg-modal select option {
+            color: #222;
+        }
+
+        #ubg-modal input[type=range] {
+            accent-color: var(--color-accent);
+        }
+
+        #ubg-modal output {
+            min-width: 64px;
+            text-align: right;
+            font-size: 13px;
+        }
+
+        #ubg-thumb {
+            width: 100%;
+            height: 110px;
+            border-radius: 6px;
+            border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+            background: color-mix(in srgb, var(--color-accent) 6%, transparent) center / contain no-repeat;
+            margin-bottom: 8px;
+        }
+
         /* 名前を入れる確認画面の入力欄 */
         #ask-input {
             display: block;
@@ -2468,6 +2549,46 @@
                 <button class="settings-btn" id="set-reset-btn" type="button" title="画面を初期状態に戻します（今の画面は消えます。プリセットは残ります）">🔄 画面リセット</button>
                 <span class="settings-credit help-desc">Created by どんま / donnma　web : <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
                 <button class="help-close-btn" id="obs-close-btn">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 背景画像の設定（合わせ方・並べる大きさ・流す向きと速さ）。背景の選択画面の「📁 背景画像を選ぶ」のあとと、「🖼️ 背景画像の表示」で開く -->
+    <div id="ubg-modal">
+        <div class="help-popup" role="dialog" aria-labelledby="ubg-title">
+            <div class="help-title" id="ubg-title">背景画像</div>
+            <div class="help-body">
+                <div id="ubg-thumb"></div>
+                <div class="obs-field help-desc"><span class="help-key">合わせ方</span>
+                    <select id="ubg-fit">
+                        <option value="cover">全体を覆う（はみ出たところは切る）</option>
+                        <option value="contain">全体を入れる（すき間ができる）</option>
+                        <option value="fill">引き伸ばす</option>
+                        <option value="tile">並べる（柄のように敷き詰める）</option>
+                    </select>
+                </div>
+                <div class="obs-field help-desc" id="ubg-tile-row"><span class="help-key">並べる大きさ</span><input type="range" id="ubg-tile" min="10" max="200" step="5"><output id="ubg-tile-out"></output></div>
+                <div class="obs-field help-desc"><span class="help-key">流す</span>
+                    <select id="ubg-scroll">
+                        <option value="none">止める</option>
+                        <option value="left">左へ</option>
+                        <option value="right">右へ</option>
+                        <option value="up">上へ</option>
+                        <option value="down">下へ</option>
+                        <option value="upleft">左上へ（斜め）</option>
+                        <option value="downright">右下へ（斜め）</option>
+                    </select>
+                </div>
+                <div class="obs-field help-desc" id="ubg-speed-row"><span class="help-key">流す速さ</span><input type="range" id="ubg-speed" min="5" max="300" step="5"><output id="ubg-speed-out"></output></div>
+                <div class="help-desc" style="opacity:0.7">大きな画像は 1920×1080 を覆える大きさまで縮めて入れます。流すときは画像をつなげてくり返します。</div>
+                <div class="obs-status help-desc" id="ubg-status" role="status"></div>
+                <div class="settings-row">
+                    <button class="settings-btn" id="ubg-pick" type="button">📁 画像を選び直す</button>
+                    <button class="settings-btn" id="ubg-remove" type="button">外す</button>
+                </div>
+            </div>
+            <div class="obs-buttons">
+                <button class="help-close-btn" id="ubg-close">CLOSE</button>
             </div>
         </div>
     </div>
@@ -5360,6 +5481,271 @@
             bgModal.classList.remove('open');
             handlePartMenuItem(btn.dataset.bg);
         }));
+
+        /* ---- 背景画像（全テーマ共通）
+         *  #uploaded-bg（背景パーツ）の中の .ubg-layer に画像を敷く。合わせ方・並べる大きさ・流す向きと速さは
+         *  #uploaded-bg の data-*（fit / tile / scroll / speed / w / h）に持ち、見た目は inline style に書く
+         *  （画面の HTML ごと保存・プリセット・OBS への送信をするので、流れる動きもそのまま引き継がれる）。
+         *  流すときは層を流す向きにだけ1マス広げて transform で動かす（background-position は動かさない＝OBS で重くしない）。
+         *  各テーマの promptBgUpload をここで差し替える（テーマの背景の選択画面・パーツメニューから呼ばれる） */
+        const UBG_DIRS = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1], upleft: [-1, -1], downright: [1, 1] };
+        const ubgModal = document.getElementById('ubg-modal');
+        const ubgEl = () => document.getElementById('uploaded-bg');
+        const ubgLayer = (bg) => bg.querySelector(':scope > .ubg-layer');
+
+        // 以前の背景画像（#uploaded-bg そのものに画像、donnma は captureArea に画像）を、今の形（.ubg-layer）に移す
+        function ubgAdopt() {
+            let bg = ubgEl();
+            let src = '';
+            if (bg && !ubgLayer(bg)) {
+                src = bg.style.backgroundImage;
+                bg.style.backgroundImage = '';
+            } else if (!bg && captureArea.style.backgroundImage && captureArea.style.backgroundImage !== 'none') {
+                src = captureArea.style.backgroundImage;
+                captureArea.style.backgroundImage = '';
+            }
+            if (!bg && !src) return null;
+            if (!bg) {
+                bg = document.createElement('div');
+                bg.id = 'uploaded-bg';
+                bg.className = 'bg-part';
+                captureArea.insertBefore(bg, captureArea.querySelector('.corner-tl') || captureArea.firstChild);
+            }
+            bg.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;';
+            if (!ubgLayer(bg)) {
+                const layer = document.createElement('div');
+                layer.className = 'ubg-layer';
+                bg.appendChild(layer);
+            }
+            if (src) ubgLayer(bg).style.backgroundImage = src;
+            return bg;
+        }
+
+        // data-* から見た目を作る
+        function ubgApply(bg) {
+            const layer = ubgLayer(bg);
+            if (!layer) return;
+            const fit = bg.dataset.fit || 'cover';
+            const dir = UBG_DIRS[bg.dataset.scroll] || null;
+            const w = +bg.dataset.w || 0, h = +bg.dataset.h || 0;
+            const W = captureArea.clientWidth || 1920, H = captureArea.clientHeight || 1080;
+            const s = layer.style;
+            if ((fit === 'tile' || dir) && w && h) {
+                let tw, th;
+                if (fit === 'tile') { const k = (+bg.dataset.tile || 100) / 100; tw = w * k; th = h * k; }
+                else if (fit === 'cover') { const c = Math.max(W / w, H / h); tw = w * c; th = h * c; }
+                else if (fit === 'contain') { const c = Math.min(W / w, H / h); tw = w * c; th = h * c; }
+                else { tw = W; th = H; }
+                tw = Math.max(8, Math.round(tw));
+                th = Math.max(8, Math.round(th));
+                const ax = dir ? dir[0] : 0, ay = dir ? dir[1] : 0;
+                s.inset = 'auto';
+                s.left = (ax > 0 ? -tw : 0) + 'px';
+                s.top = (ay > 0 ? -th : 0) + 'px';
+                s.width = W + (ax ? tw : 0) + 'px';
+                s.height = H + (ay ? th : 0) + 'px';
+                s.backgroundSize = `${tw}px ${th}px`;
+                s.backgroundRepeat = 'repeat';
+                s.backgroundPosition = '0 0';
+                if (dir) {
+                    const dx = ax * tw, dy = ay * th;
+                    const speed = Math.max(1, +bg.dataset.speed || 40);
+                    s.setProperty('--ubg-dx', dx + 'px');
+                    s.setProperty('--ubg-dy', dy + 'px');
+                    s.animation = `ubg-scroll ${(Math.hypot(dx, dy) / speed).toFixed(2)}s linear infinite`;
+                    s.willChange = 'transform';
+                } else {
+                    s.animation = '';
+                    s.willChange = '';
+                }
+            } else {
+                s.left = s.top = s.width = s.height = '';
+                s.inset = '0';
+                s.backgroundSize = fit === 'fill' ? '100% 100%' : (fit === 'tile' ? 'auto' : fit);
+                s.backgroundRepeat = fit === 'tile' ? 'repeat' : 'no-repeat';
+                s.backgroundPosition = 'center';
+                s.animation = '';
+                s.willChange = '';
+            }
+        }
+
+        // 画像の大きさが分からない（以前の画像）ときは読んでから
+        function ubgMeasure(bg) {
+            const layer = ubgLayer(bg);
+            if (!layer || (+bg.dataset.w && +bg.dataset.h)) return Promise.resolve();
+            const m = /url\(["']?(.*?)["']?\)$/.exec(layer.style.backgroundImage || '');
+            if (!m) return Promise.resolve();
+            return new Promise((resolve) => {
+                const im = new Image();
+                im.onload = () => { bg.dataset.w = im.naturalWidth; bg.dataset.h = im.naturalHeight; resolve(); };
+                im.onerror = () => resolve();
+                im.src = m[1];
+            });
+        }
+
+        // 選んだ画像を、1920×1080 を覆える大きさまで縮めて WebP に（小さい GIF は動きを残すためそのまま）
+        function ubgShrink(file) {
+            return new Promise((resolve, reject) => {
+                const r = new FileReader();
+                r.onload = () => {
+                    const src = r.result;
+                    const im = new Image();
+                    im.onload = () => {
+                        if (file.type === 'image/gif' && file.size <= 2 * 1024 * 1024) { resolve({ src, w: im.naturalWidth, h: im.naturalHeight }); return; }
+                        const k = Math.min(1, Math.max(1920 / im.naturalWidth, 1080 / im.naturalHeight));
+                        const cv = document.createElement('canvas');
+                        cv.width = Math.round(im.naturalWidth * k);
+                        cv.height = Math.round(im.naturalHeight * k);
+                        cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+                        let out = cv.toDataURL('image/webp', 0.88);
+                        if (!out.startsWith('data:image/webp')) out = cv.toDataURL('image/jpeg', 0.88);
+                        resolve({ src: out, w: cv.width, h: cv.height });
+                    };
+                    im.onerror = () => reject(new Error('画像を読めませんでした'));
+                    im.src = src;
+                };
+                r.onerror = () => reject(r.error);
+                r.readAsDataURL(file);
+            });
+        }
+
+        function ubgFillForm() {
+            const bg = ubgEl();
+            const has = !!(bg && ubgLayer(bg));
+            document.getElementById('ubg-fit').value = (bg && bg.dataset.fit) || 'cover';
+            document.getElementById('ubg-tile').value = (bg && bg.dataset.tile) || 100;
+            document.getElementById('ubg-scroll').value = (bg && bg.dataset.scroll) || 'none';
+            document.getElementById('ubg-speed').value = (bg && bg.dataset.speed) || 40;
+            document.getElementById('ubg-thumb').style.backgroundImage = has ? ubgLayer(bg).style.backgroundImage : '';
+            document.getElementById('ubg-remove').disabled = !has;
+            ubgRows();
+        }
+        function ubgRows() {
+            const fit = document.getElementById('ubg-fit').value, scroll = document.getElementById('ubg-scroll').value;
+            document.getElementById('ubg-tile-row').style.display = fit === 'tile' ? '' : 'none';
+            document.getElementById('ubg-speed-row').style.display = scroll !== 'none' ? '' : 'none';
+            document.getElementById('ubg-tile-out').textContent = document.getElementById('ubg-tile').value + '%';
+            document.getElementById('ubg-speed-out').textContent = document.getElementById('ubg-speed').value + 'px/秒';
+        }
+        function ubgFromForm() {
+            ubgRows();
+            const bg = ubgEl();
+            if (!bg || !ubgLayer(bg)) return;
+            bg.dataset.fit = document.getElementById('ubg-fit').value;
+            bg.dataset.tile = document.getElementById('ubg-tile').value;
+            bg.dataset.scroll = document.getElementById('ubg-scroll').value;
+            bg.dataset.speed = document.getElementById('ubg-speed').value;
+            ubgApply(bg);
+        }
+        ['ubg-fit', 'ubg-tile', 'ubg-scroll', 'ubg-speed'].forEach(id => {
+            document.getElementById(id).addEventListener('input', ubgFromForm);
+            document.getElementById(id).addEventListener('change', ubgFromForm);
+        });
+
+        async function openUbgModal() {
+            const bg = ubgAdopt();
+            if (bg) { await ubgMeasure(bg); ubgApply(bg); }
+            document.getElementById('ubg-status').textContent = bg ? '' : 'まだ背景画像はありません。「画像を選び直す」で入れてください。';
+            ubgFillForm();
+            ubgModal.classList.add('open');
+        }
+        function overlayPromptBgUpload() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+            input.addEventListener('change', async () => {
+                const file = input.files && input.files[0];
+                input.remove();
+                if (!file) return;
+                const status = document.getElementById('ubg-status');
+                try {
+                    const img = await ubgShrink(file);
+                    let bg = ubgAdopt();
+                    if (!bg) {
+                        bg = document.createElement('div');
+                        bg.id = 'uploaded-bg';
+                        bg.className = 'bg-part';
+                        bg.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;';
+                        captureArea.insertBefore(bg, captureArea.querySelector('.corner-tl') || captureArea.firstChild);
+                    }
+                    if (!ubgLayer(bg)) { const l = document.createElement('div'); l.className = 'ubg-layer'; bg.appendChild(l); }
+                    ubgLayer(bg).style.backgroundImage = `url('${img.src}')`;
+                    // 土台の背景は1つだけ：うさぎ柄（donnma）は外す
+                    captureArea.querySelectorAll('.bg-part.bg-pattern').forEach(old => { if (old._menu) old._menu.remove(); old.remove(); });
+                    bg.dataset.w = img.w;
+                    bg.dataset.h = img.h;
+                    if (!bg.dataset.fit) bg.dataset.fit = 'cover';
+                    ubgApply(bg);
+                    ubgFillForm();
+                    status.textContent = `✅ 画像を入れました（${Math.round(img.src.length * 0.75 / 1024)}KB）`;
+                    ubgModal.classList.add('open');
+                    // 保存と OBS への送信（操作のあとの自動の分は、ファイル選択では起きないことがあるので）
+                    clearTimeout(autoSaveTimer);
+                    autoSaveTimer = setTimeout(autoSave, 300);
+                    schedulePushToObs();
+                } catch (err) {
+                    status.textContent = '⚠️ ' + err.message;
+                    ubgModal.classList.add('open');
+                }
+            });
+            document.body.appendChild(input);
+            input.click();
+        }
+        // 各テーマの promptBgUpload を差し替える（背景の選択画面・パーツメニューの「背景画像を選ぶ」）
+        promptBgUpload = overlayPromptBgUpload;
+
+        /* 背景の重なり：背景画像はいつもいちばん後ろ（飾りはあとから選んでも画像の上に出る）。
+         *  テーマによって背景パーツの入る位置が違う（先頭に入れるものがある）ので、増えたら並べ直す。
+         *  うさぎ柄（donnma の土台の背景）が足されたら、背景画像は外す（土台は1つだけ） */
+        new MutationObserver((list) => {
+            const bg = ubgEl();
+            if (!bg) return;
+            const added = list.flatMap(m => Array.from(m.addedNodes)).filter(n => n.nodeType === 1);
+            if (added.some(n => n !== bg && n.classList.contains('bg-part') && n.classList.contains('bg-pattern'))) {
+                bg.remove();
+                return;
+            }
+            if (captureArea.firstElementChild !== bg) captureArea.prepend(bg);
+        }).observe(captureArea, { childList: true });
+
+        // 背景の色：画像があると色は画像の下になって見えないので、外すか聞く（全体を入れるときのすき間の色に使うなら残す）
+        {
+            const themeColor = promptBgColor;
+            promptBgColor = async function () {
+                const bg = ubgEl();
+                if (bg && ubgLayer(bg) && ubgLayer(bg).style.backgroundImage) {
+                    const r = await overlayAsk('背景画像があると、背景の色は画像の下になって見えません。背景画像を外して、色の背景にしますか？', { yes: '画像を外す', no: '画像は残す（すき間の色）' });
+                    if (r === null) return;
+                    if (r === true) bg.remove();
+                }
+                themeColor();
+            };
+        }
+
+        document.getElementById('ubg-pick').addEventListener('click', overlayPromptBgUpload);
+        document.getElementById('ubg-remove').addEventListener('click', async () => {
+            if ((await overlayAsk('背景画像を外しますか？', { yes: '外す' })) !== true) return;
+            const bg = ubgEl();
+            if (bg) bg.remove();
+            ubgFillForm();
+            document.getElementById('ubg-status').textContent = '背景画像を外しました';
+        });
+        document.getElementById('ubg-close').addEventListener('click', () => ubgModal.classList.remove('open'));
+        ubgModal.addEventListener('click', (e) => { if (e.target === ubgModal) ubgModal.classList.remove('open'); });
+
+        // 背景の選択画面の「📁 背景画像を選ぶ」の隣に「🖼️ 背景画像の表示」を足す
+        {
+            const up = bgModal.querySelector('[data-bg="bg-upload"]');
+            if (up) {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = up.className;
+                b.textContent = '🖼️ 背景画像の表示（合わせ方・流す）';
+                b.addEventListener('click', () => { bgModal.classList.remove('open'); openUbgModal(); });
+                up.insertAdjacentElement('afterend', b);
+            }
+        }
         document.getElementById('bg-close-btn').addEventListener('click', () => bgModal.classList.remove('open'));
         bgModal.addEventListener('click', (e) => { if (e.target === bgModal) bgModal.classList.remove('open'); });
 
