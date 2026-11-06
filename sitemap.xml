@@ -141,6 +141,16 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://donnma.com/tool/overlay/minimal/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://donnma.com/tool/overlay/minimal-black/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://donnma.com/tool/authenticator-autofill/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
