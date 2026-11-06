@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINIMAL BLACK オーバーレイ — 説明書</title>
+    <meta name="description" content="OBS Studio用の無料配信オーバーレイ「MINIMAL BLACK オーバーレイ — 説明書」の使い方。">
+    <meta property="og:title" content="MINIMAL BLACK オーバーレイ — 説明書 | どんまうんど-Tools">
+    <meta property="og:description" content="OBS Studio用の無料配信オーバーレイ「MINIMAL BLACK オーバーレイ — 説明書」の使い方。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://donnma.com/tool/overlay/minimal-black/">
+    <meta property="og:site_name" content="どんまうんど-Tools">
+    <meta property="og:image" content="https://donnma.com/tool/image/ogp-overlay.jpg?v=20261005a">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="配信オーバーレイ">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@donnma777">
+    <link rel="icon" href="../../favicon.ico">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --accent: #f1efea;
+            --accent-dark: #f1efea;
+            --bg: #141414;
+            --card-bg: #1e1e1e;
+            --border: rgba(241, 239, 234, 0.14);
+            --text: #f1efea;
+            --sub: #a8a59f;
+            --code-bg: rgba(241, 239, 234, 0.06);
+            --dot: #e5484d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Zen Kaku Gothic New', 'Inter', sans-serif;
+            font-size: 15px;
+            line-height: 1.85;
+            padding: 48px 24px 80px;
+        }
+
+        .wrap {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        /* ヘッダー */
+        .doc-header {
+            text-align: center;
+            padding: 40px 0 36px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 48px;
+        }
+
+        .doc-kamon {
+            font-size: 40px;
+            color: var(--accent);
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+            opacity: 0.7;
+        }
+
+        .doc-title {
+            font-family: 'Inter', 'Zen Kaku Gothic New', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--accent);
+            letter-spacing: 6px;
+            margin-bottom: 6px;
+        }
+
+        .doc-sub {
+            font-size: 13px;
+            color: var(--sub);
+            letter-spacing: 2px;
+        }
+
+        /* セクション */
+        .section {
+            margin-bottom: 44px;
+        }
+
+        .section-title {
+            font-family: 'Inter', 'Zen Kaku Gothic New', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 13px;
+            background: var(--accent);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        /* カード */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 20px 24px;
+            margin-bottom: 14px;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent);
+            border-radius: 2px 0 0 2px;
+        }
+
+        .card-title {
+            font-family: 'Inter', 'Zen Kaku Gothic New', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .card p {
+            color: var(--sub);
+            font-size: 14px;
+        }
+
+        /* テーブル */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-family: 'Inter', 'Zen Kaku Gothic New', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--accent);
+            letter-spacing: 1px;
+            background: rgba(20, 20, 20, 0.04);
+        }
+
+        td {
+            color: var(--sub);
+        }
+
+        td:first-child {
+            color: var(--text);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* コードブロック */
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            padding: 2px 7px;
+            font-size: 12px;
+            color: var(--accent-dark);
+            border-radius: 2px;
+        }
+
+        /* ステップリスト */
+        .steps {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .steps li {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 14px 18px;
+        }
+
+        .step-num {
+            font-family: 'Inter', 'Zen Kaku Gothic New', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--accent);
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-body {
+            flex: 1;
+            font-size: 14px;
+            color: var(--sub);
+        }
+
+        .step-body strong {
+            color: var(--text);
+        }
+
+        /* キーバッジ */
+        .key {
+            display: inline-block;
+            font-family: 'Inter', 'Zen Kaku Gothic New', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+            background: rgba(241, 239, 234, 0.06);
+            border: 1px solid rgba(241, 239, 234, 0.3);
+            padding: 2px 10px;
+            border-radius: 2px;
+            white-space: nowrap;
+        }
+
+        /* 背景パーツ説明 */
+        .bg-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .bg-swatch {
+            flex: 1;
+            min-width: 200px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .bg-swatch-preview {
+            height: 56px;
+            width: 100%;
+            position: relative;
+        }
+
+        .bg-swatch-koshi {
+            background-image:
+                linear-gradient(rgba(20, 20, 20, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(20, 20, 20, 0.15) 1px, transparent 1px);
+            background-size: 24px 24px;
+            background-color: #faf6f0;
+        }
+
+        .bg-swatch-take {
+            background-image:
+                repeating-linear-gradient(90deg,
+                    rgba(70, 110, 55, 0.13) 0px,
+                    rgba(70, 110, 55, 0.2) 3px,
+                    transparent 3px, transparent 29px);
+            background-color: #faf6f0;
+        }
+
+        .bg-swatch-sakura {
+            background:
+                radial-gradient(ellipse at 25% 30%, rgba(234, 180, 198, 0.5) 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 70%, rgba(210, 155, 180, 0.4) 0%, transparent 50%),
+                #faf6f0;
+        }
+
+        .bg-swatch-body {
+            padding: 10px 14px 14px;
+        }
+
+        .bg-swatch-name {
+            font-family: 'Inter', 'Zen Kaku Gothic New', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 2px;
+        }
+
+        .bg-swatch-desc {
+            font-size: 12px;
+            color: var(--sub);
+        }
+
+        /* カラー */
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .color-row:last-child {
+            border-bottom: none;
+        }
+
+        .color-chip {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .color-meta {
+            flex: 1;
+        }
+
+        .color-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .color-code {
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            color: var(--sub);
+        }
+
+        /* フッター */
+        .doc-footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--sub);
+        }
+
+        .doc-footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .doc-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .doc-footer .credit {
+            font-family: 'Inter', 'Zen Kaku Gothic New', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        /* ヒントボックス */
+        .hint {
+            background: rgba(20, 20, 20, 0.05);
+            border: 1px solid rgba(20, 20, 20, 0.2);
+            border-left: 3px solid var(--accent);
+            padding: 12px 16px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--sub);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .hint strong {
+            color: var(--text);
+        }
+
+        /* 2カラム */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+        }
+    
+        /* ---- MINIMAL：枠と飾りを減らした紙の見た目 ---- */
+        .doc-header { text-align: left; border-bottom: 2px solid var(--text); padding: 24px 0 20px; }
+        .doc-title { font-size: 44px; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 10px; }
+        .doc-title::after { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--dot); margin-left: 8px; vertical-align: 6px; }
+        .doc-sub { font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+        .section-title { font-size: 12px; letter-spacing: 0.16em; border-bottom: 1px solid var(--text); }
+        .section-title::before { display: none; }
+        .card { border-radius: 10px; border-color: transparent; box-shadow: 0 1px 0 rgba(20, 20, 20, 0.06); padding: 22px 26px; }
+        .card::before { display: none; }
+        .card-title { font-weight: 700; }
+        .steps li { border-radius: 10px; border-color: transparent; }
+        .step-num { border-radius: 50%; background: var(--text); color: #141414; }
+        code { border-radius: 4px; color: var(--text); }
+        .key { border-radius: 999px; color: var(--text); }
+        .hint { border: none; border-left: 2px solid var(--text); background: rgba(241, 239, 234, 0.05); border-radius: 0; }
+        .color-chip { border-radius: 50%; }
+        .bg-swatch { border-radius: 10px; overflow: hidden; }
+        .bg-swatch-paper { background: #f4f2ee; }
+        .bg-swatch-mist { background: #e7ebee; }
+        .bg-swatch-blush { background: #f3e7e4; }
+        .bg-swatch-ink { background: #141414; }
+        .bg-swatch-lines { background-color: #f4f2ee; background-image: linear-gradient(rgba(20, 20, 20, .12) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 20, 20, .12) 1px, transparent 1px); background-size: 24px 24px; }
+        .bg-swatch-preview { box-shadow: inset 0 0 0 1px rgba(241, 239, 234, 0.15); }
+</style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <div class="doc-header">
+            <div class="doc-title">MINIMAL BLACK</div>
+            <div class="doc-sub">Frameless Stream Overlay — User Guide</div>
+        </div>
+
+        <!-- 概要 -->
+        <div class="section">
+            <div class="section-title">概要 / Overview</div>
+            <div class="card">
+                <div class="card-title">MINIMAL BLACK について</div>
+                <p>枠や飾りをなくし、文字と余白だけで見せるミニマルな配信オーバーレイです。MINIMAL の黒い版です。黒い地に、白い文字と小さな赤い点だけ。ゲーム画面や雑談の邪魔をしません。OBS の「ブラウザソース」に読み込んで使用します。すべての設定はブラウザ内に保存されるため、外部ファイルは不要です。</p>
+                <p>同じフォルダの <a href="waiting.html" style="color: inherit; text-decoration: underline;">waiting.html</a> は、配信の前・休憩中・終わりに出す待機画面です（同じ見た目。使い方はこのページの「待機画面」）。</p>
+            </div>
+            <div class="hint">
+                <strong>推奨設定：</strong> キャンバスサイズ 1920 × 1080 px、OBS ブラウザソース幅 1920・高さ 1080、「OBSと同じ解像度を使用する」を有効に。
+            </div>
+        </div>
+
+        <!-- 基本操作 -->
+        <div class="section">
+            <div class="section-title">基本操作 / Basic Operations</div>
+            <table>
+                <tr>
+                    <th>操作</th>
+                    <th>内容</th>
+                </tr>
+                <tr>
+                    <td><span class="key">ダブルクリック</span></td>
+                    <td>何もない場所でパーツ追加メニューを開く</td>
+                </tr>
+                <tr>
+                    <td><span class="key">ヘッダーをドラッグ</span></td>
+                    <td>ボックスを移動する</td>
+                </tr>
+                <tr>
+                    <td><span class="key">長押し（0.2秒）</span></td>
+                    <td>ボックス内のどこでも長押し → そのままドラッグで移動</td>
+                </tr>
+                <tr>
+                    <td><span class="key">角・辺のハンドル</span></td>
+                    <td>ホバーで表示、ドラッグでリサイズ</td>
+                </tr>
+                <tr>
+                    <td><span class="key">≡ ボタン</span></td>
+                    <td>ボックス右上に出現 → 複製・文字サイズ・色変更・削除</td>
+                </tr>
+                <tr>
+                    <td><span class="key">ヘッダー文字</span></td>
+                    <td>クリックで直接編集できます</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- パーツ一覧 -->
+        <div class="section">
+            <div class="section-title">パーツ一覧 / Parts</div>
+
+            <div class="card">
+                <div class="card-title">ヘッダーパーツ</div>
+                <table>
+                    <tr>
+                        <th>パーツ名</th>
+                        <th>説明</th>
+                    </tr>
+                    <tr>
+                        <td>🔴 配信中バッジ</td>
+                        <td>赤い点つきの「LIVE」ラベル。文字は直接編集可能</td>
+                    </tr>
+                    <tr>
+                        <td>👤 プロフィール欄</td>
+                        <td>複数行を自動スクロール表示。ダブルクリックで編集</td>
+                    </tr>
+                    <tr>
+                        <td>✉️ メッセージ入力欄</td>
+                        <td>自由にテキストを入力できる横長バー</td>
+                    </tr>
+                    <tr>
+                        <td>🕐 時計（バー埋め込み型）</td>
+                        <td>日付＋時刻を常時表示する時計バー</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">ボックスパーツ</div>
+                <table>
+                    <tr>
+                        <th>パーツ名</th>
+                        <th>説明</th>
+                    </tr>
+                    <tr>
+                        <td>🕐 時計（独立）</td>
+                        <td>自由配置できる独立した時計ボックス</td>
+                    </tr>
+                    <tr>
+                        <td>⏱ ストップウォッチ</td>
+                        <td>開始・停止・リセット付きのタイマー。ストップウォッチは時間を押すと開始・停止し、≡ メニューでリセットや、配信・録画・リプレイバッファ・仮想カメラとの連動ができます。連動すると、OBS でそれを始めたときに自動で数えます。</td>
+                    </tr>
+                    <tr>
+                        <td>🔢 カウンター</td>
+                        <td>＋／－／リセット付き。ステップ値を変更可能</td>
+                    </tr>
+                    <tr>
+                        <td>📝 メモボックス</td>
+                        <td>メモ用テキスト入力ボックス</td>
+                    </tr>
+                    <tr>
+                        <td>▭ テキスト入力</td>
+                        <td>ヘッダーなしのシンプルなテキスト欄</td>
+                    </tr>
+                    <tr>
+                        <td>◻ 図形（四角形）</td>
+                        <td>リサイズ・色変更できる四角形</td>
+                    </tr>
+                    <tr>
+                        <td>○ 図形（円）</td>
+                        <td>リサイズ・色変更できる円形</td>
+                    </tr>
+                    <tr>
+                        <td>🏷 タイトルボックス</td>
+                        <td>タイトル表示用の大きな文字ボックス</td>
+                    </tr>
+                    <tr>
+                        <td>🖼 画像ボックス</td>
+                        <td>クリックまたはドラッグ＆ドロップで画像を表示</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">背景パーツ</div>
+                <div class="bg-swatches" style="margin-top:8px;">
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-paper"></div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">ペーパー（地の色）</div>
+                            <div class="bg-swatch-desc">少し温かい白。文字は黒になります</div>
+                        </div>
+                    </div>
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-mist"></div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">ミスト（地の色）</div>
+                            <div class="bg-swatch-desc">青みのある明るいグレー</div>
+                        </div>
+                    </div>
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-blush"></div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">ブラッシュ（地の色）</div>
+                            <div class="bg-swatch-desc">ほんのり赤みのある白</div>
+                        </div>
+                    </div>
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-ink"></div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">墨（地の色）</div>
+                            <div class="bg-swatch-desc">黒い地。はじめの色</div>
+                        </div>
+                    </div>
+                    <div class="bg-swatch">
+                        <div class="bg-swatch-preview bg-swatch-lines"></div>
+                        <div class="bg-swatch-body">
+                            <div class="bg-swatch-name">┼ 細い罫線</div>
+                            <div class="bg-swatch-desc">方眼紙のような薄い線を重ねる</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hint" style="margin-top:14px;">
+                    地の色は「🖼️ 背景を変える」で4色から1つ選びます（選び直すと入れ替わります）。はじめは墨で、明るい地を選ぶと文字は黒になります。罫線は地の色に重ねて使えます。<br>
+                    箱の見出しの前の短い線（— TITLE）は、同じ画面の<strong>見出しの前の線</strong>で「線あり／線なし」を選べます。<strong>≡ メニュー → 削除</strong> で個別に取り除けます。<br>
+                    「🖼️ 背景を変える」の <strong>背景をすべて消す</strong> を選ぶとすべての背景パーツが消えます。<br>
+                    「🖼️ 背景を変える」の <strong>背景画像を選ぶ</strong> では任意の画像を背景として使えます。背景画像は、選んだあと（あとからは「🖼️ 背景画像の表示」）で、全体を覆う・全体を入れる・引き伸ばす・並べる（柄のように敷き詰める）と、流す向き・速さを選べます。
+                </div>
+            </div>
+        </div>
+
+        <!-- 保存・プリセット -->
+        <div class="section">
+            <div class="section-title"><span class="icon">💾</span> 保存・プリセット / Save &amp; Presets</div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body"><strong>自動保存</strong> — 今の画面は、操作するたびに自動でこのブラウザに保存されます。次に開いたときは続きから始まります。</div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body"><strong>プリセット</strong> — 「⚙️ 設定」で今の画面に名前を付けて、いくつでも保存できます（例：雑談用・ゲーム実況用）。一覧から読み込む・上書き・削除ができます。一覧は ↑↓ で好きな順に並べ替えられ、✎ で名前も変えられます。キーボードの 1〜9 を押すと、一覧の上から順に読み込めます（文字の入力中は効きません）。</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body"><strong>ファイルに書き出す</strong> — 今の画面とすべてのプリセットを、画像も含めて1つのJSONファイルにまとめてダウンロードします。別のPCへの持ち運びやバックアップに使えます。</div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-body"><strong>ファイルから読み込む</strong> — 書き出したJSONファイルから、今の画面とプリセットを復元します。同じ名前のプリセットがあるときは上書きするか確認します。以前の形式のファイルも読み込めます。</div>
+                </li>
+                <li>
+                    <div class="step-num">5</div>
+                    <div class="step-body"><strong>画面リセット</strong> — 「⚙️ 設定」から、画面を初期状態に戻します（今の画面は消えます。プリセットは残ります）。</div>
+                </li>
+                <li>
+                    <div class="step-num">6</div>
+                    <div class="step-body"><strong>以前の「設定を保存」</strong> — 前のバージョンで「設定を保存」していた内容は、プリセット一覧の先頭に「以前の『設定を保存』」として残っています。</div>
+                </li>
+            </ul>
+            <div class="card">
+                <div class="card-title">保存先について</div>
+                <p>保存先はこのブラウザの中（IndexedDB）です。<code>file://</code> で開いたときと <code>http://localhost</code> で開いたとき、またブラウザが違うときは、それぞれ別の保存になります。別のPCやブラウザへは「ファイルに書き出す」で持っていってください。</p>
+            </div>
+        </div>
+
+        <!-- リアルタイムプレビュー -->
+        <div class="section">
+            <div class="section-title">リアルタイムプレビュー / Real-time Preview</div>
+            <div class="card">
+                <div class="card-title">📡 表示更新（別タブ）</div>
+                <p>パーツメニューの「表示更新」を押すと、今の編集内容を同じURLで開いている別タブへ即座に反映できます。編集用タブと配信確認用タブを並べて作業したいときに便利です。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">条件：同一オリジン</div>
+                <p>2つのタブが同じオリジン（同じURL）で開かれている必要があります。ファイルをダブルクリックして <code>file://</code>
+                    で直接開いた場合、ブラウザによっては2タブ間でデータが共有されず、この機能が動作しません。<code>http://</code> または <code>https://</code>
+                    経由で開いてください。</p>
+            </div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body">同梱の <code>サーバー起動.bat</code> をダブルクリックする（要 Python）。</div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body">自動でブラウザタブが2つ開く（編集用・確認用、どちらも同じURL）。</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body">片方のタブで編集し、メニューから「表示更新」を押す。</div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-body">もう一方のタブに変更が即座に反映される。</div>
+                </li>
+                <li>
+                    <div class="step-num">5</div>
+                    <div class="step-body">終わったら、開いたウィンドウで何かキーを押すとローカルサーバーが停止する。</div>
+                </li>
+            </ul>
+            <div class="card">
+                <div class="card-title">Pythonが必要です</div>
+                <p>このPCにPythonが入っていない場合、<code>サーバー起動.bat</code> を実行してもエラーになります。<a
+                        href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a>
+                    からダウンロード・インストールしてください（インストール時に「Add python.exe to PATH」に必ずチェック）。インストール後、
+                    <code>サーバー起動.bat</code> を再度実行すれば起動します。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">配信本番では</div>
+                <p>OBSの「Custom Browser Dock」と「ブラウザソース」の両方に<strong>同じ公開URL</strong>を設定すれば、ローカルサーバーなしでもこの機能はそのまま使えます。</p>
+            </div>
+        </div>
+
+        <!-- OBS接続 -->
+        <div class="section">
+            <div class="section-title"><span class="icon">🔌</span> OBS接続 / OBS Connect</div>
+            <div class="card">
+                <div class="card-title">🔌 Chromeでの編集をOBSにそのまま反映</div>
+                <p>Chromeで開いたこの画面から、OBSのWebSocketサーバーに接続すると、編集内容をOBSのブラウザソースにそのまま反映できます。「対話」ウィンドウで操作する必要がなくなります（「表示更新」は同じブラウザのタブどうしでしか届かないため、OBSへはこちらを使います）。</p>
+            </div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body">OBSのメニュー <strong>「ツール → WebSocketサーバー設定」</strong> で「WebSocketサーバーを有効にする」をオンにし、「接続情報を表示」でポートとパスワードを確認する（最初の1回だけ）。</div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body">OBSのブラウザソースには、今までどおりこのHTMLファイルを入れておく。</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body">同じPCのChromeで同じHTMLファイルを開き、空いている場所をダブルクリック → <strong>「⚙️ 設定」</strong> → 「OBS接続」にポートとパスワードを入れて <strong>「接続」</strong>。</div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-body">Chromeで編集すると、OBSのブラウザソースにそのまま反映されます。OBS側にも保存されるので、OBSを再起動しても消えません。</div>
+                </li>
+            </ul>
+            <div class="card">
+                <div class="card-title">リアルタイム</div>
+                <p>編集すると、少しあとに自動でOBSへ送ります。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">確定したときだけ</div>
+                <p>メニューの「📤 OBSに反映」か Ctrl+Enter を押したときだけ送ります。配信中にこっそり直したいとき向けです。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">注意</div>
+                <p>ChromeとOBSは同じPCで動かしてください（スマホなど別の機器からは接続できません）。Chromeが「ローカルネットワークへのアクセス」を確認してきたら許可してください。ポート・パスワードはこのブラウザに保存され、次に開いたときは自動で再接続します。OBS 28 以降が必要です。OBS のブラウザソースに入れる URL は、設定画面の「OBS 用の URL」からコピーできます（幅 1920・高さ 1080 で置いてください）。プリセットごとの URL もあり、シーンごとに別のプリセットを出し続けられます（OBS に接続すると、Chrome のプリセットが OBS にも届きます）。</p>
+            </div>
+        </div>
+
+        <!-- 待機画面 -->
+        <div class="section">
+            <div class="section-title"><span class="icon">⏳</span> 待機画面 / Standby Screen</div>
+            <div class="card">
+                <div class="card-title">⏳ 配信の前・休憩中・終わりに出す画面</div>
+                <p>このテーマと同じ見た目の待機画面を用意しています。オーバーレイ本体とは別のページ（同じフォルダの <a href="waiting.html" style="color: inherit; text-decoration: underline;">waiting.html</a>）です。</p>
+            </div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body">OBS に待機用のシーンを作り、ブラウザソースで同じフォルダの <strong>waiting.html</strong> を読み込む（幅 1920・高さ 1080）。</div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body">ソースを右クリック →「対話」で開いた画面をダブルクリックすると、設定画面が開きます（Chrome で開いたときは右下の ⚙ でも開けます）。</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body">場面を選び、文字や開始時刻を入れる。</div>
+                </li>
+            </ul>
+            <div class="card">
+                <div class="card-title">場面</div>
+                <p>「まもなく開演」「中入り」「終演」「お知らせ」の4つ。設定画面のボタンか、キーボードの 1〜4 で切り替えます。4つ目は名前も自由に変えられます。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">残り時間</div>
+                <p>開始・再開の時刻を入れると残り時間を表示し、時間になると「まもなく始まります」などに変わります。「+5分後」「+10分後」「+15分後」のボタンで入れられます。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">背景</div>
+                <p>テーマの柄・画像・単色・なし（透明）から選べます。画像は画面にドラッグしても入れられ、並べる・流す（スクロール）・うすめる・ぼかしもできます。場面ごとに別の背景にもできます。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">表示する部品</div>
+                <p>場面のバッジ・日付・時刻・アイコン・英字・残り時間・配信タイトル・プロフィール・流れる文字を、それぞれ出す／出さないにできます。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">保存</div>
+                <p>変えた内容は自動で保存されます。名前を付けたプリセットや、ファイルへの書き出し・読み込みもできます。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">OBS接続</div>
+                <p>Chrome で開いた待機画面から OBS に接続すると、Chrome での変更（場面の切り替えも）を OBS の待機画面にそのまま反映できます。ポート・パスワードはオーバーレイ本体で入れたものを使います。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">OBS 用の URL</div>
+                <p>設定画面の「OBS」タブで、場面を決めた URL（例：<code>waiting.html?mode=break</code>）をコピーできます。場面ごとにシーンを分けたいときに使います。</p>
+            </div>
+            <div class="card">
+                <div class="card-title">注意</div>
+                <p>待機画面の設定は、オーバーレイ本体とは別に保存されます（同じブラウザ、OBS なら OBS の中）。背景の画像は大きいと保存できないことがあるので、そのときは小さめの画像にしてください。</p>
+            </div>
+        </div>
+
+        <!-- カスタマイズ -->
+        <div class="section">
+            <div class="section-title">カスタマイズ / Customization</div>
+            <div class="card">
+                <div class="card-title">CONFIG 設定（HTML 内）</div>
+                <p>ファイル上部の <code>const CONFIG = { ... }</code> ブロックを編集することで、色・テキスト・アニメーション間隔などを変更できます。</p>
+            </div>
+            <table style="margin-top:0;">
+                <tr>
+                    <th>設定項目</th>
+                    <th>初期値</th>
+                    <th>説明</th>
+                </tr>
+                <tr>
+                    <td><code>color.accent</code></td>
+                    <td><code>#141414</code></td>
+                    <td>線・ラベルなどのメインカラー（墨）</td>
+                </tr>
+                <tr>
+                    <td><code>color.liveBadge</code></td>
+                    <td><code>transparent</code></td>
+                    <td>LIVE バッジの背景色（はじめは透明。赤い点だけ）</td>
+                </tr>
+                <tr>
+                    <td><code>color.background</code></td>
+                    <td><code>#141414</code></td>
+                    <td>画面の背景色（墨）</td>
+                </tr>
+                <tr>
+                    <td><code>color.bodyText</code></td>
+                    <td><code>#f1efea</code></td>
+                    <td>コメント・メモの文字色</td>
+                </tr>
+                <tr>
+                    <td><code>text.liveBadge</code></td>
+                    <td><code>LIVE</code></td>
+                    <td>バッジに表示する文字</td>
+                </tr>
+                <tr>
+                    <td><code>text.titleBoxHeader</code></td>
+                    <td><code>TITLE</code></td>
+                    <td>タイトルボックスのヘッダー</td>
+                </tr>
+                <tr>
+                    <td><code>text.commentBoxHeader</code></td>
+                    <td><code>COMMENT</code></td>
+                    <td>コメントボックスのヘッダー</td>
+                </tr>
+                <tr>
+                    <td><code>text.memoBoxHeader</code></td>
+                    <td><code>MEMO</code></td>
+                    <td>メモボックスのヘッダー</td>
+                </tr>
+                <tr>
+                    <td><code>profile</code></td>
+                    <td>3行の配列</td>
+                    <td>プロフィール欄に表示する文字列リスト</td>
+                </tr>
+                <tr>
+                    <td><code>animation.profileInterval</code></td>
+                    <td><code>3000</code>（ms）</td>
+                    <td>プロフィールの切替間隔</td>
+                </tr>
+                <tr>
+                    <td><code>features.autoLoad</code></td>
+                    <td><code>true</code></td>
+                    <td>ページを開いたとき、前回の画面（自動保存）から始める。<code>false</code> にすると毎回初期状態から始まります。</td>
+                </tr>
+                <tr>
+                    <td><code>features.saveConfigEnabled</code></td>
+                    <td><code>true</code></td>
+                    <td>今の画面を自動で保存する。<code>false</code> にすると自動保存しません（プリセット・ファイル書き出しは使えます）。</td>
+                </tr>
+                <tr>
+                    <td><code>features.presetSave</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面に「プリセットに保存」（名前を付けて保存・上書き）を出す。</td>
+                </tr>
+                <tr>
+                    <td><code>features.presetLoad</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面にプリセットの一覧（読み込む・削除）を出す。</td>
+                </tr>
+                <tr>
+                    <td><code>features.obsSettings</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面に「OBS接続」の欄を出す。<code>false</code> にすると、ブラウザに保存された値ではなく、いつも下の <code>obs</code> の値で接続します。</td>
+                </tr>
+                <tr>
+                    <td><code>features.fileExport</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面に「ファイルに書き出す」を出す。</td>
+                </tr>
+                <tr>
+                    <td><code>features.fileImport</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面に「ファイルから読み込む」を出す。</td>
+                </tr>
+                <tr>
+                    <td><code>features.resetButton</code></td>
+                    <td><code>true</code></td>
+                    <td>設定画面に「画面リセット」を出す。</td>
+                </tr>
+                <tr>
+                    <td><code>features.editLock</code></td>
+                    <td><code>false</code></td>
+                    <td>表示専用にする。<code>true</code> にすると、パーツメニュー・ドラッグ・入力など画面の編集が一切できなくなります（OBS接続で送られてきた変更は反映されます）。</td>
+                </tr>
+                <tr>
+                    <td><code>obs.port</code></td>
+                    <td><code>4455</code></td>
+                    <td>OBSのWebSocketサーバーのポート番号。</td>
+                </tr>
+                <tr>
+                    <td><code>obs.password</code></td>
+                    <td><code>''</code></td>
+                    <td>OBSのWebSocketサーバーのパスワード。このファイルを人に渡すとパスワードも渡るので注意してください。</td>
+                </tr>
+                <tr>
+                    <td><code>obs.mode</code></td>
+                    <td><code>'auto'</code></td>
+                    <td>反映のしかた。<code>'auto'</code> = リアルタイム、<code>'manual'</code> = 確定したときだけ。</td>
+                </tr>
+                <tr>
+                    <td><code>obs.autoConnect</code></td>
+                    <td><code>false</code></td>
+                    <td>ページを開いたら自動で接続する。</td>
+                </tr>
+            </table>
+            <div class="card">
+                <div class="card-title">ゲームセンターなど、画面を触られたくない場所では</div>
+                <p><code>features.editLock</code> を <code>true</code> にすると、画面の編集が一切できなくなります。<code>obs</code> にパスワードを入れて <code>autoConnect: true</code> にしておけば、開くだけでOBSにつながり、別のPC（<code>editLock</code> をかけていないファイル）から編集を送れます。</p>
+                <p><code>features: {<br>&nbsp;&nbsp;&nbsp;&nbsp;// …<br>&nbsp;&nbsp;&nbsp;&nbsp;editLock: true,<br>},<br>obs: {<br>&nbsp;&nbsp;&nbsp;&nbsp;port: 4455,<br>&nbsp;&nbsp;&nbsp;&nbsp;password: 'OBSのパスワード',<br>&nbsp;&nbsp;&nbsp;&nbsp;mode: 'auto',<br>&nbsp;&nbsp;&nbsp;&nbsp;autoConnect: true,<br>},</code></p>
+            </div>
+        </div>
+
+        <!-- カラーパレット -->
+        <div class="section">
+            <div class="section-title">カラーパレット / Color Palette</div>
+            <div class="card">
+                <div class="color-row">
+                    <div class="color-chip" style="background:#141414;border:1px solid #444;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">墨 Ink（背景）</div>
+                        <div class="color-code">#141414</div>
+                    </div>
+                </div>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#f1efea;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">白 Chalk（文字・線）</div>
+                        <div class="color-code">#f1efea</div>
+                    </div>
+                </div>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#e5484d;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">赤い点 Dot（LIVE）</div>
+                        <div class="color-code">#e5484d</div>
+                    </div>
+                </div>
+                <div class="color-row">
+                    <div class="color-chip" style="background:#e7ebee;border:1px solid #ddd;"></div>
+                    <div class="color-meta">
+                        <div class="color-name">ミスト Mist（背景の選択肢）</div>
+                        <div class="color-code">#e7ebee</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OBS 設定 -->
+        <div class="section">
+            <div class="section-title">OBS 設定 / OBS Setup</div>
+            <ul class="steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-body">OBS の <strong>ソース追加 → ブラウザ</strong> を選択し、<strong>「ローカルファイル」</strong>
+                        にチェックを入れる</div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-body"><code>minimal-black.html</code> を選択する（このフォルダ内のファイル）</div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-body">幅 <strong>1920</strong>、高さ <strong>1080</strong> に設定する</div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-body"><strong>「OBSと同じ解像度を使用する」</strong> を有効にする（推奨）</div>
+                </li>
+                <li>
+                    <div class="step-num">5</div>
+                    <div class="step-body">ソースを右クリック → <strong>「インタラクト」</strong> でブラウザ内を操作できます</div>
+                </li>
+            </ul>
+            <div class="hint">
+                <strong>背景を透明にする場合：</strong>「カスタム CSS」欄に <code>body { background-color: transparent !important; }</code>
+                を追加し、「ページが表示されていない場合にソースをシャットダウン」のチェックを外してください。
+            </div>
+        </div>
+
+        <!-- フォント -->
+        <div class="section">
+            <div class="section-title">使用フォント / Fonts</div>
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-title">Inter</div>
+                    <p>英字のラベル（LIVE・TITLE など）と数字に使用。細く整った欧文書体。</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Zen Kaku Gothic New</div>
+                    <p>本文・タイトルに使用。すっきりしたゴシック体。</p>
+                </div>
+            </div>
+            <div class="hint">フォントはGoogle Fontsから読み込みます。オフライン環境ではシステムのデフォルトフォントが使用されます。</div>
+        </div>
+
+        <!-- フッター -->
+        <div class="doc-footer">
+            <div class="credit">donnma（どんま）</div>
+            <p>WEB: <a href="https://donnma.com/" target="_blank">donnma.com</a> &nbsp;／&nbsp; X: <a
+                    href="https://twitter.com/donnma777" target="_blank">@donnma777</a></p>
+            <p style="margin-top:8px;font-size:12px;opacity:0.65;">MINIMAL BLACK Stream Overlay — 枠なしミニマル配信オーバーレイ（黒）</p>
+            <p style="margin-top:6px;font-size:12px;opacity:0.55;">注意：二次配布、および編集したものの配布・公開を禁じます（<a href="https://donnma.com/tool/terms/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">利用規約</a>）。</p>
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -13,6 +13,7 @@ OBS Studio のブラウザソースで使える配信オーバーレイのテー
 | POP | `pop/` |
 | CITY POP | `citypop/` |
 | MINIMAL | `minimal/` |
+| MINIMAL BLACK | `minimal-black/` |
 
 各フォルダにオーバーレイ本体（`.html`）、待機画面（`waiting.html`）、説明書（`index.html` または `説明書.html`）、ローカルプレビュー用の `サーバー起動.bat` が入っています。
 
