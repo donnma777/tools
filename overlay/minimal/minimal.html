@@ -1739,6 +1739,11 @@
             background: var(--mtext);
         }
 
+        /* 見出しの線なし（背景の画面の「見出しの線：なし」。目印 #min-flags は画面の中に置くので保存・OBS にも乗る） */
+        #capture-area:has(#min-flags.no-line) .header::before {
+            display: none;
+        }
+
         .header-input {
             font-family: 'Inter', sans-serif;
             font-size: 12px;
@@ -2619,6 +2624,11 @@
                 <div class="settings-row">
                     <button class="settings-btn" type="button" data-bg="bg-lines">┼ 細い罫線</button>
                 </div>
+                <div class="help-section">見出しの前の線（— TITLE）</div>
+                <div class="settings-row">
+                    <button class="settings-btn" type="button" data-bg="min-line:on">— 線あり</button>
+                    <button class="settings-btn" type="button" data-bg="min-line:off">線なし</button>
+                </div>
                 <div class="help-section">色・画像</div>
                 <div class="settings-row">
                     <button class="settings-btn" type="button" data-bg="bg-color">🎨 背景の色を選ぶ</button>
@@ -3142,6 +3152,8 @@
             try {
                 // 地の色：「bg-min:色」
                 if (/^bg-min:/.test(type)) { setMinimalGround(type.split(':')[1]); return; }
+                // 見出しの線：「min-line:on / off」
+                if (/^min-line:/.test(type)) { setMinimalLine(type.split(':')[1] !== 'off'); return; }
                 switch (type) {
                     case 'clock': addClockBox(x, y); break;
                     case 'stopwatch': addStopwatch(x, y); break;
@@ -3293,6 +3305,18 @@
             const el = document.createElement('div');
             el.className = 'bg-grain' + (name === 'ink' ? ' tone-dark' : '');
             addBgPart(el);
+        }
+
+        // 見出しの前の線のあり・なし。画面の中の目印（#min-flags）のクラスで切り替える
+        function setMinimalLine(on) {
+            let flags = captureArea.querySelector('#min-flags');
+            if (!flags) {
+                flags = document.createElement('div');
+                flags.id = 'min-flags';
+                flags.hidden = true;
+                captureArea.appendChild(flags);
+            }
+            flags.classList.toggle('no-line', !on);
         }
 
         function promptBgUpload() {

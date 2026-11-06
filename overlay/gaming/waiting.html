@@ -1462,6 +1462,8 @@
                 };
             }
             const SHOW_DEF = { badge: true, date: true, time: true, bunnies: true, sub: true, count: true, title: true, profile: true, ticker: true };
+            // テーマが足す部品（THEME.extraShow：[[キー, 名前, 初めは出すか]]）。消すと #stage に off-キー が付くので、見た目はテーマの CSS で消す
+            (THEME.extraShow || []).forEach(([k, , on]) => { SHOW_DEF[k] = on !== false; });
             const BG_KEYS = ['bgType', 'bg', 'bgMove', 'bgColor', 'bgImage', 'bgFit', 'bgTile', 'bgScroll', 'bgSpeed', 'bgDim', 'bgBlur', 'bgPatternOver'];
             // 背景の設定は、ふだんは state（全部の場面で共通）に持ち、
             // 「この場面だけ別の背景にする」場面は modes[場面].bgSet に持つ（bgOwn が true のときだけ使う）
@@ -1535,6 +1537,14 @@
             document.querySelectorAll('.t-icon').forEach((e) => { e.textContent = THEME.iconName; });
             $('#opt-pattern').textContent = THEME.patternName;
             $('#ticker-tag').textContent = THEME.tickerTag || 'INFO';
+            (THEME.extraShow || []).forEach(([k, name]) => {
+                const lb = document.createElement('label');
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.dataset.show = k;
+                lb.append(cb, ' ' + name);
+                document.querySelector('#panel .show-grid').appendChild(lb);
+            });
             {
                 const sel = $('#f-bg');
                 THEME.patterns.concat([['none', '色なし（透明）']]).forEach(([v, label]) => {
@@ -1580,14 +1590,24 @@
                     sp.style.setProperty('--i', i);
                     el.appendChild(sp);
                 });
-                // 長い文字は枠に収まるまで小さくする
-                let fs = 128;
+                // 長い文字は収まるまで小さくする。はじめの大きさはテーマの CSS の --main-size（なければ 128px）。
+                // 縦書き（writing-mode: vertical-*）のテーマは、高さに合わせる
+                el.style.fontSize = '';
+                const cs = getComputedStyle(el);
+                let fs = parseFloat(cs.getPropertyValue('--main-size')) || 128;
+                const vertical = cs.writingMode.startsWith('vertical');
                 el.style.fontSize = fs + 'px';
                 const row = $('#main-row');
-                const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
-                let max = row.clientWidth;
-                row.querySelectorAll('.icon').forEach((ic) => { if (ic.style.display !== 'none') max -= ic.getBoundingClientRect().width / (stageScale || 1) + gap; });
-                while (el.scrollWidth > max && fs > 56) { fs -= 4; el.style.fontSize = fs + 'px'; }
+                const gap = parseFloat(vertical ? getComputedStyle(row).rowGap : getComputedStyle(row).columnGap) || 0;
+                let max = vertical ? row.clientHeight : row.clientWidth;
+                row.querySelectorAll('.icon').forEach((ic) => {
+                    if (ic.style.display !== 'none' && getComputedStyle(ic).display !== 'none') {
+                        const r = ic.getBoundingClientRect();
+                        max -= (vertical ? r.height : r.width) / (stageScale || 1) + gap;
+                    }
+                });
+                const size = () => (vertical ? el.scrollHeight : el.scrollWidth);
+                while (size() > max && fs > 40) { fs -= 4; el.style.fontSize = fs + 'px'; }
             }
 
             let tickerText = null;
@@ -1617,6 +1637,7 @@
             function render() {
                 const m = state.modes[curMode()];
                 const sh = state.show;
+                (THEME.extraShow || []).forEach(([k]) => { $('#stage').classList.toggle('off-' + k, !sh[k]); });
                 $('#badge').hidden = !sh.badge;
                 $('#badge-txt').textContent = m.label;
                 $('#clock .date').hidden = !sh.date;

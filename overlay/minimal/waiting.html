@@ -99,6 +99,7 @@
             patternName: "紙",
             iconName: "アイコン",
             tickerTag: "NEWS",
+            extraShow: [["headline", "見出しの線（— の線）", true]],
             patterns: [["paper", "ペーパー"], ["mist", "ミスト"], ["blush", "ブラッシュ"], ["ink", "墨（暗め）"]],
             icon(place, side) {
                 // 小さな四角（枠なしのテーマは、ふだんはアイコンを出さない）
@@ -1144,6 +1145,11 @@
             opacity: 0.5;
         }
 
+        /* 「表示する部品」の「見出しの線」を外したとき */
+        #stage.off-headline #card .head::before {
+            display: none;
+        }
+
         #card .head::before {
             content: '';
             width: 56px;
@@ -1552,6 +1558,8 @@
                 };
             }
             const SHOW_DEF = { badge: true, date: true, time: true, bunnies: true, sub: true, count: true, title: true, profile: true, ticker: true };
+            // テーマが足す部品（THEME.extraShow：[[キー, 名前, 初めは出すか]]）。消すと #stage に off-キー が付くので、見た目はテーマの CSS で消す
+            (THEME.extraShow || []).forEach(([k, , on]) => { SHOW_DEF[k] = on !== false; });
             const BG_KEYS = ['bgType', 'bg', 'bgMove', 'bgColor', 'bgImage', 'bgFit', 'bgTile', 'bgScroll', 'bgSpeed', 'bgDim', 'bgBlur', 'bgPatternOver'];
             // 背景の設定は、ふだんは state（全部の場面で共通）に持ち、
             // 「この場面だけ別の背景にする」場面は modes[場面].bgSet に持つ（bgOwn が true のときだけ使う）
@@ -1625,6 +1633,14 @@
             document.querySelectorAll('.t-icon').forEach((e) => { e.textContent = THEME.iconName; });
             $('#opt-pattern').textContent = THEME.patternName;
             $('#ticker-tag').textContent = THEME.tickerTag || 'INFO';
+            (THEME.extraShow || []).forEach(([k, name]) => {
+                const lb = document.createElement('label');
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.dataset.show = k;
+                lb.append(cb, ' ' + name);
+                document.querySelector('#panel .show-grid').appendChild(lb);
+            });
             {
                 const sel = $('#f-bg');
                 THEME.patterns.concat([['none', '色なし（透明）']]).forEach(([v, label]) => {
@@ -1717,6 +1733,7 @@
             function render() {
                 const m = state.modes[curMode()];
                 const sh = state.show;
+                (THEME.extraShow || []).forEach(([k]) => { $('#stage').classList.toggle('off-' + k, !sh[k]); });
                 $('#badge').hidden = !sh.badge;
                 $('#badge-txt').textContent = m.label;
                 $('#clock .date').hidden = !sh.date;
