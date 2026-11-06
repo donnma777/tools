@@ -1202,6 +1202,10 @@
         <summary><span class="sec-icon">🎭</span>テンプレート<span class="preset-count"></span></summary>
         <div class="preset-row preset-body" id="presets"></div>
       </details>
+      <details class="sec preset-sec" data-key="counter-presets-theme">
+        <summary><span class="sec-icon">🎬</span>オーバーレイとおそろい<span class="preset-count"></span></summary>
+        <div class="preset-row preset-body" id="presets-theme"></div>
+      </details>
       <!-- sections are generated from SECTIONS below -->
     </div>
 
@@ -1480,6 +1484,17 @@
         ['ゲージ（あと○人）', { gaugeOn: true, colorMode: 'gradient', grad1: '#ffec61', grad2: '#f321d7', gaugeFillMode: 'same', textEffect: 'shadow', effectWidth: 3, effectColor: '#000000', scale: 1.6 }],
         ['ゲージだけ', { gaugeOn: true, showCount: false, gaugeInfo: 'frac', gaugeTitle: '登録者 目標 {goal}人', gaugeFillMode: 'gradient', gaugeFill1: '#7ff9ff', gaugeFill2: '#ff3fd2', gaugeHeight: 28, gaugeRadius: 14, gaugeBorder: true, gaugeBorderColor: '#7ff9ff', boxOn: true, boxBg: '#140a24', boxAlpha: 0.8, boxRadius: 20, textEffect: 'glow', effectWidth: 3, effectColor: '#ff3fd2' }],
         ['収益化チャレンジ', { gaugeOn: true, goal: 1000, goalAfter: 'stay', gaugeTitle: '収益化まで', gaugeInfo: 'left', font: 'Mochiy Pop One', weight: '400', labelWeight: '400', color: '#ffffff', textEffect: 'outline', effectWidth: 4, effectColor: '#ff6f91', labelColor: '#ffe066', suffixColor: '#ffe066', gaugeTextColor: '#ffffff', gaugeFillMode: 'solid', gaugeFill1: '#ffe066', gaugeTrack: '#ff6f91', gaugeTrackAlpha: 0.45, gaugeBorder: true, gaugeBorderWidth: 3, gaugeBorderColor: '#ffffff', scale: 1.6 }],
+      ];
+
+      // このサイトの配信オーバーレイ（overlay/）と同じ配色のテンプレート（チャットCSSメーカーの「オーバーレイとおそろい」とも合わせる）
+      const THEME_PRESETS = [
+        ['GAMING', { font: 'Zen Kaku Gothic New', color: '#ffffff', textEffect: 'glow', effectWidth: 4, effectColor: '#00fff7', labelText: 'SUBSCRIBERS', labelColor: '#00fff7', suffixColor: '#00fff7', boxOn: true, boxBg: '#0a0a0f', boxAlpha: 0.75, boxRadius: 4, boxBorder: true, boxBorderWidth: 2, boxBorderColor: '#00fff7', gaugeFill1: '#00fff7', gaugeFill2: '#7dffb0', gaugeTextColor: '#ffffff' }],
+        ['CYBERPUNK VAPORWAVE', { font: 'Dela Gothic One', weight: '400', labelWeight: '400', color: '#ffffff', textEffect: 'glow', effectWidth: 3, effectColor: '#ff007f', labelText: 'SUBSCRIBERS', labelColor: '#ffee00', suffixColor: '#ffee00', scale: 1.6, boxOn: true, boxBg: '#0b071a', boxAlpha: 0.8, boxRadius: 0, boxBorder: true, boxBorderWidth: 2, boxBorderColor: '#ff007f', gaugeFill1: '#ff007f', gaugeFill2: '#7b2ff7', gaugeRadius: 0, gaugeTextColor: '#ffffff' }],
+        ['GAMING GIRLY NEON', { font: 'M PLUS Rounded 1c', color: '#ffe6f7', textEffect: 'glow', effectWidth: 4, effectColor: '#ff6ec7', labelColor: '#ff6ec7', suffixColor: '#ff6ec7', boxOn: true, boxBg: '#0d0010', boxAlpha: 0.75, boxRadius: 24, boxBorder: true, boxBorderWidth: 2, boxBorderColor: '#ff6ec7', gaugeFill1: '#ff6ec7', gaugeFill2: '#b388ff', gaugeTextColor: '#ffe6f7' }],
+        ['SWEET LOLITA ROSE', { font: 'Zen Maru Gothic', color: '#df6ba6', textEffect: 'outline', effectWidth: 4, effectColor: '#ffffff', labelColor: '#7a4d6a', suffixColor: '#7a4d6a', boxOn: true, boxBg: '#fff0f7', boxAlpha: 0.95, boxRadius: 28, boxBorder: true, boxBorderWidth: 3, boxBorderColor: '#ea92c1', gaugeFill1: '#ea92c1', gaugeFill2: '#df6ba6', gaugeTrack: '#df6ba6', gaugeTrackAlpha: 0.2, gaugeTextColor: '#7a4d6a' }],
+        ['和 WA', { font: 'Shippori Mincho', weight: '800', labelWeight: '700', color: '#5a3a4a', textEffect: 'none', labelText: '登録者', labelColor: '#b5627e', suffixColor: '#b5627e', boxOn: true, boxBg: '#faf6f0', boxAlpha: 0.95, boxRadius: 4, boxBorder: true, boxBorderWidth: 2, boxBorderColor: '#b5627e', gaugeFillMode: 'solid', gaugeFill1: '#b5627e', gaugeTrack: '#b5627e', gaugeTrackAlpha: 0.15, gaugeTextColor: '#5a3a4a', gaugeShine: false, gaugeRadius: 2 }],
+        ['POP', { font: 'Mochiy Pop One', weight: '400', labelWeight: '400', color: '#3a8bb5', textEffect: 'outline', effectWidth: 4, effectColor: '#ffffff', labelColor: '#ff9ecb', suffixColor: '#ff9ecb', boxOn: true, boxBg: '#f0faff', boxAlpha: 0.95, boxRadius: 28, boxBorder: true, boxBorderWidth: 4, boxBorderColor: '#7ec8e3', gaugeFill1: '#7ec8e3', gaugeFill2: '#ff9ecb', gaugeTrack: '#7ec8e3', gaugeTrackAlpha: 0.2, gaugeTextColor: '#3a8bb5', idle: 'float' }],
+        ['CITY POP', { font: 'Zen Kaku Gothic New', colorMode: 'gradient', grad1: '#f59e0b', grad2: '#ec4899', gradAngle: 180, textEffect: 'shadow', effectWidth: 2, effectColor: '#1c0a00', labelText: 'SUBSCRIBERS', labelColor: '#fcd34d', suffixColor: '#fcd34d', boxOn: true, boxBg: '#1c0a00', boxAlpha: 0.85, boxRadius: 16, gaugeFill1: '#f59e0b', gaugeFill2: '#ec4899', gaugeTextColor: '#fef9e7' }],
         ['MINIMAL', { font: 'Zen Kaku Gothic New', weight: '700', color: '#141414', textEffect: 'none', labelText: 'SUBSCRIBERS', labelSize: 20, labelColor: '#8a8781', labelWeight: '700', suffixColor: '#8a8781', boxOn: true, boxBg: '#ffffff', boxAlpha: 0.94, boxRadius: 14, gaugeFillMode: 'solid', gaugeFill1: '#e5484d', gaugeTrack: '#141414', gaugeTrackAlpha: 0.12, gaugeTextColor: '#141414', gaugeShine: false, gaugeHeight: 10, gaugeRadius: 5 }],
         ['MINIMAL BLACK', { font: 'Zen Kaku Gothic New', weight: '700', color: '#f1efea', textEffect: 'none', labelText: 'SUBSCRIBERS', labelSize: 20, labelColor: '#8f8c86', labelWeight: '700', suffixColor: '#8f8c86', boxOn: true, boxBg: '#141414', boxAlpha: 0.92, boxRadius: 14, gaugeFillMode: 'solid', gaugeFill1: '#e5484d', gaugeTrack: '#f1efea', gaugeTrackAlpha: 0.18, gaugeTextColor: '#f1efea', gaugeShine: false, gaugeHeight: 10, gaugeRadius: 5 }],
       ];
@@ -1699,14 +1714,18 @@
         toast('URLをコピーしました！OBSのブラウザソースのURLに貼り付けてください');
       });
 
-      for (const [name, p] of PRESETS) {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'chip-btn';
-        b.textContent = name;
-        b.addEventListener('click', () => { applyAll({ ...DEFAULTS, ...p }); toast(`テンプレート「${name}」を適用しました`); });
-        $('presets').appendChild(b);
-      }
+      const addPresetButtons = (el, list) => {
+        for (const [name, p] of list) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'chip-btn';
+          b.textContent = name;
+          b.addEventListener('click', () => { applyAll({ ...DEFAULTS, ...p }); toast(`テンプレート「${name}」を適用しました`); });
+          el.appendChild(b);
+        }
+      };
+      addPresetButtons($('presets'), PRESETS);
+      addPresetButtons($('presets-theme'), THEME_PRESETS);
       document.querySelectorAll('.preset-sec').forEach(group => {
         const key = 'donnma-youtube-subscribers-open-' + group.dataset.key;
         group.querySelector('.preset-count').textContent = `${group.querySelectorAll('.chip-btn').length}種類`;
