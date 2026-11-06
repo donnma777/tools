@@ -11,7 +11,7 @@
        開始した時刻はこのブラウザに覚えておくので、ソースを開き直しても続きから数える。 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&family=Orbitron:wght@700;900&family=Rajdhani:wght@700&family=Fira+Code:wght@500;700&family=Outfit:wght@700;900&family=Quicksand:wght@700&family=Noto+Serif+JP:wght@600;900&family=Nunito:wght@800;900&family=Josefin+Sans:wght@600;700&family=DM+Sans:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&family=Orbitron:wght@700;900&family=Rajdhani:wght@700&family=Fira+Code:wght@500;700&family=Outfit:wght@700;900&family=Quicksand:wght@700&family=Noto+Serif+JP:wght@600;900&family=Nunito:wght@800;900&family=Josefin+Sans:wght@600;700&family=DM+Sans:wght@600;700&family=Inter:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
   <style>
     html,
     body {
@@ -341,6 +341,53 @@
       letter-spacing: 0.14em;
     }
 
+    /* MINIMAL：枠も飾りもない、白い板に黒い文字。ラベルの前に小さな赤い点 */
+    .t-minimal #stage,
+    .t-minimal .face,
+    .t-mblack #stage,
+    .t-mblack .face {
+      font-family: 'Inter', 'Zen Kaku Gothic New', sans-serif;
+      font-weight: 600;
+      color: var(--a);
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: calc(14px * var(--k));
+      --sep: rgba(20, 20, 20, 0.14);
+    }
+
+    /* MINIMAL BLACK：黒い板に白い文字 */
+    .t-mblack #stage,
+    .t-mblack .face {
+      background: rgba(20, 20, 20, 0.92);
+      --sep: rgba(241, 239, 234, 0.18);
+    }
+
+    .t-minimal .lab,
+    .t-minimal .date,
+    .t-mblack .lab,
+    .t-mblack .date {
+      font-family: 'Inter', 'Zen Kaku Gothic New', sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      color: rgba(20, 20, 20, 0.5);
+    }
+
+    .t-mblack .lab,
+    .t-mblack .date {
+      color: rgba(241, 239, 234, 0.55);
+    }
+
+    .t-minimal .lab:not(:empty)::before,
+    .t-mblack .lab:not(:empty)::before {
+      content: '';
+      display: inline-block;
+      width: 0.5em;
+      height: 0.5em;
+      border-radius: 50%;
+      background: #e5484d;
+      margin-right: 0.6em;
+      vertical-align: 0.1em;
+    }
+
     /* ── 円（アナログ）：1つずつ丸い文字盤にする。台の見た目は .face に移す ── */
     .f-dial #stage {
       align-items: center;
@@ -544,6 +591,18 @@
       --ink: #fcd34d;
       --sec: #ec4899;
     }
+
+    .t-minimal.f-dial #stage {
+      --ink: #141414;
+      --hand: #141414;
+      --sec: #e5484d;
+    }
+
+    .t-mblack.f-dial #stage {
+      --ink: #f1efea;
+      --hand: #f1efea;
+      --sec: #e5484d;
+    }
   </style>
 </head>
 
@@ -585,13 +644,13 @@
         dial: get('f', '') === 'dial',  // 円（アナログ）
         nums: get('n', 'q'),            // 文字盤の数字：all（12個）/ q（4つ）/ none
       };
-      const THEMES = ['simple', 'gaming', 'cyber', 'neon', 'rose', 'wa', 'pop', 'city'];
+      const THEMES = ['simple', 'gaming', 'cyber', 'neon', 'rose', 'wa', 'pop', 'city', 'minimal', 'mblack'];
       document.body.classList.add('t-' + (THEMES.includes(C.theme) ? C.theme : 'simple'), 'al-' + C.align);
       if (C.panel) document.body.classList.add('panel');
       if (C.layout === 'col') $('stage').classList.add('col');
       document.body.style.setProperty('--k', C.size / 100);
       if (/^[0-9a-f]{6}$/i.test(C.accent)) document.body.style.setProperty('--a', '#' + C.accent);
-      else document.body.style.setProperty('--a', { simple: '#ff85a1', gaming: '#00fff7', cyber: '#ff007f', neon: '#ff6ec7', rose: '#ea92c1', wa: '#b5627e', pop: '#7ec8e3', city: '#f59e0b' }[C.theme] || '#ff85a1');
+      else document.body.style.setProperty('--a', { simple: '#ff85a1', gaming: '#00fff7', cyber: '#ff007f', neon: '#ff6ec7', rose: '#ea92c1', wa: '#b5627e', pop: '#7ec8e3', city: '#f59e0b', minimal: '#141414', mblack: '#f1efea' }[C.theme] || '#ff85a1');
 
       $('b-clock').hidden = !C.clock;
       $('b-tz').hidden = !C.tz;
