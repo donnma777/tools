@@ -1900,6 +1900,19 @@
             background: rgba(20, 20, 20, 0.06) !important;
         }
 
+        /* ≡ メニューの選択肢（表示形式など）：選ばれているものは黒い地に白い文字（もとは黒い文字で読めなかった） */
+        .hover-menu-preset {
+            font-family: 'Inter', 'Zen Kaku Gothic New', sans-serif;
+            border-color: rgba(20, 20, 20, 0.2);
+            color: rgba(20, 20, 20, 0.7);
+            border-radius: 999px;
+        }
+
+        .hover-menu-preset[style*="--color-accent"] {
+            background: #141414 !important;
+            color: #ffffff !important;
+        }
+
         /* shared-css:start */
         /* =====================================================
          *  共通機能の見た目（overlay/_shared/overlay-shared.css から build.py で流し込み。ここは直接編集しない）
