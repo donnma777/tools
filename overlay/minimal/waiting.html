@@ -1,0 +1,2683 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="OBS Studio用の配信待機画面（まもなく開始・休憩中・配信終了）。枠なしのミニマル。">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
+    <title>待機画面 - MINIMAL</title>
+
+    <script>
+        /**
+         * =====================================================
+         *  ★ 待機画面の初期値 ★（MINIMAL）
+         *  画面をダブルクリック（OBS ではソースの「対話」）で開く設定画面から変えられます。
+         *  変えた内容はブラウザに保存されるので、ここを書き換えるのは最初の値を変えたいときだけ。
+         *  URL に ?mode=break のように付けると、そのソースはいつもその場面を出します（soon / break / end / free）。
+         *  設定画面の「OBS 用の URL」でコピーできます。
+         * =====================================================
+         */
+        const CONFIG = {
+            color: {
+                /** メインカラー（枠線・見出し） */
+                accent: "#111111",
+            },
+            /** 場面ごとの文字（free は自由に使う4つ目）。time は "21:00" の形（空なら残り時間を出さない）。ticker は下を流れる文字（空なら帯を出さない） */
+            modes: {
+                soon: { label: "まもなく開始", header: "STANDBY", main: "まもなく開始", sub: "STARTING SOON", countLabel: "開始まで", reached: "まもなく始まります", time: "", ticker: "ご来場ありがとうございます！ 配信開始までもう少しお待ちください ♪" },
+                break: { label: "休憩中", header: "BREAK", main: "休憩中", sub: "BE RIGHT BACK", countLabel: "再開まで", reached: "まもなく再開します", time: "", ticker: "ただいま休憩中です。少しだけお待ちください ♪" },
+                end: { label: "配信終了", header: "THANK YOU", main: "おつかれさまでした", sub: "THANK YOU FOR WATCHING", countLabel: "", reached: "", time: "", ticker: "ご視聴ありがとうございました！ また遊びに来てね ♪" },
+                free: { label: "おしらせ", header: "INFORMATION", main: "おしらせ", sub: "INFORMATION", countLabel: "あと", reached: "", time: "", ticker: "" },
+            },
+            mode: 'soon',
+            title: '今日の配信タイトル',
+            profile: [
+                'donnma(どんま)',
+                'WEB: donnma.com',
+                'X: @donnma777',
+                '#どんま生',
+            ],
+            /** 出す部品（false で隠す）。設定画面の「表示する部品」でも変えられる */
+            show: {
+                badge: true,    // 左上の場面のバッジ
+                date: true,     // 右上の日付
+                time: true,     // 右上の時刻
+                bunnies: false,  // 大きな文字の両側のアイコン
+                sub: true,      // 大きな文字の下の英字
+                count: true,    // 残り時間
+                title: true,    // 配信タイトル
+                profile: true,  // 枠の下のプロフィール
+                ticker: true,   // 下の流れる文字
+            },
+            /** 背景の種類：'pattern' = 柄 / 'image' = 画像 / 'color' = 単色 / 'none' = なし（透明） */
+            bgType: 'pattern',
+            /** 柄の下の色（THEME.patterns の値か 'none'） */
+            bg: "paper",
+            /** 柄をゆっくり動かす */
+            bgMove: false,
+            /** 単色のときの色（画像を「全体を入れる」にしたときのすき間の色にも使う） */
+            bgColor: '#333344',
+            /** 画像の合わせ方：'cover' = 全体を覆う / 'contain' = 全体を入れる / 'fill' = 引き伸ばす / 'tile' = 並べる */
+            bgFit: 'cover',
+            /** 「並べる」ときの大きさ（10〜200 %） */
+            bgTile: 100,
+            /** 画像を流す向き：'none' / 'left' / 'right' / 'up' / 'down' / 'upleft' / 'downright' */
+            bgScroll: 'none',
+            /** 画像を流す速さ（1秒に何px） */
+            bgSpeed: 40,
+            /** 画像をうすめる（0〜80 %）。文字を読みやすくしたいとき */
+            bgDim: 0,
+            /** 画像のぼかし（0〜20 px） */
+            bgBlur: 0,
+            /** 画像の上に柄を重ねる */
+            bgPatternOver: false,
+            /** 保存に使うキー（ほかのページと重ならないように） */
+            storageKey: "minimalWaiting",
+            // -----------------------------------------------
+            // 【OBS接続の初期値】設定画面の「OBS」タブに最初から入る値。
+            // -----------------------------------------------
+            obs: {
+                /** ポート番号 */
+                port: 4455,
+                /** パスワード（このファイルを人に渡すとパスワードも渡るので注意） */
+                password: '',
+                /** 反映のしかた：'auto' = リアルタイム / 'manual' = 確定したときだけ */
+                mode: 'auto',
+                /** ページを開いたら自動で接続する */
+                autoConnect: false,
+            },
+        };
+
+        /**
+         * テーマの見た目のうち、絵と呼び名（共通の動きから使う）
+         *  icon(place, side)：アイコンの絵。place は 'badge'（左上）/ 'main'（大きな文字の両側）/ 'ticker'（下の帯）、
+         *                     side は大きな文字の左 'l' / 右 'r'。色は currentColor（色はテーマの CSS で決める）
+         *  patterns：柄の下に敷く色（値はテーマの CSS の #bg-pat.pat-値）
+         */
+        const THEME = {
+            patternName: "紙",
+            iconName: "アイコン",
+            tickerTag: "NEWS",
+            patterns: [["paper", "ペーパー"], ["mist", "ミスト"], ["blush", "ブラッシュ"], ["ink", "墨（暗め）"]],
+            icon(place, side) {
+                // 小さな四角（枠なしのテーマは、ふだんはアイコンを出さない）
+                return { viewBox: '0 0 24 24', svg: '<rect x="7" y="7" width="10" height="10" fill="currentColor"/>' };
+            },
+        };
+    </script>
+
+    <style>
+        /* waiting-css:start */
+        /* 待機画面の共通の見た目（overlay/_shared/waiting/waiting.css から build_waiting.py で流し込み。ここは直接編集しない）。
+           色・書体・形はテーマの側で、下の変数と、各部品のセレクタの上書きで変える */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font: 'M PLUS Rounded 1c', sans-serif;      /* ふだんの文字 */
+            --font-main: var(--font);                       /* 大きな文字 */
+            --font-num: var(--font);                        /* 時刻・残り時間の数字 */
+            --accent: #8B4513;                              /* メインの色（枠・見出し） */
+            --on-accent: #fff;                              /* メインの色の上の文字 */
+            --text: var(--accent);                          /* 枠の中の文字 */
+            --box-bg: rgba(255, 248, 252, 0.96);            /* 枠の中の色 */
+            --dot: rgba(255, 220, 230, 0.75);               /* 見出しの丸 */
+            --shadow: color-mix(in srgb, var(--accent) 22%, transparent);
+            --pat-size: 300px;                              /* 柄の1マスの大きさ（動かすときに使う） */
+            --veil: 255 250 245;                            /* 画像をうすめる色（R G B） */
+            /* 設定画面 */
+            --panel-bg: #fffafc;
+            --panel-fg: var(--accent);
+            --input-bg: #fff;
+            --input-fg: #4a2a12;
+            --tab-bg: #f6ece4;
+        }
+
+        body,
+        input,
+        textarea,
+        select,
+        button {
+            font-family: var(--font);
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        /* 1920×1080 の舞台。窓の大きさに合わせて縮める（OBS の 1920×1080 ではそのまま） */
+        #stage {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            transform-origin: 0 0;
+            color: var(--text);
+        }
+
+        /* ---- 背景（画像 → 白いうすめ → 柄 の順に重ねる。柄の絵と色はテーマの側） ---- */
+        #bg {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        #bg-img,
+        #bg-veil,
+        #bg-pat {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        #bg-img {
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        #bg-img[hidden],
+        #bg-veil[hidden],
+        #bg-pat[hidden] {
+            display: none;
+        }
+
+
+        #bg-pat::before {
+            content: '';
+            position: absolute;
+            left: calc(var(--pat-size) * -1);
+            top: calc(var(--pat-size) * -1);
+            right: 0;
+            bottom: 0;
+        }
+
+        /* 飾り（角のかぎ括弧など。テーマの側で ::before / ::after を使う） */
+        #deco {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        #bg-pat.move::before {
+            animation: bg-drift 40s linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes bg-drift {
+            to {
+                transform: translate(var(--pat-size), var(--pat-size));
+            }
+        }
+
+
+        /* アイコンの色（絵は currentColor で描く）。メインの色の上にあるものは --on-accent */
+        .icon {
+            color: var(--accent);
+            overflow: visible;
+        }
+
+        #badge .icon,
+        #ticker .icon {
+            color: var(--on-accent);
+        }
+
+        /* ---- 共通の丸い枠 ---- */
+        .pill {
+            position: absolute;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 28px;
+            border-radius: 30px;
+            border: 2.5px solid var(--accent);
+            background: var(--box-bg);
+            font-weight: 700;
+            font-size: 26px;
+            box-shadow: 0 3px 12px var(--shadow);
+            white-space: nowrap;
+        }
+
+        /* 左上：場面のバッジ（LIVE バッジと同じ形） */
+        #badge {
+            left: 24px;
+            top: 24px;
+            background: var(--accent);
+            color: var(--on-accent);
+            gap: 12px;
+            padding: 0 30px 0 22px;
+        }
+
+        #badge .icon {
+            width: 32px;
+            height: 32px;
+            animation: hop 1.6s ease-in-out infinite;
+        }
+
+        /* 右上：日付と時刻 */
+        #clock {
+            right: 24px;
+            top: 24px;
+            min-width: 200px;
+            gap: 22px;
+        }
+
+        /* 隠した部品（.pill などは display: flex なので、hidden だけでは消えない） */
+        #stage [hidden] {
+            display: none !important;
+        }
+
+        #clock .date {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        #clock .time {
+            font-size: 30px;
+            letter-spacing: 1px;
+            font-family: var(--font-num);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ---- 真ん中の大きな枠 ---- */
+        #card {
+            position: absolute;
+            left: 50%;
+            top: 150px;
+            width: 1240px;
+            margin-left: -620px;
+            border: 3px solid var(--accent);
+            border-radius: 26px;
+            background: var(--box-bg);
+            box-shadow: 0 10px 40px var(--shadow);
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        #card .head {
+            position: relative;
+            height: 56px;
+            background: var(--accent);
+            color: var(--on-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 24px;
+            letter-spacing: 4px;
+        }
+
+        #card .head .dots {
+            position: absolute;
+            right: 26px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        #card .head .dots i {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--dot);
+        }
+
+        #card .body {
+            padding: 46px 60px 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #main-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 34px;
+            width: 100%;
+        }
+
+        #main-row .icon {
+            width: 92px;
+            height: 92px;
+            flex: none;
+            animation: hop 1.8s ease-in-out infinite;
+        }
+
+        #main-row .icon.r {
+            animation-delay: 0.9s;
+        }
+
+        @keyframes hop {
+            0%, 60%, 100% { transform: translateY(0) scale(1, 1); }
+            15% { transform: translateY(0) scale(1.08, 0.9); }
+            32% { transform: translateY(-18px) scale(0.95, 1.06); }
+            48% { transform: translateY(0) scale(1.05, 0.94); }
+        }
+
+        #main {
+            font-family: var(--font-main);
+            font-size: 128px;
+            font-weight: 800;
+            line-height: 1.15;
+            white-space: nowrap;
+            text-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 12%, transparent);
+        }
+
+        /* 一文字ずつ波のように跳ねる */
+        #main span {
+            display: inline-block;
+            animation: wave 3.2s ease-in-out infinite;
+            animation-delay: calc(var(--i) * 0.09s);
+        }
+
+        @keyframes wave {
+            0%, 40%, 100% { transform: translateY(0); }
+            20% { transform: translateY(-14px); }
+        }
+
+        #sub {
+            margin-top: 6px;
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: 12px;
+            opacity: 0.75;
+        }
+
+        #count {
+            margin-top: 34px;
+            display: flex;
+            align-items: center;
+            gap: 26px;
+            padding: 12px 44px;
+            border-radius: 50px;
+            background: var(--accent);
+            color: var(--on-accent);
+            font-weight: 700;
+        }
+
+        #count[hidden] {
+            display: none;
+        }
+
+        #count .label {
+            font-size: 30px;
+        }
+
+        #count .num {
+            font-size: 58px;
+            line-height: 1.1;
+            letter-spacing: 2px;
+            font-family: var(--font-num);
+            font-variant-numeric: tabular-nums;
+        }
+
+        #count.reached .num {
+            font-size: 40px;
+            letter-spacing: 1px;
+            animation: blink 1.6s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.45; }
+        }
+
+        #title {
+            margin-top: 34px;
+            max-width: 100%;
+            font-size: 38px;
+            font-weight: 700;
+            padding: 6px 30px;
+            border-bottom: 3px dotted color-mix(in srgb, var(--accent) 45%, transparent);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #title:empty {
+            display: none;
+        }
+
+        /* 枠の下：プロフィール（順番に切り替わる） */
+        #profile {
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+            min-width: 440px;
+        }
+
+        #profile .txt {
+            transition: opacity 0.4s;
+        }
+
+        #profile .txt.fade {
+            opacity: 0;
+        }
+
+        /* 下：流れる文字 */
+        #ticker {
+            left: 24px;
+            right: 24px;
+            bottom: 24px;
+            justify-content: flex-start;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #ticker .tag {
+            flex: none;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 26px 0 20px;
+            background: var(--accent);
+            color: var(--on-accent);
+            font-size: 22px;
+            z-index: 1;
+        }
+
+        #ticker .tag .icon {
+            width: 26px;
+            height: 26px;
+        }
+
+        #ticker .win {
+            flex: 1;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        #ticker .track {
+            display: inline-flex;
+            white-space: nowrap;
+            animation: scroll linear infinite;
+            will-change: transform;
+        }
+
+        #ticker .track span {
+            padding-right: 160px;
+        }
+
+        @keyframes scroll {
+            to { transform: translateX(-50%); }
+        }
+
+        #ticker[hidden] {
+            display: none;
+        }
+
+        /* ---- 設定画面（OBS では「対話」から開く） ---- */
+        #gear {
+            position: fixed;
+            right: 14px;
+            bottom: 14px;
+            z-index: 10;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            background: var(--panel-bg);
+            color: var(--panel-fg);
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        body:hover #gear {
+            opacity: 0.85;
+        }
+
+        body.in-obs #gear {
+            display: none;
+        }
+
+        #panel-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(20, 10, 10, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        #panel-wrap[hidden] {
+            display: none;
+        }
+
+        #panel {
+            width: 760px;
+            max-width: 100%;
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            border: 2.5px solid var(--accent);
+            border-radius: 18px;
+            background: var(--panel-bg);
+            color: var(--panel-fg);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        #panel .p-head {
+            background: var(--accent);
+            color: var(--on-accent);
+            font-weight: 700;
+            font-size: 17px;
+            padding: 12px 20px;
+            letter-spacing: 1px;
+        }
+
+        #panel .p-body {
+            overflow-y: auto;
+            padding: 16px 22px 8px;
+        }
+
+        #panel fieldset {
+            border: 1.5px solid color-mix(in srgb, var(--accent) 30%, transparent);
+            border-radius: 12px;
+            padding: 10px 14px 12px;
+            margin-bottom: 14px;
+        }
+
+        #panel legend {
+            padding: 0 6px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        #panel .row {
+            display: grid;
+            grid-template-columns: 130px 1fr;
+            align-items: center;
+            gap: 6px 10px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        #panel input[type=text],
+        #panel input[type=password],
+        #panel input[type=time],
+        #panel textarea,
+        #panel select {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1.5px solid color-mix(in srgb, var(--accent) 35%, transparent);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--input-fg);
+            font-size: 15px;
+        }
+
+        #panel textarea {
+            resize: vertical;
+            min-height: 92px;
+        }
+
+        #panel .hint {
+            font-size: 12px;
+            opacity: 0.75;
+            margin-top: 4px;
+        }
+
+        .mode-btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: 2px solid var(--accent);
+            background: var(--input-bg);
+            color: var(--panel-fg);
+            font-weight: 700;
+            font-size: 15px;
+            border-radius: 999px;
+            padding: 7px 18px;
+            cursor: pointer;
+        }
+
+        .btn.on,
+        .btn.primary {
+            background: var(--accent);
+            color: var(--on-accent);
+        }
+
+        .time-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .time-row input[type=time] {
+            width: 150px !important;
+        }
+
+        .time-row .btn {
+            padding: 5px 12px;
+            font-size: 13px;
+        }
+
+        .url-row {
+            display: grid;
+            grid-template-columns: 150px 1fr auto;
+            gap: 8px;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        #panel .url-row input {
+            font-size: 12px;
+            color: var(--input-fg);
+            background: color-mix(in srgb, var(--input-bg) 85%, var(--accent));
+        }
+
+        .url-row .btn {
+            padding: 5px 14px;
+            font-size: 13px;
+            min-width: 92px;
+        }
+
+        .check-line {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-top: 6px;
+            font-size: 14px;
+        }
+
+        .warn {
+            margin-top: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: #fff1dc;
+            color: #8a4b00;
+            font-size: 13px;
+        }
+
+        .warn[hidden] {
+            display: none;
+        }
+
+        /* 背景の設定 */
+        #panel input[type=range] {
+            width: 100%;
+            accent-color: var(--accent);
+        }
+
+        #panel input[type=color] {
+            width: 64px;
+            height: 34px;
+            padding: 2px;
+            border: 1.5px solid color-mix(in srgb, var(--accent) 35%, transparent);
+            border-radius: 8px;
+            background: var(--input-bg);
+        }
+
+        .range-line {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .range-line output {
+            min-width: 46px;
+            text-align: right;
+            font-size: 13px;
+        }
+
+        .img-line {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #bg-thumb {
+            width: 128px;
+            height: 72px;
+            border-radius: 8px;
+            border: 1.5px solid color-mix(in srgb, var(--accent) 35%, transparent);
+            background: var(--tab-bg) center / cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        #panel .row[hidden] {
+            display: none;
+        }
+
+        /* 画像をドラッグしているとき */
+        body.dragging #stage::after {
+            content: 'ここに画像を落とすと背景になります';
+            position: absolute;
+            inset: 30px;
+            border: 6px dashed var(--accent);
+            border-radius: 30px;
+            background: color-mix(in srgb, var(--panel-bg) 78%, transparent);
+            color: var(--panel-fg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            font-weight: 800;
+            z-index: 50;
+        }
+
+        /* 表示する部品 */
+        .show-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px 12px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .show-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* タブ */
+        .tabs {
+            display: flex;
+            gap: 6px;
+            padding: 10px 22px 0;
+            border-bottom: 2px solid color-mix(in srgb, var(--accent) 25%, transparent);
+        }
+
+        .tab-btn {
+            border: 2px solid color-mix(in srgb, var(--accent) 35%, transparent);
+            border-bottom: none;
+            background: var(--tab-bg);
+            color: var(--panel-fg);
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 10px 10px 0 0;
+            padding: 7px 18px;
+            cursor: pointer;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn.on {
+            background: var(--panel-bg);
+            border-color: var(--accent);
+            border-bottom: 2px solid var(--panel-bg);
+        }
+
+        .tab-pane[hidden] {
+            display: none;
+        }
+
+        /* プリセット */
+        .preset-add {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .preset-add input {
+            flex: 1;
+        }
+
+        .preset-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto auto;
+            gap: 6px;
+            align-items: center;
+            padding: 6px 4px;
+            border-bottom: 1px dashed color-mix(in srgb, var(--accent) 20%, transparent);
+            font-size: 14px;
+        }
+
+        .preset-item .name {
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .preset-item .date {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .btn.small {
+            padding: 4px 11px;
+            font-size: 12px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .status {
+            margin-top: 8px;
+            font-size: 13px;
+            min-height: 1.2em;
+        }
+
+        /* OBS接続 */
+        .conn-state {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #e5f4e8;
+            color: #23733a;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .conn-state.off {
+            background: #eee;
+            color: #777;
+        }
+
+        .conn-state.dirty {
+            background: #fff1dc;
+            color: #a35a00;
+        }
+
+        .radio-line {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* 確認（confirm の代わり。OBS の「対話」では confirm が出ないことがあるため） */
+        #ask-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(20, 10, 10, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        #ask-wrap[hidden] {
+            display: none;
+        }
+
+        #ask-box {
+            width: 440px;
+            max-width: 100%;
+            border: 2.5px solid var(--accent);
+            border-radius: 16px;
+            background: var(--panel-bg);
+            color: var(--panel-fg);
+            padding: 20px 22px 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        #ask-msg {
+            font-size: 15px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        #ask-box .btn-row {
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        /* OBS の中のプルダウンの代わり（enhanceSelectsForObs） */
+        .fake-select-wrap {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .fake-select {
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .fake-select-list {
+            display: flex;
+            flex-direction: column;
+            margin-top: 4px;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .fake-select-list[hidden] {
+            display: none;
+        }
+
+        .fake-select-list button {
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            padding: 7px 10px;
+        }
+
+        /* 一覧を開いても、左の項目名は上にそろえる */
+        #panel .row:has(.fake-select-wrap) {
+            align-items: start;
+        }
+
+        #panel .row:has(.fake-select-wrap) > label {
+            padding-top: 8px;
+        }
+
+        #panel .fake-select {
+            padding: 7px 10px;
+            border: 1.5px solid color-mix(in srgb, var(--accent) 35%, transparent);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--input-fg);
+            font-size: 15px;
+        }
+
+        #panel .fake-select-list {
+            border: 1.5px solid color-mix(in srgb, var(--accent) 35%, transparent);
+            border-radius: 8px;
+            background: var(--input-bg);
+        }
+
+        #panel .fake-select-list button {
+            background: transparent;
+            color: var(--input-fg);
+            font-size: 14px;
+        }
+
+        #panel .fake-select-list button.on,
+        #panel .fake-select-list button:hover {
+            background: color-mix(in srgb, var(--accent) 18%, transparent);
+        }
+
+        #panel .p-foot {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 12px 22px 16px;
+            border-top: 1.5px solid color-mix(in srgb, var(--accent) 15%, transparent);
+        }
+
+        #panel .p-foot .note {
+            margin-right: auto;
+            align-self: center;
+            font-size: 12px;
+            opacity: 0.75;
+        }
+
+        @media (max-width: 600px) {
+            #panel .row,
+            .url-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* waiting-css:end */
+
+        /* ===== テーマ：MINIMAL（共通の見た目を、ここで上書きする） ===== */
+
+        :root {
+            --font: 'Zen Kaku Gothic New', 'Inter', sans-serif;
+            --font-main: 'Zen Kaku Gothic New', sans-serif;
+            --font-num: 'Inter', sans-serif;
+            --accent: #111111;
+            --on-accent: #ffffff;
+            --text: #141414;
+            --box-bg: transparent;
+            --shadow: transparent;
+            --main-size: 230px;
+            --pat-size: 24px;
+            --veil: 244 242 238;
+            --panel-bg: #fbfaf8;
+            --panel-fg: #222222;
+            --input-bg: #ffffff;
+            --input-fg: #111111;
+            --tab-bg: #eeebe6;
+            --pad: 120px;
+        }
+
+        /* 暗い地（墨）を選んだら、文字を白に */
+        #stage:has(#bg-pat.pat-ink:not([hidden])) {
+            --text: #f1efea;
+            --accent: #f1efea;
+        }
+
+        /* 枠なし：丸い枠はただの文字に */
+        .pill {
+            height: auto;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        #badge {
+            left: var(--pad);
+            top: 84px;
+            gap: 14px;
+            font-size: 18px;
+            letter-spacing: 6px;
+            background: transparent;
+            color: var(--text);
+        }
+
+        #badge::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e5484d;
+            animation: dot 1.6s ease-in-out infinite;
+        }
+
+        @keyframes dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.25; }
+        }
+
+        #badge .icon { display: none; }
+
+        #clock { right: var(--pad); top: 84px; min-width: 0; gap: 18px; }
+        #clock .date { font-size: 18px; opacity: 0.55; font-family: 'Inter', sans-serif; }
+        #clock .time { font-size: 24px; font-weight: 600; letter-spacing: 1px; }
+
+        /* 大きな枠もなくして、左寄せでドンと置く */
+        #card {
+            left: var(--pad);
+            right: var(--pad);
+            width: auto;
+            margin-left: 0;
+            top: 250px;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            overflow: visible;
+            animation: none;
+        }
+
+        #card .head {
+            height: auto;
+            justify-content: flex-start;
+            background: transparent;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 8px;
+            opacity: 0.5;
+        }
+
+        #card .head::before {
+            content: '';
+            width: 56px;
+            height: 2px;
+            margin-right: 20px;
+            background: currentColor;
+        }
+
+        #card .head .dots { display: none; }
+
+        #card .body {
+            padding: 18px 0 0;
+            align-items: flex-start;
+        }
+
+        #main-row { justify-content: flex-start; }
+
+        #main {
+            font-weight: 900;
+            line-height: 1.02;
+            letter-spacing: -0.02em;
+            text-shadow: none;
+            color: var(--text);
+        }
+
+        /* 一文字ずつ、下からすっと浮かぶ */
+        #main span {
+            animation: rise 7s cubic-bezier(0.2, 0.7, 0.2, 1) infinite;
+            animation-delay: calc(var(--i) * 0.06s);
+        }
+
+        @keyframes rise {
+            0% { opacity: 0; transform: translateY(24px); }
+            12%, 88% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-8px); }
+        }
+
+        #sub {
+            margin-top: 22px;
+            font-family: 'Inter', sans-serif;
+            font-size: 24px;
+            font-weight: 500;
+            letter-spacing: 12px;
+            opacity: 0.45;
+        }
+
+        #count {
+            margin-top: 64px;
+            padding: 0;
+            border-radius: 0;
+            background: transparent;
+            color: var(--text);
+            gap: 28px;
+            align-items: baseline;
+        }
+
+        #count .label { font-size: 20px; font-weight: 500; letter-spacing: 2px; opacity: 0.55; }
+        #count .num { font-size: 110px; font-weight: 300; letter-spacing: -3px; line-height: 1; }
+        #count.reached .num { font-size: 44px; font-weight: 700; letter-spacing: 0; }
+
+        #title {
+            margin-top: 40px;
+            padding: 0;
+            border: none;
+            font-size: 30px;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        #title::before { content: '— '; opacity: 0.5; }
+
+        #profile {
+            left: var(--pad) !important;
+            top: auto !important;
+            bottom: 84px;
+            transform: none;
+            min-width: 0;
+            justify-content: flex-start;
+            font-size: 20px;
+            opacity: 0.6;
+        }
+
+        #ticker {
+            left: auto;
+            right: var(--pad);
+            bottom: 84px;
+            width: 820px;
+            height: 30px;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        #ticker .tag {
+            background: transparent;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            letter-spacing: 4px;
+            opacity: 0.45;
+            padding: 0 18px 0 0;
+        }
+
+        #ticker .tag .icon { display: none; }
+        #ticker .win { -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+
+        /* 柄：紙（ごく細かな点） */
+        #bg-pat::before {
+            background: radial-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1.3px) 0 0 / 24px 24px;
+        }
+
+        #bg-pat.pat-ink::before { background: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1.3px) 0 0 / 24px 24px; }
+
+        #bg-pat.pat-paper { background-color: #f4f2ee; }
+        #bg-pat.pat-mist { background-color: #e7ebee; }
+        #bg-pat.pat-blush { background-color: #f3e7e4; }
+        #bg-pat.pat-ink { background-color: #141414; }
+    </style>
+</head>
+
+<body>
+    <!-- waiting-html:start -->
+    <!-- 待機画面の共通の部品と設定画面（overlay/_shared/waiting/waiting.html から build_waiting.py で流し込み。ここは直接編集しない） -->
+    <div id="stage">
+        <div id="bg"><div id="bg-img" hidden></div><div id="bg-veil" hidden></div><div id="bg-pat"></div></div>
+        <div id="deco"></div>
+
+        <div id="badge" class="pill"><svg class="icon" data-icon="badge"></svg><span id="badge-txt"></span></div>
+        <div id="clock" class="pill"><span class="date"></span><span class="time"></span></div>
+
+        <div id="card">
+            <div class="head"><span id="head-txt"></span><span class="dots"><i></i><i></i><i></i></span></div>
+            <div class="body">
+                <div id="main-row">
+                    <svg class="icon l" data-icon="main"></svg>
+                    <div id="main"></div>
+                    <svg class="icon r" data-icon="main"></svg>
+                </div>
+                <div id="sub"></div>
+                <div id="count"><span class="label"></span><span class="num"></span></div>
+                <div id="title"></div>
+            </div>
+        </div>
+
+        <div id="profile" class="pill"><span class="txt"></span></div>
+
+        <div id="ticker" class="pill">
+            <div class="tag"><svg class="icon" data-icon="ticker"></svg><span id="ticker-tag">INFO</span></div>
+            <div class="win"><div class="track"></div></div>
+        </div>
+    </div>
+
+    <button id="gear" type="button" title="設定（画面のダブルクリックでも開けます）">⚙</button>
+
+    <div id="panel-wrap" hidden>
+        <div id="panel" role="dialog" aria-label="待機画面の設定">
+            <div class="p-head">待機画面の設定</div>
+            <div class="tabs" role="tablist">
+                <button type="button" class="tab-btn on" data-tab="view">表示</button>
+                <button type="button" class="tab-btn" data-tab="save">保存・プリセット</button>
+                <button type="button" class="tab-btn" data-tab="obs">OBS</button>
+            </div>
+            <div class="p-body">
+                <div class="tab-pane" data-pane="view">
+                <fieldset>
+                    <legend>出す場面</legend>
+                    <div class="mode-btns" id="mode-btns"></div>
+                    <div class="warn" id="url-state-warn" hidden>いまは URL に入れた設定で表示しています。ここで変えても保存されず、読み込み直すと URL の内容に戻ります。変えたいときは、下の「OBS 用の URL」を作り直して OBS に貼り直してください。</div>
+                    <div class="hint">キーボードの 1〜4 でも切り替えられます（OBS では「対話」の窓で）。</div>
+                </fieldset>
+
+                <fieldset id="mode-fields">
+                    <legend id="mode-legend"></legend>
+                    <div class="row"><label for="f-label">場面の名前</label><input type="text" id="f-label" placeholder="左上のバッジとボタンに出ます"></div>
+                    <div class="row"><label for="f-main">大きな文字</label><input type="text" id="f-main"></div>
+                    <div class="row"><label for="f-sub">下の英字</label><input type="text" id="f-sub"></div>
+                    <div class="row"><label for="f-header">枠の見出し</label><input type="text" id="f-header"></div>
+                    <div class="row" id="countlabel-wrap"><label for="f-countlabel">残り時間の前の文字</label><input type="text" id="f-countlabel" placeholder="空なら残り時間を出しません"></div>
+                    <div class="row" id="time-wrap">
+                        <label for="f-time" id="time-label">時刻</label>
+                        <div>
+                            <div class="time-row">
+                                <input type="time" id="f-time">
+                                <button type="button" class="btn" data-add="5">+5分後</button>
+                                <button type="button" class="btn" data-add="10">+10分後</button>
+                                <button type="button" class="btn" data-add="15">+15分後</button>
+                                <button type="button" class="btn" data-add="0">消す</button>
+                            </div>
+                            <div class="hint">空のときは残り時間を出しません。過ぎたら「時間になったら」の文字に変わります（空なら消えます）。</div>
+                        </div>
+                    </div>
+                    <div class="row"><label for="f-ticker">流れる文字</label><input type="text" id="f-ticker" placeholder="空なら下の帯を出しません"></div>
+                    <div class="row" id="reached-wrap"><label for="f-reached">時間になったら</label><input type="text" id="f-reached"></div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>全部の場面で共通</legend>
+                    <div class="row"><label for="f-title">配信タイトル</label><input type="text" id="f-title" placeholder="空なら出しません"></div>
+                    <div class="row"><label for="f-profile">プロフィール</label><textarea id="f-profile" placeholder="1行に1つ。順番に切り替わります"></textarea></div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>表示する部品（全部の場面で共通）</legend>
+                    <div class="show-grid">
+                        <label><input type="checkbox" data-show="badge"> 場面のバッジ</label>
+                        <label><input type="checkbox" data-show="date"> 日付</label>
+                        <label><input type="checkbox" data-show="time"> 時刻</label>
+                        <label><input type="checkbox" data-show="bunnies"> <span class="t-icon">アイコン</span></label>
+                        <label><input type="checkbox" data-show="sub"> 下の英字</label>
+                        <label><input type="checkbox" data-show="count"> 残り時間</label>
+                        <label><input type="checkbox" data-show="title"> 配信タイトル</label>
+                        <label><input type="checkbox" data-show="profile"> プロフィール</label>
+                        <label><input type="checkbox" data-show="ticker"> 流れる文字</label>
+                    </div>
+                    <div class="hint">チェックを外した部品は出しません（文字を空にしても消えます）。</div>
+                </fieldset>
+
+                <fieldset>
+                    <legend id="bg-legend">背景（全部の場面で共通）</legend>
+                    <div class="row" id="r-own"><span></span><label><input type="checkbox" id="f-bgown"> <span id="l-bgown">この場面だけ別の背景にする</span></label></div>
+                    <div class="hint" id="bg-own-note"></div>
+                    <div class="row">
+                        <label for="f-bgtype">背景の種類</label>
+                        <select id="f-bgtype">
+                            <option value="pattern" id="opt-pattern">柄</option>
+                            <option value="image">画像</option>
+                            <option value="color">単色</option>
+                            <option value="none">なし（透明）</option>
+                        </select>
+                    </div>
+                    <div class="row" id="r-img">
+                        <span>画像</span>
+                        <div>
+                            <div class="img-line">
+                                <div id="bg-thumb">未設定</div>
+                                <button type="button" class="btn" id="bg-pick">🖼️ 画像を選ぶ</button>
+                                <button type="button" class="btn" id="bg-clear">外す</button>
+                            </div>
+                            <div class="hint" id="bg-note">画面に画像をドラッグしても入れられます。大きな画像は 1920×1080 くらいまで縮めて保存します。</div>
+                        </div>
+                    </div>
+                    <div class="row" id="r-fit">
+                        <label for="f-bgfit">合わせ方</label>
+                        <select id="f-bgfit">
+                            <option value="cover">全体を覆う（はみ出たところは切る）</option>
+                            <option value="contain">全体を入れる（すき間は下の色）</option>
+                            <option value="fill">引き伸ばす</option>
+                            <option value="tile">並べる（柄のように敷き詰める）</option>
+                        </select>
+                    </div>
+                    <div class="row" id="r-tile"><label for="f-bgtile">並べる大きさ</label><div class="range-line"><input type="range" id="f-bgtile" min="10" max="200" step="5"><output id="o-bgtile"></output></div></div>
+                    <div class="row" id="r-scroll">
+                        <label for="f-bgscroll">流す</label>
+                        <select id="f-bgscroll">
+                            <option value="none">止める</option>
+                            <option value="left">左へ</option>
+                            <option value="right">右へ</option>
+                            <option value="up">上へ</option>
+                            <option value="down">下へ</option>
+                            <option value="upleft">左上へ（斜め）</option>
+                            <option value="downright">右下へ（斜め）</option>
+                        </select>
+                    </div>
+                    <div class="row" id="r-speed"><label for="f-bgspeed">流す速さ</label><div class="range-line"><input type="range" id="f-bgspeed" min="5" max="300" step="5"><output id="o-bgspeed"></output></div></div>
+                    <div class="row" id="r-dim"><label for="f-bgdim">うすめる</label><div class="range-line"><input type="range" id="f-bgdim" min="0" max="80" step="5"><output id="o-bgdim"></output></div></div>
+                    <div class="row" id="r-blur"><label for="f-bgblur">ぼかし</label><div class="range-line"><input type="range" id="f-bgblur" min="0" max="20" step="1"><output id="o-bgblur"></output></div></div>
+                    <div class="row" id="r-over"><span></span><label><input type="checkbox" id="f-bgover"> 画像の上に<span class="t-pat">柄</span>を重ねる</label></div>
+                    <div class="row" id="r-color"><label for="f-bgcolor" id="l-bgcolor">色</label><input type="color" id="f-bgcolor"></div>
+                    <div class="row" id="r-patcolor">
+                        <label for="f-bg">柄の下の色</label>
+                        <select id="f-bg"></select>
+                    </div>
+                    <div class="row" id="r-move"><span></span><label><input type="checkbox" id="f-move"> <span class="t-pat">柄</span>をゆっくり動かす</label></div>
+                </fieldset>
+                </div>
+
+                <div class="tab-pane" data-pane="save" hidden>
+                <fieldset>
+                    <legend>プリセット（名前を付けて保存）</legend>
+                    <div class="hint">今の文字・時刻・背景・場面をまとめて取っておけます。配信の種類ごとに作っておくと、読み込むだけで切り替えられます。</div>
+                    <div class="preset-add">
+                        <input type="text" id="preset-name" maxlength="40" placeholder="プリセット名（例: 雑談用）" spellcheck="false">
+                        <button type="button" class="btn primary" id="preset-save">＋ 保存</button>
+                    </div>
+                    <div id="preset-list"></div>
+                    <div class="status" id="save-status" role="status"></div>
+                </fieldset>
+                <fieldset>
+                    <legend>ファイル</legend>
+                    <div class="hint">今の設定とプリセットを、まとめて1つのファイルに書き出します。別のパソコンやブラウザ（OBS など）へ持っていったり、バックアップにしたりできます。</div>
+                    <div class="btn-row">
+                        <button type="button" class="btn" id="file-export">⬇️ ファイルに書き出す</button>
+                        <button type="button" class="btn" id="file-import">⬆️ ファイルから読み込む</button>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>別のタブ</legend>
+                    <div class="hint">同じブラウザで開いているこのページのほかのタブには、変えた内容が自動で反映されます（OBS へは「OBS」タブの接続で送ります）。</div>
+                </fieldset>
+                </div>
+
+                <div class="tab-pane" data-pane="obs" hidden>
+                <fieldset id="size-set">
+                    <legend>OBS に置くとき</legend>
+                    <div class="row"><span>おすすめの大きさ</span><div><strong>幅 1920・高さ 1080</strong></div></div>
+                    <div class="row"><span>いまの大きさ</span><div id="size-now"></div></div>
+                    <div class="hint">OBS の「ブラウザソース」のプロパティで、幅と高さをこの大きさにしてください（配信の解像度が 1920×1080 のとき）。ほかの大きさでも画面に合わせて縮みますが、16:9 でないと上下か左右にすき間ができます。</div>
+                    <div class="warn" id="size-warn" hidden></div>
+                </fieldset>
+
+                <fieldset id="obs-link-set">
+                    <legend>OBS接続（WebSocket）</legend>
+                    <div class="hint">OBS の「ツール → WebSocketサーバー設定」で「WebSocketサーバーを有効にする」をオンにし、「接続情報を表示」のポートとパスワードを入れてください。接続すると、Chrome での変更（場面の切り替えも）を OBS のこのページに送ります。</div>
+                    <div class="row"><label for="obs-port">ポート</label><input type="text" id="obs-port" inputmode="numeric" placeholder="4455"></div>
+                    <div class="row"><label for="obs-password">パスワード</label><input type="password" id="obs-password" autocomplete="off" placeholder="認証なしなら空欄"></div>
+                    <div class="row"><span>反映のしかた</span>
+                        <div class="radio-line">
+                            <label><input type="radio" name="obs-mode" value="auto"> リアルタイム</label>
+                            <label><input type="radio" name="obs-mode" value="manual"> 確定したときだけ</label>
+                        </div>
+                    </div>
+                    <div class="hint">「確定したときだけ」は、「📤 OBSに反映」か Ctrl+Enter を押したときに送ります。配信中にこっそり直したいとき向けです。</div>
+                    <div class="conn-state off" id="obs-state">● 未接続</div>
+                    <div class="btn-row">
+                        <button type="button" class="btn primary" id="obs-connect">🔌 接続</button>
+                        <button type="button" class="btn" id="obs-disconnect" hidden>切断</button>
+                        <button type="button" class="btn" id="obs-commit" hidden>📤 OBSに反映</button>
+                    </div>
+                    <div class="status" id="obs-status" role="status"></div>
+                    <div class="warn" id="obs-in-obs" hidden>いまは OBS の中で開いています。接続は Chrome で開いた編集用のページからします（ここでは受け取るだけ）。</div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>OBS 用の URL</legend>
+                    <div class="hint">OBS の「ブラウザソース」→「URL」に貼ります（「ローカルファイル」のチェックは外す）。場面ごとにシーンを分けるときは、それぞれの URL を使います。</div>
+                    <label class="check-line"><input type="checkbox" id="f-url-state"> 今の文字・設定も URL に入れる（Chrome で作った内容を OBS へ持っていくとき）</label>
+                    <div class="warn" id="url-img-warn" hidden>背景の画像は長すぎて URL に入りません。画像は「OBS接続」か「ファイルに書き出す」で持っていってください。</div>
+                    <div id="url-rows"></div>
+                </fieldset>
+                </div>
+            </div>
+            <div class="p-foot">
+                <span class="note">変えた内容は自動で保存されます</span>
+                <button type="button" class="btn" id="btn-reset">最初の値に戻す</button>
+                <button type="button" class="btn primary" id="btn-close">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ask-wrap" hidden>
+        <div id="ask-box" role="alertdialog" aria-modal="true" aria-labelledby="ask-msg">
+            <div id="ask-msg"></div>
+            <div class="btn-row">
+                <button type="button" class="btn" id="ask-no"></button>
+                <button type="button" class="btn primary" id="ask-yes"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- waiting-html:end -->
+
+    <script>
+        // waiting-js:start
+        // 待機画面の動き（overlay/_shared/waiting/waiting.js から build_waiting.py で流し込み。ここは直接編集しない）
+        (() => {
+            const $ = (s) => document.querySelector(s);
+            const MODE_KEYS = ['soon', 'break', 'end', 'free'];
+            const inObs = typeof window.obsstudio !== 'undefined';
+            if (inObs) document.body.classList.add('in-obs');
+
+            // URL の ?mode= で場面を決め打ちにする（場面ごとに別のソースを置きたいとき）
+            const urlMode = new URLSearchParams(location.search).get('mode');
+            const fixedMode = MODE_KEYS.includes(urlMode) ? urlMode : null;
+            // URL の ?d= に設定が入っていたら、それで表示する（保存はしない）
+            const urlState = (() => {
+                const d = new URLSearchParams(location.search).get('d');
+                if (!d) return null;
+                try {
+                    const b = d.replace(/-/g, '+').replace(/_/g, '/');
+                    return JSON.parse(decodeURIComponent(escape(atob(b))));
+                } catch (e) { return null; }
+            })();
+
+            document.documentElement.style.setProperty('--accent', CONFIG.color.accent);
+
+            // ---- 保存 ----
+            const clone = (o) => JSON.parse(JSON.stringify(o));
+            function defaults() {
+                return {
+                    mode: CONFIG.mode,
+                    modes: clone(CONFIG.modes),
+                    title: CONFIG.title,
+                    profile: CONFIG.profile.slice(),
+                    show: { ...SHOW_DEF, ...(CONFIG.show || {}) },
+                    bgType: CONFIG.bgType || 'pattern',
+                    bg: CONFIG.bg,
+                    bgMove: CONFIG.bgMove,
+                    bgColor: CONFIG.bgColor || '#efe2d2',
+                    bgImage: '',
+                    bgFit: CONFIG.bgFit || 'cover',
+                    bgTile: CONFIG.bgTile || 100,
+                    bgScroll: CONFIG.bgScroll || 'none',
+                    bgSpeed: CONFIG.bgSpeed || 40,
+                    bgDim: CONFIG.bgDim || 0,
+                    bgBlur: CONFIG.bgBlur || 0,
+                    bgPatternOver: !!CONFIG.bgPatternOver,
+                };
+            }
+            const SHOW_DEF = { badge: true, date: true, time: true, bunnies: true, sub: true, count: true, title: true, profile: true, ticker: true };
+            const BG_KEYS = ['bgType', 'bg', 'bgMove', 'bgColor', 'bgImage', 'bgFit', 'bgTile', 'bgScroll', 'bgSpeed', 'bgDim', 'bgBlur', 'bgPatternOver'];
+            // 背景の設定は、ふだんは state（全部の場面で共通）に持ち、
+            // 「この場面だけ別の背景にする」場面は modes[場面].bgSet に持つ（bgOwn が true のときだけ使う）
+            function bgOf(k) {
+                const m = state.modes[k];
+                return m && m.bgOwn && m.bgSet ? m.bgSet : state;
+            }
+            // 柄の下の色がこのテーマにあるか（ほかのテーマのプリセットやファイルから来た色は使えない）
+            const okPat = (v) => v === 'none' || THEME.patterns.some((p) => p[0] === v);
+            const bgCopy = (src) => { const o = {}; BG_KEYS.forEach((k) => { o[k] = src[k]; }); return o; };
+            const anyBgImage = () => !!state.bgImage || MODE_KEYS.some((k) => state.modes[k].bgOwn && state.modes[k].bgSet && state.modes[k].bgSet.bgImage);
+            // 保存・プリセット・ファイル・OBS から来た内容を、足りない項目を初期値で埋めて整える
+            function normalize(s) {
+                const d = defaults();
+                try {
+                    if (s && typeof s === 'object') {
+                        for (const k of BG_KEYS.concat(['mode', 'title'])) if (k in s) d[k] = s[k];
+                        if (s.show && typeof s.show === 'object') d.show = { ...d.show, ...s.show };
+                        if (Array.isArray(s.profile)) d.profile = s.profile;
+                        if (s.modes) for (const m of MODE_KEYS) Object.assign(d.modes[m], s.modes[m] || {});
+                        // 場面ごとの背景は、足りない項目を共通の初期値で埋める
+                        const base = defaults();
+                        for (const m of MODE_KEYS) {
+                            const bs = d.modes[m].bgSet;
+                            d.modes[m].bgSet = bs && typeof bs === 'object' ? { ...bgCopy(base), ...bs } : null;
+                            d.modes[m].bgOwn = !!(d.modes[m].bgOwn && d.modes[m].bgSet);
+                        }
+                    }
+                } catch (e) { /* 読めなければ初期値 */ }
+                if (!MODE_KEYS.includes(d.mode)) d.mode = 'soon';
+                if (!okPat(d.bg)) d.bg = CONFIG.bg;
+                MODE_KEYS.forEach((k) => { const bs = d.modes[k].bgSet; if (bs && !okPat(bs.bg)) bs.bg = CONFIG.bg; });
+                return d;
+            }
+            function load() {
+                if (urlState) return normalize(urlState);
+                try { return normalize(JSON.parse(localStorage.getItem(CONFIG.storageKey) || 'null')); } catch (e) { return defaults(); }
+            }
+            let state = load();
+            // 保存できなかったら（画像が大きすぎて localStorage に入らないなど）、設定画面の下に出す
+            let saveFailed = false;
+            function save() {
+                if (urlState) return;
+                try {
+                    localStorage.setItem(CONFIG.storageKey, JSON.stringify(state));
+                    saveFailed = false;
+                } catch (e) {
+                    saveFailed = true;
+                }
+                const note = document.querySelector('#panel .p-foot .note');
+                if (note) note.textContent = saveFailed ? '⚠️ 保存できませんでした（画像が大きすぎるかもしれません）' : '変えた内容は自動で保存されます';
+            }
+            // 別のタブで変えたら、こちらも描き直す
+            window.addEventListener('storage', (e) => {
+                if (e.key === CONFIG.storageKey && !urlState) { state = load(); render(); if (!wrap.hidden) fillPanel(); }
+            });
+
+            const curMode = () => fixedMode || state.mode;
+
+            // ---- アイコン（テーマの THEME.icon で描く。場所は data-icon の badge / main / ticker） ----
+            function drawIcons() {
+                document.querySelectorAll('svg.icon').forEach((svg) => {
+                    const ic = THEME.icon(svg.dataset.icon || 'main', svg.classList.contains('r') ? 'r' : 'l');
+                    svg.setAttribute('viewBox', ic.viewBox);
+                    svg.innerHTML = ic.svg;
+                });
+            }
+            drawIcons();
+            // テーマで違う呼び名（柄・アイコン・帯の見出し）と、柄の色の選びかた
+            document.querySelectorAll('.t-pat').forEach((e) => { e.textContent = THEME.patternName; });
+            document.querySelectorAll('.t-icon').forEach((e) => { e.textContent = THEME.iconName; });
+            $('#opt-pattern').textContent = THEME.patternName;
+            $('#ticker-tag').textContent = THEME.tickerTag || 'INFO';
+            {
+                const sel = $('#f-bg');
+                THEME.patterns.concat([['none', '色なし（透明）']]).forEach(([v, label]) => {
+                    const o = document.createElement('option');
+                    o.value = v;
+                    o.textContent = label;
+                    sel.appendChild(o);
+                });
+            }
+
+            // ---- 舞台を窓に合わせる ----
+            let stageScale = 1;
+            function fit() {
+                const sc = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+                stageScale = sc;
+                const st = $('#stage');
+                st.style.transform = `scale(${sc})`;
+                st.style.left = (window.innerWidth - 1920 * sc) / 2 + 'px';
+                st.style.top = (window.innerHeight - 1080 * sc) / 2 + 'px';
+            }
+            window.addEventListener('resize', () => { fit(); showSize(); });
+            fit();
+            // 設定画面の「OBS に置くとき」：いまの大きさと、16:9 でないときの知らせ
+            function showSize() {
+                const w = window.innerWidth, h = window.innerHeight;
+                const el = document.getElementById('size-now');
+                if (!el) return;
+                el.textContent = `幅 ${w}・高さ ${h}` + (w === 1920 && h === 1080 ? '（ちょうど）' : '');
+                const warn = document.getElementById('size-warn');
+                const off = Math.abs(w / h - 16 / 9) > 0.01;
+                warn.hidden = !off;
+                if (off) warn.textContent = `16:9 ではないので、${w / h > 16 / 9 ? '左右' : '上下'}にすき間ができます。OBS のブラウザソースの幅と高さを 1920・1080 にしてください。`;
+            }
+            showSize();
+
+            // ---- 描画 ----
+            function setMain(text) {
+                const el = $('#main');
+                el.innerHTML = '';
+                [...text].forEach((ch, i) => {
+                    const sp = document.createElement('span');
+                    sp.textContent = ch === ' ' ? ' ' : ch;
+                    sp.style.setProperty('--i', i);
+                    el.appendChild(sp);
+                });
+                // 長い文字は収まるまで小さくする。はじめの大きさはテーマの CSS の --main-size（なければ 128px）。
+                // 縦書き（writing-mode: vertical-*）のテーマは、高さに合わせる
+                el.style.fontSize = '';
+                const cs = getComputedStyle(el);
+                let fs = parseFloat(cs.getPropertyValue('--main-size')) || 128;
+                const vertical = cs.writingMode.startsWith('vertical');
+                el.style.fontSize = fs + 'px';
+                const row = $('#main-row');
+                const gap = parseFloat(vertical ? getComputedStyle(row).rowGap : getComputedStyle(row).columnGap) || 0;
+                let max = vertical ? row.clientHeight : row.clientWidth;
+                row.querySelectorAll('.icon').forEach((ic) => {
+                    if (ic.style.display !== 'none' && getComputedStyle(ic).display !== 'none') {
+                        const r = ic.getBoundingClientRect();
+                        max -= (vertical ? r.height : r.width) / (stageScale || 1) + gap;
+                    }
+                });
+                const size = () => (vertical ? el.scrollHeight : el.scrollWidth);
+                while (size() > max && fs > 40) { fs -= 4; el.style.fontSize = fs + 'px'; }
+            }
+
+            let tickerText = null;
+            function setTicker(text) {
+                const tk = $('#ticker');
+                tk.hidden = !text.trim();
+                if (text === tickerText) return;
+                tickerText = text;
+                const tr = tk.querySelector('.track');
+                tr.innerHTML = '';
+                if (!text.trim()) return;
+                // 窓より短いと途切れるので、窓の幅を超えるまで繰り返して2組にする
+                const one = document.createElement('div');
+                one.style.display = 'inline-flex';
+                tr.appendChild(one);
+                const winW = tk.querySelector('.win').clientWidth || 1600;
+                do {
+                    const sp = document.createElement('span');
+                    sp.textContent = text;
+                    one.appendChild(sp);
+                } while (one.scrollWidth < winW && one.childElementCount < 20);
+                tr.appendChild(one.cloneNode(true));
+                tr.style.animationDuration = Math.max(8, one.scrollWidth / 110) + 's';
+            }
+
+            let profileIdx = 0;
+            function render() {
+                const m = state.modes[curMode()];
+                const sh = state.show;
+                $('#badge').hidden = !sh.badge;
+                $('#badge-txt').textContent = m.label;
+                $('#clock .date').hidden = !sh.date;
+                $('#clock .time').hidden = !sh.time;
+                $('#clock').hidden = !sh.date && !sh.time;
+                $('#head-txt').textContent = m.header;
+                document.querySelectorAll('#main-row .icon').forEach((b) => { b.style.display = sh.bunnies ? '' : 'none'; });
+                setMain(m.main);
+                $('#sub').textContent = m.sub;
+                $('#sub').hidden = !sh.sub || !m.sub;
+                $('#title').textContent = state.title;
+                $('#title').hidden = !sh.title;
+                renderBg();
+                setTicker(m.ticker || '');
+                if (!sh.ticker) $('#ticker').hidden = true;
+                const lines = state.profile.filter((s) => s.trim());
+                $('#profile').hidden = !sh.profile || !lines.length;
+                if (profileIdx >= lines.length) profileIdx = 0;
+                $('#profile .txt').textContent = lines[profileIdx] || '';
+                tick();
+                placeProfile();
+            }
+
+            // 背景：画像 → うすめ → 柄 の順に重ねる
+            let shownImg = null;
+            // 流す向き（1マスぶん動く向き）
+            const SCROLL_DIRS = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1], upleft: [-1, -1], downright: [1, 1] };
+            // 画像の大きさ（並べる・流すときに使う）。まだ分からなければ読み込んでから描き直す
+            const imgSizes = new Map();
+            function imgSize(src) {
+                if (imgSizes.has(src)) return imgSizes.get(src);
+                imgSizes.set(src, null);
+                const im = new Image();
+                im.onload = () => { imgSizes.set(src, { w: im.naturalWidth, h: im.naturalHeight }); if (bgOf(curMode()).bgImage === src) renderBg(); };
+                im.src = src;
+                return null;
+            }
+            let scrollAnim = null, scrollKey = '';
+            function setScroll(dir, tw, th, spd) {
+                const key = dir ? [dir, tw, th, spd].join(',') : '';
+                if (key === scrollKey) return;
+                scrollKey = key;
+                if (scrollAnim) { scrollAnim.cancel(); scrollAnim = null; }
+                if (!dir) { $('#bg-img').style.willChange = ''; return; }
+                const dx = dir[0] * tw, dy = dir[1] * th;
+                const speed = Math.max(1, +spd || 40);
+                $('#bg-img').style.willChange = 'transform';
+                scrollAnim = $('#bg-img').animate(
+                    [{ transform: 'translate(0, 0)' }, { transform: `translate(${dx}px, ${dy}px)` }],
+                    { duration: Math.hypot(dx, dy) / speed * 1000, iterations: Infinity, easing: 'linear' });
+            }
+            function renderBg() {
+                const B = bgOf(curMode());
+                const t = B.bgType;
+                const isImg = t === 'image' && !!B.bgImage;
+                $('#bg').style.backgroundColor = (t === 'color' || (t === 'image' && B.bgFit === 'contain')) ? B.bgColor : '';
+                const img = $('#bg-img');
+                img.hidden = !isImg;
+                if (isImg) {
+                    if (shownImg !== B.bgImage) { img.style.backgroundImage = `url("${B.bgImage}")`; shownImg = B.bgImage; }
+                    const b = +B.bgBlur || 0;
+                    img.style.filter = b ? `blur(${b}px)` : '';
+                    const fit = B.bgFit;
+                    const dir = SCROLL_DIRS[B.bgScroll] || null;
+                    const sz = imgSize(B.bgImage);
+                    if ((fit === 'tile' || dir) && sz) {
+                        // 画像1枚の大きさ（並べる・流すときの1マス）
+                        let tw, th;
+                        if (fit === 'tile') { const k = (+B.bgTile || 100) / 100; tw = sz.w * k; th = sz.h * k; }
+                        else if (fit === 'cover') { const s = Math.max(1920 / sz.w, 1080 / sz.h); tw = sz.w * s; th = sz.h * s; }
+                        else if (fit === 'contain') { const s = Math.min(1920 / sz.w, 1080 / sz.h); tw = sz.w * s; th = sz.h * s; }
+                        else { tw = 1920; th = 1080; }
+                        tw = Math.max(8, Math.round(tw));
+                        th = Math.max(8, Math.round(th));
+                        // 流す向きの側だけ1マス広げた層に敷き詰め、1マスぶん動かしてくり返す
+                        // （層を大きくしすぎると OBS で重くなるので、動かない向きには広げない。ぼかすときは端が透けないよう少し広げる）
+                        const m = b * 2;
+                        const ax = dir ? dir[0] : 0, ay = dir ? dir[1] : 0;
+                        img.style.inset = 'auto';
+                        img.style.left = (ax > 0 ? -tw : 0) - m + 'px';
+                        img.style.top = (ay > 0 ? -th : 0) - m + 'px';
+                        img.style.width = 1920 + (ax ? tw : 0) + m * 2 + 'px';
+                        img.style.height = 1080 + (ay ? th : 0) + m * 2 + 'px';
+                        img.style.backgroundSize = `${tw}px ${th}px`;
+                        img.style.backgroundRepeat = 'repeat';
+                        img.style.backgroundPosition = `${m}px ${m}px`;
+                        setScroll(dir, tw, th, B.bgSpeed);
+                    } else {
+                        img.style.left = img.style.top = img.style.width = img.style.height = '';
+                        // ぼかすと端が透けるので、そのぶん外へ広げる
+                        img.style.inset = b ? `-${b * 2}px` : '0';
+                        img.style.backgroundSize = fit === 'fill' ? '100% 100%' : (fit === 'tile' ? 'auto' : fit);
+                        img.style.backgroundRepeat = fit === 'tile' ? 'repeat' : 'no-repeat';
+                        img.style.backgroundPosition = 'center';
+                        setScroll(null);
+                    }
+                } else {
+                    if (shownImg) { img.style.backgroundImage = ''; shownImg = null; }
+                    setScroll(null);
+                }
+                const dim = +B.bgDim || 0;
+                $('#bg-veil').hidden = !(isImg && dim);
+                $('#bg-veil').style.background = `rgb(var(--veil) / ${dim / 100})`;
+                const pat = $('#bg-pat');
+                const showPat = t === 'pattern' || (isImg && B.bgPatternOver);
+                pat.hidden = !showPat;
+                const pc = okPat(B.bg) ? B.bg : CONFIG.bg;
+                pat.className = ((t === 'pattern' && pc !== 'none') ? 'pat-' + pc : '') + (B.bgMove ? ' move' : '');
+            }
+
+            // プロフィールは大きな枠のすぐ下に置く
+            function placeProfile() {
+                const card = $('#card');
+                $('#profile').style.top = card.offsetTop + card.offsetHeight + 36 + 'px';
+            }
+
+            // 時計と残り時間（毎秒）
+            const pad = (n) => String(n).padStart(2, '0');
+            function targetDate(hhmm) {
+                const mt = /^(\d{1,2}):(\d{2})$/.exec(hhmm || '');
+                if (!mt) return null;
+                const now = new Date();
+                const t = new Date(now.getFullYear(), now.getMonth(), now.getDate(), +mt[1], +mt[2], 0, 0);
+                // 夜ふかし配信で日をまたぐとき：6時間以上前の時刻なら次の日とみなす
+                if (now - t > 6 * 3600 * 1000) t.setDate(t.getDate() + 1);
+                return t;
+            }
+            function tick() {
+                const now = new Date();
+                const W = '日月火水木金土';
+                $('#clock .date').textContent = `${now.getFullYear()}/${pad(now.getMonth() + 1)}/${pad(now.getDate())} (${W[now.getDay()]})`;
+                $('#clock .time').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+                const m = state.modes[curMode()];
+                const cnt = $('#count');
+                const t = m.countLabel ? targetDate(m.time) : null;
+                if (!t || !state.show.count) { cnt.hidden = true; return; }
+                cnt.hidden = false;
+                const left = Math.ceil((t - now) / 1000);
+                if (left > 0) {
+                    cnt.classList.remove('reached');
+                    const h = Math.floor(left / 3600), mi = Math.floor(left / 60) % 60, s = left % 60;
+                    cnt.querySelector('.label').textContent = `${m.countLabel}（${pad(t.getHours())}:${pad(t.getMinutes())}〜）`;
+                    cnt.querySelector('.num').textContent = (h ? h + ':' + pad(mi) : pad(mi)) + ':' + pad(s);
+                } else if (!m.reached) {
+                    cnt.hidden = true;
+                    return;
+                } else {
+                    cnt.classList.add('reached');
+                    cnt.querySelector('.label').textContent = '';
+                    cnt.querySelector('.num').textContent = m.reached;
+                }
+                cnt.querySelector('.label').hidden = !cnt.querySelector('.label').textContent;
+            }
+            setInterval(tick, 1000);
+
+            setInterval(() => {
+                const lines = state.profile.filter((s) => s.trim());
+                if (lines.length < 2) return;
+                const tx = $('#profile .txt');
+                tx.classList.add('fade');
+                setTimeout(() => {
+                    profileIdx = (profileIdx + 1) % lines.length;
+                    tx.textContent = lines[profileIdx];
+                    tx.classList.remove('fade');
+                }, 400);
+            }, 3000);
+
+            // ---- 設定画面 ----
+            const wrap = $('#panel-wrap');
+            let editMode = curMode();
+            function openPanel() { editMode = curMode(); fillPanel(); wrap.hidden = false; if (curTab === 'save') renderPresets(); }
+            function closePanel() { wrap.hidden = true; }
+            $('#gear').addEventListener('click', openPanel);
+            document.addEventListener('dblclick', (e) => { if (wrap.hidden) openPanel(); });
+            $('#btn-close').addEventListener('click', closePanel);
+            wrap.addEventListener('mousedown', (e) => { if (e.target === wrap) closePanel(); });
+
+            // 日本語の変換中かどうか（変換中は OBS へ送らない。終わったら送る）
+            let composing = false;
+            // いま入力している欄は書き換えない（受け取った内容で描き直すとき、打った文字が消えないように）
+            const editing = (el) => el === document.activeElement && !wrap.hidden;
+            function setVal(sel, v) {
+                const el = $(sel);
+                if (editing(el) && el.type !== 'checkbox') return;
+                el.value = v;
+            }
+            function setChk(sel, v) { $(sel).checked = v; }
+            function fillPanel() {
+                const box = $('#mode-btns');
+                box.innerHTML = '';
+                MODE_KEYS.forEach((k, i) => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'btn' + (k === curMode() ? ' on' : '');
+                    b.textContent = `${i + 1}. ${state.modes[k].label}`;
+                    b.addEventListener('click', () => setMode(k));
+                    box.appendChild(b);
+                });
+                if (fixedMode) {
+                    const n = document.createElement('div');
+                    n.className = 'hint';
+                    n.textContent = `この画面は URL の ?mode=${fixedMode} で「${state.modes[fixedMode].label}」に決めてあります。`;
+                    box.appendChild(n);
+                }
+                const m = state.modes[editMode];
+                $('#mode-legend').textContent = `「${m.label}」の文字`;
+                setVal('#f-label', m.label);
+                $('#countlabel-wrap').hidden = editMode !== 'free';
+                setVal('#f-countlabel', m.countLabel);
+                setVal('#f-main', m.main);
+                setVal('#f-sub', m.sub);
+                setVal('#f-header', m.header);
+                const hasTime = !!m.countLabel || editMode === 'free';
+                $('#time-wrap').hidden = !hasTime;
+                $('#reached-wrap').hidden = !hasTime;
+                $('#time-label').textContent = editMode === 'free' ? '時刻' : m.countLabel.replace(/まで$/, '') + 'の時刻';
+                setVal('#f-time', m.time || '');
+                setVal('#f-reached', m.reached);
+                setVal('#f-title', state.title);
+                setVal('#f-profile', state.profile.join('\n'));
+                document.querySelectorAll('[data-show]').forEach((c) => { c.checked = !!state.show[c.dataset.show]; });
+                setVal('#f-ticker', m.ticker || '');
+                const F = bgOf(editMode);
+                const own = !!state.modes[editMode].bgOwn;
+                setChk('#f-bgown', own);
+                $('#l-bgown').textContent = `「${state.modes[editMode].label}」だけ別の背景にする`;
+                $('#bg-legend').textContent = own ? `背景（「${state.modes[editMode].label}」だけ）` : '背景（全部の場面で共通）';
+                const others = MODE_KEYS.filter((k) => k !== editMode && state.modes[k].bgOwn).map((k) => `「${state.modes[k].label}」`);
+                $('#bg-own-note').textContent = own
+                    ? 'ここで変えた背景は、この場面のときだけ出ます。チェックを外すと共通の背景に戻ります（この場面用の背景は取っておきます）。'
+                    : (others.length ? `${others.join('')}は別の背景にしてあります（その場面を選ぶと変えられます）。` : '');
+                $('#bg-own-note').hidden = !$('#bg-own-note').textContent;
+                setVal('#f-bg', F.bg);
+                setChk('#f-move', !!F.bgMove);
+                setVal('#f-bgtype', F.bgType);
+                setVal('#f-bgfit', F.bgFit);
+                setVal('#f-bgtile', F.bgTile);
+                setVal('#f-bgscroll', F.bgScroll);
+                setVal('#f-bgspeed', F.bgSpeed);
+                setVal('#f-bgdim', F.bgDim);
+                setVal('#f-bgblur', F.bgBlur);
+                setChk('#f-bgover', !!F.bgPatternOver);
+                setVal('#f-bgcolor', F.bgColor);
+                bgRows();
+                $('#url-state-warn').hidden = !urlState;
+                $('#panel .p-foot .note').textContent = urlState ? 'URL の設定で表示中（保存しません）' : '変えた内容は自動で保存されます';
+                renderUrls();
+            }
+
+            // ---- OBS 用の URL ----
+            function baseUrl() {
+                return location.href.split(/[?#]/)[0];
+            }
+            function stateParam() {
+                // 画像は長すぎて URL に入らないので外す
+                const modes = JSON.parse(JSON.stringify(state.modes));
+                MODE_KEYS.forEach((k) => { if (modes[k].bgSet) delete modes[k].bgSet.bgImage; });
+                const s = { modes, title: state.title, profile: state.profile };
+                BG_KEYS.forEach((k) => { if (k !== 'bgImage') s[k] = state[k]; });
+                const json = JSON.stringify(s);
+                return btoa(unescape(encodeURIComponent(json))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            }
+            function buildUrl(mode) {
+                const q = new URLSearchParams();
+                if (mode) q.set('mode', mode);
+                if ($('#f-url-state').checked) q.set('d', stateParam());
+                const s = q.toString();
+                return baseUrl() + (s ? '?' + s : '');
+            }
+            function renderUrls() {
+                $('#url-img-warn').hidden = !($('#f-url-state').checked && anyBgImage());
+                const box = $('#url-rows');
+                box.innerHTML = '';
+                const rows = [[null, 'ここで切り替える']].concat(MODE_KEYS.map((k) => [k, state.modes[k].label + 'だけ']));
+                rows.forEach(([k, name]) => {
+                    const row = document.createElement('div');
+                    row.className = 'url-row';
+                    const lb = document.createElement('span');
+                    lb.textContent = name;
+                    const inp = document.createElement('input');
+                    inp.type = 'text';
+                    inp.readOnly = true;
+                    inp.value = buildUrl(k);
+                    inp.addEventListener('focus', () => inp.select());
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'btn';
+                    b.textContent = 'コピー';
+                    b.addEventListener('click', () => copyText(inp, b));
+                    row.append(lb, inp, b);
+                    box.appendChild(row);
+                });
+            }
+            async function copyText(inp, btn) {
+                let ok = false;
+                try { await navigator.clipboard.writeText(inp.value); ok = true; } catch (e) { /* 下のやり方で */ }
+                if (!ok) {
+                    inp.focus(); inp.select();
+                    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+                }
+                btn.textContent = ok ? 'コピーしました' : '選んで Ctrl+C';
+                setTimeout(() => { btn.textContent = 'コピー'; }, 1800);
+            }
+            $('#f-url-state').addEventListener('change', renderUrls);
+            function setMode(k) {
+                if (!fixedMode) state.mode = k;
+                editMode = k;
+                save(); render(); fillPanel();
+                changed();
+            }
+            function fromPanel() {
+                const m = state.modes[editMode];
+                m.label = $('#f-label').value;
+                if (editMode === 'free') m.countLabel = $('#f-countlabel').value;
+                m.main = $('#f-main').value;
+                m.sub = $('#f-sub').value;
+                m.header = $('#f-header').value;
+                m.time = $('#f-time').value;
+                m.reached = $('#f-reached').value;
+                state.title = $('#f-title').value;
+                state.profile = $('#f-profile').value.split('\n');
+                document.querySelectorAll('[data-show]').forEach((c) => { state.show[c.dataset.show] = c.checked; });
+                m.ticker = $('#f-ticker').value;
+                const F = bgOf(editMode);
+                F.bg = $('#f-bg').value || F.bg;
+                F.bgMove = $('#f-move').checked;
+                F.bgType = $('#f-bgtype').value;
+                F.bgFit = $('#f-bgfit').value;
+                F.bgTile = +$('#f-bgtile').value;
+                F.bgScroll = $('#f-bgscroll').value;
+                F.bgSpeed = +$('#f-bgspeed').value;
+                F.bgDim = +$('#f-bgdim').value;
+                F.bgBlur = +$('#f-bgblur').value;
+                F.bgPatternOver = $('#f-bgover').checked;
+                F.bgColor = $('#f-bgcolor').value;
+                bgRows();
+                save(); render();
+                // ボタンの名前・見出し・URL も合わせる（入力中の欄はそのまま）
+                $('#mode-btns').querySelectorAll('.btn').forEach((b, i) => { b.textContent = `${i + 1}. ${state.modes[MODE_KEYS[i]].label}`; });
+                $('#mode-legend').textContent = `「${m.label}」の文字`;
+                renderUrls();
+                changed();
+            }
+            // 「表示」タブの欄だけが設定を書き換える（URL・プリセット・OBS の欄は別）
+            const fromPanelEv = (e) => {
+                if (!e.target.closest('[data-pane="view"]') || e.target.id === 'f-bgown') return;
+                fromPanel();
+            };
+            $('#panel').addEventListener('input', fromPanelEv);
+            $('#panel').addEventListener('change', fromPanelEv);
+            $('#panel').addEventListener('compositionstart', () => { composing = true; });
+            $('#panel').addEventListener('compositionend', (e) => { composing = false; fromPanelEv(e); });
+            document.querySelectorAll('[data-add]').forEach((b) => b.addEventListener('click', () => {
+                const add = +b.dataset.add;
+                if (!add) { $('#f-time').value = ''; }
+                else {
+                    const t = new Date(Date.now() + add * 60000);
+                    // 秒を切り上げて「ちょうど◯分」にする
+                    if (t.getSeconds()) t.setMinutes(t.getMinutes() + 1);
+                    $('#f-time').value = `${pad(t.getHours())}:${pad(t.getMinutes())}`;
+                }
+                fromPanel();
+            }));
+
+            // 「最初の値に戻す」は確認を、ボタンをもう一度押してもらう形にする（OBS では confirm が出ないことがあるため）
+            let resetArmed = null;
+            $('#btn-reset').addEventListener('click', (e) => {
+                const b = e.currentTarget;
+                if (!resetArmed) {
+                    b.textContent = 'もう一度押すと戻します';
+                    resetArmed = setTimeout(() => { b.textContent = '最初の値に戻す'; resetArmed = null; }, 3000);
+                    return;
+                }
+                clearTimeout(resetArmed); resetArmed = null;
+                b.textContent = '最初の値に戻す';
+                state = defaults();
+                save(); render(); fillPanel();
+                changed();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (!$('#ask-wrap').hidden) {
+                    if (e.key === 'Escape') askFinish(null);
+                    return;
+                }
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && obs.ready) { e.preventDefault(); pushToObs(true); return; }
+                if (e.target.closest && e.target.closest('input, textarea, select')) return;
+                if (e.key === 'Escape') closePanel();
+                const i = ['1', '2', '3', '4'].indexOf(e.key);
+                if (i >= 0) setMode(MODE_KEYS[i]);
+            });
+
+            // ---- 背景の設定：種類に合わせて行を出し分ける ----
+            function bgRows() {
+                const t = $('#f-bgtype').value;
+                const isImg = t === 'image';
+                ['r-img', 'r-fit', 'r-scroll', 'r-dim', 'r-blur', 'r-over'].forEach((id) => { $('#' + id).hidden = !isImg; });
+                $('#r-tile').hidden = !(isImg && $('#f-bgfit').value === 'tile');
+                $('#r-speed').hidden = !(isImg && $('#f-bgscroll').value !== 'none');
+                $('#o-bgtile').textContent = $('#f-bgtile').value + '%';
+                $('#o-bgspeed').textContent = $('#f-bgspeed').value + 'px/秒';
+                $('#r-patcolor').hidden = t !== 'pattern';
+                $('#r-move').hidden = !(t === 'pattern' || (isImg && $('#f-bgover').checked));
+                $('#r-color').hidden = !(t === 'color' || (isImg && $('#f-bgfit').value === 'contain' && $('#f-bgscroll').value === 'none'));
+                $('#l-bgcolor').textContent = t === 'color' ? '色' : 'すき間の色';
+                $('#o-bgdim').textContent = $('#f-bgdim').value + '%';
+                $('#o-bgblur').textContent = $('#f-bgblur').value + 'px';
+                const th = $('#bg-thumb');
+                const FI = bgOf(editMode).bgImage;
+                th.style.backgroundImage = FI ? `url("${FI}")` : '';
+                th.textContent = FI ? '' : '未設定';
+                $('#bg-clear').hidden = !FI;
+            }
+
+            const readFile = (file) => new Promise((resolve, reject) => {
+                const r = new FileReader();
+                r.onload = () => resolve(r.result);
+                r.onerror = () => reject(r.error);
+                r.readAsDataURL(file);
+            });
+            const loadImg = (src) => new Promise((resolve, reject) => {
+                const im = new Image();
+                im.onload = () => resolve(im);
+                im.onerror = () => reject(new Error('画像を読めませんでした'));
+                im.src = src;
+            });
+            // 画像を背景にする。保存・プリセット・OBS への送信が重くならないよう、
+            // 1920×1080 を覆える大きさまで縮めて WebP にする（小さい GIF は動きを残すためそのまま）
+            async function setBgFile(file) {
+                if (!file || !/^image\//.test(file.type)) return;
+                const note = $('#bg-note');
+                note.textContent = '読み込み中…';
+                try {
+                    let out = await readFile(file);
+                    if (!(file.type === 'image/gif' && file.size <= 2 * 1024 * 1024)) {
+                        const im = await loadImg(out);
+                        const sc = Math.min(1, Math.max(1920 / im.naturalWidth, 1080 / im.naturalHeight));
+                        const cv = document.createElement('canvas');
+                        cv.width = Math.round(im.naturalWidth * sc);
+                        cv.height = Math.round(im.naturalHeight * sc);
+                        cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+                        out = cv.toDataURL('image/webp', 0.86);
+                        if (!out.startsWith('data:image/webp')) out = cv.toDataURL('image/jpeg', 0.86);
+                    }
+                    const F = bgOf(editMode);
+                    F.bgImage = out;
+                    F.bgType = 'image';
+                    save(); render(); fillPanel();
+                    changed();
+                    note.textContent = saveFailed
+                        ? '⚠️ 画像が大きすぎて保存できませんでした（表示はしています）。小さめの画像にしてください'
+                        : `画像を入れました（${Math.round(out.length * 0.75 / 1024)}KB）。画面にドラッグしても入れ替えられます。`;
+                } catch (err) {
+                    note.textContent = '⚠️ ' + err.message;
+                }
+            }
+            $('#bg-pick').addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = () => setBgFile(input.files[0]);
+                input.click();
+            });
+            $('#bg-clear').addEventListener('click', () => {
+                const F = bgOf(editMode);
+                F.bgImage = '';
+                if (F.bgType === 'image') F.bgType = 'pattern';
+                save(); render(); fillPanel();
+                changed();
+                $('#bg-note').textContent = '画像を外しました';
+            });
+            $('#f-bgown').addEventListener('change', (e) => {
+                const m = state.modes[editMode];
+                m.bgOwn = e.target.checked;
+                // 初めてのときは、今の共通の背景を写して始める
+                if (m.bgOwn && !m.bgSet) m.bgSet = bgCopy(state);
+                save(); render(); fillPanel();
+                changed();
+            });
+            // 画面に画像をドラッグして入れ替える
+            const hasFiles = (e) => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+            let dragDepth = 0;
+            document.addEventListener('dragenter', (e) => { if (!hasFiles(e)) return; dragDepth++; document.body.classList.add('dragging'); });
+            document.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove('dragging'); } });
+            document.addEventListener('dragover', (e) => { if (hasFiles(e)) e.preventDefault(); });
+            document.addEventListener('drop', (e) => {
+                if (!hasFiles(e)) return;
+                e.preventDefault();
+                dragDepth = 0;
+                document.body.classList.remove('dragging');
+                const f = Array.from(e.dataTransfer.files).find((x) => /^image\//.test(x.type));
+                if (f) setBgFile(f);
+            });
+
+            // ---- タブ ----
+            let curTab = 'view';
+            function showTab(name) {
+                curTab = name;
+                document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('on', b.dataset.tab === name));
+                document.querySelectorAll('.tab-pane').forEach((p) => { p.hidden = p.dataset.pane !== name; });
+                if (name === 'save') renderPresets();
+                $('#panel .p-body').scrollTop = 0;
+            }
+            document.querySelectorAll('.tab-btn').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
+
+            // 設定をまるごと入れ替える（プリセット・ファイル）
+            function applyState(s) {
+                state = normalize(s);
+                editMode = curMode();
+                save(); render(); fillPanel();
+                changed();
+            }
+
+            // ---- 確認（はい → true / いいえ → false / Esc・外側 → null） ----
+            let askDone = null;
+            function askFinish(v) {
+                if (!askDone) return;
+                const d = askDone;
+                askDone = null;
+                $('#ask-wrap').hidden = true;
+                d(v);
+            }
+            function ask(msg, { yes = 'OK', no = 'やめる' } = {}) {
+                askFinish(null);
+                $('#ask-msg').textContent = msg;
+                $('#ask-yes').textContent = yes;
+                $('#ask-no').textContent = no || '';
+                $('#ask-no').hidden = !no;
+                $('#ask-wrap').hidden = false;
+                (no ? $('#ask-no') : $('#ask-yes')).focus();
+                return new Promise((resolve) => { askDone = resolve; });
+            }
+            $('#ask-yes').addEventListener('click', () => askFinish(true));
+            $('#ask-no').addEventListener('click', () => askFinish(false));
+            $('#ask-wrap').addEventListener('mousedown', (e) => { if (e.target === $('#ask-wrap')) askFinish(null); });
+
+            const saveStatus = (t) => { $('#save-status').textContent = t ? `✅ ${t}（${new Date().toLocaleTimeString()}）` : ''; };
+            const fmtDate = (t) => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+            const stateCopy = () => JSON.parse(JSON.stringify(state));
+
+            // ---- プリセット（localStorage。中身は文字だけなので小さい） ----
+            const PRESET_KEY = CONFIG.storageKey + 'Presets';
+            function presetAll() {
+                try {
+                    const a = JSON.parse(localStorage.getItem(PRESET_KEY) || '[]');
+                    return Array.isArray(a) ? a.filter((p) => p && p.name && p.state) : [];
+                } catch (e) { return []; }
+            }
+            function presetWrite(list) {
+                try { localStorage.setItem(PRESET_KEY, JSON.stringify(list)); return true; } catch (e) {
+                    $('#save-status').textContent = '⚠️ 保存できませんでした（ブラウザの保存場所がいっぱいの可能性があります）';
+                    return false;
+                }
+            }
+            function presetPut(name, st, savedAt = Date.now()) {
+                const list = presetAll().filter((p) => p.name !== name);
+                list.push({ name, savedAt, state: st });
+                return presetWrite(list);
+            }
+            function renderPresets() {
+                const box = $('#preset-list');
+                box.innerHTML = '';
+                const list = presetAll().sort((a, b) => b.savedAt - a.savedAt);
+                if (!list.length) {
+                    const n = document.createElement('div');
+                    n.className = 'hint';
+                    n.style.marginTop = '8px';
+                    n.textContent = 'まだプリセットはありません';
+                    box.appendChild(n);
+                    return;
+                }
+                list.forEach((p) => {
+                    const row = document.createElement('div');
+                    row.className = 'preset-item';
+                    const nm = document.createElement('span');
+                    nm.className = 'name';
+                    nm.textContent = p.name;
+                    nm.title = p.name;
+                    const dt = document.createElement('span');
+                    dt.className = 'date';
+                    dt.textContent = fmtDate(p.savedAt);
+                    row.append(nm, dt);
+                    const mk = (label, fn) => {
+                        const b = document.createElement('button');
+                        b.type = 'button';
+                        b.className = 'btn small';
+                        b.textContent = label;
+                        b.addEventListener('click', fn);
+                        row.appendChild(b);
+                    };
+                    mk('読み込む', () => { applyState(p.state); saveStatus(`「${p.name}」を読み込みました`); });
+                    mk('上書き', async () => {
+                        if ((await ask(`「${p.name}」を今の設定で上書きしますか？`, { yes: '上書きする' })) !== true) return;
+                        if (presetPut(p.name, stateCopy())) saveStatus(`「${p.name}」を上書きしました`);
+                        renderPresets();
+                    });
+                    mk('削除', async () => {
+                        if ((await ask(`「${p.name}」を削除しますか？`, { yes: '削除する' })) !== true) return;
+                        presetWrite(presetAll().filter((x) => x.name !== p.name));
+                        saveStatus(`「${p.name}」を削除しました`);
+                        renderPresets();
+                    });
+                    box.appendChild(row);
+                });
+            }
+            $('#preset-save').addEventListener('click', async () => {
+                const name = $('#preset-name').value.trim();
+                if (!name) { $('#save-status').textContent = '⚠️ プリセット名を入れてください'; $('#preset-name').focus(); return; }
+                if (presetAll().some((p) => p.name === name)
+                    && (await ask(`「${name}」はすでにあります。上書きしますか？`, { yes: '上書きする' })) !== true) return;
+                if (presetPut(name, stateCopy())) saveStatus(`「${name}」を保存しました`);
+                $('#preset-name').value = '';
+                renderPresets();
+            });
+            $('#preset-name').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#preset-save').click(); });
+
+            // ---- ファイルに書き出す／読み込む ----
+            const EXPORT_FORMAT = 'donnma-waiting';
+            $('#file-export').addEventListener('click', () => {
+                const presets = presetAll();
+                const data = { format: EXPORT_FORMAT, key: CONFIG.storageKey, version: 1, exportedAt: new Date().toISOString(), current: stateCopy(), presets };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const n = new Date();
+                a.href = url;
+                a.download = `waiting-${CONFIG.storageKey}_${n.getFullYear()}${pad(n.getMonth() + 1)}${pad(n.getDate())}_${pad(n.getHours())}${pad(n.getMinutes())}.json`;
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                saveStatus(`ファイルに書き出しました（今の設定＋プリセット ${presets.length}件）`);
+            });
+            async function importData(data) {
+                if (!data || data.format !== EXPORT_FORMAT) {
+                    await ask('待機画面のファイルではないようです（overlay 本体のファイルは読み込めません）。', { yes: 'OK', no: '' });
+                    return;
+                }
+                if (data.key && data.key !== CONFIG.storageKey
+                    && (await ask(`このファイルは別の待機画面（${data.key}）のものです。読み込みますか？`, { yes: '読み込む' })) !== true) return;
+                if (data.current) applyState(data.current);
+                const incoming = Array.isArray(data.presets) ? data.presets.filter((p) => p && p.name && p.state) : [];
+                const existing = presetAll().map((p) => p.name);
+                const dup = incoming.filter((p) => existing.includes(p.name));
+                let overwrite = true;
+                if (dup.length) {
+                    const r = await ask(`同じ名前のプリセットが ${dup.length}件あります（${dup.map((p) => p.name).join('、')}）。`, { yes: '上書きする', no: '同じ名前のものは読み込まない' });
+                    if (r === null) return;
+                    overwrite = r;
+                }
+                let added = 0;
+                for (const p of incoming) {
+                    if (!overwrite && existing.includes(p.name)) continue;
+                    if (presetPut(p.name, p.state, p.savedAt || Date.now())) added++;
+                }
+                saveStatus(`ファイルから読み込みました（プリセット ${added}件）`);
+                renderPresets();
+            }
+            $('#file-import').addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json,application/json';
+                input.onchange = () => {
+                    const f = input.files[0];
+                    if (!f) return;
+                    const r = new FileReader();
+                    r.onload = async () => {
+                        let data;
+                        try { data = JSON.parse(r.result); } catch (e) {
+                            await ask('読み込めませんでした。正しい JSON ファイルか確認してください。', { yes: 'OK', no: '' });
+                            return;
+                        }
+                        importData(data);
+                    };
+                    r.readAsText(f);
+                };
+                input.click();
+            });
+
+            /* ---- OBS接続（obs-websocket v5）
+             *  Chrome で開いたこのページから OBS に接続し、obs-browser の emit_event で
+             *  OBS 内のブラウザソースへ設定を送る（overlay 本体と同じやり方。イベント名は別） */
+            const OBS_EVENT = 'donnmaWaitingUpdate';
+            const OBS_LINK_KEY = CONFIG.storageKey + 'ObsLink';
+            const OBS_DEF = { port: 4455, password: '', mode: 'auto', autoConnect: false, ...(CONFIG.obs || {}) };
+            // このページの印（自分が送った合図が戻ってきても、受け取らないように）
+            const PAGE_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
+            const obs = { ws: null, ready: false, nextId: 1, pending: new Map(), lastKey: '', timer: 0, mode: 'auto', dirty: false };
+
+            // OBS 側：届いたら反映して、このソースにも保存する（URL の設定で表示しているときは保存しない）
+            // 中身は JSON の文字列（json）で受け取る。OBS は途中で内容を OBS の形式に変えるが、
+            // その形式の配列は「項目のまとまり」しか入らず、プロフィールのような文字の配列は空になってしまうため。
+            // （前の形の state も読めるようにしておく）
+            window.addEventListener(OBS_EVENT, (e) => {
+                const d = e.detail;
+                if (!d || d.key !== CONFIG.storageKey || d.from === PAGE_ID) return;
+                let st = d.state;
+                if (typeof d.json === 'string') { try { st = JSON.parse(d.json); } catch (err) { return; } }
+                if (!st || typeof st !== 'object') return;
+                state = normalize(st);
+                save(); render();
+                if (!wrap.hidden) fillPanel();
+            });
+
+            /* 接続先（ポート・パスワード）は overlay 本体と同じ OBS なので、共通で使う。
+             *  待機画面でまだ入れていなければ、共通の保存先（donnmaObsLink）→ overlay 本体の保存（…ObsLink）の順に探す。
+             *  （同じブラウザで file:// や同じサイトから開いているときだけ読める） */
+            const COMMON_LINK_KEY = 'donnmaObsLink';
+            function sharedLink() {
+                const keys = [COMMON_LINK_KEY, 'nainAllObsLink', 'donnma02ObsLink'];
+                try {
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const k = localStorage.key(i);
+                        if (/ObsLink$/.test(k) && k !== OBS_LINK_KEY && !keys.includes(k)) keys.push(k);
+                    }
+                } catch (e) { /* 読めなければ探さない */ }
+                let portOnly = null;
+                for (const k of keys) {
+                    try {
+                        const v = JSON.parse(localStorage.getItem(k) || 'null');
+                        if (!v) continue;
+                        if (v.password) return { port: v.port || OBS_DEF.port, password: v.password };
+                        if (v.port && !portOnly) portOnly = { port: v.port };
+                    } catch (e) { /* 壊れていれば次へ */ }
+                }
+                return portOnly || {};
+            }
+            function loadLink() {
+                let saved = {};
+                try { saved = JSON.parse(localStorage.getItem(OBS_LINK_KEY) || 'null') || {}; } catch (e) { /* なし */ }
+                const out = { port: OBS_DEF.port, password: OBS_DEF.password, mode: OBS_DEF.mode === 'manual' ? 'manual' : 'auto', auto: !!OBS_DEF.autoConnect, ...saved };
+                // パスワードが空なら（入れていない・前に空のまま切断した）、共通・overlay 本体の設定を使う
+                if (!out.password && !OBS_DEF.password) {
+                    const sh = sharedLink();
+                    if (sh.password) { out.password = sh.password; if (!saved.port || +saved.port === +OBS_DEF.port) out.port = sh.port; }
+                    else if (sh.port && !saved.port) out.port = sh.port;
+                }
+                return out;
+            }
+            function saveLink(patch) {
+                try { localStorage.setItem(OBS_LINK_KEY, JSON.stringify({ ...loadLink(), ...patch })); } catch (e) { /* 覚えられなくても接続はできる */ }
+            }
+            // つながった接続先は、ほかのページ（overlay 本体など）でも使えるように共通の保存先にも書く
+            function saveCommonLink(port, password) {
+                try { localStorage.setItem(COMMON_LINK_KEY, JSON.stringify({ port, password })); } catch (e) { /* なくても困らない */ }
+            }
+            const setObsStatus = (t) => { $('#obs-status').textContent = t; };
+            function refreshObsUi() {
+                $('#obs-connect').hidden = obs.ready;
+                $('#obs-disconnect').hidden = !obs.ready;
+                const manual = obs.mode === 'manual';
+                const dirty = obs.ready && manual && obs.dirty;
+                $('#obs-commit').hidden = !(obs.ready && manual);
+                $('#obs-commit').textContent = dirty ? '📤 OBSに反映 ●' : '📤 OBSに反映';
+                const st = $('#obs-state');
+                st.classList.toggle('off', !obs.ready);
+                st.classList.toggle('dirty', dirty);
+                st.textContent = !obs.ready ? '● 未接続'
+                    : !manual ? '● 接続中（リアルタイム）'
+                        : dirty ? '● 接続中（確定モード）・未反映の変更あり' : '● 接続中（確定モード）';
+                document.querySelectorAll('input[name="obs-mode"]').forEach((r) => { r.checked = r.value === obs.mode; });
+                // 設定画面の下の行にも出す（閉じていても分かるように、⚙ の色も変える）
+                $('#gear').style.background = obs.ready ? (dirty ? '#fff1dc' : '#e5f4e8') : '#fff';
+            }
+            async function obsAuth(password, salt, challenge) {
+                const enc = new TextEncoder();
+                const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+                const secret = b64(await crypto.subtle.digest('SHA-256', enc.encode(password + salt)));
+                return b64(await crypto.subtle.digest('SHA-256', enc.encode(secret + challenge)));
+            }
+            function obsDisconnect() {
+                if (obs.ws) { const ws = obs.ws; obs.ws = null; obs.ready = false; ws.close(); }
+                obs.lastKey = '';
+                obs.dirty = false;
+                refreshObsUi();
+            }
+            function obsConnect(port, password) {
+                obsDisconnect();
+                return new Promise((resolve, reject) => {
+                    let ws;
+                    try { ws = new WebSocket(`ws://127.0.0.1:${port}`, 'obswebsocket.json'); } catch (e) { reject(new Error('接続先が正しくありません')); return; }
+                    obs.ws = ws;
+                    ws.onmessage = async (ev) => {
+                        const msg = JSON.parse(ev.data);
+                        if (msg.op === 0) { // Hello
+                            const identify = { rpcVersion: 1, eventSubscriptions: 0 };
+                            const auth = msg.d.authentication;
+                            if (auth) {
+                                if (!password) { reject(new Error('パスワードが必要です')); ws.close(); return; }
+                                identify.authentication = await obsAuth(password, auth.salt, auth.challenge);
+                            }
+                            ws.send(JSON.stringify({ op: 1, d: identify }));
+                        } else if (msg.op === 2) { // Identified
+                            obs.ready = true;
+                            refreshObsUi();
+                            resolve();
+                        } else if (msg.op === 7) { // RequestResponse
+                            const p = obs.pending.get(msg.d.requestId);
+                            if (!p) return;
+                            obs.pending.delete(msg.d.requestId);
+                            if (msg.d.requestStatus.result) p.resolve(msg.d.responseData);
+                            else p.reject(new Error(msg.d.requestStatus.comment || `エラー ${msg.d.requestStatus.code}`));
+                        }
+                    };
+                    ws.onclose = (ev) => {
+                        const wasReady = obs.ready;
+                        if (obs.ws === ws) { obs.ws = null; obs.ready = false; }
+                        obs.pending.forEach((p) => p.reject(new Error('切断されました')));
+                        obs.pending.clear();
+                        refreshObsUi();
+                        if (ev.code === 4009) reject(new Error('パスワードが違います'));
+                        else if (!wasReady) reject(new Error('OBSに接続できません（OBSが起動しているか、WebSocketサーバーが有効か確認してください）'));
+                        else setObsStatus('OBSとの接続が切れました');
+                    };
+                });
+            }
+            function obsRequest(requestType, requestData) {
+                return new Promise((resolve, reject) => {
+                    if (!obs.ready) { reject(new Error('OBSに接続していません')); return; }
+                    const requestId = String(obs.nextId++);
+                    obs.pending.set(requestId, { resolve, reject });
+                    obs.ws.send(JSON.stringify({ op: 6, d: { requestType, requestId, requestData } }));
+                });
+            }
+            async function pushToObs(force) {
+                if (!obs.ready) return;
+                const key = JSON.stringify(state);
+                if (!force && key === obs.lastKey) return;
+                obs.lastKey = key;
+                obs.dirty = false;
+                refreshObsUi();
+                try {
+                    await obsRequest('CallVendorRequest', {
+                        vendorName: 'obs-browser',
+                        requestType: 'emit_event',
+                        requestData: { event_name: OBS_EVENT, event_data: { key: CONFIG.storageKey, from: PAGE_ID, json: key } },
+                    });
+                    setObsStatus('✅ OBSに反映しました（' + new Date().toLocaleTimeString() + '）');
+                } catch (err) {
+                    obs.lastKey = '';
+                    obs.dirty = true;
+                    refreshObsUi();
+                    setObsStatus('⚠️ 送れませんでした：' + err.message);
+                }
+            }
+            // 設定が変わったとき（自分の操作）。リアルタイムなら少し待って送る、確定モードなら「未反映」にする
+            function changed() {
+                if (!obs.ready || composing) return;
+                clearTimeout(obs.timer);
+                obs.timer = setTimeout(() => {
+                    if (obs.mode === 'auto') pushToObs(false);
+                    else { obs.dirty = JSON.stringify(state) !== obs.lastKey; refreshObsUi(); }
+                }, 300);
+            }
+            async function connectFromPanel(silent) {
+                const port = parseInt($('#obs-port').value, 10) || 4455;
+                const password = $('#obs-password').value;
+                setObsStatus('接続中…');
+                try {
+                    await obsConnect(port, password);
+                    saveLink({ port, password, auto: true, mode: obs.mode });
+                    saveCommonLink(port, password);
+                    if (obs.mode === 'auto') {
+                        setObsStatus('✅ 接続しました。変えるとOBSに自動で反映されます');
+                        pushToObs(true);
+                    } else {
+                        setObsStatus('✅ 接続しました。「OBSに反映」か Ctrl+Enter でOBSに送ります');
+                        obs.dirty = true;
+                        refreshObsUi();
+                    }
+                } catch (err) {
+                    setObsStatus('⚠️ ' + err.message);
+                    if (!silent) { /* 設定画面は開いたまま */ }
+                }
+            }
+            $('#obs-connect').addEventListener('click', () => connectFromPanel(false));
+            $('#obs-disconnect').addEventListener('click', () => { obsDisconnect(); saveLink({ auto: false }); setObsStatus('切断しました'); });
+            $('#obs-commit').addEventListener('click', () => pushToObs(true));
+            document.querySelectorAll('input[name="obs-mode"]').forEach((r) => r.addEventListener('change', () => {
+                if (!r.checked) return;
+                obs.mode = r.value;
+                saveLink({ mode: obs.mode });
+                if (obs.mode === 'auto') pushToObs(false);
+                else { obs.dirty = JSON.stringify(state) !== obs.lastKey; }
+                refreshObsUi();
+            }));
+            {
+                const l = loadLink();
+                obs.mode = l.mode === 'manual' ? 'manual' : 'auto';
+                $('#obs-port').value = l.port || 4455;
+                $('#obs-password').value = l.password || '';
+                $('#obs-in-obs').hidden = !inObs;
+                if (inObs) $('#obs-connect').disabled = true;
+                refreshObsUi();
+                // 前回つないでいたら、開いたときに自動で再接続する（OBS の中ではつながない）
+                if (!inObs && l.auto) connectFromPanel(true);
+            }
+
+
+            /* ---- OBS の中のプルダウン（<select>）
+             *  OBS のブラウザソースの「対話」やドックでは、プルダウンを開いても選択肢が出ないことがある。
+             *  どこで開いても（OBS のドックは OBS の中だと見分けられないので）、ボタン＋選択肢の一覧に置き換える（元の select は隠して残し、値はそこに入れる。
+             *  選んだら input / change を送るので、ほかの処理はそのまま）。一覧は場所を取って開く（スクロールする枠に切られないように） */
+            function enhanceSelectsForObs(root) {
+                const valueProp = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+                root.querySelectorAll('select').forEach((sel) => {
+                    if (sel._fakeSelect) return;
+                    const wrap = document.createElement('span');
+                    wrap.className = 'fake-select-wrap';
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'fake-select';
+                    const list = document.createElement('div');
+                    list.className = 'fake-select-list';
+                    list.hidden = true;
+                    sel.parentNode.insertBefore(wrap, sel);
+                    wrap.append(sel, btn, list);
+                    sel.style.display = 'none';
+                    const label = () => {
+                        const o = sel.options[sel.selectedIndex];
+                        btn.textContent = (o ? o.textContent : '') + ' ▾';
+                    };
+                    // コードから value を入れたときも、ボタンの文字を合わせる
+                    Object.defineProperty(sel, 'value', {
+                        configurable: true,
+                        get() { return valueProp.get.call(this); },
+                        set(v) { valueProp.set.call(this, v); label(); },
+                    });
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (!list.hidden) { list.hidden = true; return; }
+                        document.querySelectorAll('.fake-select-list').forEach((l) => { l.hidden = true; });
+                        list.textContent = '';
+                        Array.from(sel.options).forEach((o) => {
+                            const b = document.createElement('button');
+                            b.type = 'button';
+                            b.textContent = o.textContent;
+                            if (o.value === sel.value) b.className = 'on';
+                            b.addEventListener('click', (ev) => {
+                                ev.stopPropagation();
+                                sel.value = o.value;
+                                list.hidden = true;
+                                sel.dispatchEvent(new Event('input', { bubbles: true }));
+                                sel.dispatchEvent(new Event('change', { bubbles: true }));
+                            });
+                            list.appendChild(b);
+                        });
+                        list.hidden = false;
+                    });
+                    sel._fakeSelect = true;
+                    label();
+                });
+            }
+            document.addEventListener('click', () => { document.querySelectorAll('.fake-select-list').forEach((l) => { l.hidden = true; }); });
+            enhanceSelectsForObs(document.getElementById('panel'));
+
+            render();
+            // フォントが届いたら幅が変わるので、もう一度合わせる
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { tickerText = null; render(); });
+        })();
+        // waiting-js:end
+    </script>
+</body>
+
+</html>
