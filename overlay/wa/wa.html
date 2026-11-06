@@ -4931,11 +4931,10 @@
         ubgModal.addEventListener('click', (e) => { if (e.target === ubgModal) ubgModal.classList.remove('open'); });
 
         /* ---- OBS の中のプルダウン（<select>）
-         *  OBS のブラウザソースの「対話」では、プルダウンを開いても選択肢が出ないことがある。
-         *  OBS の中で開いたときだけ、ボタン＋選択肢の一覧に置き換える（元の select は隠して残し、値はそこに入れる。
+         *  OBS のブラウザソースの「対話」やドックでは、プルダウンを開いても選択肢が出ないことがある。
+         *  どこで開いても（OBS のドックは OBS の中だと見分けられないので）、ボタン＋選択肢の一覧に置き換える（元の select は隠して残し、値はそこに入れる。
          *  選んだら input / change を送るので、ほかの処理はそのまま）。一覧は場所を取って開く（スクロールする枠に切られないように） */
         function enhanceSelectsForObs(root) {
-            if (!window.obsstudio) return;
             const valueProp = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
             root.querySelectorAll('select').forEach((sel) => {
                 if (sel._fakeSelect) return;
