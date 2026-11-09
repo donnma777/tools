@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>フォルダツリーメーカー | どんまうんど-Tools</title>
+  <link rel="icon" href="../favicon.ico">
+  <meta name="description"
+    content="字下げで書いた一覧や、パソコンのフォルダから「├──」「└──」のフォルダツリー（ディレクトリ構成図）をテキストで作る無料ツール。tree コマンド風・全角・記号だけなど線の形を選べて、コメントの位置そろえ、.gitignore に従う読み込み、Markdown 用コピー、画像（PNG）保存つき。ファイルはどこにも送信しません。">
+  <link rel="canonical" href="https://donnma.com/tool/tree/">
+  <meta property="og:title" content="フォルダツリーメーカー | どんまうんど-Tools">
+  <meta property="og:description" content="字下げの一覧やフォルダから ├── のツリーをテキストで作る。README・ブログ用のコピーと画像保存つき。送信しません。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://donnma.com/tool/tree/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-tree.jpg?v=20261110">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="フォルダツリーメーカー">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <meta name="twitter:image:alt" content="フォルダツリーメーカー">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --surface: #2e1224;
+      --surface-2: #38172c;
+      --border: #46162e;
+      --border-strong: #5e2340;
+      --text: #f6e9ef;
+      --label: #e6cfd9;
+      --muted: #c4a2b3;
+      --accent: #ff85a1;
+      --accent-2: #ffb3c6;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --ok: #7fd8a4;
+      --warn: #ffc46b;
+      --ng: #ff8a8a;
+      --mono: ui-monospace, 'SFMono-Regular', Consolas, 'BIZ UDGothic', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    /* ── Hero（トップと同じうさぎ柄） ── */
+    .hero {
+      position: relative;
+      padding: 40px 24px 48px;
+      text-align: center;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -18px;
+      height: 18px;
+      background: radial-gradient(circle at 18px 0, var(--cream) 17.5px, transparent 18px) 0 0 / 36px 18px repeat-x;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: inline-block;
+      max-width: 720px;
+      padding: 24px 36px 26px;
+      background: rgba(246, 242, 226, 0.92);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      font-weight: 700;
+      color: var(--plum-ink);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ── Workspace ── */
+    .workspace {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 48px 24px 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      min-width: 0;
+    }
+
+    .panel-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 10px;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .panel-head .info {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .panel-body {
+      padding: 14px 16px;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      border-color: var(--border-strong);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .sp {
+      flex: 1;
+    }
+
+    /* 入れるところ */
+    .src-wrap {
+      position: relative;
+    }
+
+    #src {
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg-deep);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 10px 12px;
+      width: 100%;
+      min-height: 320px;
+      height: 52vh;
+      resize: vertical;
+      tab-size: 2;
+      white-space: pre;
+      overflow: auto;
+    }
+
+    #src:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .src-wrap.drag #src {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .drop-hint {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent-2);
+      background: rgba(26, 10, 20, 0.82);
+      border-radius: 10px;
+      pointer-events: none;
+    }
+
+    .src-wrap.drag .drop-hint {
+      display: grid;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.7;
+    }
+
+    .hint kbd {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: var(--bg-deep);
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      padding: 0 5px;
+    }
+
+    /* フォルダの読み込み */
+    .load {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .load-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--label);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--label);
+    }
+
+    .field input[type="text"] {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      color: var(--text);
+      background: var(--bg-deep);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 6px 10px;
+      width: 100%;
+    }
+
+    .field input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* 設定 */
+    .opts {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px 16px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+      color: var(--label);
+    }
+
+    .opt {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .opt>span {
+      font-size: 11.5px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    select {
+      font: inherit;
+      font-size: 12.5px;
+      color: var(--text);
+      background: var(--bg-deep);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 6px 8px;
+      width: 100%;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+      color: var(--label);
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .check input {
+      accent-color: var(--accent);
+    }
+
+    /* 結果 */
+    .out-wrap {
+      padding: 14px 16px;
+    }
+
+    #out {
+      font-family: var(--mono);
+      font-size: 14px;
+      line-height: 1.6;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      min-height: 200px;
+      max-height: 70vh;
+      overflow: auto;
+      white-space: pre;
+      tab-size: 4;
+    }
+
+    #out.jp {
+      font-family: 'MS Gothic', 'ＭＳ ゴシック', 'Osaka-Mono', 'BIZ UDGothic', monospace;
+    }
+
+    #out .p {
+      color: var(--muted);
+    }
+
+    #out .d {
+      color: var(--accent-2);
+      font-weight: 700;
+    }
+
+    #out .c {
+      color: var(--ok);
+    }
+
+    #out .empty {
+      color: var(--muted);
+      white-space: normal;
+      font-family: 'Zen Maru Gothic', sans-serif;
+      font-size: 13px;
+    }
+
+    .stats {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 16px 14px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ── Guide ── */
+    .guide {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    details.sec {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      align-self: start;
+    }
+
+    details.sec>summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    details.sec>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.sec>summary::after {
+      content: '';
+      margin-left: auto;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    details.sec[open]>summary::after {
+      transform: rotate(-135deg);
+    }
+
+    details.sec[open]>summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 36px;
+      font-size: 13.5px;
+      color: var(--label);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .steps b {
+      color: var(--text);
+    }
+
+    .notes {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+    }
+
+    .notes b {
+      color: var(--label);
+    }
+
+    .notes code {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent-2);
+      background: var(--bg-deep);
+      border-radius: 4px;
+      padding: 0.1em 0.35em;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(20px);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 400;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 900px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 40px 12px 24px;
+      }
+
+      #src {
+        height: 36vh;
+        min-height: 220px;
+      }
+
+      .guide {
+        padding: 0 12px 40px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        padding: 32px 16px 40px;
+      }
+
+      .hero-inner {
+        padding: 20px 18px 22px;
+      }
+
+      #out {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Topnav -->
+  <!-- shared:header root="../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-back" href="../">ツール一覧</a>
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
+          <span class="topnav-site-dot"></span>
+          donnma.com
+        </a>
+      </div>
+    </div>
+  </nav>
+  <!-- /shared:header -->
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>フォルダツリーメーカー</h1>
+      <p>字下げで書いた一覧や、パソコンのフォルダから、<code style="font-family:var(--mono)">├──</code> のツリーを作ります。README・ブログ・質問に貼る構成図に。ファイルはどこにも送信しません。</p>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- 入れるところ -->
+    <div class="panel">
+      <div class="panel-head">
+        <span>✏️ 書くところ</span>
+        <span class="info" id="src-info"></span>
+        <span class="sp"></span>
+        <button class="btn btn-sm" type="button" id="sample">見本</button>
+        <button class="btn btn-sm" type="button" id="normalize" title="貼ったツリーや字下げを、2文字ずつの字下げに直します">字下げに直す</button>
+        <button class="btn btn-sm" type="button" id="clear">消す</button>
+      </div>
+      <div class="panel-body">
+        <div class="src-wrap" id="src-wrap">
+          <textarea id="src" spellcheck="false" aria-label="ツリーにする一覧" placeholder="1行に1つ、字下げで中身を書きます。&#10;&#10;my-app/&#10;  src/&#10;    main.js  # はじめに読む&#10;  README.md&#10;&#10;├── のツリーや「- 」のリストを貼っても読めます。&#10;フォルダをここにドロップしても入ります。"></textarea>
+          <div class="drop-hint">ここに落とすと読み込みます</div>
+        </div>
+        <p class="hint">字下げはスペースでもタブでも。<kbd>Tab</kbd> で字下げ、<kbd>Shift</kbd>+<kbd>Tab</kbd> で戻します（何行かまとめても）。<code style="font-family:var(--mono)">  # コメント</code> は名前の右に出します。名前の後ろに <code style="font-family:var(--mono)">/</code> を付けるとフォルダになります。</p>
+
+        <div class="load">
+          <div class="load-title">📂 フォルダから作る</div>
+          <div class="row">
+            <button class="btn btn-sm btn-primary" type="button" id="pick">フォルダを選ぶ</button>
+            <span class="hint" style="margin:0">ドロップでも入ります。中身はブラウザで読むだけで、送信しません。</span>
+          </div>
+          <label class="field"><span>外すもの（スペースかカンマで区切る。<code style="font-family:var(--mono)">*</code> も使えます）</span>
+            <input type="text" id="exclude" spellcheck="false">
+          </label>
+          <div class="row" style="gap:6px 18px;font-size:12.5px;color:var(--label)">
+            <label class="check"><input type="checkbox" id="o-gitignore">.gitignore に従う</label>
+            <label class="check"><input type="checkbox" id="o-hidden">. で始まるものも出す</label>
+
+          </div>
+          <input type="file" id="dir" webkitdirectory directory multiple hidden>
+          <input type="file" id="file" accept=".txt,.md,text/plain" hidden>
+        </div>
+      </div>
+    </div>
+
+    <!-- 結果 -->
+    <div class="panel">
+      <div class="panel-head">
+        <span>🌲 できあがり</span>
+        <span class="stats" id="stats"></span>
+      </div>
+      <div class="opts">
+        <label class="opt"><span>線の形</span>
+          <select id="o-style">
+            <option value="line">├── └── │（ふつう）</option>
+            <option value="short">├─ └─ │（短め）</option>
+            <option value="round">├── ╰── │（角が丸い）</option>
+            <option value="bold">┣━━ ┗━━ ┃（太い）</option>
+            <option value="zen">├─ └─ │　（全角・日本語のフォント向け）</option>
+            <option value="ascii">|-- `-- |（記号だけ）</option>
+            <option value="win">+--- \--- |（Windows の tree /a）</option>
+            <option value="space">字下げだけ（線なし）</option>
+          </select>
+        </label>
+        <label class="opt"><span>並べ方</span>
+          <select id="o-sort">
+            <option value="none">書いた順</option>
+            <option value="dirs">名前順（フォルダが先）</option>
+            <option value="name">名前順（まぜる）</option>
+          </select>
+        </label>
+        <label class="opt"><span>フォルダの「/」</span>
+          <select id="o-slash">
+            <option value="keep">書いたまま</option>
+            <option value="add">付ける</option>
+            <option value="remove">付けない</option>
+          </select>
+        </label>
+        <label class="opt"><span>アイコン</span>
+          <select id="o-icon">
+            <option value="none">なし</option>
+            <option value="emoji">📁 📄</option>
+            <option value="dir">📁 だけ</option>
+          </select>
+        </label>
+        <label class="opt"><span>深さ</span>
+          <select id="o-depth">
+            <option value="0">ぜんぶ</option>
+            <option value="1">1段まで</option>
+            <option value="2">2段まで</option>
+            <option value="3">3段まで</option>
+            <option value="4">4段まで</option>
+            <option value="5">5段まで</option>
+          </select>
+        </label>
+        <label class="opt"><span>いちばん上</span>
+          <select id="o-root">
+            <option value="as">書いたまま</option>
+            <option value="dot">「.」を付ける</option>
+          </select>
+        </label>
+      </div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="o-align">コメントの位置をそろえる</label>
+        <label class="check"><input type="checkbox" id="o-nocomment">コメントを出さない</label>
+        <label class="check"><input type="checkbox" id="o-dironly">フォルダだけ出す</label>
+        <label class="check"><input type="checkbox" id="o-count">最後に数を書く</label>
+        <label class="check" title="MS ゴシックなど、罫線が全角の幅になるフォントで見たときの並びを確かめます"><input type="checkbox" id="o-jp">日本語のフォントで見る</label>
+      </div>
+      <div class="out-wrap">
+        <div id="out" aria-live="polite"></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" type="button" id="copy">📋 コピー</button>
+        <button class="btn" type="button" id="copy-md" title="```text で囲んで、Markdown（GitHub・Qiita・Zenn など）にそのまま貼れる形でコピーします">📋 Markdown 用にコピー</button>
+        <button class="btn" type="button" id="save-txt">💾 .txt で保存</button>
+        <button class="btn" type="button" id="save-png">🖼️ 画像（PNG）で保存</button>
+        <select id="o-png" aria-label="画像の色" style="width:auto">
+          <option value="dark">画像：暗い色</option>
+          <option value="light">画像：明るい色</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide -->
+  <section class="guide">
+    <details class="sec">
+      <summary><span class="sec-icon">🔍</span>使い方</summary>
+      <div class="panel-body">
+        <ol class="steps">
+          <li>左に、1行に1つずつ名前を書きます。中に入るものは<b>字下げ</b>（スペースかタブ）します。</li>
+          <li>右にツリーができます。<b>「線の形」</b>や<b>「並べ方」</b>を選んで、<b>「コピー」</b>で貼りつけられます。</li>
+          <li>パソコンのフォルダから作るときは<b>「フォルダを選ぶ」</b>か、フォルダを左にドロップします。左に字下げの一覧が入るので、そこで消したり、コメントを足したりできます。</li>
+          <li>前に作ったツリー（<code>├──</code> や <code>|--</code>、<code>- </code> のリスト）を貼っても読めます。<b>「字下げに直す」</b>で書き直しやすい形にします。</li>
+        </ol>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">💡</span>こんなときに</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li>GitHub の README に、リポジトリの中身の説明を書くとき（<b>「Markdown 用にコピー」</b>がそのまま使えます）。</li>
+          <li>ブログ・Qiita・Zenn の記事や、質問の掲示板・AI に、フォルダの構成を伝えるとき。</li>
+          <li>サイトのページ構成や、資料の置き場所の決まりをまとめるとき。</li>
+          <li>X（Twitter）などに貼るときは<b>画像（PNG）</b>にすると、線がずれません。</li>
+        </ul>
+      </div>
+    </details>
+    <details class="sec">
+      <summary><span class="sec-icon">⚙️</span>線がずれるとき</summary>
+      <div class="panel-body">
+        <ul class="notes">
+          <li><code>│</code> や <code>─</code> は、フォントによって半角の幅にも全角の幅にもなります。英語のフォント（GitHub など）では<b>「ふつう」</b>がそろいます。</li>
+          <li>MS ゴシックなど日本語のフォントで見る場所（Excel・メモ帳・掲示板など）では、<b>「全角・日本語のフォント向け」</b>にするとそろいます。<b>「日本語のフォントで見る」</b>で確かめられます。</li>
+          <li>どこでも同じに見せたいときは、<b>「記号だけ」</b>か<b>画像（PNG）</b>が確実です。</li>
+          <li>フォルダを選ぶとき、ブラウザに「アップロード」と出ることがありますが、ファイルは送られません（名前を読むだけです）。中身が空のフォルダは「選ぶ」では出ず、ドロップだと出ます。</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- AdSense -->
+  <div style="max-width:1400px; margin:0 auto 32px; padding:0 24px;">
+    <!-- どんまうんど -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4863572964771965" data-ad-slot="7669813635"
+      data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <!-- Footer -->
+  <!-- shared:footer root="../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); };
+      const esc = t => t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const STORE = 'donnma-tree';
+      const MAX_ENTRIES = 20000;   // フォルダから読むときの上限
+      const DEF_EXCLUDE = 'node_modules .git .svn .DS_Store Thumbs.db desktop.ini __pycache__ .venv .idea';
+      const SAMPLE = [
+        'my-app/',
+        '  public/',
+        '    favicon.ico',
+        '    index.html',
+        '  src/',
+        '    components/',
+        '      Header.jsx',
+        '      Footer.jsx',
+        '    App.jsx  # 画面のおおもと',
+        '    main.jsx  # はじめに読むファイル',
+        '  .gitignore',
+        '  package.json',
+        '  README.md',
+      ].join('\n');
+
+      // 線の形：[まんなか, いちばん下, 縦の線, 空き]
+      const STYLES = {
+        line: ['├── ', '└── ', '│   ', '    '],
+        short: ['├─ ', '└─ ', '│  ', '   '],
+        round: ['├── ', '╰── ', '│   ', '    '],
+        bold: ['┣━━ ', '┗━━ ', '┃   ', '    '],
+        zen: ['├─', '└─', '│　', '　　'],
+        ascii: ['|-- ', '`-- ', '|   ', '    '],
+        win: ['+---', '\\---', '|   ', '    '],
+        space: ['  ', '  ', '  ', '  '],
+      };
+
+      // ── 設定（このブラウザに覚えておく） ──
+      let opt = {
+        style: 'line', sort: 'none', slash: 'keep', icon: 'none', depth: '0', root: 'as',
+        align: true, nocomment: false, dironly: false, count: false, jp: false, png: 'dark',
+        exclude: DEF_EXCLUDE, gitignore: true, hidden: true,
+      };
+      let firstTime = true;
+      try {
+        const got = JSON.parse(localStorage.getItem(STORE) || 'null');
+        if (got) { opt = { ...opt, ...got.opt }; $('src').value = got.src || ''; firstTime = false; }
+      } catch (e) { }
+      if (firstTime) $('src').value = SAMPLE;
+      const save = () => {
+        try { localStorage.setItem(STORE, JSON.stringify({ opt, src: $('src').value.slice(0, 500000) })); } catch (e) { }
+      };
+
+      // ── 文字の幅（全角は 2） ──
+      const wide = cp => (cp >= 0x1100 && cp <= 0x115F) || (cp >= 0x2E80 && cp <= 0xA4CF && cp !== 0x303F) || (cp >= 0xAC00 && cp <= 0xD7A3)
+        || (cp >= 0xF900 && cp <= 0xFAFF) || (cp >= 0xFE30 && cp <= 0xFE4F) || (cp >= 0xFF00 && cp <= 0xFF60) || (cp >= 0xFFE0 && cp <= 0xFFE6)
+        || (cp >= 0x1F300 && cp <= 0x1FAFF) || (cp >= 0x20000 && cp <= 0x3FFFD);
+      // jp: 罫線（2500〜257F）も全角として数える（日本語のフォントでの見え方）
+      const width = (s, jp) => {
+        let w = 0;
+        for (const ch of s) {
+          const cp = ch.codePointAt(0);
+          if (cp === 0xFE0F || cp === 0x200D) continue;
+          w += wide(cp) || (jp && cp >= 0x2500 && cp <= 0x257F) ? 2 : 1;
+        }
+        return w;
+      };
+
+      // ── 読む：字下げ・ツリー・リスト → [{ name, dir, comment, mark, kids }] ──
+      // 行の頭の「線」や「- 」を1つずつ取る（「+page.svelte」のような名前は取らない）
+      const SP = '[ \\t\\u3000\\u00a0]';
+      const PREFIX = new RegExp(`^(?:${SP}|[│┃|¦](?=${SP}|$)|[├└┣┗┠┖╰╟╙|+\`'\\\\][─━\\-]+${SP}?|[─━]+${SP}|[-*+](?=${SP}))+`);
+      const COMMENT = /[ \t　]+(#|\/\/|<-|←)[ \t　]?(.*)$/;
+      function parse(text) {
+        const roots = [];
+        const stack = [];   // { col, node }
+        for (const raw of text.split(/\r?\n/)) {
+          const m = raw.match(PREFIX);
+          const pre = m ? m[0] : '';
+          let rest = raw.slice(pre.length).replace(/[ \t　]+$/, '');
+          if (!rest) continue;
+          let comment = '', mark = '#';
+          const cm = rest.match(COMMENT);
+          if (cm) { comment = cm[2].trim(); mark = cm[1]; rest = rest.slice(0, cm.index); }
+          else if (/^(#|\/\/)/.test(rest) && !pre) continue;   // 行まるごとのコメント
+          let col = 0;
+          for (const ch of pre) col += ch === '\t' ? 4 : 1;
+          const name = rest.trim();
+          if (!name) continue;
+          const node = { name: name.replace(/[\\/]+$/, ''), slash: /[\\/]$/.test(name), comment, mark, kids: [] };
+          if (!node.name) node.name = name;   // 「/」だけの行
+          while (stack.length && stack[stack.length - 1].col >= col) stack.pop();
+          (stack.length ? stack[stack.length - 1].node.kids : roots).push(node);
+          stack.push({ col, node });
+        }
+        return roots;
+      }
+      const isDir = n => n.slash || n.kids.length > 0;
+
+      // ── 並べる ──
+      const coll = new Intl.Collator('ja', { numeric: true, sensitivity: 'base' });
+      function sortTree(list, how) {
+        if (how === 'none') return list;
+        const out = [...list].sort((a, b) => {
+          if (how === 'dirs' && isDir(a) !== isDir(b)) return isDir(a) ? -1 : 1;
+          return coll.compare(a.name, b.name);
+        });
+        return out.map(n => ({ ...n, kids: sortTree(n.kids, how) }));
+      }
+
+      // ── 作る：→ [{ pre, label, dir, comment, mark }] ──
+      function build(roots) {
+        const st = STYLES[opt.style] || STYLES.line;
+        const maxDepth = +opt.depth || Infinity;
+        let list = sortTree(roots, opt.sort);
+        const rows = [];
+        let nDir = 0, nFile = 0;
+        const label = n => {
+          const dir = isDir(n);
+          let name = n.name;
+          if (dir && (opt.slash === 'add' || (opt.slash === 'keep' && n.slash))) name += '/';
+          const icon = opt.icon === 'emoji' ? (dir ? '📁 ' : '📄 ') : opt.icon === 'dir' && dir ? '📁 ' : '';
+          return icon + name;
+        };
+        const walk = (n, pre, last, depth, top) => {
+          const dir = isDir(n);
+          if (opt.dironly && !dir) return;
+          dir ? nDir++ : nFile++;
+          rows.push({ pre: top ? pre : pre + (last ? st[1] : st[0]), label: label(n), dir, comment: n.comment, mark: n.mark });
+          if (depth >= maxDepth) return;
+          const kids = opt.dironly ? n.kids.filter(isDir) : n.kids;
+          const next = top ? pre : pre + (last ? st[3] : st[2]);
+          kids.forEach((k, i) => walk(k, next, i === kids.length - 1, depth + 1, false));
+        };
+        if (opt.root === 'dot') {
+          rows.push({ pre: '', label: '.', dir: true, comment: '', mark: '#' });
+          const top = opt.dironly ? list.filter(isDir) : list;
+          top.forEach((n, i) => walk(n, '', i === top.length - 1, 1, false));
+        } else {
+          list.forEach(n => walk(n, '', true, 0, true));
+        }
+        return { rows, nDir, nFile };
+      }
+
+      // 行を文字にする（コメントの位置もそろえる）
+      function lines(res) {
+        const jp = opt.style === 'zen' || opt.jp;
+        const showC = !opt.nocomment;
+        let col = 0;
+        if (showC && opt.align) for (const r of res.rows) if (r.comment) col = Math.max(col, width(r.pre + r.label, jp));
+        const out = res.rows.map(r => {
+          const head = r.pre + r.label;
+          if (!showC || !r.comment) return { head, tail: '', r };
+          const pad = opt.align ? ' '.repeat(col - width(head, jp) + 2) : '  ';
+          return { head, tail: pad + r.mark + ' ' + r.comment, r };
+        });
+        return out;
+      }
+      const countText = res => `\n${res.nDir} 個のフォルダ${opt.dironly ? '' : `、${res.nFile} 個のファイル`}`;
+      function toText() {
+        const res = build(parse($('src').value));
+        let t = lines(res).map(l => (l.head + l.tail).replace(/[ 　]+$/, '')).join('\n');
+        if (t && opt.count) t += '\n' + countText(res);
+        return t;
+      }
+
+      // ── 画面に出す ──
+      function render() {
+        const roots = parse($('src').value);
+        const res = build(roots);
+        const out = $('out');
+        out.classList.toggle('jp', opt.jp);
+        if (!res.rows.length) {
+          out.innerHTML = '<div class="empty">左に名前を書くと、ここにツリーが出ます。</div>';
+          $('stats').textContent = '';
+        } else {
+          let html = lines(res).map(l => {
+            const r = l.r;
+            const icon = l.head.slice(r.pre.length);
+            return `<span class="p">${esc(r.pre)}</span>${r.dir ? `<span class="d">${esc(icon)}</span>` : esc(icon)}${l.tail ? `<span class="c">${esc(l.tail)}</span>` : ''}`;
+          }).join('\n');
+          if (opt.count) html += `\n<span class="p">${esc(countText(res))}</span>`;
+          out.innerHTML = html;
+          $('stats').textContent = `フォルダ ${res.nDir}・ファイル ${res.nFile}`;
+        }
+        const n = $('src').value.split('\n').filter(s => s.trim()).length;
+        $('src-info').textContent = n ? `${n} 行` : '';
+        save();
+      }
+
+      // ── 字下げに直す（ツリーを貼ったあと、書き直しやすく） ──
+      function toIndent(roots) {
+        const out = [];
+        const walk = (n, d) => {
+          out.push('  '.repeat(d) + n.name + (isDir(n) ? '/' : '') + (n.comment ? `  ${n.mark} ${n.comment}` : ''));
+          n.kids.forEach(k => walk(k, d + 1));
+        };
+        roots.forEach(n => walk(n, 0));
+        return out.join('\n');
+      }
+      const setSrc = text => {
+        const ta = $('src');
+        ta.focus();
+        ta.select();
+        // 元に戻す（Ctrl+Z）が効くように、できれば execCommand で入れる
+        if (!document.execCommand || !document.execCommand('insertText', false, text)) ta.value = text;
+        if (ta.value !== text) ta.value = text;
+        ta.setSelectionRange(0, 0);
+        ta.scrollTop = 0;
+        render();
+      };
+      $('normalize').addEventListener('click', () => {
+        const roots = parse($('src').value);
+        if (!roots.length) { toast('書いてあるものがありません'); return; }
+        setSrc(toIndent(roots));
+        toast('2文字ずつの字下げに直しました');
+      });
+      $('sample').addEventListener('click', () => setSrc(SAMPLE));
+      $('clear').addEventListener('click', () => { setSrc(''); });
+
+      // ── Tab で字下げ ──
+      $('src').addEventListener('keydown', e => {
+        if (e.key !== 'Tab' || e.ctrlKey || e.altKey || e.metaKey) return;
+        const ta = e.target;
+        const v = ta.value, s = ta.selectionStart, en = ta.selectionEnd;
+        const ls = v.lastIndexOf('\n', s - 1) + 1;
+        let le = v.indexOf('\n', en > s && v[en - 1] === '\n' ? en - 1 : en);
+        if (le < 0) le = v.length;
+        const multi = v.slice(s, en).includes('\n');
+        if (!multi && !e.shiftKey) {
+          // 1行の中なら、カーソルのところに2文字
+          e.preventDefault();
+          document.execCommand('insertText', false, '  ') || (ta.setRangeText('  ', s, en, 'end'));
+          render();
+          return;
+        }
+        e.preventDefault();
+        const block = v.slice(ls, le).split('\n');
+        let d0 = 0, dAll = 0;
+        const next = block.map((l, i) => {
+          let r;
+          if (e.shiftKey) { const m = l.match(/^( {1,2}|\t)/); r = m ? l.slice(m[0].length) : l; }
+          else r = l ? '  ' + l : l;
+          const d = r.length - l.length;
+          if (i === 0) d0 = d;
+          dAll += d;
+          return r;
+        }).join('\n');
+        ta.setSelectionRange(ls, le);
+        if (!document.execCommand('insertText', false, next)) ta.setRangeText(next, ls, le);
+        ta.setSelectionRange(Math.max(ls, s + d0), en + dAll);
+        render();
+      });
+
+      // ── フォルダを読む ──
+      const globRe = (p, anchored) => {
+        let r = '';
+        for (let i = 0; i < p.length; i++) {
+          const c = p[i];
+          if (c === '*') {
+            if (p[i + 1] === '*') {
+              i++;
+              if (p[i + 1] === '/') { i++; r += '(?:.*/)?'; } else r += '.*';
+            } else r += '[^/]*';
+          } else if (c === '?') r += '[^/]';
+          else if (c === '[') { const j = p.indexOf(']', i); if (j > i) { r += p.slice(i, j + 1).replace(/^\[!/, '[^'); i = j; } else r += '\\['; }
+          else r += c.replace(/[.+^${}()|\\]/g, '\\$&');
+        }
+        return new RegExp((anchored ? '^' : '^(?:.*/)?') + r + '$', 'i');
+      };
+      // 外すもの（名前）と .gitignore → (相対パス, フォルダか) => 外すなら true
+      function makeFilter(gitignoreText) {
+        const names = opt.exclude.split(/[\s,、]+/).filter(Boolean).map(p => globRe(p.replace(/\/$/, ''), false));
+        const rules = [];
+        if (opt.gitignore && gitignoreText) {
+          for (let l of gitignoreText.split(/\r?\n/)) {
+            l = l.replace(/\s+$/, '');
+            if (!l || l.startsWith('#')) continue;
+            let neg = false;
+            if (l.startsWith('!')) { neg = true; l = l.slice(1); }
+            const dirOnly = l.endsWith('/');
+            l = l.replace(/\/+$/, '');
+            const anchored = l.replace(/^\//, '').includes('/') || l.startsWith('/');
+            l = l.replace(/^\//, '');
+            if (!l) continue;
+            rules.push({ re: globRe(l, anchored), neg, dirOnly });
+          }
+        }
+        return (rel, dir) => {
+          const base = rel.split('/').pop();
+          if (!opt.hidden && base.startsWith('.')) return true;
+          if (names.some(re => re.test(base))) return true;
+          let out = false;
+          for (const r of rules) {
+            // 親のフォルダから順に見るので、外したフォルダの中はそもそも読まない
+            if (r.dirOnly && !dir) continue;
+            if (r.re.test(rel)) out = !r.neg;
+          }
+          return out;
+        };
+      }
+      const dirNode = name => ({ name, slash: true, comment: '', mark: '#', kids: [], map: new Map() });
+      const fileNode = name => ({ name, slash: false, comment: '', mark: '#', kids: [] });
+      const finish = (root, count, cut) => {
+        const clean = n => { delete n.map; n.kids.forEach(clean); };
+        clean(root);
+        // フォルダを先にした名前順で入れる（「書いた順」のままでも見やすいように）
+        setSrc(toIndent(sortTree([root], 'dirs')));
+        toast(cut ? `多すぎるので ${MAX_ENTRIES} 個で止めました` : `${count} 個を読み込みました`);
+      };
+
+      // 「フォルダを選ぶ」（webkitdirectory）
+      $('pick').addEventListener('click', () => $('dir').click());
+      $('dir').addEventListener('change', async e => {
+        const files = [...e.target.files];
+        e.target.value = '';
+        if (!files.length) { toast('ファイルが1つもないフォルダは、ドロップで読み込めます'); return; }
+        const top = files[0].webkitRelativePath.split('/')[0];
+        const gi = files.find(f => f.webkitRelativePath === top + '/.gitignore');
+        const skip = makeFilter(gi ? await gi.text() : '');
+        const root = dirNode(top);
+        let count = 0, cut = false;
+        for (const f of files) {
+          const parts = f.webkitRelativePath.split('/').slice(1);
+          let cur = root, ok = true;
+          for (let i = 0; i < parts.length; i++) {
+            const isLast = i === parts.length - 1;
+            const rel = parts.slice(0, i + 1).join('/');
+            if (skip(rel, !isLast)) { ok = false; break; }
+            if (isLast) break;
+            let d = cur.map.get(parts[i]);
+            if (!d) {
+              if (count >= MAX_ENTRIES) { cut = true; ok = false; break; }
+              d = dirNode(parts[i]); cur.map.set(parts[i], d); cur.kids.push(d); count++;
+            }
+            cur = d;
+          }
+          if (!ok) continue;
+          if (count >= MAX_ENTRIES) { cut = true; continue; }
+          cur.kids.push(fileNode(parts[parts.length - 1])); count++;
+        }
+        finish(root, count, cut);
+      });
+
+      // ドロップ（フォルダは中をたどる。空のフォルダも出る）
+      const readAll = dirEntry => new Promise(res => {
+        const r = dirEntry.createReader(), all = [];
+        const more = () => r.readEntries(list => { if (!list.length) res(all); else { all.push(...list); more(); } }, () => res(all));
+        more();
+      });
+      const entryText = entry => new Promise(res => entry.file(f => f.text().then(res, () => res('')), () => res('')));
+      async function readDropped(entry) {
+        let gi = '';
+        const firsts = await readAll(entry);
+        const g = firsts.find(x => x.isFile && x.name === '.gitignore');
+        if (g && opt.gitignore) gi = await entryText(g);
+        const skip = makeFilter(gi);
+        const root = dirNode(entry.name);
+        let count = 0, cut = false;
+        const walk = async (list, node, base) => {
+          for (const x of list) {
+            if (count >= MAX_ENTRIES) { cut = true; return; }
+            const rel = base + x.name;
+            if (skip(rel, x.isDirectory)) continue;
+            count++;
+            if (x.isDirectory) {
+              const d = dirNode(x.name);
+              node.kids.push(d);
+              await walk(await readAll(x), d, rel + '/');
+            } else node.kids.push(fileNode(x.name));
+          }
+        };
+        $('src-info').textContent = '読み込み中…';
+        await walk(firsts, root, '');
+        finish(root, count, cut);
+      }
+      const wrap = $('src-wrap');
+      wrap.addEventListener('dragover', e => { if ([...e.dataTransfer.types].includes('Files')) { e.preventDefault(); wrap.classList.add('drag'); } });
+      wrap.addEventListener('dragleave', e => { if (!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag'); });
+      wrap.addEventListener('drop', async e => {
+        wrap.classList.remove('drag');
+        const items = [...e.dataTransfer.items].filter(i => i.kind === 'file');
+        if (!items.length) return;
+        e.preventDefault();
+        const entries = items.map(i => i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
+        const dirs = entries.filter(x => x.isDirectory);
+        if (dirs.length) { await readDropped(dirs[0]); if (dirs.length > 1) toast('フォルダは1つずつ落としてください（はじめの1つを読みました）'); return; }
+        // ファイルだけ：1つなら文字として読む（前に作ったツリーなど）、いくつもなら名前を並べる
+        const files = [...e.dataTransfer.files];
+        if (files.length === 1 && files[0].size < 2 * 1024 * 1024 && /^(text\/|$)/.test(files[0].type)) {
+          const text = await files[0].text();
+          if (!/\u0000/.test(text.slice(0, 2000))) { setSrc(text.replace(/^﻿/, '')); toast(`「${files[0].name}」を読み込みました`); return; }
+        }
+        setSrc(files.map(f => f.name).sort(coll.compare).join('\n'));
+      });
+
+      // ── 書き出し ──
+      const copyText = async (text, msg) => {
+        if (!text) { toast('まだ何もありません'); return; }
+        try { await navigator.clipboard.writeText(text); toast(msg); }
+        catch (e) { toast('コピーできませんでした'); }
+      };
+      $('copy').addEventListener('click', () => copyText(toText(), 'コピーしました'));
+      $('copy-md').addEventListener('click', () => { const t = toText(); copyText(t && '```text\n' + t + '\n```', 'Markdown 用にコピーしました'); });
+      const download = (blob, name) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      };
+      const fileBase = () => {
+        const r = parse($('src').value);
+        const n = (r.length === 1 ? r[0].name : 'tree').replace(/[\\/:*?"<>|]/g, '_').slice(0, 60);
+        return (n === '.' ? 'tree' : n) + '-tree';
+      };
+      $('save-txt').addEventListener('click', () => {
+        const t = toText();
+        if (!t) { toast('まだ何もありません'); return; }
+        download(new Blob([t + '\n'], { type: 'text/plain;charset=utf-8' }), fileBase() + '.txt');
+      });
+      $('save-png').addEventListener('click', async () => {
+        const res = build(parse($('src').value));
+        if (!res.rows.length) { toast('まだ何もありません'); return; }
+        const ls = lines(res);
+        if (opt.count) ls.push({ head: '', tail: '', r: { pre: '', dir: false } }, { head: countText(res).trim(), tail: '', r: { pre: countText(res).trim(), dir: false } });
+        const light = opt.png === 'light';
+        const C = light
+          ? { bg: '#fbf7f9', line: '#a98a99', dir: '#c2386a', file: '#2a1020', cmt: '#2f8a57' }
+          : { bg: '#1a0a14', line: '#8f6c7e', dir: '#ffb3c6', file: '#f6e9ef', cmt: '#7fd8a4' };
+        const fs = 18, lh = Math.round(fs * 1.6), pad = 36;
+        const font = opt.jp ? `${fs}px 'MS Gothic', 'BIZ UDGothic', monospace` : `${fs}px Consolas, 'SFMono-Regular', Menlo, 'BIZ UDGothic', monospace`;
+        try { await document.fonts.load(font); } catch (e) { }
+        const cv = document.createElement('canvas');
+        const cx = cv.getContext('2d');
+        cx.font = font;
+        let w = 0;
+        for (const l of ls) w = Math.max(w, cx.measureText(l.head + l.tail).width);
+        const W = Math.ceil(w + pad * 2), H = ls.length * lh + pad * 2 - (lh - fs) + 4;
+        let scale = 2;
+        while (scale > 1 && (W * scale > 16000 || H * scale > 16000 || W * H * scale * scale > 120e6)) scale--;
+        if (W * scale > 16000 || H * scale > 16000) { toast('大きすぎて画像にできません（深さを減らしてください）'); return; }
+        cv.width = W * scale; cv.height = H * scale;
+        cx.scale(scale, scale);
+        cx.fillStyle = C.bg;
+        cx.fillRect(0, 0, W, H);
+        cx.font = font;
+        cx.textBaseline = 'top';
+        ls.forEach((l, i) => {
+          const y = pad + i * lh;
+          let x = pad;
+          const name = l.head.slice(l.r.pre.length);
+          cx.fillStyle = C.line; cx.fillText(l.r.pre, x, y); x += cx.measureText(l.r.pre).width;
+          cx.fillStyle = l.r.dir ? C.dir : C.file; cx.fillText(name, x, y); x += cx.measureText(name).width;
+          if (l.tail) { cx.fillStyle = C.cmt; cx.fillText(l.tail, x, y); }
+        });
+        cv.toBlob(b => b ? download(b, fileBase() + '.png') : toast('画像を作れませんでした'), 'image/png');
+      });
+
+      // ── 設定 ──
+      const sel = { 'o-style': 'style', 'o-sort': 'sort', 'o-slash': 'slash', 'o-icon': 'icon', 'o-depth': 'depth', 'o-root': 'root', 'o-png': 'png' };
+      for (const [id, key] of Object.entries(sel)) {
+        $(id).value = opt[key];
+        if ($(id).value !== String(opt[key])) opt[key] = $(id).value;
+        $(id).addEventListener('change', () => { opt[key] = $(id).value; render(); });
+      }
+      const chk = { 'o-align': 'align', 'o-nocomment': 'nocomment', 'o-dironly': 'dironly', 'o-count': 'count', 'o-jp': 'jp', 'o-gitignore': 'gitignore', 'o-hidden': 'hidden' };
+      for (const [id, key] of Object.entries(chk)) {
+        $(id).checked = !!opt[key];
+        $(id).addEventListener('change', () => { opt[key] = $(id).checked; render(); });
+      }
+      $('exclude').value = opt.exclude;
+      $('exclude').addEventListener('input', () => { opt.exclude = $('exclude').value; save(); });
+      $('src').addEventListener('input', render);
+
+      render();
+    })();
+  </script>
+</body>
+
+</html>
