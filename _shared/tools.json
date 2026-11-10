@@ -451,10 +451,33 @@
           ],
           "tag": "WordPress プラグイン",
           "kind": "WordPress",
-          "desc": "新しい記事の公開・お問い合わせの送信・コメントの投稿を、Discord に通知するWPプラグイン。用途ごとに送り先を分けたり、複数のチャンネルへ同時に送ったりできる。",
+          "desc": "新しい記事の公開・フォームの送信・コメントの投稿を、Discord に通知するWPプラグイン。用途ごとに送り先を分けたり、複数のチャンネルへ同時に送ったりできる。",
           "icon": [
             "<path d=\"M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9\" />",
             "<path d=\"M10.3 21a1.94 1.94 0 0 0 3.4 0\" />"
+          ]
+        },
+        {
+          "id": "wp-contact-inbox",
+          "name": "Contact Inbox",
+          "links": [
+            {
+              "label": "GitHub",
+              "href": "https://github.com/donnma777/wp-contact-inbox/releases/latest",
+              "external": true
+            },
+            {
+              "label": "解説ページ",
+              "href": "wp-contact-inbox/",
+              "external": false
+            }
+          ],
+          "tag": "WordPress プラグイン",
+          "kind": "WordPress",
+          "desc": "お問い合わせフォームを管理画面で作り、送られた内容を受信一覧で見て、そのまま返信できるWPプラグイン。ブロックで置けて、迷惑メール対策・CSV 書き出し・Discord 通知にも対応。",
+          "icon": [
+            "<path d=\"M22 12h-6l-2 3h-4l-2-3H2\" />",
+            "<path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z\" />"
           ]
         },
         {

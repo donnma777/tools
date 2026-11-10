@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Discord Post Notify｜WordPressの投稿・フォーム・コメントをDiscordに通知するプラグイン | どんまうんど-Tools</title>
   <link rel="icon" href="../favicon.ico">
-  <meta name="description" content="WordPress で記事を公開したとき・Contact Form 7 のフォームが送られたとき・コメントが付いたときに、Discord の Webhook へ通知する無料プラグイン。用途ごとに送り先を分けたり、複数のチャンネルへ同時に送ったりできます。">
+  <meta name="description" content="WordPress で記事を公開したとき・フォームが送られたとき・コメントが付いたときに、Discord の Webhook へ通知する無料プラグイン。用途ごとに送り先を分けたり、複数のチャンネルへ同時に送ったりできます。">
   <link rel="canonical" href="https://donnma.com/tool/discord-post-notify/">
   <meta property="og:title" content="Discord Post Notify｜WordPressの投稿・フォーム・コメントをDiscordに通知するプラグイン | どんまうんど-Tools">
-  <meta property="og:description" content="WordPress の投稿公開・Contact Form 7・コメントを、Discord の Webhook に通知する無料プラグイン。">
+  <meta property="og:description" content="WordPress の投稿公開・フォームの送信・コメントを、Discord の Webhook に通知する無料プラグイン。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://donnma.com/tool/discord-post-notify/">
   <meta property="og:site_name" content="どんまうんど-Tools">
@@ -31,13 +31,13 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
     crossorigin="anonymous"></script>
   <script type="application/ld+json">
-  {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Discord Post Notify", "description": "WordPress で記事を公開したとき・Contact Form 7 のフォームが送られたとき・コメントが付いたときに、Discord の Webhook へ通知する無料プラグイン。用途ごとに送り先を分けたり、複数のチャンネルへ同時に送ったりできます。", "url": "https://donnma.com/tool/discord-post-notify/", "applicationCategory": "BusinessApplication", "operatingSystem": "WordPress", "downloadUrl": "https://github.com/donnma777/discord-post-notify/releases/latest", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "JPY"}, "author": {"@type": "Person", "name": "どんま", "url": "https://donnma.com/"}}
+  {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Discord Post Notify", "description": "WordPress で記事を公開したとき・フォームが送られたとき・コメントが付いたときに、Discord の Webhook へ通知する無料プラグイン。用途ごとに送り先を分けたり、複数のチャンネルへ同時に送ったりできます。", "url": "https://donnma.com/tool/discord-post-notify/", "applicationCategory": "BusinessApplication", "operatingSystem": "WordPress", "downloadUrl": "https://github.com/donnma777/discord-post-notify/releases/latest", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "JPY"}, "author": {"@type": "Person", "name": "どんま", "url": "https://donnma.com/"}}
   </script>
   <script type="application/ld+json">
   {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "どんまうんど-Tools", "item": "https://donnma.com/tool/"}, {"@type": "ListItem", "position": 2, "name": "WordPress プラグイン", "item": "https://donnma.com/tool/#wordpress"}, {"@type": "ListItem", "position": 3, "name": "Discord Post Notify", "item": "https://donnma.com/tool/discord-post-notify/"}]}
   </script>
   <script type="application/ld+json">
-  {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "無料で使えますか？", "acceptedAnswer": {"@type": "Answer", "text": "はい、無料です（GPLv2 or later）。"}}, {"@type": "Question", "name": "Contact Form 7 がなくても使えますか？", "acceptedAnswer": {"@type": "Answer", "text": "使えます。記事の公開とコメントの通知は、Contact Form 7 がなくても動きます。フォームの通知を使うときだけ必要です。"}}, {"@type": "Question", "name": "複数のサーバーに送れますか？", "acceptedAnswer": {"@type": "Answer", "text": "はい。Webhook URL を1行に1つずつ書くと、全部に送ります。"}}, {"@type": "Question", "name": "Webhook URL は人に見せてもいいですか？", "acceptedAnswer": {"@type": "Answer", "text": "見せないでください。URL を知っている人は、だれでもそのチャンネルに投稿できてしまいます。"}}]}
+  {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "無料で使えますか？", "acceptedAnswer": {"@type": "Answer", "text": "はい、無料です（GPLv2 or later）。"}}, {"@type": "Question", "name": "どのフォームの送信を通知できますか？", "acceptedAnswer": {"@type": "Answer", "text": "Contact Inbox に対応しています。ほかのフォームも、送信のあとに dpn_form_submitted というフックを呼べば通知できます。Contact Form 7 からのつなぎ方は GitHub の README にあります。"}}, {"@type": "Question", "name": "複数のサーバーに送れますか？", "acceptedAnswer": {"@type": "Answer", "text": "はい。Webhook URL を1行に1つずつ書くと、全部に送ります。"}}, {"@type": "Question", "name": "Webhook URL は人に見せてもいいですか？", "acceptedAnswer": {"@type": "Answer", "text": "見せないでください。URL を知っている人は、だれでもそのチャンネルに投稿できてしまいます。"}}]}
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -594,7 +594,7 @@
       <header class="g-hero">
         <span class="g-kind">WordPress プラグイン</span>
         <h1>Discord Post Notify</h1>
-        <p class="g-lead">WordPress で <strong>記事の公開</strong>・<strong>Contact Form 7 のフォーム送信</strong>・<strong>コメント</strong>があったときに、Discord に通知を送るプラグインです。</p>
+        <p class="g-lead">WordPress で <strong>記事の公開</strong>・<strong>フォームの送信</strong>・<strong>コメント</strong>があったときに、Discord に通知を送るプラグインです。</p>
         <div class="g-actions">
           <a class="g-btn g-btn-primary" href="https://github.com/donnma777/discord-post-notify/releases/latest" target="_blank" rel="noopener">ダウンロード（GitHub Releases）</a>
           <a class="g-btn g-btn-secondary" href="https://github.com/donnma777/discord-post-notify" target="_blank" rel="noopener">GitHub</a>
@@ -617,7 +617,7 @@
       <section class="g-section" id="features">
         <h2>できること</h2>
         <div class="g-features">
-          <div class="g-feature"><h3>3つのタイミングで通知</h3><p>記事を公開したとき・Contact Form 7 のフォームが送られたとき・コメントが付いたとき（スパム・ゴミ箱は除く）。</p></div>
+          <div class="g-feature"><h3>3つのタイミングで通知</h3><p>記事を公開したとき・フォームが送られたとき（<a href="../wp-contact-inbox/">Contact Inbox</a> など）・コメントが付いたとき（スパム・ゴミ箱は除く）。</p></div>
           <div class="g-feature"><h3>送り先を分けられる</h3><p>投稿・フォーム・コメントごとに Webhook URL を変えられます。空欄の用途はデフォルトの URL に送ります。</p></div>
           <div class="g-feature"><h3>複数のチャンネルへ</h3><p>URL を1行に1つずつ書けば、いくつものサーバー・チャンネルへ同時に送れます。</p></div>
           <div class="g-feature"><h3>メンションを飛ばさない</h3><p>フォームやコメントに <code>@everyone</code> などが書かれていても、Discord でメンション通知は飛びません。</p></div>
@@ -650,8 +650,8 @@
           <p>はい、無料です（GPLv2 or later）。</p>
         </details>
         <details class="g-faq">
-          <summary>Contact Form 7 がなくても使えますか？</summary>
-          <p>使えます。記事の公開とコメントの通知は、Contact Form 7 がなくても動きます。フォームの通知を使うときだけ必要です。</p>
+          <summary>どのフォームの送信を通知できますか？</summary>
+          <p><a href="../wp-contact-inbox/">Contact Inbox</a> に対応しています。ほかのフォームも、送信のあとに <code>dpn_form_submitted</code> というフックを呼べば通知できます。Contact Form 7 からのつなぎ方は <a href="https://github.com/donnma777/discord-post-notify#contact-form-7-から通知する" target="_blank" rel="noopener">GitHub の README</a> にあります（3.0.0 で Contact Form 7 への直接の対応は外しました）。</p>
         </details>
         <details class="g-faq">
           <summary>複数のサーバーに送れますか？</summary>
@@ -667,7 +667,6 @@
         <h2>動作環境・注意</h2>
         <ul>
           <li>WordPress 6.0 以上、PHP 7.4 以上</li>
-          <li>フォームの通知を使うときは Contact Form 7</li>
           <li>管理画面は日本語だけです</li>
           <li>個人で作ったものです。サポートや不具合の対応はお約束できません</li>
         </ul>
@@ -681,13 +680,14 @@
       <section class="g-section g-related">
         <h2>ほかのツール</h2>
         <ul>
+          <li><a href="../wp-contact-inbox/">Contact Inbox</a><span>お問い合わせフォームと受信一覧・返信の WordPress プラグイン</span></li>
           <li><a href="../wp-folder-upload/">Folder Upload</a><span>uploads の好きなフォルダへアップロードする WordPress プラグイン</span></li>
           <li><a href="../wp-webp-upload/">WebP Upload</a><span>画像を自動で WebP に変換する WordPress プラグイン</span></li>
           <li><a href="../">どんまうんど-Tools のツール一覧</a><span>配信オーバーレイ・画像づくり・サイトづくりなど、ブラウザで使える無料ツール</span></li>
         </ul>
       </section>
 
-      <p class="g-date">2026年11月4日 更新</p>
+      <p class="g-date">2026年11月11日 更新</p>
     </article>
   </main>
 
