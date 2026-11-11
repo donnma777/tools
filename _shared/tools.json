@@ -481,6 +481,29 @@
           ]
         },
         {
+          "id": "wp-sns-post",
+          "name": "SNS Post",
+          "links": [
+            {
+              "label": "GitHub",
+              "href": "https://github.com/donnma777/wp-sns-post/releases/latest",
+              "external": true
+            },
+            {
+              "label": "解説ページ",
+              "href": "wp-sns-post/",
+              "external": false
+            }
+          ],
+          "tag": "WordPress プラグイン",
+          "kind": "WordPress",
+          "desc": "記事を公開すると、Bluesky・Threads・X・Facebook ページ・Discord へ自動で投稿するWPプラグイン。送り先ごとのひな形・ハッシュタグ・プレビュー、フォームやコメントの Discord 通知にも対応。",
+          "icon": [
+            "<path d=\"M22 2 11 13\" />",
+            "<path d=\"M22 2 15 22l-4-9-9-4 20-7z\" />"
+          ]
+        },
+        {
           "id": "wp-folder-upload",
           "name": "Folder Upload",
           "links": [
