@@ -1085,6 +1085,25 @@
       flex: 1;
     }
 
+    /* 会社の中の期間（配属・異動ごと） */
+    .cv-terms {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .cv-term {
+      border-left: 3px solid var(--border-strong);
+      padding: 2px 0 2px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .cv-term .cv-co-head {
+      font-size: 12px;
+    }
+
     .cv-co .two {
       gap: 6px;
     }
@@ -1210,8 +1229,15 @@
       padding-bottom: 5px;
     }
 
-    .ss-item.off input[type="text"] {
+    .ss-item.off input[type="text"],
+    .ss-item.off .fixed {
       opacity: .5;
+    }
+
+    .ss-item .fixed {
+      font-size: 13px;
+      color: var(--text);
+      padding: 5px 2px;
     }
 
     .page-view.landscape {
@@ -1470,6 +1496,38 @@
       width: 1%;
     }
 
+    /* 表から取り込む */
+    #paste-text {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .paste-sum {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+      margin: 8px 0 4px;
+    }
+
+    .paste-list select {
+      font-size: 12px;
+      padding: 3px 6px;
+      width: auto;
+    }
+
+    .paste-list td.kind {
+      width: 1%;
+    }
+
+    .paste-list td:last-child {
+      text-align: left;
+      width: auto;
+    }
+
+    .paste-list tr.skip td {
+      opacity: 0.45;
+    }
+
     /* 写真 */
     .photo-box {
       display: flex;
@@ -1586,7 +1644,7 @@
             <button type="button" data-v="cv">🗂️ 職務経歴書</button>
             <button type="button" data-v="skill">💻 スキルシート</button>
           </div>
-          <span class="field-note" style="display:block;margin-top:8px">氏名・記入日・職歴・免許・資格・自己PR（職務経歴書とスキルシート）は共通です。</span>
+          <span class="field-note" style="display:block;margin-top:8px">氏名・記入日・学歴・職歴・免許・資格は共通です。自己PR は職務経歴書とスキルシートで別々に書けます。</span>
         </div>
       </div>
 
@@ -1696,6 +1754,10 @@
             <span class="field-label"><span>経験年数</span><span class="field-note" id="ss-years-note"></span></span>
             <input type="text" data-k="ssYears" placeholder="空なら、いちばん古い案件から数えます">
           </div>
+          <div class="field">
+            <span class="field-label"><span>最終学歴</span><span class="field-note" id="ss-edu-note"></span></span>
+            <input type="text" data-k="ssEdu" placeholder="空なら、履歴書の学歴のいちばん下の「卒業」の行から作ります">
+          </div>
           <span class="field-note">氏名・ふりがな・生年月日・性別は「氏名・生年月日」の欄と共通です。年齢は生年月日から出します。出さない項目は「表示する項目と名前」で選べます。</span>
         </div>
       </div>
@@ -1738,7 +1800,7 @@
         </div>
       </div>
 
-      <div class="panel" data-doc="cv skill">
+      <div class="panel" data-doc="cv">
         <div class="panel-body">
           <div class="panel-title"><span class="sec-icon">✨</span>自己PR</div>
           <textarea data-k="cvPr" rows="6" placeholder="職務経歴書の自己PR は、履歴書より長め（300〜400字くらい）に書けます"></textarea>
@@ -1748,8 +1810,20 @@
 
       <div class="panel" data-doc="skill">
         <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">✨</span>自己PR（スキルシート）</div>
+          <textarea data-k="ssPr" rows="6" placeholder="技術面の強み・得意な工程・チームでの役割など（200〜300字くらい）"></textarea>
+          <div class="row" style="margin-top:6px">
+            <span class="field-note" id="ss-pr-note"></span>
+            <button class="btn btn-sm" type="button" id="ss-pr-copy" style="margin-left:auto">職務経歴書の自己PRを写す</button>
+          </div>
+          <span class="field-note">職務経歴書の自己PR とは別に書けます。エンジニア向けに技術の話を中心にするなど、書き分けられます。</span>
+        </div>
+      </div>
+
+      <div class="panel" data-doc="resume cv skill">
+        <div class="panel-body">
           <div class="panel-title"><span class="sec-icon">🏷️</span>表示する項目と名前</div>
-          <span class="field-note">チェックを外した項目はシートに出しません（入力は残ります）。名前を書くと、シートの見出しがその名前になります。応募先の書き方に合わせるときに。</span>
+          <span class="field-note" id="items-note"></span>
           <div class="ss-items" id="ss-items"></div>
           <div class="row" style="margin-top:8px">
             <button class="btn btn-sm" type="button" id="ss-items-reset">最初の形に戻す</button>
@@ -1828,6 +1902,29 @@
             <span class="field-label"><span>E-mail</span></span>
             <input type="text" data-k="cmail" inputmode="email" spellcheck="false">
           </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <details class="quick" id="paste-box" style="margin-top:0">
+            <summary>📋 表や文章を貼り付けて、学歴・職歴・資格をまとめて入れる</summary>
+            <div class="quick-body">
+              <p class="field-note">前に作った履歴書の表（Excel・スプレッドシート）や、「2012年4月 〇〇高等学校 入学」のような行をそのまま貼り付けます。年・月・内容に分けて、学歴・職歴・免許・資格に振り分けます。「学歴」「職歴」「免許・資格」の見出しの行があれば、それに従います。</p>
+              <textarea id="paste-text" rows="6" spellcheck="false" placeholder="例：
+学歴
+H24	4	〇〇高等学校 普通科 入学
+平成27年3月 〇〇高等学校 普通科 卒業
+職歴
+2019/4 株式会社〇〇 入社
+現在に至る"></textarea>
+              <div id="paste-preview"></div>
+              <div class="row" style="margin-top:8px">
+                <button class="btn btn-sm btn-primary" type="button" id="paste-replace" disabled>置き換えて入れる</button>
+                <button class="btn btn-sm" type="button" id="paste-append" disabled>今の行の後ろに足す</button>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -2083,7 +2180,9 @@
       <summary><span class="sec-icon">✍️</span>書き方のコツ</summary>
       <div class="panel-body">
         <ul class="notes">
-          <li>年は<b>西暦か和暦のどちらかにそろえます</b>。ここでは入れたあとに切り替えるだけで、全部の年が変わります。</li>
+          <li>使わない欄は<b>「🏷️ 表示する項目と名前」</b>でチェックを外すと出さなくなり、名前も変えられます。履歴書では、消した欄の分だけ学歴・職歴の行や2枚目のほかの欄が広がります。</li>
+          <li>年は<b>西暦か和暦のどちらかにそろえます</b>。ここでは入れたあとに切り替えるだけで、全部の年が変わります。「H24」と入れても「平成24」（西暦なら「2012」）で出ます。</li>
+          <li>前に作った履歴書がある人は、<b>「📋 表や文章を貼り付けて、学歴・職歴・資格をまとめて入れる」</b>に Excel やスプレッドシートの表、文章をそのまま貼り付けます。1行ずつ打ち直さずに済みます。</li>
           <li>学歴は<b>中学校の卒業</b>から書くことが多いです。高校からは入学と卒業の両方を書きます。</li>
           <li>職歴は「株式会社〇〇 入社」「一身上の都合により退職」のように書きます。配属や異動は、年と月を空けた行で足せます。</li>
           <li>今も勤めているときは「現在に至る」を入れます。</li>
@@ -2279,29 +2378,71 @@
         motive: '', hope: '貴社の規定に従います。', font: 'mincho', form: 'mhlw',
         summary: '', pr: '', gakuchika: '', subjects: '', hobby: '', shifts: '',
         commute: '', dependents: '', spouse: '', spouseSup: '',
-        aiMode: 'draft', aiKeys: 'motive,pr,summary,gakuchika,cvSummary,cvCompanies,cvSkills,cvPr', aiTarget: '', aiNotes: '',
-        doc: 'resume', cvSummary: '', cvCompanies: [], cvSkills: '', cvPr: '',
-        ssNameMode: 'initial', ssInitials: '', ssStation: '', ssStart: '', ssYears: '', ssSpecialty: '', ssSkills: [], ssProjects: [], ssPhaseMode: 'free', ssOrient: 'portrait', ssOff: '', ssLabels: {},
+        aiMode: 'draft', aiKeys: 'motive,pr,summary,gakuchika,cvSummary,cvCompanies,cvSkills,cvPr,ssPr', aiTarget: '', aiNotes: '',
+        doc: 'resume', cvSummary: '', cvCompanies: [], cvSkills: '', cvPr: '', ssPr: '',
+        ssNameMode: 'initial', ssInitials: '', ssStation: '', ssStart: '', ssYears: '', ssEdu: '', ssSpecialty: '', ssSkills: [], ssProjects: [], ssPhaseMode: 'free', ssOrient: 'portrait', ssOff: '', ssLabels: {},
+        rsOff: '', rsLabels: {}, cvOff: '', cvLabels: {},
         pz: 1, px: 0, py: 0, saveType: 'a4',
       };
       const LISTS = ['ed', 'job', 'lic'];
       // スキルシートの項目（キー・名前・まとまり・消せるか）
       const SS_ITEMS = [
         ['title', 'スキルシート', '見出し', false],
-        ['name', '氏名', '基本情報'], ['age', '年齢', '基本情報'], ['sex', '性別', '基本情報'], ['station', '最寄り駅', '基本情報'], ['start', '稼働開始', '基本情報'], ['years', '経験年数', '基本情報'],
+        ['name', '氏名', '基本情報'], ['age', '年齢', '基本情報'], ['sex', '性別', '基本情報'], ['station', '最寄り駅', '基本情報'], ['start', '稼働開始', '基本情報'], ['years', '経験年数', '基本情報'], ['edu', '最終学歴', '基本情報'],
         ['specialty', '得意分野', '欄'], ['skills', 'スキル', '欄'], ['lic', '資格', '欄'], ['pr', '自己PR', '欄'], ['projects', '案件の経歴', '欄'],
-        ['cNo', 'No', '案件の表の列'], ['cPer', '期間', '案件の表の列'], ['cMain', '案件名・概要・担当した業務', '案件の表の列', false], ['cRole', '役割・規模', '案件の表の列'], ['cTech', '使用技術', '案件の表の列'], ['cPhase', '担当工程', '案件の表の列'],
+        ['skYears', '年数', 'スキルの中身', true, false], ['skLevel', 'レベル（◎○△）', 'スキルの中身', true, false],
+        ['cNo', 'No', '案件の表の列'], ['cPer', '期間', '案件の表の列'], ['cMain', '案件名・概要・担当した業務', '案件の表の列', false], ['pCompany', '所属', '案件の表の列'], ['cRole', '役割・規模', '案件の表の列'], ['cTech', '使用技術', '案件の表の列'], ['cPhase', '担当工程', '案件の表の列'],
       ];
       const SS_DEF = Object.fromEntries(SS_ITEMS.map(([k, v]) => [k, v]));
       const ssOn = k => !String(S.ssOff || '').split(',').includes(k);
       const ssLab = k => String(S.ssLabels[k] || '').trim() || SS_DEF[k];
+      // 職務経歴書の項目（キー・名前・まとまり・消せるか・名前を変えられるか）
+      const CV_ITEMS = [
+        ['title', '職　務　経　歴　書', '見出し', false], ['date', '記入日', '見出し', true, false], ['name', '氏名', '見出し'],
+        ['summary', '職務要約', '欄'], ['companies', '職務経歴', '欄', true], ['skills', '活かせる経験・知識・スキル', '欄'], ['lic', '資格', '欄'], ['pr', '自己PR', '欄'], ['end', '以上', '欄'],
+        ['period', '期間', '会社ごとの項目', true, false], ['business', '事業内容', '会社ごとの項目'], ['capital', '資本金', '会社ごとの項目'], ['sales', '売上高', '会社ごとの項目'], ['employees', '従業員数', '会社ごとの項目'], ['type', '雇用形態', '会社ごとの項目'],
+        ['assign', '配属先・常駐先', '会社ごとの項目'], ['dept', '部署・役職', '会社ごとの項目'], ['terms', '期間ごとの業務', '会社ごとの項目'], ['duties', '業務内容', '会社ごとの項目'], ['results', '実績', '会社ごとの項目'],
+      ];
+      const CV_DEF = Object.fromEntries(CV_ITEMS.map(([k, v]) => [k, v]));
+      // 履歴書の項目（2枚目の欄は様式で変わる）。出さない欄の分は rsLayout() でほかの欄を広げる
+      const RS_BASE = [
+        ['title', '履　歴　書', '1枚目', false], ['date', '記入日', '1枚目', true, false], ['photo', '写真', '1枚目', true, false],
+        ['kana', 'ふりがな', '1枚目'], ['name', '氏　名', '1枚目', false], ['birth', '生年月日', '1枚目', true, false], ['sex', '※性別', '1枚目'],
+        ['addr', '現住所', '1枚目'], ['contact', '連絡先', '1枚目'],
+        ['hist', '学歴・職歴（各別にまとめて書く）', '学歴・職歴・免許・資格', false], ['lic', '免許・資格', '学歴・職歴・免許・資格'],
+      ];
+      function rsItems(F = form()) {
+        const out = [...RS_BASE], add = (k, v) => out.push([k, v, '2枚目の欄']);
+        for (const it of F.items) {
+          if (it.box) add(it.box, it.label);
+          if (it.split) it.split.forEach(q => add(q.key, q.label));
+          if (it.side) add(it.side.key, it.side.label);
+          if (it.cells) it.cells.forEach(c => add(c.key, c.label));
+        }
+        return out;
+      }
+      const RS_ANY = Object.values(FORMS).flatMap(F => rsItems(F));
+      // 書類ごとの項目と、出さない項目・名前を入れておくところ
+      const DOCS = {
+        resume: { items: () => rsItems(), off: 'rsOff', lab: 'rsLabels' },
+        cv: { items: () => CV_ITEMS, off: 'cvOff', lab: 'cvLabels' },
+        skill: { items: () => SS_ITEMS, off: 'ssOff', lab: 'ssLabels' },
+      };
+      const itemOn = (doc, k) => !String(S[DOCS[doc].off] || '').split(',').includes(k);
+      const itemLab = (doc, k, def) => String(S[DOCS[doc].lab][k] || '').trim() || def;
+      const rsOn = k => itemOn('resume', k), rsLab = (k, def) => itemLab('resume', k, def);
+      const cvOn = k => itemOn('cv', k), cvLab = k => itemLab('cv', k, CV_DEF[k]);
       // 職務経歴書の会社の項目
-      const CF = ['name', 'from', 'to', 'business', 'employees', 'type', 'dept', 'duties', 'results'];
+      const CF = ['name', 'from', 'to', 'business', 'capital', 'sales', 'employees', 'type', 'assign', 'dept', 'duties', 'results'];
+      // 会社の中の期間（配属・異動ごと）の項目
+      const TF = ['from', 'to', 'assign', 'dept', 'duties'];
+      const normTerms = v => (Array.isArray(v) ? v : []).filter(t => t && typeof t === 'object').slice(0, 20).map(t => Object.fromEntries(TF.map(k => [k, Array.isArray(t[k]) ? t[k].join('\n') : String(t[k] ?? '')])));
+      const tFilled = t => TF.some(k => String(t[k] || '').trim());
       // スキルシートのスキル・案件の項目
       const SK = ['cat', 'name', 'years', 'level'];
-      const PJ = ['from', 'to', 'title', 'industry', 'overview', 'role', 'team', 'tech', 'phases', 'phaseText', 'work'];
+      const PJ = ['from', 'to', 'title', 'company', 'industry', 'overview', 'role', 'team', 'tech', 'phases', 'phaseText', 'work'];
       const normRows = (v, keys, max) => (Array.isArray(v) ? v : []).filter(c => c && typeof c === 'object').slice(0, max).map(c => Object.fromEntries(keys.map(k => [k, Array.isArray(c[k]) ? c[k].join(k === 'phases' ? ',' : ', ') : String(c[k] ?? '')])));
-      const normCompanies = v => (Array.isArray(v) ? v : []).filter(c => c && typeof c === 'object').slice(0, 30).map(c => Object.fromEntries(CF.map(k => [k, String(c[k] ?? '')])));
+      const normCompanies = v => (Array.isArray(v) ? v : []).filter(c => c && typeof c === 'object').slice(0, 30).map(c => ({ ...Object.fromEntries(CF.map(k => [k, String(c[k] ?? '')])), terms: normTerms(c.terms) }));
       function normalize(o) {
         const s = { ...DEF, ...(o && typeof o === 'object' ? o : {}) };
         for (const k of Object.keys(DEF)) {
@@ -2318,17 +2459,26 @@
         if (s.ssNameMode !== 'full') s.ssNameMode = 'initial';
         if (s.ssPhaseMode !== 'table') s.ssPhaseMode = 'free';
         if (s.ssOrient !== 'landscape') s.ssOrient = 'portrait';
-        // 前の「年齢を出す」を外していたら、年齢を出さない項目にする
-        const off = s.ssOff.split(',').concat(o && o.ssShowAge === false ? ['age'] : []);
-        s.ssOff = [...new Set(off)].filter(k => SS_ITEMS.some(it => it[0] === k && it[3] !== false)).join(',');
+        // 出さない項目・名前（消せない項目は出さないにしない）。前の「年齢を出す」を外していたら、年齢を出さない項目にする
+        const fixOff = (v, list, extra = []) => [...new Set(String(v).split(',').concat(extra))].filter(k => list.some(it => it[0] === k && it[3] !== false)).join(',');
+        const fixLab = (v, list) => { const lab = v && typeof v === 'object' && !Array.isArray(v) ? v : {}; return Object.fromEntries(list.filter(([k]) => typeof lab[k] === 'string' && lab[k]).map(([k]) => [k, lab[k].slice(0, 40)])); };
+        s.ssOff = fixOff(s.ssOff, SS_ITEMS, o && o.ssShowAge === false ? ['age'] : []);
         delete s.ssShowAge;
-        const lab = s.ssLabels && !Array.isArray(s.ssLabels) ? s.ssLabels : {};
-        s.ssLabels = Object.fromEntries(SS_ITEMS.filter(([k]) => typeof lab[k] === 'string' && lab[k]).map(([k]) => [k, lab[k].slice(0, 40)]));
+        s.ssLabels = fixLab(s.ssLabels, SS_ITEMS);
+        s.cvOff = fixOff(s.cvOff, CV_ITEMS); s.cvLabels = fixLab(s.cvLabels, CV_ITEMS);
+        s.rsOff = fixOff(s.rsOff, RS_ANY); s.rsLabels = fixLab(s.rsLabels, RS_ANY);
         for (const k of ['spouse', 'spouseSup']) if (!['', '有', '無'].includes(s[k])) s[k] = '';
         return s;
       }
+      // 前の版のデータ：自己PR が職務経歴書とスキルシートで1つだったので、スキルシート用にも写す
+      function migrate(o) {
+        if (!o || typeof o !== 'object' || 'ssPr' in o) return o;
+        o.ssPr = typeof o.cvPr === 'string' ? o.cvPr : '';
+        if (typeof o.aiKeys === 'string' && o.aiKeys.split(',').includes('cvPr')) o.aiKeys += ',ssPr';
+        return o;
+      }
       let S = normalize(null);
-      try { S = normalize(JSON.parse(localStorage.getItem(STORE) || 'null')); } catch (e) { /* 初めの入力 */ }
+      try { S = normalize(migrate(JSON.parse(localStorage.getItem(STORE) || 'null'))); } catch (e) { /* 初めの入力 */ }
       const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
       if (!S.date) S.date = today();
       let storeTimer;
@@ -2371,6 +2521,12 @@
         return str;
       }
       const toMonth = str => { const s = String(str).normalize('NFKC').trim().replace(/月$/, ''); return /^\d{1,2}$/.test(s) && +s >= 1 && +s <= 12 ? String(+s) : str; };
+      // 行の年を表示の形に（「H24」「平成24」のまま入っていても、西暦・和暦の設定にそろえる）
+      const ymYear = (y, m) => { const w = toWestern(String(y ?? '').trim()); return /^\d{4}$/.test(w) ? yearText(w, toMonth(String(m ?? ''))) : String(y ?? '').trim(); };
+      const ymText = r => { const w = toWestern(String(r.y ?? '').trim()), m = String(toMonth(String(r.m ?? ''))).trim(); return /^\d{4}$/.test(w) ? `${yearText(w, m)}年${m ? m + '月' : ''}` : String(r.y ?? '').trim(); };
+      // 行の年を西暦に、月を数字にそろえる（前に保存したデータ・読み込んだファイル用）
+      function tidyRows() { for (const k of LISTS) for (const r of S[k]) { r.y = toWestern(r.y); r.m = toMonth(r.m); } }
+      tidyRows();
       const parseDate = s => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); return m ? { y: +m[1], m: +m[2], d: +m[3] } : null; };
       function ageAt(b, r) {
         if (!b || !r) return null;
@@ -2401,14 +2557,47 @@
         const l = S.lic.filter(filled);
         return l.length ? l : [{ y: '', m: '', t: '特になし' }];
       }
-      // 2枚目の学歴・職歴（続き）と免許・資格の行数を分ける
-      function split() {
-        const F = form(), H = historyLines(), L = licenseLines();
-        if (!F.tables) return { F, H, L, n2: 0, nl: 0 };
-        const R = F.tables, over = Math.max(0, H.length - F.hist);
-        let n2 = Math.max(Math.ceil(R / 2), over), nl = R - n2;
-        if (nl < Math.max(3, L.length)) { nl = Math.min(R - 1, Math.max(3, L.length)); n2 = R - nl; }
-        return { F, H, L, n2, nl };
+      // 履歴書の置き方。出さない欄の分を詰めて、1枚目は学歴・職歴の行を増やし、2枚目は文の欄で分け合う
+      function rsLayout() {
+        const F = form(), H = historyLines(), L = licenseLines(), R = F.rowH;
+        // 1枚目：氏名の枠（写真を出さなければ右の端まで）・住所の枠
+        const photo = rsOn('photo'), MX = photo ? 160 : X1;
+        const yA = 24, yN = yA + (rsOn('kana') ? 7 : 0), yB = yN + 20, yE = yB + (rsOn('birth') || rsOn('sex') ? 11 : 0);
+        let y = Math.max(yE, photo ? PHOTO.y + PHOTO.h + 2 : 0);
+        const addrs = ['addr', 'contact'].filter(rsOn).map(k => { const b = { k, y }; y += 24; return b; });
+        const top = y + 4;
+        // 表の下の端は元の様式のまま。空いた分は学歴・職歴の行にする
+        const B1 = 114 + HEAD + F.hist * R + (F.lic ? 4 + HEAD + F.lic * R : 0);
+        const lic1 = F.lic && rsOn('lic') ? F.lic : 0;
+        const hist1 = Math.floor((B1 - top - (lic1 ? 4 + HEAD + lic1 * R : 0) - HEAD) / R + 1e-6);
+        // 2枚目の表：学歴・職歴（続き）と免許・資格で行を分ける。免許・資格を出さなければ全部を続きに
+        let n2 = 0, nl = 0;
+        if (F.tables) {
+          const T = F.tables;
+          if (rsOn('lic')) {
+            n2 = Math.max(Math.ceil(T / 2), H.length - hist1); nl = T - n2;
+            if (nl < Math.max(3, L.length)) { nl = Math.min(T - 1, Math.max(3, L.length)); n2 = T - nl; }
+          } else n2 = T;
+        }
+        let y2 = 12 + (n2 ? HEAD + n2 * R + 4 : 0) + (nl ? HEAD + nl * R + 4 : 0);
+        // 2枚目の欄：元の様式の高さを出してから、出す欄で分け合う（通勤時間などの小さい枠の段は高さそのまま）
+        let y0 = F.tables ? 12 + 2 * (HEAD + 4) + F.tables * R : 12;
+        const items = [];
+        for (const it of F.items) {
+          const h0 = it.h || BOTTOM2 - y0;
+          y0 += h0 + 4;
+          const cells = (it.cells || []).filter(c => rsOn(c.key)).map(c => ({ ...c, label: rsLab(c.key, c.label) }));
+          if (it.box) { if (rsOn(it.box)) items.push({ box: it.box, label: rsLab(it.box, it.label), h0 }); }
+          else if (it.split) { const parts = it.split.filter(q => rsOn(q.key)).map(q => ({ ...q, label: rsLab(q.key, q.label) })); if (parts.length) items.push({ split: parts, h0 }); }
+          else if (it.side && rsOn(it.side.key)) {
+            const side = { key: it.side.key, label: rsLab(it.side.key, it.side.label) };
+            items.push(cells.length ? { side, cells, w: it.w, h0 } : { box: side.key, label: side.label, h0 });
+          } else if (cells.length) items.push({ cells, h0: it.side ? 22 : h0, fixed: true });
+        }
+        const fixedH = items.filter(i => i.fixed).reduce((a, i) => a + i.h0, 0), sum = items.filter(i => !i.fixed).reduce((a, i) => a + i.h0, 0);
+        const free = BOTTOM2 - y2 - 4 * Math.max(0, items.length - 1) - fixedH;
+        for (const i of items) { i.h = i.fixed || !sum ? i.h0 : i.h0 * free / sum; i.y = y2; y2 += i.h + 4; }
+        return { F, H, L, R, MX, yA, yN, yB, yE, addrs, top, hist1, lic1, n2, nl, items };
       }
 
       // ---- 描く（mm で考えて、k 倍した px で描く）
@@ -2530,9 +2719,9 @@
           const by = y + HEAD + i * ROW + ROW / 2 + 1.55;
           if (l.h) { P.text(l.h, (xm + X1) / 2, by, { size: 3.7, align: 'center' }); return; }
           if (l.right) { P.text(l.right, X1 - 6, by, { size: 3.7, align: 'right' }); return; }
-          const yt = /^\d{4}$/.test(l.y.trim()) ? yearText(l.y.trim(), l.m) : l.y.trim();
+          const yt = ymYear(l.y, l.m);
           P.text(yt, (X0 + xy) / 2, by, { size: 3.5, align: 'center', maxW: 16, min: 2.4 });
-          P.text(l.m.trim(), (xy + xm) / 2, by, { size: 3.5, align: 'center', maxW: 10 });
+          P.text(String(toMonth(l.m)).trim(), (xy + xm) / 2, by, { size: 3.5, align: 'center', maxW: 10 });
           P.text(l.t, xm + 3, by, { size: 3.7, maxW: X1 - xm - 6, min: 2.6, label: `「${l.t.slice(0, 12)}」` });
         });
       }
@@ -2554,61 +2743,72 @@
       }
 
       function drawPage1(P) {
-        const MX = 160;
-        P.text('履　歴　書', X0, 20.5, { size: 7, weight: 700 });
-        P.text(dateText(parseDate(S.date), '現在'), MX - 1, 20.5, { size: 3.2, align: 'right' });
-        drawPhoto(P, PHOTO.x, PHOTO.y, PHOTO.w, PHOTO.h);
+        const Lo = rsLayout(), { F, H, L, R, MX, yA, yN, yB, yE } = Lo;
+        P.text(rsLab('title', '履　歴　書'), X0, 20.5, { size: 7, weight: 700, maxW: MX - X0 - 52, min: 4 });
+        if (rsOn('date')) P.text(dateText(parseDate(S.date), '現在'), MX - 1, 20.5, { size: 3.2, align: 'right' });
+        if (rsOn('photo')) drawPhoto(P, PHOTO.x, PHOTO.y, PHOTO.w, PHOTO.h);
 
-        // 氏名・生年月日
-        const yA = 24, yN = 31, yB = 51, yE = 62, xS = 135;
-        P.line(X0, yN, MX, yN, LINE, true);
-        P.line(X0, yB, MX, yB);
-        P.line(xS, yB, xS, yE);
+        // 氏名・生年月日（線を先に引いてから外の枠。元の様式と同じ順）
+        const xS = MX - 25, sexOn = rsOn('sex'), birthOn = rsOn('birth'), hasB = yE > yB;
+        if (yN > yA) P.line(X0, yN, MX, yN, LINE, true);
+        if (hasB) P.line(X0, yB, MX, yB);
+        if (hasB && birthOn && sexOn) P.line(xS, yB, xS, yE);
         P.rect(X0, yA, MX - X0, yE - yA);
-        P.text('ふりがな', X0 + 2, yA + 4.8, { size: 2.6 });
-        P.text(S.kana, X0 + 22, yA + 5, { size: 3.4, maxW: MX - X0 - 26, label: '氏名のふりがな' });
-        P.text('氏　名', X0 + 2, yN + 4.5, { size: 2.6 });
+        if (yN > yA) {
+          P.text(rsLab('kana', 'ふりがな'), X0 + 2, yA + 4.8, { size: 2.6, maxW: 19, min: 1.8 });
+          P.text(S.kana, X0 + 22, yA + 5, { size: 3.4, maxW: MX - X0 - 26, label: '氏名のふりがな' });
+        }
+        P.text(rsLab('name', '氏　名'), X0 + 2, yN + 4.5, { size: 2.6, maxW: 19, min: 1.8 });
         P.text(S.name, X0 + 22, yN + 13.2, { size: 8, maxW: MX - X0 - 26, min: 5, weight: 500, label: '氏名' });
-        const b = parseDate(S.birth), age = ageAt(b, parseDate(S.date));
-        P.text(`${dateText(b, '生')}　（満 ${age ?? SP} 歳）`, X0 + 8, yB + 7.2, { size: 3.6, maxW: xS - X0 - 10 });
-        P.text('※性別', xS + 2, yB + 3.8, { size: 2.4 });
-        P.text(S.sex, (xS + MX) / 2, yB + 8.6, { size: 3.6, align: 'center', maxW: MX - xS - 4 });
+        if (hasB && birthOn) {
+          const b = parseDate(S.birth), age = ageAt(b, parseDate(S.date));
+          P.text(`${dateText(b, '生')}　（満 ${age ?? SP} 歳）`, X0 + 8, yB + 7.2, { size: 3.6, maxW: (sexOn ? xS : MX) - X0 - 10 });
+        }
+        if (hasB && sexOn) {
+          const x = birthOn ? xS : X0;
+          P.text(rsLab('sex', '※性別'), x + 2, yB + 3.8, { size: 2.4, maxW: MX - x - 4 });
+          P.text(S.sex, (x + MX) / 2, yB + 8.6, { size: 3.6, align: 'center', maxW: MX - x - 4 });
+        }
 
         // 現住所・連絡先
-        const yC = 62, yD = 86, yF = 110;
-        P.rect(X0, yC, X1 - X0, yF - yC);
-        P.line(X0, yD, X1, yD);
-        P.line(150, yC, 150, yF);
-        addressBlock(P, yC, '現住所', { kana: S.addrKana, zip: S.zip, addr: S.addr, tel: S.tel, mail: S.mail });
-        addressBlock(P, yD, '連絡先', { kana: S.ckana, zip: S.czip, addr: S.caddr, tel: S.ctel, mail: S.cmail }, '（現住所以外に連絡を希望する場合のみ記入）');
-
-        const { F, H, L } = split();
-        table(P, 114, F.hist, H, HIST, F.rowH);
-        if (F.lic) {
-          table(P, 114 + HEAD + F.hist * F.rowH + 4, F.lic, L, '免許・資格', F.rowH);
-          if (H.length > F.hist) warns.push(`学歴・職歴が ${H.length - F.hist} 行入りきりません（行の多い「転職用」などの様式もあります）`);
-          if (L.length > F.lic) warns.push(`免許・資格が ${L.length - F.lic} 行入りきりません`);
+        if (Lo.addrs.length) {
+          const y0 = Lo.addrs[0].y, hh = 24 * Lo.addrs.length;
+          P.rect(X0, y0, X1 - X0, hh);
+          for (const a of Lo.addrs) if (a.y > y0) P.line(X0, a.y, X1, a.y);
+          P.line(150, y0, 150, y0 + hh);
+          for (const a of Lo.addrs) {
+            if (a.k === 'addr') addressBlock(P, a.y, rsLab('addr', '現住所'), { kana: S.addrKana, zip: S.zip, addr: S.addr, tel: S.tel, mail: S.mail });
+            else addressBlock(P, a.y, rsLab('contact', '連絡先'), { kana: S.ckana, zip: S.czip, addr: S.caddr, tel: S.ctel, mail: S.cmail }, '（現住所以外に連絡を希望する場合のみ記入）');
+          }
         }
-        P.text('※「性別」欄：記載は任意です。未記載とすることも可能です。', X0, 289, { size: 2.6 });
+
+        table(P, Lo.top, Lo.hist1, H, rsLab('hist', HIST), R);
+        if (!F.tables && H.length > Lo.hist1) warns.push(`学歴・職歴が ${H.length - Lo.hist1} 行入りきりません（行の多い「転職用」などの様式もあります）`);
+        if (Lo.lic1) {
+          table(P, Lo.top + HEAD + Lo.hist1 * R + 4, Lo.lic1, L, rsLab('lic', '免許・資格'), R);
+          if (L.length > Lo.lic1) warns.push(`免許・資格が ${L.length - Lo.lic1} 行入りきりません`);
+        }
+        if (sexOn) P.text('※「性別」欄：記載は任意です。未記載とすることも可能です。', X0, 289, { size: 2.6 });
       }
 
       function drawPage2(P) {
-        const { F, H, L, n2, nl } = split();
+        const Lo = rsLayout(), { H, L, R, n2, nl } = Lo;
         let y = 12;
-        if (F.tables) {
-          table(P, y, n2, H.slice(F.hist), HIST, F.rowH);
-          y += HEAD + n2 * F.rowH + 4;
-          table(P, y, nl, L, '免許・資格', F.rowH);
-          y += HEAD + nl * F.rowH + 4;
-          if (H.length > F.hist + n2) warns.push(`学歴・職歴が ${H.length - F.hist - n2} 行入りきりません`);
+        if (n2) {
+          table(P, y, n2, H.slice(Lo.hist1), rsLab('hist', HIST), R);
+          y += HEAD + n2 * R + 4;
+          if (H.length > Lo.hist1 + n2) warns.push(`学歴・職歴が ${H.length - Lo.hist1 - n2} 行入りきりません`);
+        }
+        if (nl) {
+          table(P, y, nl, L, rsLab('lic', '免許・資格'), R);
           if (L.length > nl) warns.push(`免許・資格が ${L.length - nl} 行入りきりません`);
         }
-        for (const it of F.items) {
-          const h = it.h || BOTTOM2 - y;
+        for (const it of Lo.items) {
+          const { y, h } = it;
           if (it.box) textField(P, X0, y, X1 - X0, h, it.label, S[it.box]);
           else if (it.split) {
             const w = (X1 - X0) / it.split.length;
-            it.split.forEach((p, i) => textField(P, X0 + w * i, y, w, h, p.label, S[p.key]));
+            it.split.forEach((q, i) => textField(P, X0 + w * i, y, w, h, q.label, S[q.key]));
           } else if (it.side) {
             const xr = X1 - it.w, ch = h / it.cells.length;
             textField(P, X0, y, xr - X0, h, it.side.label, S[it.side.key]);
@@ -2619,7 +2819,6 @@
             it.cells.forEach((c, i) => cell(P, X0 + w * i, y, w, h, c));
             P.rect(X0, y, X1 - X0, h);
           }
-          y += h + 4;
         }
       }
 
@@ -2677,7 +2876,17 @@
         return `${yearText(d.y, d.m)}年${d.m ? d.m + '月' : ''}`;
       }
       const period = c => `${fmtYM(c.from) || '　　年　月'}〜${String(c.to || '').trim() ? fmtYM(c.to) : '現在'}`;
-      const coFilled = c => CF.some(k => String(c[k] || '').trim());
+      const coFilled = c => CF.some(k => String(c[k] || '').trim()) || normTerms(c.terms).some(tFilled);
+      // 期間の「2021年4月〜2024年3月」。終わりが空なら、次の期間の始め・会社の退職・「現在」の順に使う
+      function termPeriod(c, list, i) {
+        const t = list[i], next = list[i + 1];
+        const to = String(t.to || '').trim() ? fmtYM(t.to) : next && String(next.from || '').trim() ? fmtYM(next.from) : String(c.to || '').trim() ? fmtYM(c.to) : '現在';
+        return `${fmtYM(t.from) || '　　年　月'}〜${to}`;
+      }
+      const termHead = (c, list, i) => [termPeriod(c, list, i), list[i].assign.trim(), list[i].dept.trim().replace(/\n/g, '　')].filter(Boolean).join('　');
+      // 会社の「事業内容：… ／ 資本金：… ／ 従業員数：…」の行（出す項目・名前に合わせる）
+      const cvMetaItems = c => ['business', 'capital', 'sales', 'employees', 'type'].filter(k => cvOn(k) && String(c[k] || '').trim()).map(k => `${cvLab(k)}：${c[k].trim()}`);
+      const cvMeta = c => ['business', 'capital', 'sales', 'employees', 'type'].filter(k => cvOn(k) && String(c[k] || '').trim()).map(k => `${cvLab(k)}：${c[k].trim()}`).join('　／　');
       function cvLayout() {
         const mc = cvLayout.ctx || (cvLayout.ctx = document.createElement('canvas').getContext('2d'));
         const M = makePainter(mc, 10);
@@ -2713,47 +2922,69 @@
         };
         const sub = str => { need(5.8 * 3); text(`【${str}】`, L + 2, y + 3.9, { size: 3.4, weight: 700 }); y += 5.8; };
 
-        text('職　務　経　歴　書', 105, 28, { size: 6.5, weight: 700, align: 'center' });
-        text(dateText(parseDate(S.date), '現在'), R, 38, { size: 3.4, align: 'right' });
-        text('氏名　' + (S.name.trim() || '　　　　　　'), R, 44.5, { size: 3.8, align: 'right' });
+        text(cvLab('title'), 105, 28, { size: 6.5, weight: 700, align: 'center', maxW: W });
+        if (cvOn('date')) text(dateText(parseDate(S.date), '現在'), R, 38, { size: 3.4, align: 'right' });
+        if (cvOn('name')) text(cvLab('name') + '　' + (S.name.trim() || '　　　　　　'), R, 44.5, { size: 3.8, align: 'right' });
         y = 52;
-        if (S.cvSummary.trim()) { heading('職務要約'); para(S.cvSummary.trim(), L + 2, W - 4); y += 4; }
-        const cos = S.cvCompanies.filter(coFilled);
+        if (cvOn('summary') && S.cvSummary.trim()) { heading(cvLab('summary')); para(S.cvSummary.trim(), L + 2, W - 4); y += 4; }
+        const cos = cvOn('companies') ? S.cvCompanies.filter(coFilled) : [];
         if (cos.length) {
-          heading('職務経歴');
+          heading(cvLab('companies'));
           for (const c of cos) {
             need(9 + 6 * 3);
             ops.push({ t: 'fill', x: L, y, w: W, h: 7, color: '#f6f6f6' });
             ops.push({ t: 'rect', x: L, y, w: W, h: 7 });
-            const per = period(c);
-            text(per, R - 2, y + 5, { size: 3.3, align: 'right' });
-            text(c.name.trim() || '（会社名）', L + 2, y + 5, { size: 3.7, weight: 700, maxW: W - 6 - M.width(per, 3.3) });
+            const per = cvOn('period') ? period(c) : '';
+            if (per) text(per, R - 2, y + 5, { size: 3.3, align: 'right' });
+            text(c.name.trim() || '（会社名）', L + 2, y + 5, { size: 3.7, weight: 700, maxW: W - 6 - (per ? M.width(per, 3.3) : 0) });
             y += 9;
-            const meta = [['事業内容', c.business], ['従業員数', c.employees], ['雇用形態', c.type]].filter(([, v]) => String(v || '').trim()).map(([k, v]) => `${k}：${v.trim()}`).join('　／　');
-            if (meta) { para(meta, L + 2, W - 4, 3.2); y += 1; }
-            if (c.dept.trim()) { sub('部署・役職'); bullets(c.dept, L + 4, W - 6); }
-            if (c.duties.trim()) { sub('業務内容'); bullets(c.duties, L + 4, W - 6); }
-            if (c.results.trim()) { sub('実績'); bullets(c.results, L + 4, W - 6); }
+            // 「事業内容：… ／ 資本金：…」は「／」のところで折り返す（1つが長すぎるときだけ中で折り返す）
+            const metaItems = cvMetaItems(c);
+            if (metaItems.length) {
+              const ms = 3.2, mlh = ms * 1.7, lines = [];
+              let line = '';
+              for (const it of metaItems) {
+                const next = line ? `${line}　／　${it}` : it;
+                if (!line || M.width(next, ms) <= W - 4) line = next; else { lines.push(line); line = it; }
+              }
+              lines.push(line);
+              for (const l of lines) para(l, L + 2, W - 4, ms);
+              y += 1;
+            }
+            for (const k of ['assign', 'dept']) if (cvOn(k) && String(c[k] || '').trim()) { sub(cvLab(k)); bullets(c[k], L + 4, W - 6); }
+            const terms = cvOn('terms') ? normTerms(c.terms).filter(tFilled) : [];
+            if (terms.length) {
+              sub(cvLab('terms'));
+              terms.forEach((t, i) => {
+                need(5.8 * 2);
+                para(termHead(c, terms, i), L + 4, W - 6, 3.3, 700);
+                bullets(t.duties, L + 8, W - 10);
+                y += 1;
+              });
+            }
+            for (const k of ['duties', 'results']) if (cvOn(k) && String(c[k] || '').trim()) { sub(cvLab(k)); bullets(c[k], L + 4, W - 6); }
             y += 4;
           }
         }
-        if (S.cvSkills.trim()) { heading('活かせる経験・知識・スキル'); bullets(S.cvSkills, L + 2, W - 4, 3.5); y += 4; }
-        const lic = S.lic.filter(filled);
+        if (cvOn('skills') && S.cvSkills.trim()) { heading(cvLab('skills')); bullets(S.cvSkills, L + 2, W - 4, 3.5); y += 4; }
+        const lic = cvOn('lic') ? S.lic.filter(filled) : [];
         if (lic.length) {
-          heading('資格');
+          heading(cvLab('lic'));
           for (const r of lic) {
             need(6);
-            const ym = /^\d{4}$/.test(r.y.trim()) ? `${yearText(r.y.trim(), r.m)}年${r.m.trim() ? r.m.trim() + '月' : ''}` : r.y.trim();
+            const ym = ymText(r);
             text(ym, L + 2, y + 4, { size: 3.5 });
             text(r.t, L + 34, y + 4, { size: 3.5, maxW: W - 36 });
             y += 6;
           }
           y += 4;
         }
-        if (S.cvPr.trim()) { heading('自己PR'); para(S.cvPr.trim(), L + 2, W - 4); y += 2; }
+        if (cvOn('pr') && S.cvPr.trim()) { heading(cvLab('pr')); para(S.cvPr.trim(), L + 2, W - 4); y += 2; }
         // 「以上」だけで次のページにしない（下の余白に少しかかってもよい。ページ番号とは重ならない）
-        if (y + 5 > 289) newPage();
-        text('以上', R - 2, y + 5, { size: 3.5, align: 'right' });
+        if (cvOn('end')) {
+          if (y + 5 > 289) newPage();
+          text(cvLab('end'), R - 2, y + 5, { size: 3.5, align: 'right' });
+        }
         pages.push(ops);
         return pages;
       }
@@ -2782,22 +3013,58 @@
             <input type="text" data-cf="name" value="${esc(c.name)}" placeholder="会社名（例：株式会社サンプル商事）" aria-label="会社名">
             <div class="two"><input type="text" data-cf="from" value="${esc(c.from)}" placeholder="入社（例：2021/4）" aria-label="入社"><input type="text" data-cf="to" value="${esc(c.to)}" placeholder="退職（今も勤めていれば空）" aria-label="退職"></div>
             <div class="three"><input type="text" data-cf="business" value="${esc(c.business)}" placeholder="事業内容" aria-label="事業内容"><input type="text" data-cf="employees" value="${esc(c.employees)}" placeholder="従業員数" aria-label="従業員数"><input type="text" data-cf="type" value="${esc(c.type)}" placeholder="雇用形態" aria-label="雇用形態"></div>
+            <div class="two"><input type="text" data-cf="capital" value="${esc(c.capital)}" placeholder="資本金（任意。例：5,000万円）" aria-label="資本金"><input type="text" data-cf="sales" value="${esc(c.sales)}" placeholder="売上高（任意。例：48億円）" aria-label="売上高"></div>
+            <input type="text" data-cf="assign" value="${esc(c.assign)}" placeholder="配属先・常駐先（派遣・SES・常駐のとき。例：株式会社〇〇 本社）" aria-label="配属先・常駐先">
             <textarea data-cf="dept" rows="2" placeholder="部署・役職（例：営業部 主任）" aria-label="部署・役職">${esc(c.dept)}</textarea>
-            <textarea data-cf="duties" rows="4" placeholder="業務内容（1行に1つ）" aria-label="業務内容">${esc(c.duties)}</textarea>
+            <div class="cv-terms">${(c.terms || []).map((t, k) => `
+              <div class="cv-term" data-ti="${k}">
+                <div class="cv-co-head"><b>期間 ${k + 1}</b><span class="sp"></span>
+                  <button class="icon-btn" type="button" data-tact="up" title="上へ" ${k ? '' : 'disabled'}>↑</button>
+                  <button class="icon-btn" type="button" data-tact="down" title="下へ" ${k < c.terms.length - 1 ? '' : 'disabled'}>↓</button>
+                  <button class="icon-btn" type="button" data-tact="del" title="消す">×</button></div>
+                <div class="two"><input type="text" data-tf="from" value="${esc(t.from)}" placeholder="始め（例：2019/4）" aria-label="期間の始め"><input type="text" data-tf="to" value="${esc(t.to)}" placeholder="終わり（空なら次の期間まで）" aria-label="期間の終わり"></div>
+                <div class="two"><input type="text" data-tf="assign" value="${esc(t.assign)}" placeholder="配属先・常駐先・店舗" aria-label="配属先・常駐先"><input type="text" data-tf="dept" value="${esc(t.dept)}" placeholder="部署・役職" aria-label="部署・役職"></div>
+                <textarea data-tf="duties" rows="3" placeholder="この期間の業務内容（1行に1つ）" aria-label="この期間の業務内容">${esc(t.duties)}</textarea>
+              </div>`).join('')}</div>
+            <button class="btn btn-sm" type="button" data-cact="term" style="align-self:flex-start">＋ 期間を分けて足す（異動・配属先が変わったとき）</button>
+            <textarea data-cf="duties" rows="4" placeholder="${c.terms && c.terms.length ? '会社全体の業務内容（期間ごとに書いたなら空でよい）' : '業務内容（1行に1つ）'}" aria-label="業務内容">${esc(c.duties)}</textarea>
             <textarea data-cf="results" rows="3" placeholder="実績（1行に1つ。数字があると伝わりやすい）" aria-label="実績">${esc(c.results)}</textarea>
           </div>`).join('');
       }
-      const blankCo = () => Object.fromEntries(CF.map(k => [k, '']));
+      const blankCo = () => ({ ...Object.fromEntries(CF.map(k => [k, ''])), terms: [] });
+      const blankTerm = () => Object.fromEntries(TF.map(k => [k, '']));
       document.addEventListener('input', e => {
-        const f = e.target.dataset.cf, box = e.target.closest('[data-ci]');
-        if (!f || !box) return;
-        S.cvCompanies[+box.dataset.ci][f] = e.target.value;
+        const f = e.target.dataset.cf, tf = e.target.dataset.tf, box = e.target.closest('[data-ci]');
+        if ((!f && !tf) || !box) return;
+        const c = S.cvCompanies[+box.dataset.ci];
+        if (tf) c.terms[+e.target.closest('[data-ti]').dataset.ti][tf] = e.target.value;
+        else c[f] = e.target.value;
         changed();
       });
       $('cv-companies').addEventListener('click', async e => {
+        // 期間の並べ替え・消す
+        const tb = e.target.closest('[data-tact]');
+        if (tb) {
+          const c = S.cvCompanies[+tb.closest('[data-ci]').dataset.ci], k = +tb.closest('[data-ti]').dataset.ti, act = tb.dataset.tact;
+          if (act === 'del') {
+            if (tFilled(c.terms[k]) && !await ask(`期間 ${k + 1} を消しますか？`, '消す')) return;
+            c.terms.splice(k, 1);
+          } else moveIn(c.terms, k, act);
+          renderCompanies(); changed();
+          return;
+        }
         const b = e.target.closest('[data-cact]'), box = b && b.closest('[data-ci]');
         if (!box) return;
         const i = +box.dataset.ci, list = S.cvCompanies, act = b.dataset.cact;
+        if (act === 'term') {
+          // 最初の期間は、会社の入社と部署・配属先から始める
+          const c = list[i];
+          c.terms.push(c.terms.length ? blankTerm() : { ...blankTerm(), from: c.from, assign: c.assign, dept: c.dept.split('\n')[0] });
+          renderCompanies(); changed();
+          const ts = $('cv-companies').querySelectorAll(`[data-ci="${i}"] .cv-term`);
+          ts[ts.length - 1].querySelector('input').focus();
+          return;
+        }
         if (act === 'del') {
           if (coFilled(list[i]) && !await ask(`「${list[i].name || '会社 ' + (i + 1)}」を消しますか？`, '消す')) return;
           list.splice(i, 1);
@@ -2819,21 +3086,34 @@
       function companiesFromJob() {
         const out = [];
         let cur = null;
-        const START = /\s*(に)?(入社|入職|入所|入行|入庁|入局|入店)(.*)$/;
+        const START = /\s*(に)?(入社|入職|入所|入行|入庁|入局|入店)(.*)$/, MOVE = /配属|異動|出向|転籍|転勤|常駐/;
         S.job.forEach((r, idx) => {
           if (!filled(r)) return;
           const t = r.t.trim(), ym = r.y.trim() ? `${r.y.trim()}/${r.m.trim()}`.replace(/\/$/, '') : '';
           if (START.test(t) && ym) {
             const extra = t.match(START)[3].replace(/^[\s（(]+|[）)]+$/g, '').trim();
             cur = { ...blankCo(), name: t.replace(START, '').trim(), from: ym, type: /派遣/.test(t) ? '派遣社員' : /アルバイト/.test(t) ? 'アルバイト' : /パート/.test(t) ? 'パート' : /契約/.test(t) ? '契約社員' : '', _s: idx, _e: null, _last: idx };
-            if (extra && !/派遣|アルバイト|パート|契約|正社員|嘱託/.test(extra)) cur.dept = extra;
+            if (extra && !/派遣|アルバイト|パート|契約|正社員|嘱託/.test(extra)) {
+              const m = extra.match(/^(.+?)(?:に|へ)(?:配属|常駐)$/);
+              if (m) cur.assign = m[1].trim(); else cur.dept = extra;
+            }
             out.push(cur);
             return;
           }
           if (!cur) return;
           if (/(退職|退社|契約満了)/.test(t) && ym) { cur.to = ym; cur._e = idx; cur._last = idx; }
-          else if (t && !/^(現在に至る|以上|詳細は職務経歴書のとおり)$/.test(t)) {
-            // 配属・異動などは「部署・役職」に、それ以外は業務内容の材料に
+          else if (t && ym && MOVE.test(t)) {
+            // 年月つきの配属・異動・常駐。「〇〇に配属」の〇〇は配属先にする
+            const m = t.match(/^(.+?)(?:に|へ)(?:配属|異動|出向|転籍|転勤|常駐)/), at = m ? { assign: m[1].trim() } : { dept: t };
+            if (!cur.terms.length && ym === cur.from) Object.assign(cur, at);   // 入社と同じ月なら、会社の配属先・部署
+            else {
+              // 期間を分ける（最初の期間は、入社のときの配属先・部署から）
+              if (!cur.terms.length) { cur.terms.push({ ...blankTerm(), from: cur.from, assign: cur.assign, dept: cur.dept }); cur.assign = ''; cur.dept = ''; }
+              cur.terms.push({ ...blankTerm(), from: ym, ...at });
+            }
+            cur._last = idx;
+          } else if (t && !/^(現在に至る|以上|詳細は職務経歴書のとおり)$/.test(t)) {
+            // 昇格などは「部署・役職」に、それ以外は業務内容の材料に
             const k = /配属|異動|昇格|昇進|登用|就任|出向|転籍/.test(t) ? 'dept' : 'duties';
             cur[k] += (cur[k] ? '\n' : '') + (ym ? `${fmtYM(ym)} ` : '') + t;
             cur._last = idx;
@@ -2841,7 +3121,7 @@
         });
         return out;
       }
-      const onlyCF = c => Object.fromEntries(CF.map(k => [k, c[k] || '']));
+      const onlyCF = c => ({ ...Object.fromEntries(CF.map(k => [k, c[k] || ''])), terms: normTerms(c.terms) });
       $('cv-from-job').addEventListener('click', async () => {
         const cos = companiesFromJob();
         if (!cos.length) { window.DonnmaAsk.notice('履歴書の職歴に「〇〇 入社」の行が見つかりませんでした。職歴に年・月と「入社」を入れるか、「＋ 会社を足す」で入れてください。'); return; }
@@ -2960,6 +3240,14 @@
         if (parts.length === 1) return kanaInitial(parts[0]);
         return '';
       }
+      // 最終学歴：入れていなければ、学歴のいちばん下の卒業・修了・中退の行（「〇〇大学 経済学部 卒業（2017年3月）」）
+      function autoEdu() {
+        const r = [...S.ed].reverse().find(r => filled(r) && /(卒業|修了|中退|卒)$/.test(r.t.trim()));
+        if (!r) return '';
+        const ym = ymText(r);
+        return r.t.trim() + (ym ? `（${ym}）` : '');
+      }
+      const ssEduText = () => S.ssEdu.trim() || autoEdu();
       const ssName = () => S.ssNameMode === 'full' ? S.name.trim() : (S.ssInitials.trim() || autoInitials());
       const monthsOf = s => { const d = parseYM(s); return d ? d.y * 12 + (d.m || 1) - 1 : null; };
       function projMonths(p) {
@@ -2979,6 +3267,8 @@
         return n >= 12 ? `約${Math.floor(n / 12)}年` : `${n}か月`;
       }
       const pjFilled = p => PJ.some(k => String(p[k] || '').trim());
+      // 案件の所属会社の行（案件名と同じなら出さない）
+      const pjCompany = p => { const c = String(p.company || '').trim(); return ssOn('pCompany') && c && c !== p.title.trim() ? `${ssLab('pCompany')}：${c}` : ''; };
       function phaseFromTable(phases) {
         const idx = String(phases || '').split(',').map(x => PHASES.indexOf(x.trim())).filter(i => i >= 0).sort((a, b) => a - b);
         if (!idx.length) return '';
@@ -2988,6 +3278,9 @@
       }
       const phaseLabel = p => String(p.phaseText || '').trim() || phaseFromTable(p.phases);
       const skFilled = s => String(s.name || '').trim();
+      // スキル1つの書き方「TypeScript（4年・◎）」。年数・レベルは「表示する項目」で出さないにできる
+      const skText = s => { const sub = [ssOn('skYears') ? s.years.trim() : '', ssOn('skLevel') ? s.level.trim() : ''].filter(Boolean).join('・'); return s.name.trim() + (sub ? `（${sub}）` : ''); };
+      const LEVEL_NOTE = 'レベル　◎：中心に使い、人に教えられる　○：実務で使える　△：経験あり・学習中';
       const splitTech = s => String(s || '').split(/[,、，\n]+/).map(x => x.trim()).filter(Boolean);
 
       function ssLayout() {
@@ -3026,9 +3319,17 @@
             text(val, x + w / 2, y + 12.2, { size: 3.6, align: 'center', maxW: w - 3, weight: k === 'name' ? 700 : 400 });
             x += w;
           }
-          rect(L, y, W, 15, true);
-          y += 19;
-        } else y += 2;
+        }
+        // 最終学歴（基本情報の枠の下に、名前と中身の1行）
+        const edu = ssOn('edu') ? ssEduText() : '';
+        const bh = (cells.length ? 15 : 0) + (edu ? 8 : 0);
+        if (edu) {
+          const ey = y + (cells.length ? 15 : 0), lw = wide ? 34 : 28;
+          fill(L, ey, lw, 8); rect(L, ey, lw, 8); rect(L + lw, ey, W - lw, 8);
+          text(ssLab('edu'), L + lw / 2, ey + 5.3, { size: 2.9, align: 'center', maxW: lw - 2 });
+          text(edu, L + lw + 3, ey + 5.4, { size: 3.4, maxW: W - lw - 5 });
+        }
+        if (bh) { rect(L, y, W, bh, true); y += bh + 4; } else y += 2;
 
         // ラベルの列＋中身の表（得意分野・スキル・資格・自己PR）
         const LW = wide ? 34 : 28, CW = W - LW, lh = 4.9, size = 3.2;
@@ -3047,24 +3348,23 @@
           heading(ssLab('skills'));
           const cats = [...SKILL_CATS.filter(c => skills.some(s => s.cat === c)), ...new Set(skills.map(s => s.cat).filter(c => !SKILL_CATS.includes(c)))];
           for (const c of cats) {
-            const items = skills.filter(s => s.cat === c).map(s => {
-              const sub = [s.years.trim(), s.level.trim()].filter(Boolean).join('・');
-              return s.name.trim() + (sub ? `（${sub}）` : '');
-            });
+            const items = skills.filter(s => s.cat === c).map(skText);
             labelRow(c || 'その他', M.wrap(items.join('　／　'), CW - 5, size));
           }
-          need(5);
-          text('レベル　◎：中心に使い、人に教えられる　○：実務で使える　△：経験あり・学習中', R, y + 3.6, { size: 2.6, align: 'right' });
-          y += 7;
+          if (ssOn('skLevel')) {
+            need(5);
+            text(LEVEL_NOTE, R, y + 3.6, { size: 2.6, align: 'right' });
+            y += 7;
+          } else y += 4;
         }
         const lic = ssOn('lic') ? S.lic.filter(filled) : [];
         if (lic.length) {
           heading(ssLab('lic'));
-          const ls = lic.map(r => `${/^\d{4}$/.test(r.y.trim()) ? `${yearText(r.y.trim(), r.m)}年${r.m.trim() ? r.m.trim() + '月' : ''}` : r.y.trim()}　${r.t.trim()}`);
+          const ls = lic.map(r => `${ymText(r)}　${r.t.trim()}`);
           labelRow(ssLab('lic'), ls.flatMap(s => M.wrap(s, CW - 5, size)));
           y += 4;
         }
-        if (ssOn('pr') && S.cvPr.trim()) { heading(ssLab('pr')); labelRow(ssLab('pr'), wrapAll(S.cvPr, CW - 5, size)); y += 4; }
+        if (ssOn('pr') && S.ssPr.trim()) { heading(ssLab('pr')); labelRow(ssLab('pr'), wrapAll(S.ssPr, CW - 5, size)); y += 4; }
 
         // 案件の経歴
         const projects = ssOn('projects') ? S.ssProjects.filter(pjFilled) : [];
@@ -3108,7 +3408,7 @@
           };
           // 1行目の高さ（見出しだけがページの下に残らないように）
           const rowHeight = p => {
-            const main = 1 + wrapAll(p.overview, COL[2] - 4, s).length + (p.industry.trim() ? 1 : 0) + String(p.work || '').split(/\r?\n/).filter(x => x.trim()).length * 1.2 + 1;
+            const main = 1 + (pjCompany(p) ? 1 : 0) + wrapAll(p.overview, COL[2] - 4, s).length + (p.industry.trim() ? 1 : 0) + String(p.work || '').split(/\r?\n/).filter(x => x.trim()).length * 1.2 + 1;
             return Math.max(main, splitTech(p.tech).length / 2, 4) * l2 + 3.5;
           };
           need(7.5 + 10 + Math.min(rowHeight(projects[0]), BOT - TOP - 30));
@@ -3120,6 +3420,8 @@
             if (dur) per.push(`（${dur}）`);
             const main = [];
             M.wrap(p.title.trim() || '（案件名）', COL[2] - 4, 3.2, 700).forEach(t => main.push({ t, w: 700 }));
+            const co = pjCompany(p);
+            if (co) M.wrap(co, COL[2] - 4, s).forEach(t => main.push({ t }));
             const meta = [p.industry.trim() && `業種：${p.industry.trim()}`].filter(Boolean).join('');
             wrapAll(p.overview, COL[2] - 4, s).forEach(t => main.push({ t }));
             if (meta) M.wrap(meta, COL[2] - 4, s).forEach(t => main.push({ t }));
@@ -3199,6 +3501,7 @@
               <button class="icon-btn" type="button" data-pact="down" title="下へ" ${i < S.ssProjects.length - 1 ? '' : 'disabled'}>↓</button>
               <button class="icon-btn" type="button" data-pact="del" title="消す">×</button></div>
             <input type="text" data-pf="title" value="${esc(p.title)}" placeholder="案件名（例：EC サイトのリニューアル）" aria-label="案件名">
+            <input type="text" data-pf="company" value="${esc(p.company)}" placeholder="所属会社（SES・派遣・フリーランスのとき。例：株式会社〇〇）" aria-label="所属会社">
             <div class="two"><input type="text" data-pf="from" value="${esc(p.from)}" placeholder="始め（例：2022/4）" aria-label="始め"><input type="text" data-pf="to" value="${esc(p.to)}" placeholder="終わり（続いていれば空）" aria-label="終わり"></div>
             <div class="three"><input type="text" data-pf="industry" value="${esc(p.industry)}" placeholder="業種（例：小売）" aria-label="業種"><input type="text" data-pf="role" value="${esc(p.role)}" placeholder="役割（SE など）" aria-label="役割"><input type="text" data-pf="team" value="${esc(p.team)}" placeholder="人数" aria-label="チームの人数"></div>
             <textarea data-pf="overview" rows="2" placeholder="概要（どんなシステムか）" aria-label="概要">${esc(p.overview)}</textarea>
@@ -3211,36 +3514,45 @@
           </div>`;
         }).join('');
       }
-      function renderSsItems() {
+      const ITEMS_NOTE = {
+        resume: 'チェックを外した欄は履歴書に出しません（入力は残ります）。出さない欄の分だけ、学歴・職歴の行や2枚目のほかの欄を広げます。名前を書くと、欄の見出しがその名前になります。',
+        cv: 'チェックを外した項目は職務経歴書に出しません（入力は残ります）。名前を書くと、見出しがその名前になります。応募先の書き方に合わせるときに。',
+        skill: 'チェックを外した項目はシートに出しません（入力は残ります）。名前を書くと、シートの見出しがその名前になります。応募先の書き方に合わせるときに。',
+      };
+      function renderItems() {
+        const D = DOCS[S.doc], labs = S[D.lab];
         let g = '';
-        $('ss-items').innerHTML = SS_ITEMS.map(([k, def, grp, can]) => {
+        $('items-note').textContent = ITEMS_NOTE[S.doc];
+        $('ss-items').innerHTML = D.items().map(([k, def, grp, can, ren]) => {
           const head = grp !== g ? `<div class="g">${esc(grp)}</div>` : '';
           g = grp;
-          const on = ssOn(k);
+          const on = itemOn(S.doc, k), name = def.replace(/（.*$/, '');
           return `${head}<div class="ss-item${on ? '' : ' off'}" data-ik="${k}">
-            <input type="checkbox" data-ion ${on ? 'checked' : ''} ${can === false ? 'disabled title="この項目は消せません"' : ''} aria-label="${esc(def)}を出す">
-            <input type="text" data-ilab value="${esc(S.ssLabels[k] || '')}" placeholder="${esc(def)}" maxlength="40" aria-label="${esc(def)}の名前"></div>`;
+            <input type="checkbox" data-ion ${on ? 'checked' : ''} ${can === false ? 'disabled title="この項目は消せません"' : ''} aria-label="${esc(name)}を出す">
+            ${ren === false ? `<span class="fixed">${esc(name)}</span>` : `<input type="text" data-ilab value="${esc(labs[k] || '')}" placeholder="${esc(def)}" maxlength="40" aria-label="${esc(name)}の名前">`}</div>`;
         }).join('');
+        renderItems.sig = S.doc + '|' + S.form;
       }
       $('ss-items').addEventListener('change', e => {
         const row = e.target.closest('[data-ik]');
         if (!row || !e.target.matches('[data-ion]')) return;
-        const k = row.dataset.ik, off = new Set(String(S.ssOff || '').split(',').filter(Boolean));
+        const D = DOCS[S.doc], k = row.dataset.ik, off = new Set(String(S[D.off] || '').split(',').filter(Boolean));
         if (e.target.checked) off.delete(k); else off.add(k);
-        S.ssOff = [...off].join(',');
+        S[D.off] = [...off].join(',');
         row.classList.toggle('off', !e.target.checked);
         changed(true);
       });
       $('ss-items').addEventListener('input', e => {
         const row = e.target.closest('[data-ik]');
         if (!row || !e.target.matches('[data-ilab]')) return;
-        const v = e.target.value;
-        if (v.trim()) S.ssLabels[row.dataset.ik] = v; else delete S.ssLabels[row.dataset.ik];
+        const labs = S[DOCS[S.doc].lab], v = e.target.value;
+        if (v.trim()) labs[row.dataset.ik] = v; else delete labs[row.dataset.ik];
         changed(true);
       });
       $('ss-items-reset').addEventListener('click', () => {
-        S.ssOff = ''; S.ssLabels = {};
-        renderSsItems(); changed(true);
+        const D = DOCS[S.doc];
+        S[D.off] = ''; S[D.lab] = {};
+        renderItems(); changed(true);
         toast('最初の形に戻しました');
       });
       // 担当工程のボタン（自由に書く欄に足す）
@@ -3310,9 +3622,13 @@
         const cos = S.cvCompanies.filter(coFilled);
         if (!cos.length) { window.DonnmaAsk.notice('職務経歴書に会社がありません。職務経歴書で会社を入れるか、「＋ 案件を足す」で入れてください。'); return; }
         if (S.ssProjects.some(pjFilled) && !await ask(`今の案件を、職務経歴書の ${cos.length} 社から作った案件に置き換えますか？`, '置き換える')) return;
-        S.ssProjects = cos.map(c => ({ ...blankPj(), from: c.from, to: c.to, title: c.name, industry: c.business, role: String(c.dept || '').split('\n')[0], work: c.duties }));
+        S.ssProjects = cos.flatMap(c => {
+          const terms = normTerms(c.terms).filter(tFilled);
+          if (!terms.length) return [{ ...blankPj(), from: c.from, to: c.to, title: String(c.assign || '').trim() || c.name, company: c.name, industry: c.business, role: String(c.dept || '').split('\n')[0], work: c.duties }];
+          return terms.map((t, i) => ({ ...blankPj(), from: t.from, to: t.to || (terms[i + 1] ? terms[i + 1].from : c.to), title: t.assign.trim() || String(c.assign || '').trim() || c.name, company: c.name, industry: c.business, role: t.dept.split('\n')[0], work: t.duties }));
+        });
         renderProjects(); changed();
-        toast(`${cos.length} 件の案件を作りました。会社の中で案件が分かれるときは、「＋ 案件を足す」で分けてください`);
+        toast(`${S.ssProjects.length} 件の案件を作りました。会社の中で案件が分かれるときは、「＋ 案件を足す」で分けてください`);
       });
 
       // ---- 見本（架空の人。様式ごとに中身を変える）
@@ -3367,9 +3683,13 @@
       const SAMPLE_CV = {
         cvSummary: '大学卒業後、株式会社サンプル商事に入社し、中小企業向けの法人営業を3年、営業企画を2年あまり担当しました。営業では新規開拓を中心に、3年目に新規取引先を年20社増やしました。営業企画では売上データの分析と販売計画づくりを担当し、チームの成約率の向上に取り組みました。',
         cvCompanies: [{
-          name: '株式会社サンプル商事', from: '2021/4', to: '', business: '事務用品・オフィス家具の販売', employees: '120名', type: '正社員',
-          dept: '営業部（2021年4月〜2024年3月）\n営業企画課（2024年4月〜）',
-          duties: '中小企業（従業員10〜100名）向けの事務用品の提案営業（担当 約80社）\n電話・紹介・展示会での新規開拓\n売上データの集計と分析、月ごとの販売計画づくり\n営業部向けの、訪問の優先順位を決める表の作成と運用',
+          name: '株式会社サンプル商事', from: '2021/4', to: '', business: '事務用品・オフィス家具の販売', capital: '5,000万円', sales: '48億円（2024年度）', employees: '120名', type: '正社員',
+          assign: '', dept: '',
+          terms: [
+            { from: '2021/4', to: '2024/3', assign: '', dept: '営業部', duties: '中小企業（従業員10〜100名）向けの事務用品の提案営業（担当 約80社）\n電話・紹介・展示会での新規開拓' },
+            { from: '2024/4', to: '', assign: '', dept: '営業企画課', duties: '売上データの集計と分析、月ごとの販売計画づくり\n営業部向けの、訪問の優先順位を決める表の作成と運用' },
+          ],
+          duties: '',
           results: '2023年度 新規取引先 20社（部内1位）\n訪問の優先順位表を入れて、チームの成約率が前の年より約1割上がった',
         }],
         cvSkills: '法人営業（新規開拓・既存のお客様の対応）\nExcel（関数・ピボットテーブル）での売上の集計と分析\nPowerPoint での提案資料づくり\n日商簿記2級の知識',
@@ -3391,12 +3711,12 @@
           { from: '2022/4', to: '2024/3', title: 'EC サイトのリニューアル', industry: '小売', overview: '月間100万PV の EC サイトを SPA に作り直した', role: 'SE', team: '10', tech: 'TypeScript, React, Next.js, Node.js, PostgreSQL, AWS', phases: '基本設計,詳細設計,実装,テスト', phaseText: '基本設計〜テスト、表示の速さの改善', work: '商品検索・カートのフロントエンドの設計と実装\nAPI の設計（OpenAPI）\n表示の速さの改善（LCP を約40%短く）' },
           { from: '2024/4', to: '', title: '予約管理 SaaS の新しい機能の開発', industry: 'サービス', overview: '美容室向けの予約 SaaS に、決済と通知の機能を足した', role: 'PL', team: '5', tech: 'TypeScript, React, Python, Django, PostgreSQL, AWS ECS, GitHub Actions', phases: '要件定義,基本設計,詳細設計,実装,テスト,運用保守', work: '5名のチームのリーダーとして進み具合の管理とレビュー\n決済サービスとつなぐ部分の設計・実装\nCI/CD を整えて、リリースの作業を半日から30分に' },
         ],
-        cvPr: 'Web アプリの設計から運用までを一通り経験してきました。使う人の困りごとを聞いて仕様にまとめ、チームで形にすることが得意です。直近ではリーダーとして5名のチームをまとめ、レビューと CI/CD を整えることで、品質を保ちながらリリースの回数を増やしました。',
+        ssPr: 'Web アプリの設計から運用までを一通り経験してきました。使う人の困りごとを聞いて仕様にまとめ、チームで形にすることが得意です。直近ではリーダーとして5名のチームをまとめ、レビューと CI/CD を整えることで、品質を保ちながらリリースの回数を増やしました。',
         lic: [{ y: '2019', m: '10', t: '基本情報技術者試験 合格' }, { y: '2021', m: '6', t: '応用情報技術者試験 合格' }, { y: '2023', m: '7', t: 'AWS Certified Solutions Architect – Associate 取得' }],
       };
       let sampleMode = false;
       const sampleState = () => {
-        const s = { ...SAMPLE_BASE, ...SAMPLES[S.form], ...SAMPLE_CV, doc: S.doc, form: S.form, era: S.era, font: S.font, date: S.date, saveType: S.saveType };
+        const s = { ...SAMPLE_BASE, ...SAMPLES[S.form], ...SAMPLE_CV, doc: S.doc, form: S.form, era: S.era, font: S.font, date: S.date, saveType: S.saveType, rsOff: S.rsOff, rsLabels: S.rsLabels, cvOff: S.cvOff, cvLabels: S.cvLabels };
         // 履歴書の見本で退職しているときは、職務経歴書の見本もそろえる
         const quit = (SAMPLES[S.form].job || []).find(r => /退職/.test(r.t));
         if (quit && S.form !== 'arbeit' && S.form !== 'gakusei') s.cvCompanies = [{ ...SAMPLE_CV.cvCompanies[0], to: `${quit.y}/${quit.m}` }];
@@ -3419,7 +3739,7 @@
         $('save').disabled = on;
         schedule();
       }
-      const hasData = () => [S.name, S.kana, S.addr, S.motive, S.pr, S.summary, S.gakuchika, S.cvSummary, S.cvSkills, S.cvPr].some(v => String(v || '').trim()) || LISTS.some(k => S[k].some(filled)) || S.cvCompanies.some(coFilled) || S.ssSkills.some(skFilled) || S.ssProjects.some(pjFilled);
+      const hasData = () => [S.name, S.kana, S.addr, S.motive, S.pr, S.summary, S.gakuchika, S.cvSummary, S.cvSkills, S.cvPr, S.ssPr].some(v => String(v || '').trim()) || LISTS.some(k => S[k].some(filled)) || S.cvCompanies.some(coFilled) || S.ssSkills.some(skFilled) || S.ssProjects.some(pjFilled);
       $('sample-btn').addEventListener('click', () => setSample(!sampleMode));
       $('sample-close').addEventListener('click', () => setSample(false));
       $('sample-use').addEventListener('click', async () => {
@@ -3500,7 +3820,8 @@
         const F = form(), keys = formKeys(F), isCv = S.doc !== 'resume', isSs = S.doc === 'skill';
         document.querySelectorAll('[data-doc]').forEach(el => { el.hidden = !el.dataset.doc.split(' ').includes(S.doc); });
         document.querySelectorAll('[data-field]').forEach(el => { el.hidden = isCv || !keys.includes(el.dataset.field); });
-        document.querySelectorAll('[data-label]').forEach(el => { el.textContent = formLabel(F, el.dataset.label); });
+        document.querySelectorAll('[data-label]').forEach(el => { el.textContent = rsLab(el.dataset.label, formLabel(F, el.dataset.label)); });
+        if (renderItems.sig !== S.doc + '|' + S.form) renderItems();
         $('doc-name').textContent = isSs ? 'スキルシート' : isCv ? '職務経歴書' : '履歴書';
         $('form-info').textContent = isCv ? `${isSs && S.ssOrient === 'landscape' ? 'A4横' : 'A4'}・${cvPageCount}枚` : `${F.label}（A4 2枚）`;
         $('opt-a3').disabled = isCv;
@@ -3510,6 +3831,8 @@
         $('ss-initial-note').textContent = ai ? `ふりがなからは「${ai}」` : 'ふりがなを入れると自動で作ります';
         const yt = S.ssYears.trim() ? '' : ssYearsText();
         $('ss-years-note').textContent = yt ? `案件からは「${yt}」` : '';
+        const ae = S.ssEdu.trim() ? '' : autoEdu();
+        $('ss-edu-note').textContent = ae ? `学歴からは「${ae}」` : '';
         if (isCv && S.saveType === 'a3') document.querySelector('[data-k="saveType"]').value = 'a4';
         renderAiKeys();
         updateAi();
@@ -3522,6 +3845,7 @@
         $('motive-note').textContent = count(S.motive);
         $('cv-summary-note').textContent = count(S.cvSummary);
         $('cv-pr-note').textContent = count(S.cvPr);
+        $('ss-pr-note').textContent = count(S.ssPr);
         renderQuick();
       }
 
@@ -3538,7 +3862,7 @@
         renderCompanies();
         renderSkills();
         renderProjects();
-        renderSsItems();
+        renderItems();
         $('photo-zoom').value = Math.round(S.pz * 100);
         $('zoom-val').textContent = Math.round(S.pz * 100) + '%';
         $('photo-zoom-field').hidden = !photo;
@@ -3562,6 +3886,11 @@
         seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
         if (seg.dataset.seg === 'ssPhaseMode') renderProjects();
         changed(['form', 'era', 'font', 'doc', 'ssNameMode', 'ssPhaseMode', 'ssOrient'].includes(seg.dataset.seg));
+      });
+      $('ss-pr-copy').addEventListener('click', async () => {
+        if (!S.cvPr.trim()) { toast('職務経歴書の自己PR がまだありません'); return; }
+        if (S.ssPr.trim() && S.ssPr !== S.cvPr && !await ask('スキルシートの自己PR を、職務経歴書の自己PR で置き換えますか？', '置き換える')) return;
+        S.ssPr = S.cvPr; syncUI(); changed();
       });
       $('today').addEventListener('click', () => { S.date = today(); $('f-date').value = S.date; changed(); });
       $('same-addr').addEventListener('click', () => {
@@ -3619,6 +3948,103 @@
           rows[rows.length - 1].querySelector('input').focus();
         }
       });
+
+      // ---- 表や文章を貼り付けて取り込む
+      //  1行が1つ。タブ区切り（Excel・スプレッドシート）なら「年｜月｜内容」「年月｜内容」、文なら「2012年4月 内容」「H24/4 内容」を読む
+      const PASTE_KIND = { ed: '学歴', job: '職歴', lic: '免許・資格', skip: '入れない' };
+      const YR = '(\\d{4}|(?:令和|平成|昭和|[RHS])\\s*(?:元|\\d{1,2}))';
+      const RE_YM = new RegExp(`^${YR}\\s*(?:年|[/.\\-])\\s*(\\d{1,2})\\s*月?(?:\\s*[/.\\-]\\s*\\d{1,2}|\\s*\\d{1,2}\\s*日)?\\s*(.*)$`, 'i');
+      const RE_Y = new RegExp(`^${YR}\\s*年?(?:\\s+(.*)|$)`, 'i');
+      const RE_YCELL = new RegExp(`^${YR}\\s*年?$`, 'i');
+      const RE_MCELL = /^(\d{1,2})\s*月?$/;
+      const RE_ED = /(入学|卒業|中退|修了|退学|編入|転入|転校|休学|復学|留学|学校|高校|大学|学院|高専|学部|学科|専攻)/;
+      const RE_JOB = /(入社|退社|退職|入職|就職|転籍|出向|配属|異動|昇進|昇格|開業|設立|独立|契約|派遣|勤務|就任|株式会社|有限会社|合同会社|\(株\)|㈱|職務経歴書)/;
+      const RE_LIC = /(免許|資格|検定|試験|合格|取得|認定)/;
+      const RE_JOB_STRONG = /(入社|退社|退職|入職|就職|転籍|株式会社|有限会社|合同会社|\(株\)|㈱)/;
+      const RE_LIC_STRONG = /(免許|検定|合格|取得|認定)/;
+      function guessKind(t, prev) {
+        if (RE_JOB.test(t) && !/(入学|卒業|中退|修了)/.test(t)) return 'job';
+        if (RE_ED.test(t)) return 'ed';
+        if (RE_LIC.test(t)) return 'lic';
+        return prev || 'ed';
+      }
+      function parseHistoryText(text) {
+        const rows = [];
+        let sec = '', prev = '', now = false;
+        for (const line of String(text).normalize('NFKC').split(/\r?\n/)) {
+          const cells = line.split('\t').map(c => c.trim()).filter(Boolean);
+          if (!cells.length) continue;
+          const flat = cells.join('').replace(/\s/g, '');
+          // 見出し・決まった行
+          if (/^学歴[・,、/]?職歴$/.test(flat)) { sec = ''; continue; }
+          if (flat === '学歴') { sec = 'ed'; continue; }
+          if (flat === '職歴') { sec = 'job'; continue; }
+          if (/^(免許[・,、/]?資格|資格[・,、/]?免許|免許|資格)(等|など)?$/.test(flat)) { sec = 'lic'; continue; }
+          if (/^年月/.test(flat) && !/\d/.test(flat)) { if (/免許|資格/.test(flat)) sec = 'lic'; else if (/^年月(学歴|職歴)?/.test(flat) && sec === 'lic') sec = ''; continue; }
+          if (/^(以上|なし|特になし)$/.test(flat)) continue;
+          if (/^(現在に至る|現在にいたる|現在まで|現在に至ります)$/.test(flat)) { now = true; continue; }
+          let y = '', m = '', t = '';
+          if (cells.length >= 3 && RE_YCELL.test(cells[0]) && RE_MCELL.test(cells[1])) { y = cells[0]; m = cells[1]; t = cells.slice(2).join(' '); }
+          else if (cells.length >= 2 && RE_YCELL.test(cells[0]) && !RE_MCELL.test(cells[1])) { y = cells[0]; t = cells.slice(1).join(' '); }
+          else {
+            const str = cells.join(' ').replace(/^[・•*\-]\s*/, '');
+            let mm = str.match(RE_YM);
+            if (mm) { y = mm[1]; m = mm[2]; t = mm[3]; }
+            else if ((mm = str.match(RE_Y))) { y = mm[1]; t = mm[2] || ''; }
+            else t = str;
+          }
+          y = toWestern(y.replace(/\s/g, ''));
+          m = toMonth(m.replace(/月$/, ''));
+          if (m && !(+m >= 1 && +m <= 12)) { t = `${m} ${t}`; m = ''; }
+          t = t.replace(/^[・•*\-]\s*/, '').trim();
+          if (!t && !y) continue;
+          // 見出しの下でも、はっきり職歴・資格と分かる行はそちらへ（「学歴」の下の「入社」など）
+          const kind = sec === 'ed' ? (RE_JOB_STRONG.test(t) ? 'job' : RE_LIC_STRONG.test(t) && !RE_ED.test(t) ? 'lic' : 'ed')
+            : sec === 'job' ? (RE_LIC_STRONG.test(t) && !RE_JOB.test(t) ? 'lic' : 'job')
+            : sec || guessKind(t, prev);
+          prev = kind;
+          rows.push({ kind, y, m, t });
+        }
+        return { rows, now };
+      }
+      let pasted = { rows: [], now: false };
+      function pasteSum() {
+        const { rows, now } = pasted, cnt = k => rows.filter(r => r.kind === k).length;
+        $('paste-replace').disabled = $('paste-append').disabled = !rows.some(r => r.kind !== 'skip') && !now;
+        return (['ed', 'job', 'lic'].filter(cnt).map(k => `${PASTE_KIND[k]} ${cnt(k)} 行`).join('・') || (now ? '' : '入れる行がありません')) + (now ? '・「現在に至る」' : '');
+      }
+      function renderPaste() {
+        pasted = parseHistoryText($('paste-text').value);
+        const box = $('paste-preview'), sum = pasteSum();
+        if (!pasted.rows.length) { box.innerHTML = pasted.now ? `<p class="paste-sum">${esc(sum.replace(/^・/, ''))} を入れます</p>` : ''; return; }
+        box.innerHTML = `<p class="paste-sum"><span id="paste-sum">${esc(sum)}</span><br><span class="field-note">分け方がちがう行は、左の選択で直せます。</span></p>
+          <table class="quick-list paste-list">${pasted.rows.map((r, i) => `<tr class="${r.kind === 'skip' ? 'skip' : ''}">
+            <td class="kind"><select data-paste="${i}" aria-label="入れる先">${Object.entries(PASTE_KIND).map(([k, v]) => `<option value="${k}" ${k === r.kind ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
+            <td class="ym">${esc(ymText(r) || '―')}</td><td>${esc(r.t)}</td></tr>`).join('')}</table>`;
+      }
+      $('paste-text').addEventListener('input', renderPaste);
+      $('paste-preview').addEventListener('change', e => {
+        const i = e.target.dataset.paste;
+        if (i == null) return;
+        pasted.rows[+i].kind = e.target.value;
+        e.target.closest('tr').className = e.target.value === 'skip' ? 'skip' : '';
+        $('paste-sum').textContent = pasteSum();
+      });
+      async function applyPaste(replace) {
+        const by = { ed: [], job: [], lic: [] };
+        for (const r of pasted.rows) if (by[r.kind]) by[r.kind].push({ y: r.y, m: r.m, t: r.t });
+        const keys = LISTS.filter(k => by[k].length);
+        if (!keys.length && !pasted.now) return;
+        if (replace && keys.some(k => S[k].some(filled)) && !await ask(`今の「${keys.map(k => PASTE_KIND[k]).join('」「')}」の行を、貼り付けた行に置き換えますか？`, '置き換える')) return;
+        for (const k of keys) S[k] = replace ? by[k] : [...S[k].filter(filled), ...by[k]];
+        if (pasted.now) S.jobNow = true;
+        syncUI(); changed();
+        toast(`${keys.map(k => `${PASTE_KIND[k]} ${by[k].length} 行`).join('・') || '「現在に至る」'}を入れました`);
+        $('paste-text').value = '';
+        renderPaste();
+      }
+      $('paste-replace').addEventListener('click', () => applyPaste(true));
+      $('paste-append').addEventListener('click', () => applyPaste(false));
 
       // 早見表（4月2日〜翌年4月1日生まれが同じ学年）
       function renderQuick() {
@@ -3738,33 +4164,32 @@
       // ---- AI に貼るプロンプト
       //  今の様式の文の欄と、枠に入るおよその文字数（3.8mm の文字・行の高さ 1.65 倍で数えて、少し少なめに）
       function aiFields() {
-        const F = form(), out = [];
-        let y = F.tables ? 12 + HEAD * 2 + F.tables * F.rowH + 8 : 12;
+        if (S.doc === 'cv') return CV_FIELDS.filter(f => cvOn(CV_ITEM_OF[f.key]));
+        if (S.doc === 'skill') return SS_FIELDS.filter(f => ssOn(SS_ITEM_OF[f.key]));
+        const out = [];
         const cap = (w, h) => Math.floor(Math.floor((w - 11) / 3.8) * Math.floor((h - 10) / (3.8 * 1.65)) * 0.85 / 10) * 10;
-        if (S.doc === 'cv') return CV_FIELDS;
-        if (S.doc === 'skill') return SS_FIELDS;
-        for (const it of F.items) {
-          const h = it.h || BOTTOM2 - y;
-          const add = (key, label, w) => { if (key !== 'shifts') out.push({ key, label: label.replace(/（.*$/, ''), max: cap(w, h) }); };
+        for (const it of rsLayout().items) {
+          const add = (key, label, w) => { if (key !== 'shifts') out.push({ key, label: label.replace(/（.*$/, ''), max: cap(w, it.h) }); };
           if (it.box) add(it.box, it.label, X1 - X0);
-          if (it.split) it.split.forEach(p => add(p.key, p.label, (X1 - X0) / it.split.length));
+          if (it.split) it.split.forEach(q => add(q.key, q.label, (X1 - X0) / it.split.length));
           if (it.side) add(it.side.key, it.side.label, X1 - X0 - it.w);
-          y += h + 4;
         }
         out.push({ key: 'history', label: '学歴・職歴を行数に収める', rows: historyRowsMax() });
         return out;
       }
+      const CV_ITEM_OF = { cvSummary: 'summary', cvCompanies: 'companies', cvSkills: 'skills', cvPr: 'pr' };
+      const SS_ITEM_OF = { ssSpecialty: 'specialty', ssSkills: 'skills', ssProjects: 'projects', ssPr: 'pr' };
       // 学歴・職歴に使える行（見出しの「学歴」「職歴」・「以上」・「現在に至る」の行を除く）
       function historyRowsMax() {
-        const F = form(), nl = licenseLines().length;
-        const all = F.hist + (F.tables ? F.tables - Math.min(F.tables - 1, Math.max(3, nl)) : 0);
+        const Lo = rsLayout(), T = Lo.F.tables, nl = Lo.L.length;
+        const all = Lo.hist1 + (T ? (rsOn('lic') ? T - Math.min(T - 1, Math.max(3, nl)) : T) : 0);
         return all - 3 - (S.jobNow ? 1 : 0);
       }
       const SS_FIELDS = [
         { key: 'ssSpecialty', label: '得意分野', hint: '1〜3行' },
         { key: 'ssSkills', label: 'スキル一覧', hint: '種類・年数・レベル' },
         { key: 'ssProjects', label: '案件の経歴', hint: '案件ごと' },
-        { key: 'cvPr', label: '自己PR', hint: '200〜300字' },
+        { key: 'ssPr', label: '自己PR', hint: '200〜300字' },
       ];
       const CV_FIELDS = [
         { key: 'cvSummary', label: '職務要約', hint: '200〜300字' },
@@ -3854,19 +4279,19 @@
         if (S.ssSpecialty.trim()) cur.ssSpecialty = S.ssSpecialty.trim();
         if (S.ssSkills.some(skFilled)) cur.ssSkills = S.ssSkills.filter(skFilled);
         if (S.ssProjects.some(pjFilled)) cur.ssProjects = S.ssProjects.filter(pjFilled);
-        if (S.cvPr.trim()) cur.cvPr = S.cvPr.trim();
+        if (S.ssPr.trim()) cur.ssPr = S.ssPr.trim();
         if (Object.keys(cur).length) L.push('', polish ? '# 今のスキルシート（下書き）' : '# 今のスキルシート（参考）', JSON.stringify(cur, null, 2));
         L.push('', '# 書いてほしいもの');
         if (has('ssSpecialty')) L.push('- ssSpecialty：得意分野（1〜3行）');
         if (has('ssSkills')) L.push(`- ssSkills：スキル一覧。1つずつ cat（${SKILL_CATS.join('・')} のどれか）・name・years（「3年」の形。分からなければ空）・level（◎：中心に使い人に教えられる／○：実務で使える／△：経験あり・学習中）。案件で使った技術から集めてよい。`);
-        if (has('ssProjects')) L.push(`- ssProjects：案件の経歴。古い順に、案件ごとに from / to（「2022/4」の形。続いていれば to は空）・title（案件名）・industry（業種）・overview（概要 1〜2行）・role（PG・SE・PL・PM など）・team（チームの人数。数字だけ）・tech（使用技術を「, 」で区切る）・${S.ssPhaseMode === 'table' ? `phases（${PHASES.join('・')} のうち担当したものの配列）` : 'phaseText（担当工程を短く自由に。例：「基本設計〜テスト、インフラ構築」）'}・work（担当した業務 2〜5行）。1つの会社で案件が分かれるときは分ける。`);
-        if (has('cvPr')) L.push('- cvPr：自己PR（200〜300字）');
+        if (has('ssProjects')) L.push(`- ssProjects：案件の経歴。古い順に、案件ごとに from / to（「2022/4」の形。続いていれば to は空）・title（案件名）・company（所属会社。SES・派遣で、案件先と所属が違うときだけ）・industry（業種）・overview（概要 1〜2行）・role（PG・SE・PL・PM など）・team（チームの人数。数字だけ）・tech（使用技術を「, 」で区切る）・${S.ssPhaseMode === 'table' ? `phases（${PHASES.join('・')} のうち担当したものの配列）` : 'phaseText（担当工程を短く自由に。例：「基本設計〜テスト、インフラ構築」）'}・work（担当した業務 2〜5行）。1つの会社で案件が分かれるときは分ける。`);
+        if (has('ssPr')) L.push('- ssPr：自己PR（200〜300字）。エンジニアとしての技術の強み・得意な工程・チームでの役割を中心に。');
         L.push('', '# 返し方', '次の形の JSON だけを返してください（コードブロックで囲んでもかまいません）。');
         const sample = {};
         if (has('ssSpecialty')) sample.ssSpecialty = '得意分野';
         if (has('ssSkills')) sample.ssSkills = [{ cat: '言語', name: 'TypeScript', years: '3年', level: '○' }];
         if (has('ssProjects')) sample.ssProjects = [{ from: '2022/4', to: '', title: '〇〇システムの開発', industry: '小売', overview: '', role: 'SE', team: '5', tech: 'TypeScript, React', ...(S.ssPhaseMode === 'table' ? { phases: ['基本設計', '実装'] } : { phaseText: '基本設計〜テスト' }), work: '担当した業務1\n担当した業務2' }];
-        if (has('cvPr')) sample.cvPr = '自己PR の文';
+        if (has('ssPr')) sample.ssPr = '自己PR の文';
         sample.questions = ['よりよくするために聞きたいこと（なければ空の配列）'];
         L.push(JSON.stringify(sample, null, 2));
         return L.join('\n');
@@ -3896,13 +4321,13 @@
         if (Object.keys(cur).length) L.push('', polish ? '# 今の職務経歴書（下書き）' : '# 今の職務経歴書（参考）', JSON.stringify(cur, null, 2));
         L.push('', '# 書いてほしいもの');
         if (has('cvSummary')) L.push('- cvSummary：職務要約（200〜300字）');
-        if (has('cvCompanies')) L.push('- cvCompanies：職務経歴。会社ごとに name（会社名）・from / to（「2021/4」の形。今も勤めていれば to は空）・business（事業内容）・employees（従業員数）・type（雇用形態）・dept（部署・役職。時期が分かれるときは1行ずつ）・duties（業務内容 3〜6行）・results（実績 1〜3行）。分からない項目は空にする。新しい会社を上にしない（入社の古い順）。');
+        if (has('cvCompanies')) L.push('- cvCompanies：職務経歴。会社ごとに name（会社名）・from / to（「2021/4」の形。今も勤めていれば to は空）・business（事業内容）・employees（従業員数）・type（雇用形態）・capital（資本金。分からなければ空）・sales（売上高。分からなければ空）・assign（配属先・常駐先。派遣・SES・常駐のときだけ）・dept（部署・役職）・terms（異動・配属先の変更で期間が分かれるときだけ。期間ごとに from / to・assign・dept・duties。分かれなければ空の配列）・duties（業務内容 3〜6行）・results（実績 1〜3行）。分からない項目は空にする。新しい会社を上にしない（入社の古い順）。');
         if (has('cvSkills')) L.push('- cvSkills：活かせる経験・知識・スキル（3〜6行）');
         if (has('cvPr')) L.push('- cvPr：自己PR（300〜400字）');
         L.push('', '# 返し方', '次の形の JSON だけを返してください（コードブロックで囲んでもかまいません）。');
         const sample = {};
         if (has('cvSummary')) sample.cvSummary = '職務要約の文';
-        if (has('cvCompanies')) sample.cvCompanies = [{ name: '株式会社〇〇', from: '2021/4', to: '', business: '', employees: '', type: '正社員', dept: '営業部', duties: '業務内容1\n業務内容2', results: '実績1' }];
+        if (has('cvCompanies')) sample.cvCompanies = [{ name: '株式会社〇〇', from: '2021/4', to: '', business: '', capital: '', sales: '', employees: '', type: '正社員', assign: '', dept: '営業部', terms: [], duties: '業務内容1\n業務内容2', results: '実績1' }];
         if (has('cvSkills')) sample.cvSkills = 'スキル1\nスキル2';
         if (has('cvPr')) sample.cvPr = '自己PR の文';
         sample.questions = ['よりよくするために聞きたいこと（なければ空の配列）'];
@@ -3952,7 +4377,7 @@
         const rowsOf = v => Array.isArray(v) ? v.filter(r => r && typeof r === 'object').slice(0, 60).map(r => ({ y: toWestern(String(r.y ?? '').replace(/年$/, '')), m: toMonth(String(r.m ?? '')), t: fixNl(r.t).replace(/\n/g, ' ') })).filter(filled) : null;
         const ed = rowsOf(j.ed), job = rowsOf(j.job);
         const hasHist = !!(ed && job && (ed.length || job.length));
-        const cos = Array.isArray(j.cvCompanies) ? normCompanies(j.cvCompanies).map(c => Object.fromEntries(CF.map(k => [k, fixNl(c[k])]))).filter(coFilled) : null;
+        const cos = Array.isArray(j.cvCompanies) ? normCompanies(j.cvCompanies).map(c => ({ ...Object.fromEntries(CF.map(k => [k, fixNl(c[k])])), terms: c.terms.map(t => Object.fromEntries(TF.map(k => [k, fixNl(t[k])]))).filter(tFilled) })).filter(coFilled) : null;
         if (hasHist) keys.push('history');
         if (cos && cos.length) keys.push('cvCompanies');
         const sks = Array.isArray(j.ssSkills) ? normRows(j.ssSkills, SK, 80).map(s => ({ ...s, cat: SKILL_CATS.includes(s.cat.trim()) ? s.cat.trim() : 'その他', level: LEVELS.includes(s.level.trim()) ? s.level.trim() : '' })).filter(skFilled) : null;
@@ -3983,7 +4408,7 @@
       // ---- 記録（1つの欄の文を1行。同じ「日時」の行が1回分）
       const LOG_KEY = 'donnma-rirekisho-log';
       const LOG_MAX = 500;
-      const TEXT_KEYS = ['summary', 'pr', 'gakuchika', 'subjects', 'hobby', 'motive', 'hope', 'cvSummary', 'cvSkills', 'cvPr', 'ssSpecialty'];
+      const TEXT_KEYS = ['summary', 'pr', 'gakuchika', 'subjects', 'hobby', 'motive', 'hope', 'cvSummary', 'cvSkills', 'cvPr', 'ssSpecialty', 'ssPr'];
       // 学歴・職歴と職務経歴は、JSON の文字にして記録する（戻すときに読み直す）
       const JSON_KEYS = ['history', 'cvCompanies', 'ssSkills', 'ssProjects'];
       const logValue = k => k === 'history' ? JSON.stringify({ ed: S.ed.filter(filled), job: S.job.filter(filled) }) : k === 'cvCompanies' ? JSON.stringify(S.cvCompanies.filter(coFilled))
@@ -4006,7 +4431,7 @@
         renderLog();
       }
       // 記録・CSV での欄の名前（様式によらず短い名前にそろえる）
-      const SHORT = { summary: '職務の要約', pr: '自己PR', gakuchika: '学生時代に力を入れたこと', subjects: '得意な科目・研究テーマ', hobby: '趣味・特技', motive: '志望の動機', hope: '本人希望', history: '学歴・職歴', cvSummary: '職務要約（職務経歴書）', cvCompanies: '職務経歴（職務経歴書）', cvSkills: 'スキル（職務経歴書）', cvPr: '自己PR（職務経歴書・スキルシート）', ssSpecialty: '得意分野（スキルシート）', ssSkills: 'スキル一覧（スキルシート）', ssProjects: '案件の経歴（スキルシート）', questions: 'AI からの質問' };
+      const SHORT = { summary: '職務の要約', pr: '自己PR', gakuchika: '学生時代に力を入れたこと', subjects: '得意な科目・研究テーマ', hobby: '趣味・特技', motive: '志望の動機', hope: '本人希望', history: '学歴・職歴', cvSummary: '職務要約（職務経歴書）', cvCompanies: '職務経歴（職務経歴書）', cvSkills: 'スキル（職務経歴書）', cvPr: '自己PR（職務経歴書）', ssPr: '自己PR（スキルシート）', ssSpecialty: '得意分野（スキルシート）', ssSkills: 'スキル一覧（スキルシート）', ssProjects: '案件の経歴（スキルシート）', questions: 'AI からの質問' };
       const anyLabel = k => SHORT[k] || k;
       const pad2 = n => String(n).padStart(2, '0');
       const nowText = () => { const d = new Date(); return `${d.getFullYear()}/${pad2(d.getMonth() + 1)}/${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`; };
@@ -4034,7 +4459,7 @@
       }
       $('log-add').addEventListener('click', () => {
         const pairs = S.doc === 'skill'
-          ? [...['ssSpecialty', 'cvPr'].filter(k => S[k].trim()).map(k => [k, S[k].trim()]), ...['ssSkills', 'ssProjects'].filter(k => k === 'ssSkills' ? S.ssSkills.some(skFilled) : S.ssProjects.some(pjFilled)).map(k => [k, logValue(k)])]
+          ? [...['ssSpecialty', 'ssPr'].filter(k => S[k].trim()).map(k => [k, S[k].trim()]), ...['ssSkills', 'ssProjects'].filter(k => k === 'ssSkills' ? S.ssSkills.some(skFilled) : S.ssProjects.some(pjFilled)).map(k => [k, logValue(k)])]
           : S.doc === 'cv'
           ? [...['cvSummary', 'cvSkills', 'cvPr'].filter(k => S[k].trim()).map(k => [k, S[k].trim()]), ...(S.cvCompanies.some(coFilled) ? [['cvCompanies', logValue('cvCompanies')]] : [])]
           : TEXT_KEYS.filter(k => formKeys(form()).includes(k) && String(S[k] || '').trim()).map(k => [k, S[k].trim()]);
@@ -4159,7 +4584,7 @@
           const j = JSON.parse(await f.text());
           if (!j || j.app !== 'donnma-rirekisho' || typeof j.data !== 'object') throw new Error('format');
           if (!await ask('今の入力を、ファイルの内容に置き換えますか？', '置き換える')) return;
-          S = normalize(j.data); store();
+          S = normalize(migrate(j.data)); tidyRows(); store();
           await usePhoto(typeof j.photo === 'string' && j.photo.startsWith('data:image/') ? j.photo : null);
           toast('読み込みました');
         } catch (err) { window.DonnmaAsk.notice('読み込めませんでした。このツールで書き出したファイルを選んでください。'); }
@@ -4245,31 +4670,37 @@
       }
 
       const bullet = s => String(s || '').split(/\r?\n/).map(x => x.trim().replace(/^[・•●◆\-－*]\s*/, '')).filter(Boolean).map(x => '・' + x).join('\n');
-      const ymText = r => /^\d{4}$/.test(r.y.trim()) ? `${yearText(r.y.trim(), r.m)}年${r.m.trim() ? r.m.trim() + '月' : ''}` : r.y.trim();
 
       // 履歴書（1枚目のあとで改ページ）
       function resumeSheet() {
         const F = form(), sh = makeSheet([22, 12, 30, 30, 30, 30, 31], { name: '履歴書' }), N = 7;
         const LB = { sz: 8, v: 'top' }, HD = { h: 'center', fill: 'F2F2F2' };
         let r = sh.row(12);
-        sh.set(r, 0, '履　歴　書', { sz: 18, b: true, bd: 0, v: 'bottom' }, 3);
-        sh.set(r, 3, dateText(parseDate(S.date), '現在'), { h: 'right', bd: 0, v: 'bottom' }, 3);
+        sh.set(r, 0, rsLab('title', '履　歴　書'), { sz: 18, b: true, bd: 0, v: 'bottom' }, 3);
+        if (rsOn('date')) sh.set(r, 3, dateText(parseDate(S.date), '現在'), { h: 'right', bd: 0, v: 'bottom' }, 3);
         sh.row(2);
         // 氏名・生年月日（右に写真 30×40mm）
-        const rk = sh.row(8), rn = sh.row(22), rb = sh.row(10);
-        sh.set(rk, 0, 'ふりがな', LB); sh.set(rk, 1, S.kana, {}, 5);
-        sh.set(rn, 0, '氏名', LB); sh.set(rn, 1, S.name, { sz: 20 }, 5);
-        const b = parseDate(S.birth), age = ageAt(b, parseDate(S.date));
-        sh.set(rb, 0, '生年月日', LB); sh.set(rb, 1, `${dateText(b, '生')}　（満 ${age ?? SP} 歳）`, {}, 4);
-        sh.set(rb, 5, `※性別　${S.sex}`, {});
-        sh.set(rk, 6, photo ? '' : '写真をはる位置\n縦 36〜40mm\n横 24〜30mm', { sz: 7, h: 'center', bd: 'dash' }, 1, 3);
-        if (photo) {
-          const c = document.createElement('canvas');
-          c.width = 354; c.height = 472;   // 30×40mm を 300dpi で
-          const ctx = c.getContext('2d');
-          ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
-          drawPhoto(makePainter(ctx, c.width / 30), 0, 0, 30, 40);
-          sh.image = { r: rk, c: 6, x: 0.5, w: 30, h: 40, canvas: c };
+        const photoOn = rsOn('photo'), NW = photoOn ? 5 : 6, rows = [];
+        if (rsOn('kana')) { const rk = sh.row(8); rows.push(rk); sh.set(rk, 0, rsLab('kana', 'ふりがな'), LB); sh.set(rk, 1, S.kana, {}, NW); }
+        const rn = sh.row(22); rows.push(rn);
+        sh.set(rn, 0, rsLab('name', '氏名'), LB); sh.set(rn, 1, S.name, { sz: 20 }, NW);
+        if (rsOn('birth') || rsOn('sex')) {
+          const rb = sh.row(10); rows.push(rb);
+          const b = parseDate(S.birth), age = ageAt(b, parseDate(S.date));
+          if (rsOn('birth')) { sh.set(rb, 0, rsLab('birth', '生年月日'), LB); sh.set(rb, 1, `${dateText(b, '生')}　（満 ${age ?? SP} 歳）`, {}, rsOn('sex') ? NW - 1 : NW); }
+          if (rsOn('sex')) sh.set(rb, rsOn('birth') ? NW : 0, `${rsLab('sex', '※性別')}　${S.sex}`, {}, rsOn('birth') ? 1 : NW + 1);
+        }
+        if (photoOn) {
+          const r0 = rows[0];
+          sh.set(r0, 6, photo ? '' : '写真をはる位置\n縦 36〜40mm\n横 24〜30mm', { sz: 7, h: 'center', bd: 'dash' }, 1, Math.max(rows.length, 1));
+          if (photo) {
+            const c = document.createElement('canvas');
+            c.width = 354; c.height = 472;   // 30×40mm を 300dpi で
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+            drawPhoto(makePainter(ctx, c.width / 30), 0, 0, 30, 40);
+            sh.image = { r: r0, c: 6, x: 0.5, w: 30, h: 40, canvas: c };
+          }
         }
         // 現住所・連絡先
         const addr = (label, d) => {
@@ -4279,8 +4710,8 @@
           sh.set(r2, 0, label, { sz: 8, v: 'top' }); sh.set(r2, 1, `〒 ${d.zip}\n${d.addr}`, { v: 'top' }, 4);
           sh.set(r2, 5, `E-mail\n${d.mail}`, { sz: 9, v: 'top' }, 2);
         };
-        addr('現住所', { kana: S.addrKana, zip: S.zip, addr: S.addr, tel: S.tel, mail: S.mail });
-        addr('連絡先\n（現住所以外に連絡を希望する場合のみ記入）', { kana: S.ckana, zip: S.czip, addr: S.caddr, tel: S.ctel, mail: S.cmail });
+        if (rsOn('addr')) addr(rsLab('addr', '現住所'), { kana: S.addrKana, zip: S.zip, addr: S.addr, tel: S.tel, mail: S.mail });
+        if (rsOn('contact')) addr(rsLab('contact', '連絡先') + '\n（現住所以外に連絡を希望する場合のみ記入）', { kana: S.ckana, zip: S.czip, addr: S.caddr, tel: S.ctel, mail: S.cmail });
         // 年・月・中身の表（書き足せるように空の行を2つ）
         const table = (title, lines) => {
           sh.row(3);
@@ -4289,14 +4720,14 @@
           for (const l of [...lines, { y: '', m: '', t: '' }, { y: '', m: '', t: '' }]) {
             r = sh.row(7.5);
             if (l.h || l.right) { sh.set(r, 0, ''); sh.set(r, 1, ''); sh.set(r, 2, l.h || l.right, { h: l.h ? 'center' : 'right' }, N - 2); continue; }
-            sh.set(r, 0, /^\d{4}$/.test(l.y.trim()) ? yearText(l.y.trim(), l.m) : l.y.trim(), { h: 'center' });
-            sh.set(r, 1, l.m.trim(), { h: 'center' });
+            sh.set(r, 0, ymYear(l.y, l.m), { h: 'center' });
+            sh.set(r, 1, String(toMonth(l.m)).trim(), { h: 'center' });
             sh.set(r, 2, l.t, {}, N - 2);
           }
         };
-        table(HIST, historyLines());
-        table('免許・資格', licenseLines());
-        sh.line('※「性別」欄：記載は任意です。未記載とすることも可能です。', { sz: 8, bd: 0 }, 6);
+        table(rsLab('hist', HIST), historyLines());
+        if (rsOn('lic')) table(rsLab('lic', '免許・資格'), licenseLines());
+        if (rsOn('sex')) sh.line('※「性別」欄：記載は任意です。未記載とすることも可能です。', { sz: 8, bd: 0 }, 6);
         sh.breaks.push(sh.rows.length);
         // 2枚目の欄
         const groups = n => { const out = []; let c = 0; for (let i = 0; i < n; i++) { const w = Math.floor(N / n) + (i < N % n ? 1 : 0); out.push([c, w]); c += w; } return out; };
@@ -4311,11 +4742,11 @@
           return v || '有・無';
         };
         sh.row(2);
-        for (const it of F.items) {
+        for (const it of rsLayout().items) {
           sh.row(3);
-          const h = it.h ? Math.max(12, it.h * 0.45) : 24;
+          const h = Math.max(12, it.h * 0.45);
           if (it.box) fields([[it.label, S[it.box]]], h);
-          if (it.split) fields(it.split.map(p => [p.label, S[p.key]]), h);
+          if (it.split) fields(it.split.map(q => [q.label, S[q.key]]), h);
           if (it.side) fields([[it.side.label, S[it.side.key]]], h);
           if (it.cells) { if (it.side) sh.row(3); fields(it.cells.map(c => [c.label, cellVal(c), { h: 'center', v: 'center' }]), 10); }
         }
@@ -4325,39 +4756,47 @@
       // 職務経歴書
       function cvSheet() {
         const sh = makeSheet([30, 95, 60], { name: '職務経歴書' }), N = 3;
-        sh.line('職　務　経　歴　書', { sz: 16, b: true, h: 'center', bd: 0 }, 12);
-        sh.line(dateText(parseDate(S.date), '現在'), { h: 'right', bd: 0 }, 6);
-        sh.line('氏名　' + (S.name.trim() || '　　　　　　'), { h: 'right', bd: 0, sz: 11 }, 7);
+        sh.line(cvLab('title'), { sz: 16, b: true, h: 'center', bd: 0 }, 12);
+        if (cvOn('date')) sh.line(dateText(parseDate(S.date), '現在'), { h: 'right', bd: 0 }, 6);
+        if (cvOn('name')) sh.line(cvLab('name') + '　' + (S.name.trim() || '　　　　　　'), { h: 'right', bd: 0, sz: 11 }, 7);
         const head = s => { sh.row(3); sh.line('■ ' + s, { b: true, sz: 11, fill: 'EBEBEB', bd: 0 }, 7); };
         const para = s => sh.line(s, { bd: 0, v: 'top' }, 6);
-        if (S.cvSummary.trim()) { head('職務要約'); para(S.cvSummary.trim()); }
-        const cos = S.cvCompanies.filter(coFilled);
+        if (cvOn('summary') && S.cvSummary.trim()) { head(cvLab('summary')); para(S.cvSummary.trim()); }
+        const cos = cvOn('companies') ? S.cvCompanies.filter(coFilled) : [];
         if (cos.length) {
-          head('職務経歴');
+          head(cvLab('companies'));
           for (const c of cos) {
             let r = sh.row(7.5);
             sh.set(r, 0, c.name.trim() || '（会社名）', { b: true, sz: 11, fill: 'F6F6F6' }, 2);
-            sh.set(r, 2, period(c), { h: 'right', fill: 'F6F6F6' });
-            const meta = [['事業内容', c.business], ['従業員数', c.employees], ['雇用形態', c.type]].filter(([, v]) => String(v || '').trim()).map(([k, v]) => `${k}：${v.trim()}`).join('　／　');
+            sh.set(r, 2, cvOn('period') ? period(c) : '', { h: 'right', fill: 'F6F6F6' });
+            const meta = cvMeta(c);
             if (meta) { r = sh.row(6); sh.set(r, 0, meta, { sz: 9.5 }, N); }
-            for (const [lab, k] of [['部署・役職', 'dept'], ['業務内容', 'duties'], ['実績', 'results']]) {
-              if (!c[k].trim()) continue;
+            const terms = cvOn('terms') ? normTerms(c.terms).filter(tFilled) : [];
+            for (const k of ['assign', 'dept', 'terms', 'duties', 'results']) {
+              if (k === 'terms') {
+                if (!terms.length) continue;
+                r = sh.row(7);
+                sh.set(r, 0, cvLab('terms'), { b: true, v: 'top', fill: 'FAFAFA' });
+                sh.set(r, 1, terms.flatMap((t, i) => [{ t: (i ? '\n' : '') + termHead(c, terms, i), b: true }, { t: t.duties.trim() ? '\n' + bullet(t.duties) : '' }]), { v: 'top' }, 2);
+                continue;
+              }
+              if (!cvOn(k) || !String(c[k] || '').trim()) continue;
               r = sh.row(7);
-              sh.set(r, 0, lab, { b: true, v: 'top', fill: 'FAFAFA' });
+              sh.set(r, 0, cvLab(k), { b: true, v: 'top', fill: 'FAFAFA' });
               sh.set(r, 1, bullet(c[k]), { v: 'top' }, 2);
             }
             sh.row(3);
           }
         }
-        if (S.cvSkills.trim()) { head('活かせる経験・知識・スキル'); para(bullet(S.cvSkills)); }
-        const lic = S.lic.filter(filled);
+        if (cvOn('skills') && S.cvSkills.trim()) { head(cvLab('skills')); para(bullet(S.cvSkills)); }
+        const lic = cvOn('lic') ? S.lic.filter(filled) : [];
         if (lic.length) {
-          head('資格');
+          head(cvLab('lic'));
           for (const l of lic) { const r = sh.row(6); sh.set(r, 0, ymText(l), { bd: 0 }); sh.set(r, 1, l.t.trim(), { bd: 0 }, 2); }
         }
-        if (S.cvPr.trim()) { head('自己PR'); para(S.cvPr.trim()); }
+        if (cvOn('pr') && S.cvPr.trim()) { head(cvLab('pr')); para(S.cvPr.trim()); }
         sh.row(2);
-        sh.line('以上', { h: 'right', bd: 0 }, 6);
+        if (cvOn('end')) sh.line(cvLab('end'), { h: 'right', bd: 0 }, 6);
         return sh;
       }
 
@@ -4418,22 +4857,20 @@
           });
         }
 
+        if (ssOn('edu') && ssEduText()) labelRow(ssLab('edu'), ssEduText());
         if (ssOn('specialty') && S.ssSpecialty.trim()) { head(ssLab('specialty')); labelRow(ssLab('specialty'), S.ssSpecialty.trim()); }
         const skills = ssOn('skills') ? S.ssSkills.filter(skFilled) : [];
         if (skills.length) {
           head(ssLab('skills'));
           const cats = [...SKILL_CATS.filter(c => skills.some(s => s.cat === c)), ...new Set(skills.map(s => s.cat).filter(c => !SKILL_CATS.includes(c)))];
           for (const c of cats) {
-            labelRow(c || 'その他', skills.filter(s => s.cat === c).map(s => {
-              const sub = [s.years.trim(), s.level.trim()].filter(Boolean).join('・');
-              return s.name.trim() + (sub ? `（${sub}）` : '');
-            }).join('　／　'));
+            labelRow(c || 'その他', skills.filter(s => s.cat === c).map(skText).join('　／　'));
           }
-          sh.line('レベル　◎：中心に使い、人に教えられる　○：実務で使える　△：経験あり・学習中', { sz: 8, h: 'right', bd: 0 }, 5);
+          if (ssOn('skLevel')) sh.line(LEVEL_NOTE, { sz: 8, h: 'right', bd: 0 }, 5);
         }
         const lic = ssOn('lic') ? S.lic.filter(filled) : [];
         if (lic.length) { head(ssLab('lic')); labelRow(ssLab('lic'), lic.map(l => `${ymText(l)}　${l.t.trim()}`).join('\n')); }
-        if (ssOn('pr') && S.cvPr.trim()) { head(ssLab('pr')); labelRow(ssLab('pr'), S.cvPr.trim()); }
+        if (ssOn('pr') && S.ssPr.trim()) { head(ssLab('pr')); labelRow(ssLab('pr'), S.ssPr.trim()); }
 
         const projects = ssOn('projects') ? S.ssProjects.filter(pjFilled) : [];
         if (projects.length) {
@@ -4453,7 +4890,7 @@
               const dur = durText(projMonths(p));
               put(r, at.cPer, [fmtYM(p.from) || '　年　月', '〜', String(p.to || '').trim() ? fmtYM(p.to) : '現在', dur ? `（${dur}）` : ''].filter(Boolean).join('\n'), { ...C, h: 'center' });
             }
-            const rest = [p.overview.trim(), p.industry.trim() && `業種：${p.industry.trim()}`].filter(Boolean);
+            const rest = [pjCompany(p), p.overview.trim(), p.industry.trim() && `業種：${p.industry.trim()}`].filter(Boolean);
             const work = bullet(p.work);
             if (work) rest.push('【担当】', work);
             put(r, at.cMain, [{ t: p.title.trim() || '（案件名）', b: true }, { t: rest.length ? '\n' + rest.join('\n') : '' }], C);
