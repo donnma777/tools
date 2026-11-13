@@ -7,10 +7,10 @@
   <title>背景透過ツール | どんまうんど-Tools</title>
   <link rel="icon" href="../favicon.ico">
   <meta name="description"
-    content="画像の背景をブラウザだけで透明にできる無料ツール。背景の色をクリックするだけで、似た色をまとめて透明にします。消しゴム・復元ブラシ、ふちのなめらかさ、PNG・WebP 保存つき。画像はどこにも送信しません。">
+    content="画像の背景をブラウザだけで透明にできる無料ツール。背景の色をクリックして透明にしたり、残したいものを囲んで切り抜いたりできます。色の塗りつぶし、背景色をつけての保存、消しゴム・復元ブラシ、PNG・WebP・JPG 保存つき。画像はどこにも送信しません。">
   <link rel="canonical" href="https://donnma.com/tool/bg-remove/">
   <meta property="og:title" content="背景透過ツール | どんまうんど-Tools">
-  <meta property="og:description" content="背景の色をクリックするだけで透明に。ブラウザだけで使える無料の背景透過ツール。">
+  <meta property="og:description" content="背景の色をクリックするか、残したいものを囲むだけで透明に。ブラウザだけで使える無料の背景透過ツール。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://donnma.com/tool/bg-remove/">
   <meta property="og:site_name" content="どんまうんど-Tools">
@@ -463,7 +463,7 @@
     /* 道具の切り替え */
     .tools {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 6px;
     }
 
@@ -756,13 +756,96 @@
       background: #ff85a1;
     }
 
+    .canvas-wrap[data-bg="fill"] {
+      background: var(--fill-bg, #fff);
+    }
+
+    /* 切り抜くときの囲み */
+    .lasso {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .lasso polygon {
+      fill: rgba(255, 255, 255, 0.12);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+      stroke-linejoin: round;
+    }
+
+    .lasso .a {
+      stroke: #000;
+    }
+
+    .lasso .b {
+      fill: none;
+      stroke: #fff;
+      stroke-dasharray: 6 6;
+    }
+
+    .busy {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(20, 8, 16, 0.45);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.6;
+      z-index: 2;
+    }
+
+    .busy[hidden] {
+      display: none;
+    }
+
+    /* 色を選ぶところ */
+    .colors {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .colors input[type=color] {
+      width: 40px;
+      height: 30px;
+      padding: 2px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      background: var(--surface-2);
+      cursor: pointer;
+    }
+
+    .colors .chip {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid var(--border-strong);
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .colors .chip:hover {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
     #cv {
       display: block;
       touch-action: none;
       image-rendering: auto;
     }
 
-    .main[data-tool="pick"] #cv {
+    .main[data-tool="pick"] #cv,
+    .main[data-tool="cut"] #cv,
+    .main[data-tool="fill"] #cv {
       cursor: crosshair;
     }
 
@@ -956,7 +1039,7 @@
       }
 
       .main {
-        position: static;
+        position: relative;
         height: 70vh;
         min-height: 420px;
       }
@@ -1010,7 +1093,7 @@
   <header class="hero">
     <div class="hero-inner">
       <h1>背景透過ツール</h1>
-      <p>背景の色をクリックするだけで、似た色をまとめて透明にします。消しゴムと復元のブラシで仕上げて、PNG・WebP で保存できます。画像はどこにも送信しません。</p>
+      <p>背景の色をクリックして透明にしたり、残したいものを囲んで切り抜いたりできます。色の塗りつぶし・背景色をつけての保存にも対応。消しゴムと復元のブラシで仕上げて、PNG・WebP・JPG で保存できます。画像はどこにも送信しません。</p>
     </div>
   </header>
 
@@ -1023,6 +1106,8 @@
           <div class="panel-title"><span class="sec-icon">🧰</span>道具</div>
           <div class="tools" role="group" aria-label="道具">
             <button class="tool-btn" type="button" data-tool="pick" aria-pressed="true" title="クリックした色を透明にします"><span class="ic">🎯</span>色を抜く</button>
+            <button class="tool-btn" type="button" data-tool="cut" aria-pressed="false" title="残したいものを囲むと、まわりの背景を消します"><span class="ic">✂️</span>切り抜く</button>
+            <button class="tool-btn" type="button" data-tool="fill" aria-pressed="false" title="クリックしたところを選んだ色で塗ります"><span class="ic">🪣</span>塗る</button>
             <button class="tool-btn" type="button" data-tool="erase" aria-pressed="false" title="なぞったところを透明にします"><span class="ic">🧽</span>消す</button>
             <button class="tool-btn" type="button" data-tool="restore" aria-pressed="false" title="なぞったところを元の画像に戻します"><span class="ic">🖌</span>戻す</button>
             <button class="tool-btn" type="button" data-tool="hand" aria-pressed="false" title="拡大したときに、ドラッグで見る場所を動かします"><span class="ic">✋</span>動かす</button>
@@ -1078,6 +1163,41 @@
 
       <div class="panel">
         <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">✂️</span>囲んで切り抜く</div>
+          <div class="field">
+            <span class="field-label"><span>囲み方</span></span>
+            <select id="cut-shape">
+              <option value="rect">四角で囲む</option>
+              <option value="lasso">手でなぞって囲む</option>
+            </select>
+            <span class="field-note">✂️ 切り抜く を選んで、残したいものをドラッグで囲みます。囲みの外の色を背景として覚えて、中から背景らしいところを消します。写真の背景にも使えます</span>
+          </div>
+          <div class="row">
+            <button class="btn btn-sm" type="button" id="cut-again" disabled>🔁 なぞったところを手がかりにもう一度</button>
+          </div>
+          <div class="field-note" style="margin-top:6px">消えすぎたところを 🖌 戻す、残ったところを 🧽 消す で少しなぞってからこのボタンを押すと、それを手がかりに分け直します</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="panel-title"><span class="sec-icon">🎨</span>色で塗る</div>
+          <div class="field">
+            <span class="field-label"><span>🪣 塗る色</span></span>
+            <div class="colors" data-for="fill-color"><input type="color" id="fill-color" value="#ffffff" aria-label="塗る色"><button class="chip" type="button" data-c="#ffffff" style="background:#ffffff" aria-label="白" title="白"></button><button class="chip" type="button" data-c="#000000" style="background:#000000" aria-label="黒" title="黒"></button><button class="chip" type="button" data-c="#00b140" style="background:#00b140" aria-label="緑" title="緑"></button><button class="chip" type="button" data-c="#0047bb" style="background:#0047bb" aria-label="青" title="青"></button><button class="chip" type="button" data-c="#ff85a1" style="background:#ff85a1" aria-label="ピンク" title="ピンク"></button><button class="chip" type="button" data-c="#808080" style="background:#808080" aria-label="灰色" title="灰色"></button></div>
+            <span class="field-note">🪣 塗る で画像をクリックすると、つながった似た色を塗ります（似た色の範囲・ふちのなめらかさを使います）。透明なところをクリックすると、つながった透明なところを塗ります</span>
+          </div>
+          <label class="toggle"><span>保存する画像の背景を塗る</span><input type="checkbox" id="bg-fill"><span class="sw"></span></label>
+          <div class="field" id="bg-field" hidden>
+            <span class="field-label"><span>背景の色</span></span>
+            <div class="colors" data-for="bg-color"><input type="color" id="bg-color" value="#ffffff" aria-label="背景の色"><button class="chip" type="button" data-c="#ffffff" style="background:#ffffff" aria-label="白" title="白"></button><button class="chip" type="button" data-c="#000000" style="background:#000000" aria-label="黒" title="黒"></button><button class="chip" type="button" data-c="#00b140" style="background:#00b140" aria-label="緑" title="緑"></button><button class="chip" type="button" data-c="#0047bb" style="background:#0047bb" aria-label="青" title="青"></button><button class="chip" type="button" data-c="#ff85a1" style="background:#ff85a1" aria-label="ピンク" title="ピンク"></button><button class="chip" type="button" data-c="#808080" style="background:#808080" aria-label="灰色" title="灰色"></button></div>
+            <span class="field-note">透明なところをこの色で埋めて保存します。JPG でも保存できます</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
           <div class="panel-title"><span class="sec-icon">👀</span>見え方</div>
           <div class="field">
             <span class="field-label"><span>透明なところの表示</span></span>
@@ -1088,7 +1208,7 @@
               <option value="green">緑</option>
               <option value="pink">ピンク</option>
             </select>
-            <span class="field-note">黒や緑にすると、ふちの残りが見つけやすくなります（保存する画像には入りません）</span>
+            <span class="field-note" id="view-note">黒や緑にすると、ふちの残りが見つけやすくなります（保存する画像には入りません）</span>
           </div>
         </div>
       </div>
@@ -1117,14 +1237,17 @@
         <div class="canvas-wrap" id="wrap" data-bg="check" hidden>
           <canvas id="cv" aria-label="透過した画像"></canvas>
           <div class="brush-cursor" id="cursor"></div>
+          <svg class="lasso" id="lasso" preserveAspectRatio="none" hidden><polygon class="a" id="lasso-a"></polygon><polygon class="b" id="lasso-b"></polygon></svg>
         </div>
       </div>
+      <div class="busy" id="busy" hidden>✂️ 切り抜いています…</div>
       <div class="save-row">
         <input type="text" id="file-name" spellcheck="false" aria-label="ファイル名" placeholder="ファイル名">
         <label class="toggle" title="透明なまわりの余白を切り取って保存します"><span>余白を切る</span><input type="checkbox" id="crop"><span class="sw"></span></label>
         <select id="save-type" aria-label="保存の形式">
           <option value="image/png">PNG</option>
           <option value="image/webp">WebP</option>
+          <option value="image/jpeg" disabled>JPG</option>
         </select>
         <button class="btn btn-primary" id="save-btn" type="button" disabled>⬇ 保存</button>
       </div>
@@ -1139,9 +1262,11 @@
         <ol class="steps">
           <li>「📁 画像を開く」で画像を選びます（ドロップ・Ctrl+V の貼り付けでも開けます）。四隅が同じような色なら、その色が自動で抜けます。</li>
           <li><b>🎯 色を抜く</b> で、消したい背景をクリックします。何か所でもクリックできます。</li>
+          <li>写真など背景の色がそろっていないときは、<b>✂️ 切り抜く</b> で残したいものをドラッグで囲みます。うまく分かれないところは、ブラシで少しなぞってから「🔁 なぞったところを手がかりにもう一度」を押します。</li>
+          <li><b>🪣 塗る</b> で、クリックしたところを選んだ色で塗れます。</li>
           <li>残ったところは <b>🧽 消す</b>、消えすぎたところは <b>🖌 戻す</b> でなぞって直します。</li>
           <li>「似た色の範囲」「ふちのなめらかさ」「ふちを削る」で、ふちの仕上がりを整えます。</li>
-          <li>形式（PNG・WebP）を選んで <b>「⬇ 保存」</b> を押すと、透明な画像がダウンロードされます。</li>
+          <li>形式（PNG・WebP）を選んで <b>「⬇ 保存」</b> を押すと、透明な画像がダウンロードされます。「保存する画像の背景を塗る」をオンにすると、透明なところを好きな色で埋めて保存します（JPG も選べます）。</li>
         </ol>
       </div>
     </details>
@@ -1153,7 +1278,8 @@
           <li>単色の背景・グリーンバック・白背景のイラストや商品写真に向いています。写真の複雑な背景は、ブラシでの手直しが多くなります。</li>
           <li>白背景で、キャラの目や服の白まで消えるときは、抜き方を「つながった部分だけ」にするか、「似た色の範囲」を小さくしてください。</li>
           <li>透明なところの表示を黒や緑にすると、ふちに残った背景の色が見つけやすくなります。</li>
-          <li>JPG は透明を残せないので、保存は PNG か WebP です。WebP のほうがファイルが軽くなります。</li>
+          <li>JPG は透明を残せないので、選べるのは「保存する画像の背景を塗る」をオンにしたときだけです。透明のまま保存するなら PNG か WebP（WebP のほうが軽い）にします。</li>
+          <li>✂️ 切り抜く は、物と背景の色の違いで分けます。物と背景が似た色だと境目がずれるので、ブラシで直してください。大きな画像は縮めて分けてから、ふちを元の大きさで整えます。</li>
           <li>大きな画像は、長い辺が 4096px になるように縮めて開きます。</li>
           <li>透過した画像は、<a href="../thumbnail/">サムネイルメーカー</a>でキャラや商品の画像として使えます。</li>
         </ul>
@@ -1215,11 +1341,12 @@
       //  状態
       //  src … 元の画像（RGBA）
       //  key … 色を抜いた結果の不透明さ（0〜255）。keyIdx はそのピクセルを抜いた色の番号（にじみを減らすときに使う）
-      //  mask … key にブラシを重ねた、最後の不透明さ
-      //  actions … 抜いた色・ブラシの操作の並び（戻す・やり直すは、これを並べ直して作り直す）
+      //  mask … key にブラシ・切り抜き・塗りを重ねた、最後の不透明さ
+      //  col … 塗った色を重ねた画像（RGBA）。見える色はここから作る
+      //  actions … 抜いた色・ブラシ・切り抜き・塗りの操作の並び（戻す・やり直すは、これを並べ直して作り直す）
       // =====================================================
       const MAX_SIDE = 4096;
-      let W = 0, H = 0, src = null, key = null, keyIdx = null, mask = null, out = null;
+      let W = 0, H = 0, src = null, col = null, key = null, keyIdx = null, mask = null, out = null;
       let actions = [], redoStack = [], baseName = 'image';
       let tool = 'pick';
       const cv = $('cv'), ctx = cv.getContext('2d', { willReadFrequently: true });
@@ -1331,28 +1458,91 @@
       // ---- 作り直して描く
       function rebuild() {
         if (!src) return;
+        col.set(src);
         buildKey();
         mask.set(key);
-        for (const a of actions) if (a.type === 'stroke') playStroke(a);
+        for (const a of actions) {
+          if (a.type === 'stroke') playStroke(a);
+          else if (a.type === 'cut') playCut(a);
+          else if (a.type === 'fill') playFill(a);
+        }
         compose(0, 0, W - 1, H - 1);
         ui();
       }
-      // 見える画像を作る（にじみを減らす：半透明のところから、抜いた色の分を引く）
+      // 見える色（にじみを減らす：半透明のところから、抜いた色の分を引く）
+      function pixel(i, list, o) {
+        const p = i * 4, m = mask[i];
+        let r = col[p], g = col[p + 1], b = col[p + 2];
+        if (P.decon && m > 0 && m < 255 && keyIdx[i] !== 255 && list[keyIdx[i]]) {
+          const c = list[keyIdx[i]].color, t = m / 255;
+          r = Math.min(255, Math.max(0, (r - c[0] * (1 - t)) / t));
+          g = Math.min(255, Math.max(0, (g - c[1] * (1 - t)) / t));
+          b = Math.min(255, Math.max(0, (b - c[2] * (1 - t)) / t));
+        }
+        o[0] = r; o[1] = g; o[2] = b;
+        return col[p + 3] * m / 255;
+      }
+      // 見える画像を作る
       function compose(x0, y0, x1, y1) {
         const list = picks();
-        const d = out.data;
+        const d = out.data, o = [0, 0, 0];
         for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-          const i = y * W + x, p = i * 4, m = mask[i];
-          let r = src[p], g = src[p + 1], b = src[p + 2];
-          if (P.decon && m > 0 && m < 255 && keyIdx[i] !== 255 && list[keyIdx[i]]) {
-            const c = list[keyIdx[i]].color, t = m / 255;
-            r = Math.min(255, Math.max(0, (r - c[0] * (1 - t)) / t));
-            g = Math.min(255, Math.max(0, (g - c[1] * (1 - t)) / t));
-            b = Math.min(255, Math.max(0, (b - c[2] * (1 - t)) / t));
-          }
-          d[p] = r; d[p + 1] = g; d[p + 2] = b; d[p + 3] = src[p + 3] * m / 255;
+          const i = y * W + x, p = i * 4;
+          const a = pixel(i, list, o);
+          d[p] = o[0]; d[p + 1] = o[1]; d[p + 2] = o[2]; d[p + 3] = a;
         }
         ctx.putImageData(out, 0, 0, x0, y0, x1 - x0 + 1, y1 - y0 + 1);
+      }
+
+      // ---- 塗る（クリックしたところとつながった似た色を、選んだ色にする）
+      //  透明なところをクリックしたときは、つながった透明なところを塗って不透明にする
+      function playFill(a) {
+        const N = W * H, s = a.y * W + a.x, list = picks(), o = [0, 0, 0];
+        const seen = new Uint8Array(N), queue = new Int32Array(N);
+        const [fr, fg, fb] = a.color;
+        const vis = i => col[i * 4 + 3] * mask[i] / 255;
+        let head = 0, tail = 0;
+        queue[tail++] = s; seen[s] = 1;
+        if (vis(s) < 128) {
+          while (head < tail) {
+            const i = queue[head++], p = i * 4;
+            const v = pixel(i, list, o);
+            if (v >= 255) continue;
+            // 半透明のふちは、塗る色の上に重ねた色にする
+            const t = v / 255;
+            col[p] = o[0] * t + fr * (1 - t); col[p + 1] = o[1] * t + fg * (1 - t); col[p + 2] = o[2] * t + fb * (1 - t); col[p + 3] = 255;
+            mask[i] = 255; keyIdx[i] = 255;
+            if (v >= 128) continue;
+            const x = i % W;
+            if (x > 0 && !seen[i - 1]) { seen[i - 1] = 1; queue[tail++] = i - 1; }
+            if (x < W - 1 && !seen[i + 1]) { seen[i + 1] = 1; queue[tail++] = i + 1; }
+            if (i >= W && !seen[i - W]) { seen[i - W] = 1; queue[tail++] = i - W; }
+            if (i < N - W && !seen[i + W]) { seen[i + W] = 1; queue[tail++] = i + W; }
+          }
+          return;
+        }
+        const c = [col[s * 4], col[s * 4 + 1], col[s * 4 + 2]];
+        while (head < tail) {
+          const i = queue[head++], p = i * 4;
+          if (vis(i) <= 0) continue;
+          const d = dist(col[p], col[p + 1], col[p + 2], c);
+          const t = d <= a.tol ? 1 : (a.soft > 0 && d < a.tol + a.soft ? 1 - (d - a.tol) / a.soft : 0);
+          if (t <= 0) continue;
+          col[p] += (fr - col[p]) * t; col[p + 1] += (fg - col[p + 1]) * t; col[p + 2] += (fb - col[p + 2]) * t;
+          if (t >= 1) keyIdx[i] = 255;
+          if (d > a.tol) continue;
+          const x = i % W;
+          if (x > 0 && !seen[i - 1]) { seen[i - 1] = 1; queue[tail++] = i - 1; }
+          if (x < W - 1 && !seen[i + 1]) { seen[i + 1] = 1; queue[tail++] = i + 1; }
+          if (i >= W && !seen[i - W]) { seen[i - W] = 1; queue[tail++] = i - W; }
+          if (i < N - W && !seen[i + W]) { seen[i + W] = 1; queue[tail++] = i + W; }
+        }
+      }
+
+      // ---- 切り抜き（結果はとっておいてあるので、作り直すときは重ねるだけ）
+      function playCut(a) {
+        const r = a.res;
+        for (let i = 0; i < r.length; i++) mask[i] = Math.min(key[i], r[i]);
       }
 
       // ---- 画面の表示
@@ -1364,6 +1554,8 @@
         $('save-btn').disabled = !has;
         $('auto').disabled = !has;
         $('clear-picks').disabled = !picks().length;
+        const lc = lastCut();
+        $('cut-again').disabled = !(lc >= 0 && actions.slice(lc + 1).some(a => a.type === 'stroke'));
         const box = $('picks');
         const list = picks();
         box.innerHTML = list.length ? '' : '<span class="picks-empty">まだありません。画像の背景をクリックしてください</span>';
@@ -1388,8 +1580,8 @@
         else actions.push(a);
         if (a.type === 'unpick') { redoStack = []; rebuild(); return; }
         redoStack = [];
-        if (a.type === 'pick') rebuild();
-        else ui();
+        if (a.type === 'stroke') ui();
+        else rebuild();
       }
       $('undo').onclick = () => { if (!actions.length) return; redoStack.push(actions.pop()); rebuild(); };
       $('redo').onclick = () => { if (!redoStack.length) return; actions.push(redoStack.pop()); rebuild(); };
@@ -1426,6 +1618,370 @@
       $('auto').onclick = () => { if (autoCorners(false)) toast('四隅の色を抜きました'); };
 
       // =====================================================
+      //  囲んで切り抜く（GrabCut のやり方）
+      //  囲みの外を背景・中を物として、それぞれの色の分布（5色の混ざり）を作り、
+      //  「色がどちらに近いか」と「となりと色が近ければ同じ側」の合計がいちばん小さくなる分け方をグラフカットで求める。
+      //  大きい画像は長い辺 CUT_SIDE に縮めて分け、ふちは元の大きさで色を見て整える
+      // =====================================================
+      const CUT_SIDE = 720, GK = 5, LOG2PI = Math.log(2 * Math.PI);
+      const DX = [1, -1, 0, 0, 1, -1, 1, -1], DY = [0, 0, 1, -1, 1, -1, -1, 1]; // d と d^1 が逆向き
+
+      // 多角形の中（ピクセルの真ん中で判定）
+      function polyMask(poly, w, h, sx, sy) {
+        const m = new Uint8Array(w * h), pts = poly.map(([x, y]) => [x * sx, y * sy]), n = pts.length, xs = [];
+        for (let y = 0; y < h; y++) {
+          const cy = y + 0.5;
+          xs.length = 0;
+          for (let i = 0, j = n - 1; i < n; j = i++) {
+            const [xi, yi] = pts[i], [xj, yj] = pts[j];
+            if ((yi > cy) !== (yj > cy)) xs.push(xi + (cy - yi) / (yj - yi) * (xj - xi));
+          }
+          xs.sort((a, b) => a - b);
+          for (let k = 0; k + 1 < xs.length; k += 2) {
+            const a = Math.max(0, Math.ceil(xs[k] - 0.5)), b = Math.min(w - 1, Math.floor(xs[k + 1] - 0.5));
+            for (let x = a; x <= b; x++) m[y * w + x] = 1;
+          }
+        }
+        return m;
+      }
+
+      // 色の分布（ガウス分布 GK 個の混ざり）
+      function gmmFit(px, idx, as) {
+        const comps = [], m = idx.length;
+        for (let k = 0; k < GK; k++) {
+          let n = 0, sr = 0, sg = 0, sb = 0, rr = 0, rg = 0, rb = 0, gg = 0, gb = 0, bb = 0;
+          for (let j = 0; j < m; j++) {
+            if (as[j] !== k) continue;
+            const p = idx[j] * 3, r = px[p], g = px[p + 1], b = px[p + 2];
+            n++; sr += r; sg += g; sb += b; rr += r * r; rg += r * g; rb += r * b; gg += g * g; gb += g * b; bb += b * b;
+          }
+          if (!n) continue;
+          const mr = sr / n, mg = sg / n, mb = sb / n, REG = 4;
+          const a = rr / n - mr * mr + REG, b = rg / n - mr * mg, c = rb / n - mr * mb;
+          const d = gg / n - mg * mg + REG, e = gb / n - mg * mb, f = bb / n - mb * mb + REG;
+          // 対称な 3×3 [[a,b,c],[b,d,e],[c,e,f]] の逆行列
+          const A = d * f - e * e, B = c * e - b * f, C = b * e - c * d;
+          const det = a * A + b * B + c * C;
+          if (!(det > 1e-6)) continue;
+          comps.push({
+            m: [mr, mg, mb],
+            inv: [A / det, B / det, C / det, (a * f - c * c) / det, (b * c - a * e) / det, (a * d - b * b) / det],
+            ln: Math.log(n / m) - 0.5 * Math.log(det) - 1.5 * LOG2PI,
+          });
+        }
+        return comps;
+      }
+      const compLog = (c, r, g, b) => {
+        const x = r - c.m[0], y = g - c.m[1], z = b - c.m[2], v = c.inv;
+        return c.ln - 0.5 * (v[0] * x * x + v[3] * y * y + v[5] * z * z + 2 * (v[1] * x * y + v[2] * x * z + v[4] * y * z));
+      };
+      function gmmLog(comps, r, g, b) {
+        let mx = -Infinity;
+        const ls = comps.map(c => { const l = compLog(c, r, g, b); if (l > mx) mx = l; return l; });
+        let s = 0;
+        for (const l of ls) s += Math.exp(l - mx);
+        return mx + Math.log(s);
+      }
+      function gmmBest(comps, r, g, b) {
+        let best = 0, bl = -Infinity;
+        comps.forEach((c, k) => { const l = compLog(c, r, g, b); if (l > bl) { bl = l; best = k; } });
+        return best;
+      }
+      // lab が want のピクセルから分布を作る（はじめは k 平均で分け、2回目からは前の分布で分ける）
+      function gmmLearn(px, lab, want, prev) {
+        let cnt = 0;
+        for (let i = 0; i < lab.length; i++) if (lab[i] === want) cnt++;
+        if (!cnt) return null;
+        const step = Math.max(1, Math.floor(cnt / 30000)), idx = [];
+        for (let i = 0, c = 0; i < lab.length; i++) if (lab[i] === want && c++ % step === 0) idx.push(i);
+        const m = idx.length, as = new Uint8Array(m);
+        if (prev && prev.length) {
+          for (let j = 0; j < m; j++) { const p = idx[j] * 3; as[j] = gmmBest(prev, px[p], px[p + 1], px[p + 2]); }
+        } else {
+          // 明るさの順に並べて、等分したところを最初の中心にする
+          const lum = j => { const p = idx[j] * 3; return px[p] * 0.299 + px[p + 1] * 0.587 + px[p + 2] * 0.114; };
+          const order = [...Array(m).keys()].sort((a, b) => lum(a) - lum(b));
+          const cen = [];
+          for (let k = 0; k < GK; k++) { const p = idx[order[Math.floor((k + 0.5) / GK * m)]] * 3; cen.push([px[p], px[p + 1], px[p + 2]]); }
+          for (let it = 0; it < 6; it++) {
+            const sum = cen.map(() => [0, 0, 0, 0]);
+            for (let j = 0; j < m; j++) {
+              const p = idx[j] * 3;
+              let best = 0, bd = Infinity;
+              for (let k = 0; k < GK; k++) {
+                const d = (px[p] - cen[k][0]) ** 2 + (px[p + 1] - cen[k][1]) ** 2 + (px[p + 2] - cen[k][2]) ** 2;
+                if (d < bd) { bd = d; best = k; }
+              }
+              as[j] = best;
+              const s = sum[best]; s[0] += px[p]; s[1] += px[p + 1]; s[2] += px[p + 2]; s[3]++;
+            }
+            sum.forEach((s, k) => { if (s[3]) cen[k] = [s[0] / s[3], s[1] / s[3], s[2] / s[3]]; });
+          }
+        }
+        return gmmFit(px, idx, as);
+      }
+
+      // 最大流（Boykov–Kolmogorov）。cap … ピクセル i から向き d のとなりへの残り容量（i*8+d）
+      //  tr … 端の残り容量（+ は物の側、- は背景の側）。返り値 … 1 のピクセルが物の側
+      function maxflow(w, h, cap, tr, okm) {
+        const N = w * h, off = DX.map((dx, d) => dx + DY[d] * w);
+        const tree = new Uint8Array(N), par = new Int8Array(N).fill(-1); // par: -1 なし、8 端、0〜7 親への向き
+        const ts = new Int32Array(N), dist = new Int32Array(N), nxt = new Int32Array(N).fill(-1);
+        let qh = -1, qt = -1;
+        const setActive = i => { if (nxt[i] !== -1) return; nxt[i] = i; if (qt >= 0) nxt[qt] = i; else qh = i; qt = i; };
+        const nextActive = () => {
+          while (qh >= 0) {
+            const i = qh, n = nxt[i];
+            qh = n === i ? -1 : n;
+            if (qh < 0) qt = -1;
+            nxt[i] = -1;
+            if (par[i] !== -1) return i;
+          }
+          return -1;
+        };
+        for (let i = 0; i < N; i++) {
+          if (tr[i] > 0) { tree[i] = 1; par[i] = 8; dist[i] = 1; setActive(i); }
+          else if (tr[i] < 0) { tree[i] = 2; par[i] = 8; dist[i] = 1; setActive(i); }
+        }
+        const orph = [];
+        let TIME = 0, cur = -1;
+        for (;;) {
+          let i = cur;
+          if (i >= 0 && par[i] === -1) i = -1;
+          if (i < 0) { i = nextActive(); if (i < 0) break; }
+          let a = -1, b = -1, da = -1;
+          const m = okm[i];
+          if (tree[i] === 1) {
+            for (let d = 0; d < 8; d++) {
+              if (!(m >> d & 1) || cap[i * 8 + d] <= 0) continue;
+              const j = i + off[d];
+              if (tree[j] === 0) { tree[j] = 1; par[j] = d ^ 1; ts[j] = ts[i]; dist[j] = dist[i] + 1; setActive(j); }
+              else if (tree[j] === 2) { a = i; b = j; da = d; break; }
+              else if (ts[j] <= ts[i] && dist[j] > dist[i]) { par[j] = d ^ 1; ts[j] = ts[i]; dist[j] = dist[i] + 1; }
+            }
+          } else {
+            for (let d = 0; d < 8; d++) {
+              if (!(m >> d & 1)) continue;
+              const j = i + off[d];
+              if (cap[j * 8 + (d ^ 1)] <= 0) continue;
+              if (tree[j] === 0) { tree[j] = 2; par[j] = d ^ 1; ts[j] = ts[i]; dist[j] = dist[i] + 1; setActive(j); }
+              else if (tree[j] === 1) { a = j; b = i; da = d ^ 1; break; }
+              else if (ts[j] <= ts[i] && dist[j] > dist[i]) { par[j] = d ^ 1; ts[j] = ts[i]; dist[j] = dist[i] + 1; }
+            }
+          }
+          TIME++;
+          if (a < 0) { cur = -1; continue; }
+          cur = i;
+          // 道の中でいちばん細いところ
+          let bott = cap[a * 8 + da];
+          for (let x = a; ;) {
+            const p = par[x];
+            if (p === 8) { if (tr[x] < bott) bott = tr[x]; break; }
+            const y = x + off[p], c = cap[y * 8 + (p ^ 1)];
+            if (c < bott) bott = c;
+            x = y;
+          }
+          for (let x = b; ;) {
+            const p = par[x];
+            if (p === 8) { if (-tr[x] < bott) bott = -tr[x]; break; }
+            const c = cap[x * 8 + p];
+            if (c < bott) bott = c;
+            x += off[p];
+          }
+          // 流す。使い切ったところの子は親なし（みなしご）になる
+          cap[a * 8 + da] -= bott; cap[b * 8 + (da ^ 1)] += bott;
+          for (let x = a; ;) {
+            const p = par[x];
+            if (p === 8) { tr[x] -= bott; if (tr[x] <= 0) { par[x] = -1; orph.push(x); } break; }
+            const y = x + off[p];
+            cap[y * 8 + (p ^ 1)] -= bott; cap[x * 8 + p] += bott;
+            if (cap[y * 8 + (p ^ 1)] <= 0) { par[x] = -1; orph.push(x); }
+            x = y;
+          }
+          for (let x = b; ;) {
+            const p = par[x];
+            if (p === 8) { tr[x] += bott; if (tr[x] >= 0) { par[x] = -1; orph.push(x); } break; }
+            const y = x + off[p];
+            cap[x * 8 + p] -= bott; cap[y * 8 + (p ^ 1)] += bott;
+            if (cap[x * 8 + p] <= 0) { par[x] = -1; orph.push(x); }
+            x = y;
+          }
+          // みなしごの新しい親を探す
+          for (let oh = 0; oh < orph.length; oh++) {
+            const p = orph[oh], tp = tree[p], mp = okm[p];
+            let bestD = -1, bestDist = 1e9;
+            for (let d = 0; d < 8; d++) {
+              if (!(mp >> d & 1)) continue;
+              const j = p + off[d];
+              if (tree[j] !== tp) continue;
+              if ((tp === 1 ? cap[j * 8 + (d ^ 1)] : cap[p * 8 + d]) <= 0) continue;
+              let x = j, dd = 0, ok = false;
+              for (;;) {
+                if (ts[x] === TIME) { dd += dist[x]; ok = true; break; }
+                const q = par[x];
+                dd++;
+                if (q === 8) { ts[x] = TIME; dist[x] = 1; ok = true; break; }
+                if (q === -1) break;
+                x += off[q];
+              }
+              if (!ok) continue;
+              if (dd < bestDist) { bestD = d; bestDist = dd; }
+              for (x = j; ts[x] !== TIME; x += off[par[x]]) { ts[x] = TIME; dist[x] = dd--; }
+            }
+            if (bestD >= 0) { par[p] = bestD; ts[p] = TIME; dist[p] = bestDist + 1; continue; }
+            for (let d = 0; d < 8; d++) {
+              if (!(mp >> d & 1)) continue;
+              const j = p + off[d];
+              if (tree[j] !== tp) continue;
+              if ((tp === 1 ? cap[j * 8 + (d ^ 1)] : cap[p * 8 + d]) > 0) setActive(j);
+              const q = par[j];
+              if (q >= 0 && q < 8 && j + off[q] === p) { par[j] = -1; orph.push(j); }
+            }
+            tree[p] = 0;
+          }
+          orph.length = 0;
+        }
+        return tree;
+      }
+
+      // ブラシの跡を、縮めた大きさの手がかり（1 物・2 背景）にする。ブラシの真ん中寄りだけ使う
+      function seedStroke(seed, a, sx, sy, w, h) {
+        const r = Math.max(1, a.r * sx * 0.8), v = a.erase ? 2 : 1;
+        const pts = a.pts.map(([x, y]) => [x * sx, y * sy]);
+        const dot = (cx, cy) => {
+          for (let y = Math.max(0, Math.floor(cy - r)); y <= Math.min(h - 1, Math.ceil(cy + r)); y++)
+            for (let x = Math.max(0, Math.floor(cx - r)); x <= Math.min(w - 1, Math.ceil(cx + r)); x++)
+              if ((x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2 <= r * r) seed[y * w + x] = v;
+        };
+        dot(...pts[0]);
+        for (let k = 1; k < pts.length; k++) {
+          const [x0, y0] = pts[k - 1], [x1, y1] = pts[k], n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / Math.max(0.5, r / 2)));
+          for (let s = 1; s <= n; s++) dot(x0 + (x1 - x0) * s / n, y0 + (y1 - y0) * s / n);
+        }
+      }
+
+      function grabCut(poly, seeds) {
+        const sc = Math.min(1, CUT_SIDE / Math.max(W, H));
+        const w = Math.max(1, Math.round(W * sc)), h = Math.max(1, Math.round(H * sc)), sx = w / W, sy = h / H, n = w * h;
+        // 縮めた画像
+        let d;
+        if (sc < 1) {
+          const full = document.createElement('canvas'); full.width = W; full.height = H;
+          full.getContext('2d').putImageData(new ImageData(col, W, H), 0, 0);
+          const small = document.createElement('canvas'); small.width = w; small.height = h;
+          const g = small.getContext('2d', { willReadFrequently: true });
+          g.imageSmoothingQuality = 'high';
+          g.drawImage(full, 0, 0, w, h);
+          d = g.getImageData(0, 0, w, h).data;
+        } else d = col;
+        const px = new Float32Array(n * 3), hard = new Uint8Array(n); // hard: 0 わからない、1 物、2 背景
+        const inside = polyMask(poly, w, h, sx, sy);
+        for (let i = 0; i < n; i++) {
+          px[i * 3] = d[i * 4]; px[i * 3 + 1] = d[i * 4 + 1]; px[i * 3 + 2] = d[i * 4 + 2];
+          if (!inside[i]) hard[i] = 2;
+        }
+        for (const a of seeds) seedStroke(hard, a, sx, sy, w, h);
+        for (let i = 0; i < n; i++) if (d[i * 4 + 3] < 8) hard[i] = 2;
+        const lab = new Uint8Array(n);
+        let nf = 0, nb = 0;
+        for (let i = 0; i < n; i++) { lab[i] = hard[i] === 2 ? 0 : 1; if (lab[i]) nf++; else nb++; }
+        if (!nf) return { err: '囲みの中に残すものがありません' };
+        if (!nb) return { err: '囲みの外に背景が見えません。画像のふちより少し内側を囲んでください' };
+        // となりとのつながり（色が近いほど強い）
+        const okm = new Uint8Array(n);
+        for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+          let m = 0;
+          for (let k = 0; k < 8; k++) { const xx = x + DX[k], yy = y + DY[k]; if (xx >= 0 && xx < w && yy >= 0 && yy < h) m |= 1 << k; }
+          okm[y * w + x] = m;
+        }
+        const FW = [0, 2, 4, 6], offs = DX.map((dx, k) => dx + DY[k] * w);
+        const diff2 = (i, j) => (px[i * 3] - px[j * 3]) ** 2 + (px[i * 3 + 1] - px[j * 3 + 1]) ** 2 + (px[i * 3 + 2] - px[j * 3 + 2]) ** 2;
+        let sum = 0, cnt = 0;
+        for (let i = 0; i < n; i++) for (const k of FW) if (okm[i] >> k & 1) { sum += diff2(i, i + offs[k]); cnt++; }
+        const beta = sum > 0 ? cnt / (2 * sum) : 0, GAMMA = 50;
+        const ew = new Float32Array(n * 8);
+        for (let i = 0; i < n; i++) for (const k of FW) {
+          if (!(okm[i] >> k & 1)) continue;
+          const j = i + offs[k], v = GAMMA * Math.exp(-beta * diff2(i, j)) / (k >= 4 ? Math.SQRT2 : 1);
+          ew[i * 8 + k] = v; ew[j * 8 + (k ^ 1)] = v;
+        }
+        const cap = new Float32Array(n * 8), tr = new Float64Array(n), INF = 1e7;
+        let fgM = null, bgM = null;
+        for (let it = 0; it < 3; it++) {
+          fgM = gmmLearn(px, lab, 1, fgM); bgM = gmmLearn(px, lab, 0, bgM);
+          if (!fgM || !fgM.length || !bgM || !bgM.length) break;
+          for (let i = 0; i < n; i++) {
+            if (hard[i] === 2) tr[i] = -INF;
+            else if (hard[i] === 1) tr[i] = INF;
+            else {
+              const p = i * 3, v = gmmLog(fgM, px[p], px[p + 1], px[p + 2]) - gmmLog(bgM, px[p], px[p + 1], px[p + 2]);
+              tr[i] = Math.max(-1e3, Math.min(1e3, v));
+            }
+          }
+          cap.set(ew);
+          const tree = maxflow(w, h, cap, tr, okm);
+          for (let i = 0; i < n; i++) lab[i] = hard[i] === 2 ? 0 : hard[i] === 1 ? 1 : tree[i] === 1 ? 1 : 0;
+        }
+        // ふちを整える：縮めた結果を少しぼかして元の大きさに広げ、境目のあたりは元の色がどちらに近いかで決める
+        const soft = new Float32Array(n);
+        for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+          let s = 0, c = 0;
+          for (let yy = Math.max(0, y - 1); yy <= Math.min(h - 1, y + 1); yy++)
+            for (let xx = Math.max(0, x - 1); xx <= Math.min(w - 1, x + 1); xx++) { s += lab[yy * w + xx]; c++; }
+          soft[y * w + x] = s / c;
+        }
+        const useColor = fgM && bgM && fgM.length && bgM.length;
+        const res = new Uint8Array(W * H), insideF = polyMask(poly, W, H, 1, 1);
+        for (let Y = 0; Y < H; Y++) {
+          const fy = Math.min(h - 1, Math.max(0, (Y + 0.5) * sy - 0.5)), y0 = Math.floor(fy), y1 = Math.min(h - 1, y0 + 1), ty = fy - y0;
+          for (let X = 0; X < W; X++) {
+            const I = Y * W + X;
+            if (!insideF[I]) continue;
+            const fx = Math.min(w - 1, Math.max(0, (X + 0.5) * sx - 0.5)), x0 = Math.floor(fx), x1 = Math.min(w - 1, x0 + 1), tx = fx - x0;
+            const p = (soft[y0 * w + x0] * (1 - tx) + soft[y0 * w + x1] * tx) * (1 - ty) + (soft[y1 * w + x0] * (1 - tx) + soft[y1 * w + x1] * tx) * ty;
+            if (p <= 0.02) continue;
+            if (p >= 0.98) { res[I] = 255; continue; }
+            const q = I * 4;
+            const L = useColor ? Math.max(-6, Math.min(6, gmmLog(fgM, col[q], col[q + 1], col[q + 2]) - gmmLog(bgM, col[q], col[q + 1], col[q + 2]))) : 0;
+            res[I] = Math.round(255 / (1 + Math.exp(-((p - 0.5) * 12 + L * 0.5))));
+          }
+        }
+        return { res };
+      }
+
+      let cutting = false;
+      async function runCut(poly, seeds) {
+        if (cutting) return;
+        cutting = true;
+        $('busy').hidden = false;
+        await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+        try {
+          const t0 = performance.now();
+          const r = grabCut(poly, seeds);
+          if (r.err) { toast(r.err); return; }
+          doAction({ type: 'cut', poly, seeds, res: r.res });
+          toast(`切り抜きました（${((performance.now() - t0) / 1000).toFixed(1)}秒）。残ったところ・消えすぎたところはブラシで直せます`);
+        } catch (e) {
+          console.error(e);
+          toast('切り抜けませんでした');
+        } finally {
+          cutting = false;
+          $('busy').hidden = true;
+        }
+      }
+      function lastCut() {
+        for (let k = actions.length - 1; k >= 0; k--) if (actions[k].type === 'cut') return k;
+        return -1;
+      }
+      $('cut-again').onclick = () => {
+        const k = lastCut();
+        if (k < 0) return;
+        const strokes = actions.slice(k + 1).filter(a => a.type === 'stroke');
+        if (!strokes.length) { toast('🖌 戻す・🧽 消す で直したいところをなぞってから押してください'); return; }
+        runCut(actions[k].poly, [...actions[k].seeds, ...strokes]);
+      };
+
+      // =====================================================
       //  画像を開く（ボタン・ドロップ・貼り付け）
       // =====================================================
       async function openFile(f) {
@@ -1440,6 +1996,8 @@
         ctx.clearRect(0, 0, W, H);
         ctx.drawImage(bmp, 0, 0, W, H);
         src = ctx.getImageData(0, 0, W, H).data;
+        col = new Uint8ClampedArray(src);
+        $('lasso').setAttribute('viewBox', `0 0 ${W} ${H}`);
         key = new Uint8Array(W * H); keyIdx = new Uint8Array(W * H); mask = new Uint8Array(W * H);
         out = ctx.createImageData(W, H);
         actions = []; redoStack = [];
@@ -1539,6 +2097,17 @@
           doAction({ type: 'pick', x: xi, y: yi, color });
           return;
         }
+        if (tool === 'fill') {
+          const xi = Math.min(W - 1, Math.max(0, Math.floor(x))), yi = Math.min(H - 1, Math.max(0, Math.floor(y)));
+          doAction({ type: 'fill', x: xi, y: yi, color: rgbOf($('fill-color').value), tol: P.tol, soft: P.soft });
+          return;
+        }
+        if (tool === 'cut') {
+          if (cutting) return;
+          drag = { cut: true, rect: $('cut-shape').value === 'rect', pts: [[x, y]] };
+          drawLasso(drag);
+          return;
+        }
         const a = { type: 'stroke', erase: tool === 'erase', r: P.brush, pts: [[x, y]] };
         drag = { a };
         const rect = [W, H, 0, 0];
@@ -1554,6 +2123,13 @@
         }
         if (!drag) return;
         if (drag.hand) { stage.scrollLeft = drag.l - (e.clientX - drag.sx); stage.scrollTop = drag.t - (e.clientY - drag.sy); return; }
+        if (drag.cut) {
+          const [x, y] = toImg(e), pts = drag.pts;
+          if (drag.rect) pts[1] = [x, y];
+          else if (Math.hypot(x - pts[pts.length - 1][0], y - pts[pts.length - 1][1]) * zoom >= 3) pts.push([x, y]);
+          drawLasso(drag);
+          return;
+        }
         const [x, y] = toImg(e), a = drag.a, [px, py] = a.pts[a.pts.length - 1];
         if (Math.hypot(x - px, y - py) < 0.5) return;
         a.pts.push([x, y]);
@@ -1561,11 +2137,41 @@
         stamp(x, y, a.r, a.erase, px, py, rect);
         compose(rect[0], rect[1], rect[2], rect[3]);
       });
+      // 囲み（四角は対角の2点、手書きは通った点）を多角形にする
+      function lassoPoly(dr) {
+        const cl = ([x, y]) => [Math.min(W, Math.max(0, x)), Math.min(H, Math.max(0, y))];
+        if (dr.rect) {
+          if (dr.pts.length < 2) return [];
+          const [a, b] = dr.pts.map(cl);
+          return [[a[0], a[1]], [b[0], a[1]], [b[0], b[1]], [a[0], b[1]]];
+        }
+        return dr.pts.map(cl);
+      }
+      function drawLasso(dr) {
+        const svg = $('lasso');
+        if (!dr) { svg.hidden = true; return; }
+        const pts = lassoPoly(dr).map(p => p.join(',')).join(' ');
+        $('lasso-a').setAttribute('points', pts);
+        $('lasso-b').setAttribute('points', pts);
+        svg.hidden = false;
+      }
       const endDrag = () => {
         if (!drag) return;
-        if (drag.hand) cv.style.cursor = '';
-        else doAction(drag.a);
+        const dr = drag;
         drag = null;
+        if (dr.hand) { cv.style.cursor = ''; return; }
+        if (dr.cut) {
+          drawLasso(null);
+          const poly = lassoPoly(dr);
+          const xs = poly.map(p => p[0]), ys = poly.map(p => p[1]);
+          if (poly.length < 3 || Math.max(...xs) - Math.min(...xs) < 8 || Math.max(...ys) - Math.min(...ys) < 8) {
+            toast('残したいものを、ドラッグでぐるっと囲んでください');
+            return;
+          }
+          runCut(poly, []);
+          return;
+        }
+        doAction(dr.a);
       };
       cv.addEventListener('pointerup', endDrag);
       cv.addEventListener('pointercancel', endDrag);
@@ -1588,15 +2194,38 @@
       }
       $('mode').onchange = () => { P.mode = $('mode').value; rebuild(); };
       $('decon').onchange = () => { P.decon = $('decon').checked; if (src) compose(0, 0, W - 1, H - 1); };
-      $('view-bg').onchange = () => { $('wrap').dataset.bg = $('view-bg').value; };
+      // ---- 色を選ぶ・保存する画像の背景
+      const rgbOf = h => [1, 3, 5].map(k => parseInt(h.slice(k, k + 2), 16));
+      document.querySelectorAll('.colors').forEach(box => {
+        const input = $(box.dataset.for);
+        box.querySelectorAll('.chip').forEach(c => c.onclick = () => { input.value = c.dataset.c; input.dispatchEvent(new Event('input')); });
+      });
+      function applyView() {
+        const fill = $('bg-fill').checked, wrap = $('wrap');
+        $('bg-field').hidden = !fill;
+        $('view-bg').disabled = fill;
+        $('view-note').textContent = fill
+          ? '「保存する画像の背景を塗る」がオンなので、その色で表示しています'
+          : '黒や緑にすると、ふちの残りが見つけやすくなります（保存する画像には入りません）';
+        wrap.dataset.bg = fill ? 'fill' : $('view-bg').value;
+        wrap.style.setProperty('--fill-bg', $('bg-color').value);
+        // JPG は背景を塗るときだけ
+        const jpg = $('save-type').querySelector('option[value="image/jpeg"]');
+        jpg.disabled = !fill;
+        if (!fill && $('save-type').value === 'image/jpeg') $('save-type').value = 'image/png';
+      }
+      $('view-bg').onchange = applyView;
+      $('bg-fill').onchange = applyView;
+      $('bg-color').addEventListener('input', applyView);
       ui();
 
       // =====================================================
       //  保存（余白を切る・PNG / WebP）
       // =====================================================
-      const EXT = { 'image/png': 'png', 'image/webp': 'webp' };
+      const EXT = { 'image/png': 'png', 'image/webp': 'webp', 'image/jpeg': 'jpg' };
       const TYPE_KEY = 'donnma-bgremove-savetype';
-      try { const t = localStorage.getItem(TYPE_KEY); if (EXT[t]) $('save-type').value = t; } catch (e) { /* ignore */ }
+      try { const t = localStorage.getItem(TYPE_KEY); if (EXT[t] && t !== 'image/jpeg') $('save-type').value = t; } catch (e) { /* ignore */ }
+      applyView();
       $('save-type').onchange = () => { try { localStorage.setItem(TYPE_KEY, $('save-type').value); } catch (e) { /* ignore */ } };
       $('save-btn').onclick = () => {
         if (!src) return;
@@ -1612,10 +2241,15 @@
         }
         const c = document.createElement('canvas');
         c.width = x1 - x0 + 1; c.height = y1 - y0 + 1;
-        c.getContext('2d').putImageData(out, -x0, -y0);
+        const cc = c.getContext('2d');
+        if ($('bg-fill').checked) {
+          cc.fillStyle = $('bg-color').value;
+          cc.fillRect(0, 0, c.width, c.height);
+          cc.drawImage(cv, x0, y0, c.width, c.height, 0, 0, c.width, c.height);
+        } else cc.putImageData(out, -x0, -y0);
         c.toBlob(b => {
           if (!b) { toast('保存できませんでした'); return; }
-          if (b.type !== type) { toast('このブラウザは WebP で保存できません。PNG で保存してください'); return; }
+          if (b.type !== type) { toast(`このブラウザは ${EXT[type].toUpperCase()} で保存できません。PNG で保存してください`); return; }
           const a = document.createElement('a');
           a.href = URL.createObjectURL(b);
           a.download = ($('file-name').value.trim() || `${baseName}_nobg`).replace(/[\\/:*?"<>|]+/g, '_') + '.' + EXT[type];
