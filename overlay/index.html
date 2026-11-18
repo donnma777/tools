@@ -1040,6 +1040,21 @@
       }
 
     }
+
+    /* 大きな画面：トップページと同じく広げて、テーマのカードを横にたくさん並べる */
+    @media (min-width: 1600px) {
+
+      .section,
+      .ad-slot,
+      .footer-inner,
+      .topnav-inner {
+        max-width: 2400px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      }
+    }
   </style>
 </head>
 
