@@ -1503,6 +1503,18 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    @media (min-width: 1001px) {
+      .main {
+        max-height: calc(100vh - 142px);
+        overflow: auto;
+        scrollbar-width: thin;
+      }
+
+      .preview canvas {
+        max-height: calc(100vh - 420px);
+      }
+    }
+
     @media (max-width: 1000px) {
       .workspace {
         grid-template-columns: minmax(0, 1fr);
