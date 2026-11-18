@@ -316,6 +316,38 @@
       box-shadow: inset 3px 0 0 var(--accent, #ff85a1);
     }
 
+    .toolmenu-foot {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 8px;
+      padding: 10px 16px 12px;
+      border-top: 1px solid var(--border, #46162e);
+      background: var(--bg-deep, #1a0a14);
+    }
+
+    .toolmenu-foot-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted, #c4a2b3);
+      margin-right: 4px;
+    }
+
+    .toolmenu-foot a {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text, #f6e9ef);
+      text-decoration: none;
+      border: 1px solid var(--border-strong, #5e2340);
+      border-radius: 999px;
+      padding: 4px 12px;
+    }
+
+    .toolmenu-foot a:hover {
+      border-color: var(--accent, #ff85a1);
+      color: var(--accent-2, #ffb3c6);
+    }
+
     .toolmenu-none {
       grid-column: 1 / -1;
       color: var(--muted, #c4a2b3);
@@ -1874,6 +1906,16 @@
         </section>
         <p class="toolmenu-none" hidden>見つかりませんでした</p>
       </div>
+      <nav class="toolmenu-foot" aria-label="どんまうんど（donnma.com）">
+        <span class="toolmenu-foot-label">どんまうんど</span>
+        <a href="https://donnma.com/" target="_blank" rel="noopener">サイトのトップ ↗</a>
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">ブログ ↗</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">プロフィール ↗</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">リンク ↗</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">お問い合わせ ↗</a>
+        <a href="https://donnma.booth.pm/item_lists/nevT9GeV" target="_blank" rel="noopener">BOOTH ↗</a>
+        <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">X（@donnma777） ↗</a>
+      </nav>
     </div>
   </div>
   <script>

@@ -154,8 +154,15 @@ def toolmenu_lines(root, rel):
                     f'            <span><b>{esc(c["name"])}{" ↗" if ext else ""}</b><small>{esc(c.get("tag", ""))}</small></span>',
                     '          </a>']
         out += ['        </div>', '      </section>']
+    site = [('https://donnma.com/', 'サイトのトップ'), ('https://donnma.com/blog/', 'ブログ'), ('https://donnma.com/profile/', 'プロフィール'),
+            ('https://donnma.com/link/', 'リンク'), ('https://donnma.com/form/', 'お問い合わせ'),
+            ('https://donnma.booth.pm/item_lists/nevT9GeV', 'BOOTH'), ('https://twitter.com/donnma777', 'X（@donnma777）')]
     out += ['      <p class="toolmenu-none" hidden>見つかりませんでした</p>',
             '    </div>',
+            '    <nav class="toolmenu-foot" aria-label="どんまうんど（donnma.com）">',
+            '      <span class="toolmenu-foot-label">どんまうんど</span>']
+    out += [f'      <a href="{attr(u)}" target="_blank" rel="noopener">{esc(t)} ↗</a>' for u, t in site]
+    out += ['    </nav>',
             '  </div>',
             '</div>',
             '<script>',
