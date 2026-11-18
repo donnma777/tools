@@ -146,6 +146,200 @@
       color: var(--accent);
     }
 
+    /* 「ツール一覧 ▾」はメニューを開くボタン */
+    button.topnav-menu {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      background: none;
+      border: 0;
+      cursor: pointer;
+    }
+
+    /* ── ツールの一覧（大きなメニュー） ── */
+    html.toolmenu-open {
+      overflow: hidden;
+    }
+
+    .toolmenu {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 64px 20px 20px;
+      background: rgba(10, 4, 8, 0.72);
+      backdrop-filter: blur(3px);
+    }
+
+    .toolmenu[hidden] {
+      display: none;
+    }
+
+    .toolmenu-box {
+      width: min(1180px, 100%);
+      max-height: calc(100vh - 84px);
+      display: flex;
+      flex-direction: column;
+      background: var(--surface, #2e1224);
+      border: 1px solid var(--border-strong, #5e2340);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+      overflow: hidden;
+    }
+
+    .toolmenu-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border, #46162e);
+    }
+
+    .toolmenu-q {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      font-size: 14px;
+      color: var(--text, #f6e9ef);
+      background: var(--bg-deep, #1a0a14);
+      border: 1px solid var(--border-strong, #5e2340);
+      border-radius: 10px;
+      padding: 9px 12px;
+    }
+
+    .toolmenu-q:focus {
+      outline: none;
+      border-color: var(--accent, #ff85a1);
+    }
+
+    .toolmenu-top {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-2, #ffb3c6);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .toolmenu-top:hover {
+      text-decoration: underline;
+    }
+
+    .toolmenu-close {
+      font: inherit;
+      font-size: 20px;
+      line-height: 1;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border-strong, #5e2340);
+      background: none;
+      color: var(--text, #f6e9ef);
+      cursor: pointer;
+    }
+
+    .toolmenu-close:hover {
+      border-color: var(--accent, #ff85a1);
+    }
+
+    .toolmenu-body {
+      overflow: auto;
+      padding: 6px 16px 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 6px 18px;
+      align-items: start;
+    }
+
+    .toolmenu-sec h2 {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted, #c4a2b3);
+      letter-spacing: 0.05em;
+      margin: 12px 4px 6px;
+    }
+
+    .toolmenu-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .toolmenu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      color: var(--text, #f6e9ef);
+      text-decoration: none;
+    }
+
+    .toolmenu-item[hidden] {
+      display: none;
+    }
+
+    .toolmenu-item svg {
+      width: 20px;
+      height: 20px;
+      flex: none;
+      color: var(--accent, #ff85a1);
+    }
+
+    .toolmenu-item span {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .toolmenu-item b {
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+
+    .toolmenu-item small {
+      font-size: 11px;
+      color: var(--muted, #c4a2b3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toolmenu-item:hover,
+    .toolmenu-item:focus-visible {
+      background: var(--surface-2, #38172c);
+      outline: none;
+    }
+
+    .toolmenu-item.on {
+      background: var(--accent-soft, rgba(255, 133, 161, 0.12));
+      box-shadow: inset 3px 0 0 var(--accent, #ff85a1);
+    }
+
+    .toolmenu-none {
+      grid-column: 1 / -1;
+      color: var(--muted, #c4a2b3);
+      font-size: 13px;
+      padding: 16px 4px;
+    }
+
+    @media (max-width: 600px) {
+      .toolmenu {
+        padding: 0;
+      }
+
+      .toolmenu-box {
+        max-height: 100vh;
+        height: 100%;
+        border-radius: 0;
+      }
+
+      .toolmenu-top {
+        display: none;
+      }
+    }
+
     .topnav-site {
       display: inline-flex;
       align-items: center;
@@ -976,34 +1170,20 @@
 
     .app {
       display: grid;
-      grid-template-columns: 188px minmax(0, 1fr) 330px;
+      grid-template-columns: minmax(0, 1fr) 340px;
       gap: 12px;
       padding: 12px;
       height: calc(100vh - 108px);
       min-height: 600px;
     }
 
-    body.side-closed .app {
-      grid-template-columns: minmax(0, 1fr) 330px;
-    }
 
-    body.side-closed .app-side {
-      display: none;
-    }
-
-    .app-side,
     .app-insp {
       min-height: 0;
       overflow: auto;
       scrollbar-width: thin;
     }
 
-    .app-side {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 8px 6px;
-    }
 
     .app-insp {
       display: flex;
@@ -1060,63 +1240,6 @@
       flex: none;
     }
 
-    /* ツールの一覧 */
-    .toolnav {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      font-size: 12.5px;
-    }
-
-    .toolnav-home {
-      color: var(--accent-2);
-      font-weight: 700;
-      text-decoration: none;
-      padding: 6px 8px 8px;
-    }
-
-    .toolnav-home:hover {
-      text-decoration: underline;
-    }
-
-    .toolnav-sec {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      padding: 10px 8px 4px;
-      border-top: 1px solid var(--border);
-      margin-top: 4px;
-    }
-
-    .toolnav-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 8px;
-      border-radius: 8px;
-      color: var(--label);
-      text-decoration: none;
-      font-weight: 700;
-      line-height: 1.35;
-    }
-
-    .toolnav-item svg {
-      width: 16px;
-      height: 16px;
-      flex: none;
-      color: var(--accent);
-    }
-
-    .toolnav-item:hover {
-      background: var(--surface-2);
-      color: var(--text);
-    }
-
-    .toolnav-item.on {
-      background: var(--accent-soft);
-      color: var(--accent-2);
-      box-shadow: inset 3px 0 0 var(--accent);
-    }
 
     @media (max-width: 999px) {
       .app {
@@ -1125,28 +1248,6 @@
         min-height: 0;
       }
 
-      body.side-closed .app {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .app-side,
-      body.side-closed .app-side {
-        display: block;
-        position: fixed;
-        z-index: 500;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 270px;
-        border-radius: 0 14px 14px 0;
-        transform: translateX(-105%);
-        transition: transform 0.2s;
-        box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
-      }
-
-      body.side-open .app-side {
-        transform: none;
-      }
 
       .app-insp {
         overflow: visible;
@@ -1774,7 +1875,7 @@
     <div class="topnav-inner">
       <a class="topnav-brand" href="../"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
       <div class="topnav-right">
-        <a class="topnav-back" href="../">ツール一覧</a>
+        <button class="topnav-back topnav-menu" type="button" aria-haspopup="dialog" aria-controls="toolmenu" aria-expanded="false">ツール一覧 ▾</button>
         <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener">
           <span class="topnav-site-dot"></span>
           donnma.com
@@ -1782,11 +1883,209 @@
       </div>
     </div>
   </nav>
+  <div class="toolmenu" id="toolmenu" role="dialog" aria-modal="true" aria-label="ツールの一覧" hidden>
+    <div class="toolmenu-box">
+      <div class="toolmenu-head">
+        <input type="search" class="toolmenu-q" placeholder="ツールを探す（例：qr、歌、画像、OBS）" aria-label="ツールを探す" autocomplete="off">
+        <a class="toolmenu-top" href="../">トップの一覧へ</a>
+        <button type="button" class="toolmenu-close" aria-label="閉じる">×</button>
+      </div>
+      <div class="toolmenu-body">
+        <section class="toolmenu-sec">
+          <h2>配信の便利ツール</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../overlay/index.html" data-q="配信オーバーレイテーマ OBS Studio オーバーレイ 配信向け サイバーパンク、ゲーミング、和風などOBS用オーバーレイテーマを公開中。テーマ一覧・使い方は専用ページで確認できます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2" /><path d="M8 21h8M12 17v4M10 8.5v5l4-2.5z" /></svg>
+              <span><b>配信オーバーレイテーマ</b><small>OBS Studio オーバーレイ</small></span>
+            </a>
+            <a class="toolmenu-item" href="../chat-css-generator/" data-q="チャットCSSジェネレーター YouTube / Twitch チャット 配信向け YouTubeライブ・Twitchのチャット欄をOBSでおしゃれに表示。プレビューを見ながらフォント・縁取り・吹き出し・スパチャ/Bits・アニメーションを設定できます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z" /><path d="M8.5 12h.01M12 12h.01M15.5 12h.01" /></svg>
+              <span><b>チャットCSSジェネレーター</b><small>YouTube / Twitch チャット</small></span>
+            </a>
+            <a class="toolmenu-item" href="../youtube-subscribers/" data-q="登録者数カウンター・目標ゲージ YouTube 登録者数 配信向け YouTubeの登録者数を自動で取得して、OBSでおしゃれに表示。「目標まであと○人」の目標ゲージも出せます。グラデーション・縁取り・見出しや単位・背景の箱を、プレビューを見ながら設定できます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
+              <span><b>登録者数カウンター・目標ゲージ</b><small>YouTube 登録者数</small></span>
+            </a>
+            <a class="toolmenu-item" href="../clock/" data-q="時計・経過時間 時計・配信時間 配信向け OBS のブラウザソースで使える時計です。配信・録画を始めてからの時間を自動で数え、海外の時刻も並べられます。選んで URL をコピーするだけです。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2.5 2.5" /><path d="M9 2h6" /></svg>
+              <span><b>時計・経過時間</b><small>時計・配信時間</small></span>
+            </a>
+            <a class="toolmenu-item" href="../schedule/" data-q="配信スケジュールメーカー 週・月・時間割・進行表 配信向け 配信予定を入れるだけで、X などに載せるスケジュール画像を作れます。1週間・1か月のカレンダー・週の時間割・1日の進行表から選べて、キャラの画像も置けます。OBS に入れると、今日の予定や今の枠（残り時間つき）を目立たせて配信画面にも出せます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M8 2v4M16 2v4M3 9h18M7 13h4M7 17h8" /></svg>
+              <span><b>配信スケジュールメーカー</b><small>週・月・時間割・進行表</small></span>
+            </a>
+            <a class="toolmenu-item" href="../chapter/" data-q="YouTube チャプターメーカー YouTube・アーカイブ・目次 配信向け 概要欄に入れるチャプター（目次）を作れます。メモのタイムスタンプを貼るだけで整えて、0:00 から始まる・10秒以上などの YouTube の条件を確かめて直せます。動画を見ながらボタンで区切ることもできます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3" /><path d="M10 9v6l5-3z" /><path d="M6 17h12" /><path d="M9 16v2M14 16v2" /></svg>
+              <span><b>YouTube チャプターメーカー</b><small>YouTube・アーカイブ・目次</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>大会・抽選</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../tournament/" data-q="トーナメント表メーカー 大会・配信・会場 大会・イベント 参加者を入れるだけで、トーナメント・ダブルエリミネーション・総当たり・スイスドローの表を自動で作成。点数（音ゲーのスコア）や団体戦、敗者復活、課題曲のピック・BAN・ルーレットにも対応。配信（OBS）・会場のモニター・画像保存で使えます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h5v4H3zM3 16h5v4H3z" /><path d="M8 6h3v12H8M11 12h4" /><path d="M15 9h6v6h-6z" /></svg>
+              <span><b>トーナメント表メーカー</b><small>大会・配信・会場</small></span>
+            </a>
+            <a class="toolmenu-item" href="../ranking/" data-q="スコアアタック集計 予選・スコアアタック・音ゲー 大会・イベント 参加者ごとの点数（タイム）を入れると、合計・曲ごとの順位の合計・理論値比で順位を自動で出します。本戦に進む人の線、Excel からの貼り付け、PNG 保存つき。OBS に入れると、点数を入れるたびに順位表がその場で変わります。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21V11h8v10M3 21v-6h5M16 21v-8h5" /><path d="M2 21h20" /><path d="M12 3l1.2 2.4 2.6.4-1.9 1.8.5 2.6L12 9l-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z" /></svg>
+              <span><b>スコアアタック集計</b><small>予選・スコアアタック・音ゲー</small></span>
+            </a>
+            <a class="toolmenu-item" href="../roulette/" data-q="ルーレット 抽選・罰ゲーム・順番決め 抽選・ゲーム 項目・当たりやすさ・色を自由に決めて回せるルーレット。ブラウザでそのまま使えて、OBSの配信画面にも出せます（ドック・Chromeから操作、透過背景・履歴表示・効果音つき）。罰ゲーム・順番決め・抽選に。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 13V5M12 13l6.9 4M12 13l-6.9 4" /><path d="M10 2h4l-2 3z" /></svg>
+              <span><b>ルーレット</b><small>抽選・罰ゲーム・順番決め</small></span>
+            </a>
+            <a class="toolmenu-item" href="../amida/" data-q="あみだくじ 順番決め・チーム分け・罰ゲーム 抽選・ゲーム 参加者と結果を入れるだけで作れるあみだくじ。横線を足してから始めたり、結果を隠して1人ずつ・全員まとめて開けたりできます。ブラウザでそのまま使えて、OBSの配信画面にも出せます（画像保存・効果音つき）。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v18M12 3v18M19 3v18" /><path d="M5 7h7M12 11h7M5 15h7M12 18h7" /></svg>
+              <span><b>あみだくじ</b><small>順番決め・チーム分け・罰ゲーム</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>画像づくり</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../thumbnail/" data-q="サムネイルメーカー ブログ・YouTube・SNS 画像づくり ブログのアイキャッチ、YouTubeのサムネイル、SNSの共有画像をブラウザだけで作れます。文字を入れて、背景の柄と画像を選ぶだけ。長い文字は自動で収まります。画像はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="8.5" cy="10" r="1.5" /><path d="M21 15l-5-5L5 19" /></svg>
+              <span><b>サムネイルメーカー</b><small>ブログ・YouTube・SNS</small></span>
+            </a>
+            <a class="toolmenu-item" href="../bg-remove/" data-q="背景透過ツール イラスト・写真・商品画像 画像づくり 背景の色をクリックして透明に。写真は残したいものを囲むだけで切り抜けます。色の塗りつぶし・背景色をつけての保存（JPG も）にも対応。画像はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3" /><circle cx="6" cy="18" r="3" /><line x1="20" y1="4" x2="8.12" y2="15.88" /><line x1="14.47" y1="14.48" x2="20" y2="20" /><line x1="8.12" y1="8.12" x2="12" y2="12" /></svg>
+              <span><b>背景透過ツール</b><small>イラスト・写真・商品画像</small></span>
+            </a>
+            <a class="toolmenu-item" href="../qr/" data-q="QRコードメーカー URL・Wi-Fi・連絡先 画像づくり URL・Wi-Fi・連絡先・メールなどのQRコードを、期限なし・登録なしで作れます。ドットや角の形、色・グラデーション、まん中のロゴを変えて、PNG・SVG・JPG で保存。画像からの読み取りもできます。入れた内容はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" /></svg>
+              <span><b>QRコードメーカー</b><small>URL・Wi-Fi・連絡先</small></span>
+            </a>
+            <a class="toolmenu-item" href="../meishi/" data-q="名刺メーカー 名前・SNS・QRコード 画像づくり 名前・SNS・QRコードを入れるだけで名刺を作れます。配信者のイベントや交流会に。4つのレイアウト、色・フォント・写真を選んで、家で印刷できる A4・10面の PDF や、印刷所に出せる PDF・PNG で保存。画像はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" /><circle cx="8" cy="11" r="2" /><path d="M5 16c.6-1.4 1.7-2 3-2s2.4.6 3 2" /><path d="M14 10h5M14 13h4" /></svg>
+              <span><b>名刺メーカー</b><small>名前・SNS・QRコード</small></span>
+            </a>
+            <a class="toolmenu-item" href="../psd/" data-q="PSD レイヤー書き出し 立ち絵のパーツ分け・差分 画像づくり PSD をブラウザで開いて、レイヤーを選んで PNG で保存できます。表示を切り替えた見た目を1枚で、レイヤーやフォルダを1枚ずつ、全部まとめて ZIP でも。Photoshop がなくても使えて、ファイルはどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z" /><path d="M3 12l9 5 9-5" /><path d="M3 16l9 5 9-5" /></svg>
+              <span><b>PSD レイヤー書き出し</b><small>立ち絵のパーツ分け・差分</small></span>
+            </a>
+            <a class="toolmenu-item" href="../image-compress/" data-q="画像の圧縮・変換 JPEG・PNG・WebP 画像づくり 画像を軽くしたり、JPEG・PNG・WebP に変換したりできます。何枚でもまとめて変換、画質・大きさ・「○KB 以下」を選べて、変換前と見比べられます。撮影場所の情報も消えます。画像はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="M21 15l-5-5L5 21" /><path d="M15 3v4M15 7l-2-2M15 7l2-2" /></svg>
+              <span><b>画像の圧縮・変換</b><small>JPEG・PNG・WebP</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>便利ツール</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../markdown/" data-q="マークダウンメーカー GitHub・ブログ・メモ 便利ツール Markdown を書きながら、すぐ見た目を確かめられます。ボタンで見出し・太字・リスト・表を入れられて、表は Excel から貼っても作れます。Web ページや Word の文章を貼ると Markdown に変換。.md・HTML で保存できます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M6 15V9l2.5 3L11 9v6" /><path d="M16 9v6M13.5 12.5L16 15l2.5-2.5" /></svg>
+              <span><b>マークダウンメーカー</b><small>GitHub・ブログ・メモ</small></span>
+            </a>
+            <a class="toolmenu-item" href="../diff/" data-q="テキスト比較（diff） 原稿・規約・設定ファイル 便利ツール 2つの文章を貼ると、違うところを色分けして見せます。変わった行の中では、どの文字が変わったかまで出します。空白・全角半角・大文字小文字の違いを無視したり、差分をコピーしたりもできます。文章はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="18" rx="1.5" /><rect x="14" y="3" width="7" height="18" rx="1.5" /><path d="M5.5 8h2M5.5 12h2M16.5 12h2M17.5 7v2M16.5 16h2" /></svg>
+              <span><b>テキスト比較（diff）</b><small>原稿・規約・設定ファイル</small></span>
+            </a>
+            <a class="toolmenu-item" href="../tree/" data-q="フォルダツリーメーカー README・ブログ・構成図 便利ツール 字下げで書いた一覧や、パソコンのフォルダから「├──」のフォルダツリーをテキストで作ります。線の形（全角・記号だけも）、並べ方、コメントの位置そろえ、.gitignore に従う読み込みつき。Markdown 用にコピー、画像（PNG）でも保存できます。ファイルはどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6a1 1 0 0 1 1-1h4l2 2h5a1 1 0 0 1 1 1v1" /><path d="M6 9v9h5M6 13h5" /><rect x="12" y="11" width="8" height="4" rx="1" /><rect x="12" y="16" width="8" height="4" rx="1" /></svg>
+              <span><b>フォルダツリーメーカー</b><small>README・ブログ・構成図</small></span>
+            </a>
+            <a class="toolmenu-item on" href="../hum-midi/" data-q="鼻歌 MIDI 変換 DAW・作曲・メロディの打ち込み 便利ツール マイクで歌った鼻歌や楽器の音から音の高さを読み取って、MIDI ファイル（.mid）にします。メトロノームに合わせて録音、ピアノロールで手直し、クオンタイズ・スケール補正つき。トラックを重ねて音色を選んだり、ドラムやコード伴奏・ハモリを作ったり、歌詞を付けて歌わせたり、楽譜にしたりもできます。Cakewalk などの DAW に読み込めます。音はどこにも送信しません。" aria-current="page">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="17" cy="16" r="3" /></svg>
+              <span><b>鼻歌 MIDI 変換</b><small>DAW・作曲・メロディの打ち込み</small></span>
+            </a>
+            <a class="toolmenu-item" href="../rirekisho/" data-q="履歴書メーカー 履歴書・職務経歴書・スキルシート 便利ツール 入力するだけで履歴書・職務経歴書・エンジニアのスキルシートを作れます。履歴書は厚生労働省の様式・転職用・アルバイト用・学生用・JIS 風の5つから。スキルシートはイニシャル表示・案件ごとの技術と工程つきで、出す項目や名前も選べます。AI に頼むプロンプトを作れて、答えを貼るだけで反映。PDF・Excel で保存、スプレッドシートにも貼れます。入力した内容はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2" /><rect x="13" y="5" width="4" height="5" rx=".5" /><path d="M7 6h4M7 9h4M7 13h10M7 16h10M7 19h6" /></svg>
+              <span><b>履歴書メーカー</b><small>履歴書・職務経歴書・スキルシート</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>サイトづくり</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../ogp-checker/" data-q="OGPチェッカー X・Discord・LINE・Facebook サイトづくり URL を入れるだけで、OGP の画像やページの情報を調べられます。X・LINE・Discord など、いろいろなサービスに貼ったときの見え方も確かめられて、問題があれば直し方も案内します。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" /><path d="M3 13l4-4 4 4 3-3 4 4" /><circle cx="17" cy="17" r="3.2" fill="var(--surface, #2e1224)" /><line x1="19.3" y1="19.3" x2="22" y2="22" /></svg>
+              <span><b>OGPチェッカー</b><small>X・Discord・LINE・Facebook</small></span>
+            </a>
+            <a class="toolmenu-item" href="../robots-checker/" data-q="robots.txt チェッカー Google・AI・X・AdSense サイトづくり URL を入れるだけで、Google・AI（ChatGPT・Claude など）・X・AdSense などのクローラーがそのページを読めるかを調べます。どの行で止められているか、noindex やサイトマップも確かめられ、robots.txt を書き換えて公開前に試せます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="2" /><path d="M12 3v4M9 12h.01M15 12h.01M9 16h6" /><path d="M2 12v3M22 12v3" /></svg>
+              <span><b>robots.txt チェッカー</b><small>Google・AI・X・AdSense</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>Chrome 拡張機能</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../benri-tools/" data-q="便利ツール拡張機能まとめ Chrome 拡張機能 Chrome拡張 広告ブロック・強制ダークモード・スクリーンショットなどを単体または統合版でまとめたChrome拡張機能リポジトリ。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4a2 2 0 1 1 4 0v2h4a1 1 0 0 1 1 1v4h-2a2 2 0 1 0 0 4h2v4a1 1 0 0 1-1 1h-4v-2a2 2 0 1 0-4 0v2H6a1 1 0 0 1-1-1v-4h2a2 2 0 1 0 0-4H5V7a1 1 0 0 1 1-1h4z" /></svg>
+              <span><b>便利ツール拡張機能まとめ</b><small>Chrome 拡張機能</small></span>
+            </a>
+            <a class="toolmenu-item" href="../authenticator-autofill/" data-q="Authenticator Autofill Chrome 拡張機能 Chrome拡張 2段階認証のコード・ログイン情報・住所などの個人情報・カード・メモを、端末内で暗号化して保存するChrome拡張機能。Google認証システムのQRや、Chrome・Bitwardenのパスワードを取り込めます。通信はしません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /><path d="M12 15v2" /></svg>
+              <span><b>Authenticator Autofill</b><small>Chrome 拡張機能</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>WordPress プラグイン</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="https://github.com/donnma777/smart-access-control/releases/latest" data-q="Smart Access Control WordPress プラグイン WordPress クローラー・User-Agent・IPアドレスを組み合わせてアクセスを精密に制御するWPプラグイン。AIクローラーやスクレイピングツールの許可/拒否、AIへの画像非表示やテキスト最適化表示に対応。" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z" /><path d="M8.5 12l2.5 2.5 4.5-5" /></svg>
+              <span><b>Smart Access Control ↗</b><small>WordPress プラグイン</small></span>
+            </a>
+            <a class="toolmenu-item" href="../wp-contact-inbox/" data-q="Contact Inbox WordPress プラグイン WordPress お問い合わせフォームを管理画面で作り、送られた内容を受信一覧で見て、そのまま返信できるWPプラグイン。ブロックで置けて、迷惑メール対策・CSV 書き出し・Discord 通知にも対応。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></svg>
+              <span><b>Contact Inbox</b><small>WordPress プラグイン</small></span>
+            </a>
+            <a class="toolmenu-item" href="../discord-post-notify/" data-q="Discord Post Notify WordPress プラグイン WordPress 新しい記事の公開・フォームの送信・コメントの投稿を、Discord に通知するWPプラグイン。用途ごとに送り先を分けたり、複数のチャンネルへ同時に送ったりできる。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+              <span><b>Discord Post Notify</b><small>WordPress プラグイン</small></span>
+            </a>
+            <a class="toolmenu-item" href="../wp-sns-post/" data-q="SNS Post WordPress プラグイン WordPress 記事を公開すると、Bluesky・Threads・X・Facebook ページ・Discord へ自動で投稿するWPプラグイン。送り先ごとのひな形・ハッシュタグ・プレビュー、フォームやコメントの Discord 通知にも対応。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13" /><path d="M22 2 15 22l-4-9-9-4 20-7z" /></svg>
+              <span><b>SNS Post</b><small>WordPress プラグイン</small></span>
+            </a>
+            <a class="toolmenu-item" href="../wp-folder-upload/" data-q="Folder Upload WordPress プラグイン WordPress uploads の中の好きなフォルダへ、ファイルやフォルダごとアップロードできるWPプラグイン。メディアライブラリへの登録や、記事の URL ごとまとめてのファイル名変更にも対応。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-8l-2-3H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1z" /><path d="M12 17v-6" /><path d="M9 13.5l3-3 3 3" /></svg>
+              <span><b>Folder Upload</b><small>WordPress プラグイン</small></span>
+            </a>
+            <a class="toolmenu-item" href="../wp-webp-upload/" data-q="WebP Upload WordPress プラグイン WordPress アップロードした JPEG / PNG を自動で WebP に変換して軽くするWPプラグイン。元の画像を残しておけば、あとから JPEG / PNG に戻せる。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="M21 15l-3.1-3.1a2 2 0 0 0-2.8 0L6 21" /></svg>
+              <span><b>WebP Upload</b><small>WordPress プラグイン</small></span>
+            </a>
+          </div>
+        </section>
+        <p class="toolmenu-none" hidden>見つかりませんでした</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const m = document.getElementById('toolmenu');
+      const btns = () => document.querySelectorAll('.topnav-menu, [data-toolmenu]');
+      if (!m) return;
+      const q = m.querySelector('.toolmenu-q'), none = m.querySelector('.toolmenu-none');
+      const kana = t => t.toLowerCase().replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+      const filter = () => {
+        const w = kana(q.value.trim()).split(/\s+/).filter(Boolean);
+        let any = false;
+        for (const sec of m.querySelectorAll('.toolmenu-sec')) {
+          let n = 0;
+          for (const a of sec.querySelectorAll('.toolmenu-item')) { const hit = w.every(x => kana(a.dataset.q).includes(x)); a.hidden = !hit; if (hit) n++; }
+          sec.hidden = !n; any = any || n > 0;
+        }
+        none.hidden = any;
+      };
+      const open = () => { m.hidden = false; document.documentElement.classList.add('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'true')); q.value = ''; filter(); q.focus(); };
+      const close = () => { m.hidden = true; document.documentElement.classList.remove('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'false')); };
+      document.addEventListener('click', e => { if (e.target.closest('.topnav-menu, [data-toolmenu]')) (m.hidden ? open() : close()); });
+      m.addEventListener('click', e => { if (e.target === m || e.target.closest('.toolmenu-close')) close(); });
+      q.addEventListener('input', filter);
+      q.addEventListener('keydown', e => { if (e.key === 'Enter') { const a = m.querySelector('.toolmenu-item:not([hidden])'); if (a) a.click(); } });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && !m.hidden) { e.stopPropagation(); close(); } }, true);
+      window.openToolMenu = open;
+    })();
+  </script>
   <!-- /shared:header -->
 
   <!-- 細い見出し -->
   <header class="app-title">
-    <button class="side-btn" type="button" id="side-toggle" aria-controls="app-side" title="ツールの一覧を出す・しまう" aria-label="ツールの一覧">☰</button>
+    <button class="side-btn" type="button" data-toolmenu aria-haspopup="dialog" aria-controls="toolmenu" title="ツールの一覧" aria-label="ツールの一覧">☰</button>
     <h1>鼻歌 MIDI 変換</h1>
     <p>鼻歌や楽器の音を MIDI に。ピアノロールや楽譜で直して、伴奏や歌声もつけて DAW へ。音はどこにも送信しません。</p>
     <span class="sp"></span>
@@ -1807,140 +2106,6 @@
   </header>
 
   <div class="app" id="app">
-    <aside class="app-side" id="app-side">
-      <!-- shared:toolnav root="../" current="hum-midi" -->
-      <nav class="toolnav" aria-label="ツールの一覧">
-        <a class="toolnav-home" href="../">← ツール一覧のトップ</a>
-        <div class="toolnav-sec">配信の便利ツール</div>
-        <a class="toolnav-item" href="../overlay/index.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2" /><path d="M8 21h8M12 17v4M10 8.5v5l4-2.5z" /></svg>
-          <span>配信オーバーレイテーマ</span>
-        </a>
-        <a class="toolnav-item" href="../chat-css-generator/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z" /><path d="M8.5 12h.01M12 12h.01M15.5 12h.01" /></svg>
-          <span>チャットCSSジェネレーター</span>
-        </a>
-        <a class="toolnav-item" href="../youtube-subscribers/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
-          <span>登録者数カウンター・目標ゲージ</span>
-        </a>
-        <a class="toolnav-item" href="../clock/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2.5 2.5" /><path d="M9 2h6" /></svg>
-          <span>時計・経過時間</span>
-        </a>
-        <a class="toolnav-item" href="../schedule/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M8 2v4M16 2v4M3 9h18M7 13h4M7 17h8" /></svg>
-          <span>配信スケジュールメーカー</span>
-        </a>
-        <a class="toolnav-item" href="../chapter/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3" /><path d="M10 9v6l5-3z" /><path d="M6 17h12" /><path d="M9 16v2M14 16v2" /></svg>
-          <span>YouTube チャプターメーカー</span>
-        </a>
-        <div class="toolnav-sec">大会・抽選</div>
-        <a class="toolnav-item" href="../tournament/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h5v4H3zM3 16h5v4H3z" /><path d="M8 6h3v12H8M11 12h4" /><path d="M15 9h6v6h-6z" /></svg>
-          <span>トーナメント表メーカー</span>
-        </a>
-        <a class="toolnav-item" href="../ranking/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21V11h8v10M3 21v-6h5M16 21v-8h5" /><path d="M2 21h20" /><path d="M12 3l1.2 2.4 2.6.4-1.9 1.8.5 2.6L12 9l-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z" /></svg>
-          <span>スコアアタック集計</span>
-        </a>
-        <a class="toolnav-item" href="../roulette/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 13V5M12 13l6.9 4M12 13l-6.9 4" /><path d="M10 2h4l-2 3z" /></svg>
-          <span>ルーレット</span>
-        </a>
-        <a class="toolnav-item" href="../amida/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v18M12 3v18M19 3v18" /><path d="M5 7h7M12 11h7M5 15h7M12 18h7" /></svg>
-          <span>あみだくじ</span>
-        </a>
-        <div class="toolnav-sec">画像づくり</div>
-        <a class="toolnav-item" href="../thumbnail/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="8.5" cy="10" r="1.5" /><path d="M21 15l-5-5L5 19" /></svg>
-          <span>サムネイルメーカー</span>
-        </a>
-        <a class="toolnav-item" href="../bg-remove/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3" /><circle cx="6" cy="18" r="3" /><line x1="20" y1="4" x2="8.12" y2="15.88" /><line x1="14.47" y1="14.48" x2="20" y2="20" /><line x1="8.12" y1="8.12" x2="12" y2="12" /></svg>
-          <span>背景透過ツール</span>
-        </a>
-        <a class="toolnav-item" href="../qr/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" /></svg>
-          <span>QRコードメーカー</span>
-        </a>
-        <a class="toolnav-item" href="../meishi/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" /><circle cx="8" cy="11" r="2" /><path d="M5 16c.6-1.4 1.7-2 3-2s2.4.6 3 2" /><path d="M14 10h5M14 13h4" /></svg>
-          <span>名刺メーカー</span>
-        </a>
-        <a class="toolnav-item" href="../psd/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z" /><path d="M3 12l9 5 9-5" /><path d="M3 16l9 5 9-5" /></svg>
-          <span>PSD レイヤー書き出し</span>
-        </a>
-        <a class="toolnav-item" href="../image-compress/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="M21 15l-5-5L5 21" /><path d="M15 3v4M15 7l-2-2M15 7l2-2" /></svg>
-          <span>画像の圧縮・変換</span>
-        </a>
-        <div class="toolnav-sec">便利ツール</div>
-        <a class="toolnav-item" href="../markdown/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M6 15V9l2.5 3L11 9v6" /><path d="M16 9v6M13.5 12.5L16 15l2.5-2.5" /></svg>
-          <span>マークダウンメーカー</span>
-        </a>
-        <a class="toolnav-item" href="../diff/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="18" rx="1.5" /><rect x="14" y="3" width="7" height="18" rx="1.5" /><path d="M5.5 8h2M5.5 12h2M16.5 12h2M17.5 7v2M16.5 16h2" /></svg>
-          <span>テキスト比較（diff）</span>
-        </a>
-        <a class="toolnav-item" href="../tree/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6a1 1 0 0 1 1-1h4l2 2h5a1 1 0 0 1 1 1v1" /><path d="M6 9v9h5M6 13h5" /><rect x="12" y="11" width="8" height="4" rx="1" /><rect x="12" y="16" width="8" height="4" rx="1" /></svg>
-          <span>フォルダツリーメーカー</span>
-        </a>
-        <a class="toolnav-item on" href="../hum-midi/" aria-current="page">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="17" cy="16" r="3" /></svg>
-          <span>鼻歌 MIDI 変換</span>
-        </a>
-        <a class="toolnav-item" href="../rirekisho/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2" /><rect x="13" y="5" width="4" height="5" rx=".5" /><path d="M7 6h4M7 9h4M7 13h10M7 16h10M7 19h6" /></svg>
-          <span>履歴書メーカー</span>
-        </a>
-        <div class="toolnav-sec">サイトづくり</div>
-        <a class="toolnav-item" href="../ogp-checker/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" /><path d="M3 13l4-4 4 4 3-3 4 4" /><circle cx="17" cy="17" r="3.2" fill="var(--surface, #2e1224)" /><line x1="19.3" y1="19.3" x2="22" y2="22" /></svg>
-          <span>OGPチェッカー</span>
-        </a>
-        <a class="toolnav-item" href="../robots-checker/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="2" /><path d="M12 3v4M9 12h.01M15 12h.01M9 16h6" /><path d="M2 12v3M22 12v3" /></svg>
-          <span>robots.txt チェッカー</span>
-        </a>
-        <div class="toolnav-sec">Chrome 拡張機能</div>
-        <a class="toolnav-item" href="../benri-tools/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4a2 2 0 1 1 4 0v2h4a1 1 0 0 1 1 1v4h-2a2 2 0 1 0 0 4h2v4a1 1 0 0 1-1 1h-4v-2a2 2 0 1 0-4 0v2H6a1 1 0 0 1-1-1v-4h2a2 2 0 1 0 0-4H5V7a1 1 0 0 1 1-1h4z" /></svg>
-          <span>便利ツール拡張機能まとめ</span>
-        </a>
-        <a class="toolnav-item" href="../authenticator-autofill/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /><path d="M12 15v2" /></svg>
-          <span>Authenticator Autofill</span>
-        </a>
-        <div class="toolnav-sec">WordPress プラグイン</div>
-        <a class="toolnav-item" href="../wp-contact-inbox/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></svg>
-          <span>Contact Inbox</span>
-        </a>
-        <a class="toolnav-item" href="../discord-post-notify/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
-          <span>Discord Post Notify</span>
-        </a>
-        <a class="toolnav-item" href="../wp-sns-post/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13" /><path d="M22 2 15 22l-4-9-9-4 20-7z" /></svg>
-          <span>SNS Post</span>
-        </a>
-        <a class="toolnav-item" href="../wp-folder-upload/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-8l-2-3H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1z" /><path d="M12 17v-6" /><path d="M9 13.5l3-3 3 3" /></svg>
-          <span>Folder Upload</span>
-        </a>
-        <a class="toolnav-item" href="../wp-webp-upload/">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="M21 15l-3.1-3.1a2 2 0 0 0-2.8 0L6 21" /></svg>
-          <span>WebP Upload</span>
-        </a>
-      </nav>
-      <!-- /shared:toolnav -->
-    </aside>
 
     <main class="app-main">
       <!-- ピアノロール -->
@@ -3461,23 +3626,6 @@
       wrap.addEventListener('scroll', draw);
       window.addEventListener('resize', draw);
       if (window.ResizeObserver) new ResizeObserver(() => draw()).observe(wrap);
-      // 左のツール一覧：広い画面は出す・しまうを覚える。狭い画面は引き出し
-      const SIDE_KEY = 'donnma-toolnav', narrow = window.matchMedia('(max-width: 999px)');
-      {
-        let pref = null;
-        try { pref = localStorage.getItem(SIDE_KEY); } catch (e) { }
-        // 決めていなければ、狭めの画面ではしまっておく
-        if (pref === '0' || (pref == null && window.innerWidth < 1360)) document.body.classList.add('side-closed');
-      }
-      $('side-toggle').addEventListener('click', () => {
-        if (narrow.matches) { document.body.classList.toggle('side-open'); return; }
-        const closed = document.body.classList.toggle('side-closed');
-        try { localStorage.setItem(SIDE_KEY, closed ? '0' : '1'); } catch (e) { }
-        draw();
-      });
-      document.addEventListener('pointerdown', e => {
-        if (document.body.classList.contains('side-open') && !e.target.closest('#app-side, #side-toggle')) document.body.classList.remove('side-open');
-      });
       // Ctrl+ホイールで横の幅
       wrap.addEventListener('wheel', e => {
         if (!e.ctrlKey && !e.metaKey) return;

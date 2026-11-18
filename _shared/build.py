@@ -16,7 +16,7 @@
 
 目印に書ける設定:
   root  そのページからサイトのトップへのパス（トップページは ""、404.html は "/"）
-  back  「ツール一覧」（Tools のトップへのリンク）を出す
+  back  「ツール一覧 ▾」を出す（押すと tools.json から作った大きなメニューが開く）
   home  ロゴをリンクにしない（トップページ用）
   note  フッターの GitHub の横に足す一言
 
@@ -122,36 +122,77 @@ def tools_list(opts):
     return out
 
 
-def toolnav_list(opts):
-    """作業するページの左に出すツールの一覧（_shared/tools.json から）。
-    目印の設定：root（トップへのパス）・current（今のページの id。光らせる）
-    このサイトの中にページがあるものだけ（href か、外でない links の1つ目）を並べる"""
+def toolmenu_lines(root, rel):
+    """ヘッダーの「ツール一覧 ▾」で開く大きなメニュー（_shared/tools.json から）。
+    今のページ（rel の1つ目のフォルダ）のツールを光らせる。外のサイトにしかないものは新しいタブで開く"""
     data = json.loads((SHARED / 'tools.json').read_text(encoding='utf-8'))
-    root, cur = opts.get('root', ''), opts.get('current', '')
-    out = ['<nav class="toolnav" aria-label="ツールの一覧">',
-           f'  <a class="toolnav-home" href="{attr(root or "./")}">← ツール一覧のトップ</a>']
+    here = rel.parts[0] if rel is not None and len(rel.parts) > 1 else ''
+    out = ['<div class="toolmenu" id="toolmenu" role="dialog" aria-modal="true" aria-label="ツールの一覧" hidden>',
+           '  <div class="toolmenu-box">',
+           '    <div class="toolmenu-head">',
+           '      <input type="search" class="toolmenu-q" placeholder="ツールを探す（例：qr、歌、画像、OBS）" aria-label="ツールを探す" autocomplete="off">',
+           f'      <a class="toolmenu-top" href="{attr(root or "./")}">トップの一覧へ</a>',
+           '      <button type="button" class="toolmenu-close" aria-label="閉じる">×</button>',
+           '    </div>',
+           '    <div class="toolmenu-body">']
     for s in data['sections']:
-        items = []
+        out += ['      <section class="toolmenu-sec">', f'        <h2>{esc(s["title"])}</h2>', '        <div class="toolmenu-grid">']
         for c in s['cards']:
-            href = c.get('href') or next((l['href'] for l in c.get('links', []) if not l.get('external')), None)
-            if not href:
+            link = c.get('href')
+            ext = False
+            if not link:
+                inner = [l for l in c.get('links', []) if not l.get('external')]
+                link, ext = (inner[0]['href'], False) if inner else ((c.get('links') or [{}])[0].get('href'), True)
+            if not link:
                 continue
-            on = c['id'] == cur
-            items += [f'  <a class="toolnav-item{" on" if on else ""}" href="{attr(root + href)}"{" aria-current=\"page\"" if on else ""}>',
-                      '    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ''.join(c['icon']) + '</svg>',
-                      f'    <span>{esc(c["name"])}</span>',
-                      '  </a>']
-        if items:
-            out += [f'  <div class="toolnav-sec">{esc(s["title"])}</div>', *items]
-    out.append('</nav>')
+            href = link if ext else root + link
+            on = not ext and here and link.split('/')[0] == here
+            q = ' '.join([c['name'], c.get('tag', ''), c.get('kind', ''), c.get('desc', '')])
+            extra = (' aria-current="page"' if on else '') + (' target="_blank" rel="noopener"' if ext else '')
+            out += [f'          <a class="toolmenu-item{" on" if on else ""}" href="{attr(href)}" data-q="{attr(q)}"{extra}>',
+                    '            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ''.join(c['icon']) + '</svg>',
+                    f'            <span><b>{esc(c["name"])}{" ↗" if ext else ""}</b><small>{esc(c.get("tag", ""))}</small></span>',
+                    '          </a>']
+        out += ['        </div>', '      </section>']
+    out += ['      <p class="toolmenu-none" hidden>見つかりませんでした</p>',
+            '    </div>',
+            '  </div>',
+            '</div>',
+            '<script>',
+            '  (() => {',
+            "    const m = document.getElementById('toolmenu');",
+            "    const btns = () => document.querySelectorAll('.topnav-menu, [data-toolmenu]');",
+            "    if (!m) return;",
+            "    const q = m.querySelector('.toolmenu-q'), none = m.querySelector('.toolmenu-none');",
+            r"    const kana = t => t.toLowerCase().replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));",
+            "    const filter = () => {",
+            r"      const w = kana(q.value.trim()).split(/\s+/).filter(Boolean);",
+            "      let any = false;",
+            "      for (const sec of m.querySelectorAll('.toolmenu-sec')) {",
+            "        let n = 0;",
+            "        for (const a of sec.querySelectorAll('.toolmenu-item')) { const hit = w.every(x => kana(a.dataset.q).includes(x)); a.hidden = !hit; if (hit) n++; }",
+            "        sec.hidden = !n; any = any || n > 0;",
+            "      }",
+            "      none.hidden = any;",
+            "    };",
+            "    const open = () => { m.hidden = false; document.documentElement.classList.add('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'true')); q.value = ''; filter(); q.focus(); };",
+            "    const close = () => { m.hidden = true; document.documentElement.classList.remove('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'false')); };",
+            "    document.addEventListener('click', e => { if (e.target.closest('.topnav-menu, [data-toolmenu]')) (m.hidden ? open() : close()); });",
+            "    m.addEventListener('click', e => { if (e.target === m || e.target.closest('.toolmenu-close')) close(); });",
+            "    q.addEventListener('input', filter);",
+            "    q.addEventListener('keydown', e => { if (e.key === 'Enter') { const a = m.querySelector('.toolmenu-item:not([hidden])'); if (a) a.click(); } });",
+            "    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !m.hidden) { e.stopPropagation(); close(); } }, true);",
+            "    window.openToolMenu = open;",
+            '  })();',
+            '</script>']
     return out
 
 
 # テンプレートのファイルではなく、プログラムで中身を作る目印
-GENERATORS = {'tools': tools_list, 'toolnav': toolnav_list}
+GENERATORS = {'tools': tools_list}
 
 
-def build(text):
+def build(text, rel=None):
     for ext, start, end, mark in MARKS:
         def repl(m):
             # 値のない設定（back など）は '1' にする
@@ -163,6 +204,10 @@ def build(text):
                 body = nl.join(ind + x if x else x for x in GENERATORS[name](opts)) + nl
             else:
                 body = render(name, ext, opts, ind, m.group('nl'))
+                # 「ツール一覧」があるヘッダーには、開くメニューも足す
+                if name == 'header' and ext == 'html' and opts.get('back'):
+                    nl = m.group('nl')
+                    body += nl.join(ind + x if x else x for x in toolmenu_lines(opts.get('root', ''), rel)) + nl
             return f"{head}{body}{ind}{start} /shared:{name} {end}"
         text = mark.sub(repl, text)
     return text
@@ -182,7 +227,7 @@ def main():
             text = f.read()
         if 'shared:' not in text:
             continue
-        new = build(text)
+        new = build(text, rel)
         if new == text:
             continue
         stale.append(rel.as_posix())

@@ -138,6 +138,200 @@
       color: var(--accent);
     }
 
+    /* 「ツール一覧 ▾」はメニューを開くボタン */
+    button.topnav-menu {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      background: none;
+      border: 0;
+      cursor: pointer;
+    }
+
+    /* ── ツールの一覧（大きなメニュー） ── */
+    html.toolmenu-open {
+      overflow: hidden;
+    }
+
+    .toolmenu {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 64px 20px 20px;
+      background: rgba(10, 4, 8, 0.72);
+      backdrop-filter: blur(3px);
+    }
+
+    .toolmenu[hidden] {
+      display: none;
+    }
+
+    .toolmenu-box {
+      width: min(1180px, 100%);
+      max-height: calc(100vh - 84px);
+      display: flex;
+      flex-direction: column;
+      background: var(--surface, #2e1224);
+      border: 1px solid var(--border-strong, #5e2340);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+      overflow: hidden;
+    }
+
+    .toolmenu-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border, #46162e);
+    }
+
+    .toolmenu-q {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      font-size: 14px;
+      color: var(--text, #f6e9ef);
+      background: var(--bg-deep, #1a0a14);
+      border: 1px solid var(--border-strong, #5e2340);
+      border-radius: 10px;
+      padding: 9px 12px;
+    }
+
+    .toolmenu-q:focus {
+      outline: none;
+      border-color: var(--accent, #ff85a1);
+    }
+
+    .toolmenu-top {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-2, #ffb3c6);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .toolmenu-top:hover {
+      text-decoration: underline;
+    }
+
+    .toolmenu-close {
+      font: inherit;
+      font-size: 20px;
+      line-height: 1;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border-strong, #5e2340);
+      background: none;
+      color: var(--text, #f6e9ef);
+      cursor: pointer;
+    }
+
+    .toolmenu-close:hover {
+      border-color: var(--accent, #ff85a1);
+    }
+
+    .toolmenu-body {
+      overflow: auto;
+      padding: 6px 16px 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 6px 18px;
+      align-items: start;
+    }
+
+    .toolmenu-sec h2 {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted, #c4a2b3);
+      letter-spacing: 0.05em;
+      margin: 12px 4px 6px;
+    }
+
+    .toolmenu-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .toolmenu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      color: var(--text, #f6e9ef);
+      text-decoration: none;
+    }
+
+    .toolmenu-item[hidden] {
+      display: none;
+    }
+
+    .toolmenu-item svg {
+      width: 20px;
+      height: 20px;
+      flex: none;
+      color: var(--accent, #ff85a1);
+    }
+
+    .toolmenu-item span {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .toolmenu-item b {
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+
+    .toolmenu-item small {
+      font-size: 11px;
+      color: var(--muted, #c4a2b3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toolmenu-item:hover,
+    .toolmenu-item:focus-visible {
+      background: var(--surface-2, #38172c);
+      outline: none;
+    }
+
+    .toolmenu-item.on {
+      background: var(--accent-soft, rgba(255, 133, 161, 0.12));
+      box-shadow: inset 3px 0 0 var(--accent, #ff85a1);
+    }
+
+    .toolmenu-none {
+      grid-column: 1 / -1;
+      color: var(--muted, #c4a2b3);
+      font-size: 13px;
+      padding: 16px 4px;
+    }
+
+    @media (max-width: 600px) {
+      .toolmenu {
+        padding: 0;
+      }
+
+      .toolmenu-box {
+        max-height: 100vh;
+        height: 100%;
+        border-radius: 0;
+      }
+
+      .toolmenu-top {
+        display: none;
+      }
+    }
+
     .topnav-site {
       display: inline-flex;
       align-items: center;
