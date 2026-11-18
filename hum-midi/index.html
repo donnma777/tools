@@ -1279,19 +1279,9 @@
       white-space: nowrap;
     }
 
-    .app-title .export {
-      flex: none;
-    }
-
-    /* 右に保存のボタンがあるので、左右を同じ幅にしてタイトルを画面のまん中に */
-    .app-title {
-      grid-template-columns: minmax(372px, 1fr) minmax(0, auto) minmax(372px, 1fr);
-    }
-
-    @media (max-width: 1399px) {
-      .app-title {
-        grid-template-columns: auto minmax(0, 1fr) auto;
-      }
+    .panel-head .export {
+      margin-left: auto;
+      justify-content: flex-end;
     }
 
     .tab-tools {
@@ -1420,6 +1410,14 @@
         height: 62vh;
       }
 
+    }
+
+    .app.is-expanded {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .app.is-expanded .app-insp {
+      display: none;
     }
 
     /* 再生の帯・タブ・メニュー */
@@ -2253,20 +2251,6 @@
       <span class="app-badge" title="試用中のツールです。うまく動かないところがあれば、お問い合わせから教えてください">β版・試用中</span>
       <p>鼻歌や楽器の音を MIDI に。ピアノロールや楽譜で直して、伴奏や歌声もつけて DAW へ。音はどこにも送信しません。</p>
     </div>
-    <div class="export">
-      <button class="btn btn-sm" type="button" id="open-mid">MIDI を開く</button>
-      <input type="file" id="mid-file" accept=".mid,.midi,audio/midi,audio/x-midi" hidden>
-      <details class="menu" id="save-menu">
-        <summary class="btn btn-sm">その他の保存 ▾</summary>
-        <div class="menu-list">
-          <button type="button" id="export-wav" disabled>🔊 音で書き出す（.wav）<small>全部のトラックを、再生と同じ音で1つに</small></button>
-          <button type="button" id="save-wav" disabled>🎤 声の録音を保存（.wav）<small>選んでいるトラックの、録った声そのまま</small></button>
-          <button type="button" data-proxy="ex-ust">🎙 .ust（UTAU・OpenUtau）<small>選んでいるトラックを歌声ソフト用に</small></button>
-          <button type="button" data-proxy="ex-xml">🎼 MusicXML（楽譜・NEUTRINO）<small>選んでいるトラックを楽譜に</small></button>
-        </div>
-      </details>
-      <button class="btn btn-primary" type="button" id="save-mid" disabled>MIDI を保存（.mid）</button>
-    </div>
   </header>
 
   <div class="app" id="app">
@@ -2276,6 +2260,7 @@
       <div class="panel wide">
         <div class="panel-head">
           <span>🎹 ピアノロール</span>
+          <button class="btn btn-sm" type="button" id="roll-expand" aria-expanded="false" aria-controls="app-insp" title="録音・変換設定を隠してピアノロールを広く表示">↔ 広くする</button>
           <span class="song-set">
             <label title="テンポ（BPM）。曲全体に効きます">♩ = <input type="number" id="bpm" min="30" max="300" step="0.1" aria-label="テンポ（BPM）"></label>
             <button class="btn btn-sm" type="button" id="bpm-guess" title="クリックなしで録った音から、テンポと1小節目の頭を当てる">当てる</button>
@@ -2289,6 +2274,20 @@
               </select></label>
           </span>
           <span class="info" id="roll-info"></span>
+          <div class="export">
+            <button class="btn btn-sm" type="button" id="open-mid">MIDI を開く</button>
+            <input type="file" id="mid-file" accept=".mid,.midi,audio/midi,audio/x-midi" hidden>
+            <details class="menu" id="save-menu">
+              <summary class="btn btn-sm">その他の保存 ▾</summary>
+              <div class="menu-list">
+                <button type="button" id="export-wav" disabled>🔊 音で書き出す（.wav）<small>全部のトラックを、再生と同じ音で1つに</small></button>
+                <button type="button" id="save-wav" disabled>🎤 声の録音を保存（.wav）<small>選んでいるトラックの、録った声そのまま</small></button>
+                <button type="button" data-proxy="ex-ust">🎙 .ust（UTAU・OpenUtau）<small>選んでいるトラックを歌声ソフト用に</small></button>
+                <button type="button" data-proxy="ex-xml">🎼 MusicXML（楽譜・NEUTRINO）<small>選んでいるトラックを楽譜に</small></button>
+              </div>
+            </details>
+            <button class="btn btn-primary" type="button" id="save-mid" disabled>MIDI を保存（.mid）</button>
+          </div>
         </div>
         <div class="tracks" id="tracks"></div>
         <div class="trk-add">
@@ -2510,7 +2509,7 @@
       </div>
     </main>
 
-    <aside class="app-insp" aria-label="録音と変換の設定">
+    <aside class="app-insp" id="app-insp" aria-label="録音と変換の設定">
       <!-- 録る -->
       <div class="panel" id="in-panel">
         <div class="panel-head">
@@ -6028,6 +6027,13 @@ ${songJson(list)}
       }
       $('open-mid').addEventListener('click', () => $('mid-file').click());
       $('mid-file').addEventListener('change', e => { importMidi(e.target.files[0]); e.target.value = ''; });
+      $('roll-expand').addEventListener('click', e => {
+        const button = e.currentTarget;
+        const expanded = $('app').classList.toggle('is-expanded');
+        button.textContent = expanded ? '↔ 設定を表示' : '↔ 広くする';
+        button.title = expanded ? '録音・変換設定を表示' : '録音・変換設定を隠してピアノロールを広く表示';
+        button.setAttribute('aria-expanded', String(expanded));
+      });
 
       // ══════════════════════════════════════
       //  録音をブラウザに残す（IndexedDB。16bit にして入れる）
