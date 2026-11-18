@@ -319,11 +319,18 @@
       background: var(--bg-deep, #1a0a14);
     }
 
-    .toolmenu-foot-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted, #c4a2b3);
+    .toolmenu-foot a.toolmenu-foot-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 12px 3px 10px;
       margin-right: 4px;
+    }
+
+    .toolmenu-foot-top img {
+      height: 18px;
+      width: auto;
+      display: block;
     }
 
     .toolmenu-foot a {
@@ -919,6 +926,56 @@
 
     }
 
+    /* ── ツールを探す ── */
+    .tool-search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 24px;
+      padding: 0 14px;
+      background: var(--bg-deep);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+    }
+
+    .tool-search:focus-within {
+      border-color: var(--accent);
+    }
+
+    .tool-search svg {
+      width: 18px;
+      height: 18px;
+      color: var(--muted);
+      flex: none;
+    }
+
+    .tool-search input {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: none;
+      border: 0;
+      padding: 12px 0;
+    }
+
+    .tool-search input:focus {
+      outline: none;
+    }
+
+    .tool-search-info {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .tool-card[hidden],
+    .section-title[hidden],
+    .tool-list[hidden] {
+      display: none;
+    }
+
     /* 大きな画面：広げて、ツールのカードを3列・4列に */
     @media (min-width: 1600px) {
 
@@ -984,6 +1041,13 @@
         </div>
         <span class="official-arrow">→</span>
       </a>
+    </div>
+
+    <!-- ツールを探す -->
+    <div class="tool-search" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+      <input type="search" id="tool-q" placeholder="ツールを探す（例：qr、歌、画像、OBS）" aria-label="ツールを探す" autocomplete="off">
+      <span class="tool-search-info" id="tool-q-info" aria-live="polite"></span>
     </div>
 
     <!-- shared:tools -->
@@ -1769,6 +1833,37 @@
   </footer>
   <!-- /shared:footer -->
 
+  <script>
+    // ツールを探す：名前・説明・札で絞り込む（ひらがな・カタカナは同じに扱う）
+    (() => {
+      const q = document.getElementById('tool-q'), info = document.getElementById('tool-q-info');
+      if (!q) return;
+      const kana = t => t.toLowerCase().replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+      const cards = [...document.querySelectorAll('.tool-card')].map(el => ({ el, t: kana(el.textContent) }));
+      const run = () => {
+        const w = kana(q.value.trim()).split(/\s+/).filter(Boolean);
+        let n = 0;
+        for (const c of cards) { const hit = w.every(x => c.t.includes(x)); c.el.hidden = !hit; if (hit) n++; }
+        for (const h of document.querySelectorAll('.section-title')) {
+          let list = h.nextElementSibling;
+          while (list && !list.classList.contains('tool-list')) list = list.nextElementSibling;
+          const any = list && [...list.querySelectorAll('.tool-card')].some(c => !c.hidden);
+          h.hidden = !any;
+          if (list) list.hidden = !any;
+        }
+        info.textContent = w.length ? (n ? `${n} 件` : '見つかりませんでした') : '';
+      };
+      q.addEventListener('input', run);
+      q.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { q.value = ''; run(); }
+        if (e.key === 'Enter') { const a = cards.find(c => !c.el.hidden); if (a) { const link = a.el.matches('a') ? a.el : a.el.querySelector('a'); if (link) link.click(); } }
+      });
+      // 「/」で検索欄へ
+      document.addEventListener('keydown', e => {
+        if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) { e.preventDefault(); q.focus(); }
+      });
+    })();
+  </script>
 </body>
 
 </html>

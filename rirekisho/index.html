@@ -324,11 +324,18 @@
       background: var(--bg-deep, #1a0a14);
     }
 
-    .toolmenu-foot-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted, #c4a2b3);
+    .toolmenu-foot a.toolmenu-foot-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 12px 3px 10px;
       margin-right: 4px;
+    }
+
+    .toolmenu-foot-top img {
+      height: 18px;
+      width: auto;
+      display: block;
     }
 
     .toolmenu-foot a {
@@ -2131,8 +2138,7 @@
         <p class="toolmenu-none" hidden>見つかりませんでした</p>
       </div>
       <nav class="toolmenu-foot" aria-label="どんまうんど（donnma.com）">
-        <span class="toolmenu-foot-label">どんまうんど</span>
-        <a href="https://donnma.com/" target="_blank" rel="noopener">サイトのトップ ↗</a>
+        <a class="toolmenu-foot-top" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>TOP ↗</span></a>
         <a href="https://donnma.com/blog/" target="_blank" rel="noopener">ブログ ↗</a>
         <a href="https://donnma.com/profile/" target="_blank" rel="noopener">プロフィール ↗</a>
         <a href="https://donnma.com/link/" target="_blank" rel="noopener">リンク ↗</a>

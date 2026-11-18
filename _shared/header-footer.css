@@ -244,11 +244,18 @@ html.toolmenu-open {
   background: var(--bg-deep, #1a0a14);
 }
 
-.toolmenu-foot-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--muted, #c4a2b3);
+.toolmenu-foot a.toolmenu-foot-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 12px 3px 10px;
   margin-right: 4px;
+}
+
+.toolmenu-foot-top img {
+  height: 18px;
+  width: auto;
+  display: block;
 }
 
 .toolmenu-foot a {
