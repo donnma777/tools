@@ -497,6 +497,81 @@
     }
     /* /shared:header-footer */
 
+    /* shared:apptitle */
+    /* ── 作業するページの細い見出し（大きな見出しの代わり） ── */
+    .app-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      min-height: 52px;
+      background: var(--cream, #f6f2e2) url("../image/pattern.svg?v=20260929") center / 220px 220px repeat;
+      border-bottom: 1px solid var(--border, #46162e);
+    }
+
+    .app-title h1,
+    .app-title p {
+      background: rgba(246, 242, 226, 0.94);
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .app-title h1 {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--accent, #ff85a1);
+      letter-spacing: 0.04em;
+      line-height: 1.5;
+      padding: 2px 14px;
+      margin: 0;
+    }
+
+    .app-title p {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--plum-ink, #6e3551);
+      line-height: 1.6;
+      padding: 3px 12px;
+      margin: 0;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .app-title p code {
+      font-family: var(--mono, monospace);
+    }
+
+    /* ☰：ツールの一覧（大きなメニュー）を開く */
+    .side-btn {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border-strong, #5e2340);
+      background: var(--surface, #2e1224);
+      color: var(--text, #f6e9ef);
+      font-size: 17px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .side-btn:hover {
+      border-color: var(--accent, #ff85a1);
+    }
+
+    @media (max-width: 700px) {
+      .app-title {
+        flex-wrap: wrap;
+        padding: 8px 12px;
+      }
+
+      .app-title p {
+        display: none;
+      }
+    }
+    /* /shared:apptitle */
+
 
     /* ── Hero（トップと同じうさぎ柄） ── */
     .hero {
@@ -548,7 +623,7 @@
     .workspace {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 48px 24px 48px;
+      padding: 16px 24px 48px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) 460px;
       grid-template-areas: "settings side";
@@ -1292,7 +1367,7 @@
       .workspace {
         grid-template-columns: minmax(0, 1fr);
         grid-template-areas: "side" "settings";
-        padding: 40px 16px 40px;
+        padding: 12px 16px 40px;
       }
 
       .side {
@@ -1856,12 +1931,11 @@
   <!-- /shared:header -->
 
 
-  <!-- Hero -->
-  <header class="hero">
-    <div class="hero-inner">
-      <h1>あみだくじ</h1>
-      <p>参加者と結果を入れるだけで、あみだくじを作れます。横線を足してから始めたり、結果を隠して1人ずつ開けたり、全員まとめて開けたり。ブラウザでそのまま使えるほか、OBSの配信画面にも出せます。順番決め・チーム分け・罰ゲームに。</p>
-    </div>
+  <!-- 細い見出し -->
+  <header class="app-title">
+    <button class="side-btn" type="button" data-toolmenu aria-haspopup="dialog" aria-controls="toolmenu" title="ツールの一覧" aria-label="ツールの一覧">☰</button>
+    <h1>あみだくじ</h1>
+    <p title="参加者と結果を入れるだけで、あみだくじを作れます。横線を足してから始めたり、結果を隠して1人ずつ開けたり、全員まとめて開けたり。ブラウザでそのまま使えるほか、OBSの配信画面にも出せます。順番決め・チーム分け・罰ゲームに。">参加者と結果を入れるだけで、あみだくじを作れます。横線を足してから始めたり、結果を隠して1人ずつ開けたり、全員まとめて開けたり。ブラウザでそのまま使えるほか、OBSの配信画面にも出せます。順番決め・チーム分け・罰ゲームに。</p>
   </header>
 
   <div class="am-top">
