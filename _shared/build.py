@@ -131,7 +131,7 @@ def toolmenu_lines(root, rel):
            '  <div class="toolmenu-box">',
            '    <div class="toolmenu-head">',
            '      <input type="search" class="toolmenu-q" placeholder="ツールを探す（例：qr、歌、画像、OBS）" aria-label="ツールを探す" autocomplete="off">',
-           f'      <a class="toolmenu-top" href="{attr(root or "./")}">トップの一覧へ</a>',
+           f'      <a class="toolmenu-top" href="{attr(root or "./")}" title="どんまうんど Tools のトップ（ツールの一覧）"><img src="{attr(root)}image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>',
            '      <button type="button" class="toolmenu-close" aria-label="閉じる">×</button>',
            '    </div>',
            '    <div class="toolmenu-body">']

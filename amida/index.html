@@ -212,15 +212,28 @@
     }
 
     .toolmenu-top {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent-2, #ffb3c6);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      color: var(--text, #f6e9ef);
       text-decoration: none;
       white-space: nowrap;
+      border: 1px solid var(--border-strong, #5e2340);
+      border-radius: 999px;
+      padding: 5px 14px 5px 12px;
+    }
+
+    .toolmenu-top img {
+      height: 20px;
+      width: auto;
+      display: block;
     }
 
     .toolmenu-top:hover {
-      text-decoration: underline;
+      border-color: var(--accent, #ff85a1);
     }
 
     .toolmenu-close {
@@ -1810,7 +1823,7 @@
     <div class="toolmenu-box">
       <div class="toolmenu-head">
         <input type="search" class="toolmenu-q" placeholder="ツールを探す（例：qr、歌、画像、OBS）" aria-label="ツールを探す" autocomplete="off">
-        <a class="toolmenu-top" href="../">トップの一覧へ</a>
+        <a class="toolmenu-top" href="../" title="どんまうんど Tools のトップ（ツールの一覧）"><img src="../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
         <button type="button" class="toolmenu-close" aria-label="閉じる">×</button>
       </div>
       <div class="toolmenu-body">
