@@ -502,14 +502,35 @@
 
     /* shared:apptitle */
     /* ── 作業するページの細い見出し（大きな見出しの代わり） ── */
+    /* 左（☰）・真ん中（タイトルと説明）・右（ページのボタン）の3つ。真ん中は左右の幅に関係なく画面の中央に */
     .app-title {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr minmax(0, auto) 1fr;
       align-items: center;
       gap: 10px;
       padding: 8px 16px;
       min-height: 52px;
       background: var(--cream, #f6f2e2) url("../image/pattern.svg?v=20260929") center / 220px 220px repeat;
       border-bottom: 1px solid var(--border, #46162e);
+    }
+
+    .app-title > .side-btn {
+      justify-self: start;
+    }
+
+    .app-title-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    /* 右のボタンは折り返さない（足りないときは真ん中の説明を「…」で縮める） */
+    .app-title > :nth-child(3) {
+      justify-self: end;
+      flex-wrap: nowrap;
+      white-space: nowrap;
     }
 
     .app-title h1,
@@ -565,8 +586,14 @@
 
     @media (max-width: 700px) {
       .app-title {
+        display: flex;
         flex-wrap: wrap;
         padding: 8px 12px;
+      }
+
+      .app-title-text {
+        flex: 1;
+        justify-content: flex-start;
       }
 
       .app-title p {
@@ -1691,8 +1718,10 @@
   <!-- 細い見出し -->
   <header class="app-title">
     <button class="side-btn" type="button" data-toolmenu aria-haspopup="dialog" aria-controls="toolmenu" title="ツールの一覧" aria-label="ツールの一覧">☰</button>
-    <h1>QRコードメーカー</h1>
-    <p title="URL・Wi-Fi・連絡先などのQRコードを、期限なし・登録なしで作れます。ドットや角の形、色、まん中のロゴを変えて PNG・SVG で保存。画像からの読み取りもできます。入れた内容はどこにも送信しません。">URL・Wi-Fi・連絡先などのQRコードを、期限なし・登録なしで作れます。ドットや角の形、色、まん中のロゴを変えて PNG・SVG で保存。画像からの読み取りもできます。入れた内容はどこにも送信しません。</p>
+    <div class="app-title-text">
+      <h1>QRコードメーカー</h1>
+      <p title="URL・Wi-Fi・連絡先などのQRコードを、期限なし・登録なしで作れます。ドットや角の形、色、まん中のロゴを変えて PNG・SVG で保存。画像からの読み取りもできます。入れた内容はどこにも送信しません。">URL・Wi-Fi・連絡先などのQRコードを、期限なし・登録なしで作れます。ドットや角の形、色、まん中のロゴを変えて PNG・SVG で保存。画像からの読み取りもできます。入れた内容はどこにも送信しません。</p>
+    </div>
   </header>
 
   <div class="mode-wrap">
