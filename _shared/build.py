@@ -16,7 +16,7 @@
 
 目印に書ける設定:
   root  そのページからサイトのトップへのパス（トップページは ""、404.html は "/"）
-  back  「ツール一覧 ▾」を出す（押すと tools.json から作った大きなメニューが開く）
+  back  ロゴを押すと tools.json から作った大きなメニューが開くようにする（ロゴの横に ▾）
   home  ロゴをリンクにしない（トップページ用）
   note  フッターの GitHub の横に足す一言
 
@@ -190,6 +190,8 @@ def toolmenu_lines(root, rel):
             "    q.addEventListener('input', filter);",
             "    q.addEventListener('keydown', e => { if (e.key === 'Enter') { const a = m.querySelector('.toolmenu-item:not([hidden])'); if (a) a.click(); } });",
             "    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !m.hidden) { e.stopPropagation(); close(); } }, true);",
+            "    // ロゴがメニューを開くボタンだと分かるように",
+            "    document.querySelectorAll('a.topnav-brand').forEach(a => { a.setAttribute('aria-haspopup', 'dialog'); a.setAttribute('aria-controls', 'toolmenu'); a.title = 'ツールの一覧を開く'; });",
             "    window.openToolMenu = open;",
             '  })();',
             '</script>']

@@ -63,7 +63,15 @@ a.topnav-brand:hover {
   color: var(--accent);
 }
 
-/* 「ツール一覧 ▾」はメニューを開くボタン */
+/* ツールのメニューがあるページ：ロゴの横に ▾（押すとメニューが開く） */
+body:has(#toolmenu) a.topnav-brand::after {
+  content: '▾';
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: -4px;
+}
+
+/* 「ツール一覧 ▾」はメニューを開くボタン（今はロゴで開く。ページの中に置くとき用に残す） */
 button.topnav-menu {
   font: inherit;
   font-size: 13px;
