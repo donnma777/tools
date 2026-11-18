@@ -882,6 +882,294 @@
       gap: 0;
     }
 
+    /* ── アプリの形（このページだけ）：細い見出し＋左・真ん中・右 ── */
+    .topnav {
+      position: relative;
+    }
+
+    .app-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      min-height: 52px;
+      background: var(--cream) url("../image/pattern.svg?v=20260929") center / 220px 220px repeat;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .app-title h1,
+    .app-title p {
+      background: rgba(246, 242, 226, 0.94);
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .app-title h1 {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      padding: 2px 14px;
+    }
+
+    .app-title p {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--plum-ink);
+      padding: 3px 12px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .side-btn {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    .side-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .app-title .export {
+      flex: none;
+    }
+
+    .tab-tools {
+      align-self: center;
+      padding: 0 2px 0 10px;
+    }
+
+    .app-main .trk {
+      padding: 3px 8px;
+    }
+
+    .app-main .trk select,
+    .app-main .trk-name {
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+
+    .app-main .trk-vol span {
+      display: none;
+    }
+
+    .app-main .trk-name {
+      width: 120px;
+    }
+
+    .app-main .trk select,
+    .app-main .trk-kind {
+      width: 132px;
+    }
+
+    .app-main .zoom input {
+      width: 80px;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 188px minmax(0, 1fr) 330px;
+      gap: 12px;
+      padding: 12px;
+      height: calc(100vh - 108px);
+      min-height: 600px;
+    }
+
+    body.side-closed .app {
+      grid-template-columns: minmax(0, 1fr) 330px;
+    }
+
+    body.side-closed .app-side {
+      display: none;
+    }
+
+    .app-side,
+    .app-insp {
+      min-height: 0;
+      overflow: auto;
+      scrollbar-width: thin;
+    }
+
+    .app-side {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 8px 6px;
+    }
+
+    .app-insp {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .app-insp .rec-wrap {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .app-insp .opts {
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    }
+
+    .app-main {
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-main>.panel {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .app-main .tracks {
+      max-height: 22vh;
+      overflow: auto;
+      flex: none;
+    }
+
+    .app-main .tool-panel:not(.score-panel),
+    .app-main .kb-panel {
+      max-height: 36vh;
+      overflow: auto;
+      flex: none;
+    }
+
+    .app-main #roll-wrap {
+      flex: 1 1 0;
+      min-height: 200px;
+      overflow: auto;
+      border-radius: 0;
+    }
+
+    .app-main .score-panel {
+      max-height: 46vh;
+      overflow: auto;
+      flex: none;
+    }
+
+    /* ツールの一覧 */
+    .toolnav {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      font-size: 12.5px;
+    }
+
+    .toolnav-home {
+      color: var(--accent-2);
+      font-weight: 700;
+      text-decoration: none;
+      padding: 6px 8px 8px;
+    }
+
+    .toolnav-home:hover {
+      text-decoration: underline;
+    }
+
+    .toolnav-sec {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 10px 8px 4px;
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+    }
+
+    .toolnav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      color: var(--label);
+      text-decoration: none;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .toolnav-item svg {
+      width: 16px;
+      height: 16px;
+      flex: none;
+      color: var(--accent);
+    }
+
+    .toolnav-item:hover {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    .toolnav-item.on {
+      background: var(--accent-soft);
+      color: var(--accent-2);
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+
+    @media (max-width: 999px) {
+      .app {
+        grid-template-columns: minmax(0, 1fr);
+        height: auto;
+        min-height: 0;
+      }
+
+      body.side-closed .app {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .app-side,
+      body.side-closed .app-side {
+        display: block;
+        position: fixed;
+        z-index: 500;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 270px;
+        border-radius: 0 14px 14px 0;
+        transform: translateX(-105%);
+        transition: transform 0.2s;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+      }
+
+      body.side-open .app-side {
+        transform: none;
+      }
+
+      .app-insp {
+        overflow: visible;
+      }
+
+      .app-main>.panel {
+        overflow: visible;
+      }
+
+      .app-main #roll-wrap {
+        flex: none;
+        height: 62vh;
+      }
+
+      .app-title p {
+        display: none;
+      }
+
+      .app-title {
+        flex-wrap: wrap;
+      }
+    }
+
     /* 再生の帯・タブ・メニュー */
     .transport {
       gap: 8px;
@@ -1496,422 +1784,561 @@
   </nav>
   <!-- /shared:header -->
 
-  <!-- Hero -->
-  <header class="hero">
-    <div class="hero-inner">
-      <h1>鼻歌 MIDI 変換</h1>
-      <p>マイクで歌った鼻歌や楽器の音から、音の高さを読み取って MIDI ファイル（.mid）にします。Cakewalk などの DAW にそのまま読み込めます。音はどこにも送信しません。</p>
+  <!-- 細い見出し -->
+  <header class="app-title">
+    <button class="side-btn" type="button" id="side-toggle" aria-controls="app-side" title="ツールの一覧を出す・しまう" aria-label="ツールの一覧">☰</button>
+    <h1>鼻歌 MIDI 変換</h1>
+    <p>鼻歌や楽器の音を MIDI に。ピアノロールや楽譜で直して、伴奏や歌声もつけて DAW へ。音はどこにも送信しません。</p>
+    <span class="sp"></span>
+    <div class="export">
+      <button class="btn btn-sm" type="button" id="open-mid">MIDI を開く</button>
+      <input type="file" id="mid-file" accept=".mid,.midi,audio/midi,audio/x-midi" hidden>
+      <details class="menu" id="save-menu">
+        <summary class="btn btn-sm">その他の保存 ▾</summary>
+        <div class="menu-list">
+          <button type="button" id="export-wav" disabled>🔊 音で書き出す（.wav）<small>全部のトラックを、再生と同じ音で1つに</small></button>
+          <button type="button" id="save-wav" disabled>🎤 声の録音を保存（.wav）<small>選んでいるトラックの、録った声そのまま</small></button>
+          <button type="button" data-proxy="ex-ust">🎙 .ust（UTAU・OpenUtau）<small>選んでいるトラックを歌声ソフト用に</small></button>
+          <button type="button" data-proxy="ex-xml">🎼 MusicXML（楽譜・NEUTRINO）<small>選んでいるトラックを楽譜に</small></button>
+        </div>
+      </details>
+      <button class="btn btn-primary" type="button" id="save-mid" disabled>MIDI を保存（.mid）</button>
     </div>
   </header>
 
-  <div class="workspace">
-    <!-- 録る -->
-    <div class="panel" id="in-panel">
-      <div class="panel-head">
-        <span>🎤 録る・読み込む</span>
-        <span class="sp"></span>
-        <button class="btn btn-sm" type="button" id="open">音声ファイルを開く</button>
-        <input type="file" id="file" accept="audio/*,video/*" hidden>
-      </div>
-      <div class="panel-body">
-        <div class="rec-wrap">
-          <button class="btn btn-rec" type="button" id="rec-btn"><span id="rec">● 録音する</span><span id="rec-to"></span></button>
-          <div class="live">
-            <div class="live-top">
-              <span id="live-note">－</span>
-              <span id="live-sub">歌うと音の名前が出ます</span>
-              <span id="live-time">0:00.0</span>
-            </div>
-            <div class="cents" title="真ん中が音程ぴったり"><div id="cents-dot"></div></div>
-            <div class="meter" title="入力の大きさ"><div id="meter-bar"></div></div>
-          </div>
-        </div>
+  <div class="app" id="app">
+    <aside class="app-side" id="app-side">
+      <!-- shared:toolnav root="../" current="hum-midi" -->
+      <nav class="toolnav" aria-label="ツールの一覧">
+        <a class="toolnav-home" href="../">← ツール一覧のトップ</a>
+        <div class="toolnav-sec">配信の便利ツール</div>
+        <a class="toolnav-item" href="../overlay/index.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2" /><path d="M8 21h8M12 17v4M10 8.5v5l4-2.5z" /></svg>
+          <span>配信オーバーレイテーマ</span>
+        </a>
+        <a class="toolnav-item" href="../chat-css-generator/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z" /><path d="M8.5 12h.01M12 12h.01M15.5 12h.01" /></svg>
+          <span>チャットCSSジェネレーター</span>
+        </a>
+        <a class="toolnav-item" href="../youtube-subscribers/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
+          <span>登録者数カウンター・目標ゲージ</span>
+        </a>
+        <a class="toolnav-item" href="../clock/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2.5 2.5" /><path d="M9 2h6" /></svg>
+          <span>時計・経過時間</span>
+        </a>
+        <a class="toolnav-item" href="../schedule/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M8 2v4M16 2v4M3 9h18M7 13h4M7 17h8" /></svg>
+          <span>配信スケジュールメーカー</span>
+        </a>
+        <a class="toolnav-item" href="../chapter/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3" /><path d="M10 9v6l5-3z" /><path d="M6 17h12" /><path d="M9 16v2M14 16v2" /></svg>
+          <span>YouTube チャプターメーカー</span>
+        </a>
+        <div class="toolnav-sec">大会・抽選</div>
+        <a class="toolnav-item" href="../tournament/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h5v4H3zM3 16h5v4H3z" /><path d="M8 6h3v12H8M11 12h4" /><path d="M15 9h6v6h-6z" /></svg>
+          <span>トーナメント表メーカー</span>
+        </a>
+        <a class="toolnav-item" href="../ranking/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21V11h8v10M3 21v-6h5M16 21v-8h5" /><path d="M2 21h20" /><path d="M12 3l1.2 2.4 2.6.4-1.9 1.8.5 2.6L12 9l-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z" /></svg>
+          <span>スコアアタック集計</span>
+        </a>
+        <a class="toolnav-item" href="../roulette/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 13V5M12 13l6.9 4M12 13l-6.9 4" /><path d="M10 2h4l-2 3z" /></svg>
+          <span>ルーレット</span>
+        </a>
+        <a class="toolnav-item" href="../amida/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v18M12 3v18M19 3v18" /><path d="M5 7h7M12 11h7M5 15h7M12 18h7" /></svg>
+          <span>あみだくじ</span>
+        </a>
+        <div class="toolnav-sec">画像づくり</div>
+        <a class="toolnav-item" href="../thumbnail/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="8.5" cy="10" r="1.5" /><path d="M21 15l-5-5L5 19" /></svg>
+          <span>サムネイルメーカー</span>
+        </a>
+        <a class="toolnav-item" href="../bg-remove/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3" /><circle cx="6" cy="18" r="3" /><line x1="20" y1="4" x2="8.12" y2="15.88" /><line x1="14.47" y1="14.48" x2="20" y2="20" /><line x1="8.12" y1="8.12" x2="12" y2="12" /></svg>
+          <span>背景透過ツール</span>
+        </a>
+        <a class="toolnav-item" href="../qr/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" /></svg>
+          <span>QRコードメーカー</span>
+        </a>
+        <a class="toolnav-item" href="../meishi/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" /><circle cx="8" cy="11" r="2" /><path d="M5 16c.6-1.4 1.7-2 3-2s2.4.6 3 2" /><path d="M14 10h5M14 13h4" /></svg>
+          <span>名刺メーカー</span>
+        </a>
+        <a class="toolnav-item" href="../psd/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z" /><path d="M3 12l9 5 9-5" /><path d="M3 16l9 5 9-5" /></svg>
+          <span>PSD レイヤー書き出し</span>
+        </a>
+        <a class="toolnav-item" href="../image-compress/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="M21 15l-5-5L5 21" /><path d="M15 3v4M15 7l-2-2M15 7l2-2" /></svg>
+          <span>画像の圧縮・変換</span>
+        </a>
+        <div class="toolnav-sec">便利ツール</div>
+        <a class="toolnav-item" href="../markdown/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M6 15V9l2.5 3L11 9v6" /><path d="M16 9v6M13.5 12.5L16 15l2.5-2.5" /></svg>
+          <span>マークダウンメーカー</span>
+        </a>
+        <a class="toolnav-item" href="../diff/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="18" rx="1.5" /><rect x="14" y="3" width="7" height="18" rx="1.5" /><path d="M5.5 8h2M5.5 12h2M16.5 12h2M17.5 7v2M16.5 16h2" /></svg>
+          <span>テキスト比較（diff）</span>
+        </a>
+        <a class="toolnav-item" href="../tree/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6a1 1 0 0 1 1-1h4l2 2h5a1 1 0 0 1 1 1v1" /><path d="M6 9v9h5M6 13h5" /><rect x="12" y="11" width="8" height="4" rx="1" /><rect x="12" y="16" width="8" height="4" rx="1" /></svg>
+          <span>フォルダツリーメーカー</span>
+        </a>
+        <a class="toolnav-item on" href="../hum-midi/" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="17" cy="16" r="3" /></svg>
+          <span>鼻歌 MIDI 変換</span>
+        </a>
+        <a class="toolnav-item" href="../rirekisho/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2" /><rect x="13" y="5" width="4" height="5" rx=".5" /><path d="M7 6h4M7 9h4M7 13h10M7 16h10M7 19h6" /></svg>
+          <span>履歴書メーカー</span>
+        </a>
+        <div class="toolnav-sec">サイトづくり</div>
+        <a class="toolnav-item" href="../ogp-checker/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" /><path d="M3 13l4-4 4 4 3-3 4 4" /><circle cx="17" cy="17" r="3.2" fill="var(--surface, #2e1224)" /><line x1="19.3" y1="19.3" x2="22" y2="22" /></svg>
+          <span>OGPチェッカー</span>
+        </a>
+        <a class="toolnav-item" href="../robots-checker/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="2" /><path d="M12 3v4M9 12h.01M15 12h.01M9 16h6" /><path d="M2 12v3M22 12v3" /></svg>
+          <span>robots.txt チェッカー</span>
+        </a>
+        <div class="toolnav-sec">Chrome 拡張機能</div>
+        <a class="toolnav-item" href="../benri-tools/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4a2 2 0 1 1 4 0v2h4a1 1 0 0 1 1 1v4h-2a2 2 0 1 0 0 4h2v4a1 1 0 0 1-1 1h-4v-2a2 2 0 1 0-4 0v2H6a1 1 0 0 1-1-1v-4h2a2 2 0 1 0 0-4H5V7a1 1 0 0 1 1-1h4z" /></svg>
+          <span>便利ツール拡張機能まとめ</span>
+        </a>
+        <a class="toolnav-item" href="../authenticator-autofill/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /><path d="M12 15v2" /></svg>
+          <span>Authenticator Autofill</span>
+        </a>
+        <div class="toolnav-sec">WordPress プラグイン</div>
+        <a class="toolnav-item" href="../wp-contact-inbox/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></svg>
+          <span>Contact Inbox</span>
+        </a>
+        <a class="toolnav-item" href="../discord-post-notify/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+          <span>Discord Post Notify</span>
+        </a>
+        <a class="toolnav-item" href="../wp-sns-post/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13" /><path d="M22 2 15 22l-4-9-9-4 20-7z" /></svg>
+          <span>SNS Post</span>
+        </a>
+        <a class="toolnav-item" href="../wp-folder-upload/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-8l-2-3H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1z" /><path d="M12 17v-6" /><path d="M9 13.5l3-3 3 3" /></svg>
+          <span>Folder Upload</span>
+        </a>
+        <a class="toolnav-item" href="../wp-webp-upload/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="M21 15l-3.1-3.1a2 2 0 0 0-2.8 0L6 21" /></svg>
+          <span>WebP Upload</span>
+        </a>
+      </nav>
+      <!-- /shared:toolnav -->
+    </aside>
 
-        <div class="opts" style="margin-top:14px">
-          <label class="opt"><span>マイク</span><select id="device"><option value="">いつものマイク</option></select></label>
-          <label class="opt"><span>カウント（録る前）</span>
-            <select id="countIn">
-              <option value="0">なし</option>
-              <option value="1">1小節</option>
-              <option value="2">2小節</option>
-            </select>
-          </label>
-          <label class="opt"><span>クリックの大きさ</span><input type="range" id="clickVol" min="0" max="100"></label>
-        </div>
-        <div class="checks" style="margin-top:10px">
-          <label class="check"><input type="checkbox" id="metro">録音中にクリック（メトロノーム）を鳴らす</label>
-          <label class="check"><input type="checkbox" id="recOthers">録音中にほかのトラックを鳴らす</label>
-        </div>
-        <p class="hint">テンポと拍子は、下のピアノロールの見出しで決めます（曲全体に効きます）。録音は、下の一覧で選んでいるトラックに入ります。クリックやほかのトラックを鳴らすときは<b>ヘッドホン</b>で。録った音は小節の頭にそろうので、DAW でそのまま同じテンポに置けます。音声ファイル（歌・楽器の録音、動画も）はこの枠に落としても開けます。<kbd>R</kbd> で録音・停止。</p>
-      </div>
-    </div>
-
-    <!-- 変換の設定 -->
-    <div class="panel">
-      <div class="panel-head">
-        <span>⚙️ 変換の設定<span id="set-track" style="font-weight:500;color:var(--muted)"></span></span>
-        <span class="info set-sum" id="set-sum"></span>
-        <span class="sp"></span>
-        <button class="btn btn-sm" type="button" id="set-toggle" aria-controls="set-body">開く ▾</button>
-      </div>
-      <div class="panel-body" id="set-body">
-        <div class="opts">
-          <label class="opt"><span>音の高さの範囲</span>
-            <select id="range">
-              <option value="voice">声（ふつう）</option>
-              <option value="low">低い声・ベース</option>
-              <option value="high">高い声・笛・口笛</option>
-              <option value="wide">広く</option>
-            </select>
-          </label>
-          <label class="opt"><span>音として拾う基準</span>
-            <select id="sens">
-              <option value="0">きびしめ（きれいな音だけ）</option>
-              <option value="1">ややきびしめ</option>
-              <option value="2">ふつう</option>
-              <option value="3">ややゆるめ</option>
-              <option value="4">ゆるめ（かすれた声も）</option>
-            </select>
-          </label>
-          <label class="opt"><span>小さい音を無視 <b id="gate-v"></b></span><input type="range" id="gate" min="-70" max="-20" step="1"></label>
-          <label class="opt"><span>いちばん短い音</span>
-            <select id="minMs">
-              <option value="40">40 ミリ秒</option>
-              <option value="60">60 ミリ秒</option>
-              <option value="80">80 ミリ秒</option>
-              <option value="120">120 ミリ秒</option>
-              <option value="160">160 ミリ秒</option>
-              <option value="240">240 ミリ秒</option>
-            </select>
-          </label>
-        </div>
-        <div class="checks">
-          <label class="check"><input type="checkbox" id="split">同じ高さでも、音の出だしで区切る</label>
-          <label class="check"><input type="checkbox" id="autoTune">音程のずれを自動で合わせる</label>
-        </div>
-        <p class="note-info" id="tune-info"></p>
-
-        <div class="sub-title">音とリズムを整える</div>
-        <div class="opts">
-          <label class="opt"><span>スケール（調）に寄せる</span>
-            <span class="pair">
-              <select id="key"></select>
-              <select id="scale">
-                <option value="major">メジャー</option>
-                <option value="minor">マイナー</option>
-                <option value="majorPenta">メジャー・ペンタ</option>
-                <option value="minorPenta">マイナー・ペンタ</option>
-              </select>
-            </span>
-          </label>
-          <label class="opt"><span>&nbsp;</span><button class="btn btn-sm" type="button" id="guess-key">調を当ててみる</button></label>
-          <label class="opt"><span>オクターブ</span>
-            <select id="octave">
-              <option value="-2">2つ下げる</option>
-              <option value="-1">1つ下げる</option>
-              <option value="0">そのまま</option>
-              <option value="1">1つ上げる</option>
-              <option value="2">2つ上げる</option>
-            </select>
-          </label>
-          <label class="opt"><span>クオンタイズ（タイミング）</span>
-            <select id="quant">
-              <option value="off">しない</option>
-              <option value="4">4分音符</option>
-              <option value="8">8分音符</option>
-              <option value="16">16分音符</option>
-              <option value="32">32分音符</option>
-              <option value="8t">8分3連</option>
-              <option value="16t">16分3連</option>
-            </select>
-          </label>
-          <label class="opt"><span>強さ（ベロシティ）</span>
-            <select id="vel">
-              <option value="dyn">声の大きさから</option>
-              <option value="100">ぜんぶ 100</option>
-              <option value="80">ぜんぶ 80</option>
-            </select>
-          </label>
-          <label class="opt"><span>1小節目の頭</span>
-            <select id="align">
-              <option value="auto">おまかせ</option>
-              <option value="first">最初の音</option>
-              <option value="zero">録音のはじめ</option>
-            </select>
-          </label>
-          <label class="opt"><span>ずれ補正（ミリ秒）</span><input type="number" id="latency" min="-500" max="500" step="5" title="音がグリッドより遅れて見えるときはプラス"></label>
-          <label class="opt"><span>音の名前</span>
-            <span class="pair">
-              <select id="names">
-                <option value="en">C D E</option>
-                <option value="jp">ド レ ミ</option>
-              </select>
-              <select id="naming" title="真ん中のド（ノート番号 60）の呼び方">
-                <option value="4">真ん中 C4</option>
-                <option value="3">真ん中 C3</option>
-                <option value="5">真ん中 C5</option>
-              </select>
-            </span>
-          </label>
-        </div>
-        <div class="checks" style="margin-top:10px">
-          <label class="check"><input type="checkbox" id="quantLen">長さもそろえる</label>
-        </div>
-        <p class="hint">1小節目の頭の「おまかせ」は、クリックを鳴らして録ったときはクリックに、それ以外は最初の音に合わせます。ずれ補正は、音がグリッドより遅れて見えるときはプラスにします。真ん中のドの呼び方は DAW に合わせると見比べやすくなります（Cakewalk は初期設定で C5）。</p>
-      </div>
-    </div>
-
-    <!-- ピアノロール -->
-    <div class="panel wide">
-      <div class="panel-head">
-        <span>🎹 ピアノロール</span>
-        <span class="song-set">
-          <label title="テンポ（BPM）。曲全体に効きます">♩ = <input type="number" id="bpm" min="30" max="300" step="0.1" aria-label="テンポ（BPM）"></label>
-          <button class="btn btn-sm" type="button" id="bpm-guess" title="クリックなしで録った音から、テンポと1小節目の頭を当てる">当てる</button>
-          <label title="拍子">拍子 <select id="beats" aria-label="拍子">
-              <option value="2">2/4</option>
-              <option value="3">3/4</option>
-              <option value="4">4/4</option>
-              <option value="5">5/4</option>
-              <option value="6">6/4</option>
-              <option value="7">7/4</option>
-            </select></label>
-        </span>
-        <span class="info" id="roll-info"></span>
-        <span class="sp"></span>
-        <div class="export">
-          <button class="btn btn-sm" type="button" id="open-mid">MIDI を開く</button>
-          <input type="file" id="mid-file" accept=".mid,.midi,audio/midi,audio/x-midi" hidden>
-          <details class="menu" id="save-menu">
-            <summary class="btn btn-sm">その他の保存 ▾</summary>
-            <div class="menu-list">
-              <button type="button" id="export-wav" disabled>🔊 音で書き出す（.wav）<small>全部のトラックを、再生と同じ音で1つに</small></button>
-              <button type="button" id="save-wav" disabled>🎤 声の録音を保存（.wav）<small>選んでいるトラックの、録った声そのまま</small></button>
-              <button type="button" data-proxy="ex-ust">🎙 .ust（UTAU・OpenUtau）<small>選んでいるトラックを歌声ソフト用に</small></button>
-              <button type="button" data-proxy="ex-xml">🎼 MusicXML（楽譜・NEUTRINO）<small>選んでいるトラックを楽譜に</small></button>
-            </div>
-          </details>
-          <button class="btn btn-primary" type="button" id="save-mid" disabled>MIDI を保存（.mid）</button>
-        </div>
-      </div>
-      <div class="tracks" id="tracks"></div>
-      <div class="trk-add">
-        <button class="btn btn-sm" type="button" id="add-mel">＋ メロディのトラック</button>
-        <button class="btn btn-sm" type="button" id="add-drum">＋ ドラムのトラック</button>
-        <span class="sp"></span>
-        <button class="btn btn-sm" type="button" id="clear-all">ぜんぶ消す</button>
-      </div>
-      <div class="roll-bar transport">
-        <button class="btn btn-sm rec-mini" type="button" id="rec2" title="録音・停止（R）。選んでいるトラックに録ります。テンポやクリックの設定は上の「録る・読み込む」で">● 録音</button>
-        <span class="rec-live" id="rec-live" hidden></span>
-        <span class="vsep"></span>
-        <span class="grp">
-          <button class="btn btn-sm ic" type="button" id="play-start" disabled title="最初から再生（Home）" aria-label="最初から再生">⏮</button>
-          <button class="btn btn-sm btn-primary play-btn" type="button" id="play" disabled title="再生・停止（Space）">▶ 再生</button>
-          <button class="btn btn-sm btn-toggle ic" type="button" id="repeat" title="リピート（L）。上の目盛りをドラッグすると、くり返す範囲を決められます" aria-label="リピート">🔁</button>
-        </span>
-        <select id="playMode" aria-label="鳴らすもの" title="再生で鳴らすもの">
-          <option value="both">録音＋MIDI</option>
-          <option value="orig">録音だけ</option>
-          <option value="midi">MIDI だけ</option>
-        </select>
-        <label class="check" title="再生中にクリック（メトロノーム）を鳴らす"><input type="checkbox" id="playClick">クリック</label>
-        <span class="vsep"></span>
-        <span class="grp">
-          <button class="btn btn-sm btn-toggle" type="button" id="kb" title="パソコンのキーボードで打ち込む（K）">⌨ キー入力</button>
-          <button class="btn btn-sm btn-toggle" type="button" id="midi-in" title="USB などの MIDI キーボードで打ち込む（Chrome・Edge）">🎹 MIDI</button>
-        </span>
-        <span class="zoom" title="横の幅（Ctrl+ホイールでも変えられます）">🔍 <input type="range" id="zoom" min="16" max="240" step="2" aria-label="横の幅"></span>
-        <span class="sp"></span>
-        <span class="grp">
-          <button class="btn btn-sm ic" type="button" id="undo" disabled title="戻す（Ctrl+Z）" aria-label="戻す">↶</button>
-          <button class="btn btn-sm ic" type="button" id="redo" disabled title="やり直す（Ctrl+Y）" aria-label="やり直す">↷</button>
-          <button class="btn btn-sm ic" type="button" id="del" disabled title="選んだ音を消す（Delete）" aria-label="選んだ音を消す">🗑</button>
-        </span>
-      </div>
-      <div class="tabs" role="tablist" aria-label="道具">
-        <button class="tab" type="button" data-panel="tpl">📦 テンプレート</button>
-        <button class="tab" type="button" data-panel="edit">✂ 編集</button>
-        <button class="tab" type="button" data-panel="text">📝 文字で入力</button>
-        <button class="tab" type="button" data-panel="lyrics">🎤 歌詞・歌声</button>
-        <button class="tab" type="button" data-panel="harmony">🎶 ハモリ</button>
-        <button class="tab" type="button" data-panel="chord">🎸 コード</button>
-        <button class="tab" type="button" data-panel="score">🎼 楽譜</button>
-        <button class="tab" type="button" data-panel="ai">🤖 AI</button>
-      </div>
-      <div class="tool-panel" id="panel-edit" hidden>
-        <div class="tp-row">
-          <span class="bar-label">選んだ音を（なければ全部）</span>
-          <button class="btn btn-sm" type="button" data-len="legato" title="次の音までのばしてつなげる">つなげる</button>
-          <button class="btn btn-sm" type="button" data-len="stacc" title="グリッドの半分の長さにする">短く切る</button>
-          <button class="btn btn-sm" type="button" data-len="half">長さ ½</button>
-          <button class="btn btn-sm" type="button" data-len="double">長さ ×2</button>
-          <button class="btn btn-sm" type="button" data-len="vdown">強さ −</button>
-          <button class="btn btn-sm" type="button" data-len="vup">強さ ＋</button>
-        </div>
-        <div class="tp-row"><label class="check"><input type="checkbox" id="velLane">ピアノロールの下に「強さの欄」を出す</label></div>
-        <p class="hint">音を選ぶには：クリック、何もないところをドラッグして囲む、<b>Ctrl</b>+クリックで足す、<b>Ctrl+A</b> で全部。<b>Ctrl+C／X／V</b> でコピー・切り取り・貼り付け、<b>Ctrl+D</b> ですぐ後ろに複製、右クリックで消す。</p>
-      </div>
-      <div class="tool-panel" id="panel-tpl" hidden>
-        <div class="tp-row"><b>① 伴奏を作る</b><span class="tp-info">選んだ形で、伴奏・ベース・ドラムと空のメロディのトラックを作ります。あとは聞きながら歌うだけ</span></div>
-        <div class="tp-row">
-          <label>コード進行 <select id="tplProg"></select></label>
-          <label>調 <select id="tplKey"></select></label>
-          <label>ドラム <select id="tplDrum"></select></label>
-          <label>伴奏 <select id="tplAcc"><option value="quarter">4分で刻む</option><option value="whole">のばす（白玉）</option><option value="arp">アルペジオ</option><option value="none">なし</option></select></label>
-          <label>長さ <select id="tplBars"><option value="4">4小節</option><option value="8">8小節</option><option value="16">16小節</option></select></label>
-          <label class="check"><input type="checkbox" id="tplBass">ベース</label>
-          <span class="sp"></span>
-          <button class="btn btn-sm btn-primary" type="button" id="tpl-make">伴奏を作る</button>
-        </div>
-        <div class="tp-row"><b>② ドラムを1小節</b>
-          <label>パターン <select id="tplDrum1"></select></label>
-          <button class="btn btn-sm" type="button" id="tpl-bar">再生位置の小節に入れる</button>
-          <span class="tp-info">押すたびに次の小節へ進みます（ドラムのトラックがなければ作ります）</span>
-        </div>
-        <div class="tp-row"><b>③ 見本の曲</b>
-          <button class="btn btn-sm" type="button" data-sample="pop">そらをみて（ポップス）</button>
-          <button class="btn btn-sm" type="button" data-sample="waltz">あかいそら（ワルツ）</button>
-          <button class="btn btn-sm" type="button" data-sample="choir">VOICEVOX アカペラ（4人）</button>
-          <span class="tp-info">メロディ・歌詞・コード・ドラム入り（アカペラは声だけ）。VOICEVOX につながるとキャラが歌います。開くと今のトラックは置き換わります</span>
-        </div>
-        <p class="hint">テンポは今の BPM のままです（見本はその曲のテンポにします）。ワルツは3拍子にします。作ったコードは上のコード名をクリックで替えられ、伴奏も作り直します。見本の曲はこのツールのために作ったオリジナルで、自由に使って大丈夫です（VOICEVOX の声で公開するときは「VOICEVOX:ずんだもん」などのクレジットを）。</p>
-      </div>
-      <div class="tool-panel" id="panel-text" hidden>
-        <textarea id="txt-src" rows="3" spellcheck="false" placeholder="例：ドレミー ミレドー ・ ドレミレ ドーー&#10;CDE- EDC- r G^C-"></textarea>
-        <div class="tp-row">
-          <label>1文字の長さ <select id="textLen">
-              <option value="4">全音符</option>
-              <option value="2">2分音符</option>
-              <option value="1.5">付点4分</option>
-              <option value="1">4分音符</option>
-              <option value="0.75">付点8分</option>
-              <option value="0.5">8分音符</option>
-              <option value="0.3333333333333333">8分3連</option>
-              <option value="0.25">16分音符</option>
-            </select></label>
-          <span class="tp-info" id="txt-info"></span>
-          <span class="sp"></span>
-          <button class="btn btn-sm btn-primary" type="button" id="txt-insert">再生位置に入れる</button>
-        </div>
-        <p class="hint">ドレミファソラシ（ひらがな・do re mi も）か C D E F G A B（大文字）。<b>#</b>・<b>b</b> で半音上げ下げ、<b>ー</b> でのばす、<b>・</b> か <b>r</b> で休み。高さは前の音に近いほうを選びます。<b>^</b>（<b>'</b>）でオクターブ上、<b>_</b> で下、<b>ド5</b>・<b>C5</b> のように数字で決めることもできます。</p>
-      </div>
-      <div class="tool-panel" id="panel-lyrics" hidden>
-        <textarea id="ly-src" rows="2" placeholder="例：きらきらひかる おそらのほしよ"></textarea>
-        <div class="tp-row">
-          <label class="check"><input type="checkbox" id="ly-fromSel" checked>選んだ音から</label>
-          <button class="btn btn-sm btn-primary" type="button" id="ly-apply">音に割り当てる</button>
-          <button class="btn btn-sm" type="button" id="ly-clear">歌詞を消す</button>
-          <span class="sp"></span>
-          <label>選んだ1音の歌詞 <input type="text" id="ly-one" maxlength="16" class="tp-input"></label>
-          <label>.mid の文字 <select id="lyricEnc"><option value="sjis">Shift_JIS（日本語の DAW）</option><option value="utf8">UTF-8</option></select></label>
-        </div>
-        <div class="tp-row">
-          <b>歌声ソフトへ</b>
-          <button class="btn btn-sm" type="button" id="ex-ust" title="選んでいるトラックを UTAU の形式で">.ust（UTAU・OpenUtau）</button>
-          <button class="btn btn-sm" type="button" id="ex-xml" title="選んでいるトラックを楽譜の形式で">MusicXML（NEUTRINO など）</button>
-          <button class="btn btn-sm" type="button" id="ex-mid" title="全部のトラックを、歌詞入りの MIDI で">歌詞入り .mid（Synthesizer V など）</button>
-        </div>
-        <p class="hint">VOCALOID（.vpr・.vsqx）や Synthesizer V（.svp）の形式にしたいときは、書き出した .ust か MusicXML を <a href="https://sdercolin.github.io/utaformatix3/" target="_blank" rel="noopener">UtaFormatix</a>（無料の変換ツール）で変換してください。重音テトなどの UTAU 音源は、OpenUtau に .ust を読み込むのがかんたんです。</p>
-        <div class="tp-row vv-row">
-          <b>VOICEVOX</b>
-          <span class="tp-info vv-status" id="vv-status">つないでいません</span>
-          <label>場所 <input type="text" id="vvUrl" class="tp-input vv-url" spellcheck="false"></label>
-          <button class="btn btn-sm" type="button" id="vv-connect">つなぐ</button>
-          <button class="btn btn-sm btn-primary" type="button" id="vv-make">歌声を作る</button>
-        </div>
-        <p class="hint">パソコンに入っている VOICEVOX（0.16 より新しいもの）で歌わせられます。トラックの音色を<b>「VOICEVOX の歌声」</b>にして、となりでキャラを選びます。VOICEVOX は起動しておいてください。はじめに一度だけ、VOICEVOX を起動した状態で<a id="vv-setting" href="http://127.0.0.1:50021/setting" target="_blank" rel="noopener">エンジンの設定</a>を開き、「Allow Origin」に <code id="vv-origin"></code> を書いて保存し、VOICEVOX を起動し直してください。ブラウザに「ローカル ネットワーク上の機器へのアクセス」を聞かれたら許可します。歌声は再生・書き出しの前に自動で作ります（音や歌詞を変えたら作り直し）。歌詞の「ー」は前の母音、かな以外は「ら」で歌います。公開するときは「VOICEVOX:キャラ名」のクレジットなど、各キャラの規約に従ってください。</p>
-        <p class="hint">ひらがな・カタカナは1文字ずつ（「きゃ」のような小さい字はまとめて）音に入ります。ほかの言葉は空白で区切った1語ずつ。音色を<b>「歌（合成の声）」</b>にすると歌詞で歌います（ロボットのような声です）。保存する .mid にも歌詞が入ります（漢字は UTF-8 で入ります）。</p>
-      </div>
-      <div class="tool-panel" id="panel-harmony" hidden>
-        <div class="tp-row">
-          <label>ハモる音 <select id="hm-int"><option value="3">3度上</option><option value="-3">3度下</option><option value="-6">6度下</option><option value="5">5度上</option><option value="8">オクターブ上</option><option value="-8">オクターブ下</option></select></label>
-          <span class="tp-info" id="hm-info"></span>
-          <span class="sp"></span>
-          <button class="btn btn-sm btn-primary" type="button" id="hm-make">ハモリのトラックを作る</button>
-        </div>
-        <p class="hint">選んでいるメロディのトラックから、調に合わせたハモリを新しいトラックに作ります（歌詞もいっしょに）。調は「スケール（調）に寄せる」の設定、寄せないときは当てた調を使います。</p>
-      </div>
-      <div class="tool-panel" id="panel-chord" hidden>
-        <div class="tp-row">
-          <label>コード <select id="chordPer"><option value="1">1小節に1つ</option><option value="2">1小節に2つ</option></select></label>
-          <label>伴奏の形 <select id="accPat"><option value="whole">のばす（白玉）</option><option value="quarter">4分で刻む</option><option value="arp">アルペジオ</option><option value="none">作らない</option></select></label>
-          <label>伴奏の音色 <select id="accInst"></select></label>
-          <label class="check"><input type="checkbox" id="accBass">ベースも作る</label>
-          <span class="sp"></span>
-          <button class="btn btn-sm" type="button" id="ch-clear">コードを消す</button>
-          <button class="btn btn-sm btn-primary" type="button" id="ch-make">コードを付ける</button>
-        </div>
-        <div class="tp-row"><span class="tp-info" id="ch-info"></span><button class="btn btn-sm" type="button" id="ch-copy" hidden>進行をコピー</button></div>
-        <p class="hint">選んでいるメロディのトラックに合うコードを、調の中から選んで「伴奏」「ベース」のトラックを作ります。ピアノロールの上に出るコード名を<b>クリック</b>すると、ほかの候補に替わって伴奏も作り直します（伴奏・ベースを手で直していても上書きします）。.mid にはコード名がマーカーで入ります。</p>
-      </div>
-      <div class="tool-panel" id="panel-ai" hidden>
-        <div class="tp-row">
-          <label>送る範囲 <select id="aiScope"><option value="all">全トラック</option><option value="cur">選んでいるトラックだけ</option></select></label>
-          <span class="tp-info" id="ai-size"></span>
-        </div>
-        <textarea id="ai-ask" rows="2" placeholder="AI へのお願い（例：このメロディに合うサビを8小節足して／ドラムをもっと派手に／ジャズっぽい伴奏にして）"></textarea>
-        <div class="tp-row">
-          <button class="btn btn-sm btn-primary" type="button" id="ai-copy">プロンプトをコピー</button>
-          <button class="btn btn-sm" type="button" id="ai-copy-data">データ（JSON）だけコピー</button>
-          <span class="tp-info">ChatGPT・Gemini・Claude などに貼って、答えを下に貼ります</span>
-        </div>
-        <textarea id="ai-reply" rows="4" spellcheck="false" placeholder="AI の答えをここに貼る（説明の文章がまざっていても、JSON の部分だけ読みます）"></textarea>
-        <div class="tp-row">
-          <button class="btn btn-sm btn-primary" type="button" id="ai-apply">答えを反映する</button>
-          <span class="tp-info" id="ai-info"></span>
-        </div>
-        <p class="hint">時間は拍（4分音符＝1）、音は C4（真ん中のド）のような名前で書いた JSON にします。反映するときは、送ったトラックと入れ替えるか、後ろに足すかを選べます。反映したあとも <b>Ctrl+Z</b> では戻せないので、心配なときは先に「MIDI を保存」しておいてください。</p>
-      </div>
-      <div class="kb-panel" id="kb-panel" hidden>
-        <div class="kb-ctrl">
-          <b class="kb-title" id="kb-title">⌨ キーボード入力中</b>
-          <label class="kb-len">長さ
-            <select id="stepLen">
-              <option value="4">全音符</option>
-              <option value="2">2分音符</option>
-              <option value="1.5">付点4分</option>
-              <option value="1">4分音符</option>
-              <option value="0.75">付点8分</option>
-              <option value="0.5">8分音符</option>
-              <option value="0.3333333333333333">8分3連</option>
-              <option value="0.25">16分音符</option>
-            </select>
-          </label>
-          <span class="kb-oct" id="kb-oct">オクターブ <button class="trk-btn" type="button" id="kb-down" title="下げる（−）">−</button><b id="kb-base">C4</b><button class="trk-btn" type="button" id="kb-up" title="上げる（＾）">＋</button></span>
-          <span class="sp"></span>
-          <button class="btn btn-sm" type="button" id="kb-close">終わる（Esc）</button>
-        </div>
-        <div class="kb-map" id="kb-map"></div>
-        <p class="hint">止まっているとき：押すと再生位置（黄色い線）に置いて、離すと「長さ」だけ進みます。同時に押すと同じ位置（ドラムで重ねるとき）。<kbd>Tab</kbd> で休み、<kbd>Backspace</kbd> で1つ戻して消す。再生中：押していた長さで入ります（リピートと合わせると重ねていけます）。<kbd>−</kbd>／<kbd>＾</kbd> でオクターブ。</p>
-      </div>
-      <div id="roll-wrap">
-        <div id="roll-inner"><canvas id="roll"></canvas></div>
-      </div>
-      <div class="tool-panel score-panel" id="panel-score" hidden>
-        <div class="tp-row">
-          <b>🎼 楽譜</b><span class="tp-info" id="sc-info"></span>
-          <span class="sp"></span>
-          <button class="btn btn-sm" type="button" id="sc-print">印刷</button>
-          <button class="btn btn-sm btn-primary" type="button" id="sc-xml">MusicXML を保存</button>
-        </div>
-        <div class="tp-row sc-tools">
-          <label class="check"><input type="checkbox" id="scEdit">クリックで入力</label>
-          <span class="seg">
-            <button class="btn btn-sm btn-toggle" type="button" data-l16="16">全音符</button>
-            <button class="btn btn-sm btn-toggle" type="button" data-l16="8">2分</button>
-            <button class="btn btn-sm btn-toggle" type="button" data-l16="4">4分</button>
-            <button class="btn btn-sm btn-toggle" type="button" data-l16="2">8分</button>
-            <button class="btn btn-sm btn-toggle" type="button" data-l16="1">16分</button>
+    <main class="app-main">
+      <!-- ピアノロール -->
+      <div class="panel wide">
+        <div class="panel-head">
+          <span>🎹 ピアノロール</span>
+          <span class="song-set">
+            <label title="テンポ（BPM）。曲全体に効きます">♩ = <input type="number" id="bpm" min="30" max="300" step="0.1" aria-label="テンポ（BPM）"></label>
+            <button class="btn btn-sm" type="button" id="bpm-guess" title="クリックなしで録った音から、テンポと1小節目の頭を当てる">当てる</button>
+            <label title="拍子">拍子 <select id="beats" aria-label="拍子">
+                <option value="2">2/4</option>
+                <option value="3">3/4</option>
+                <option value="4">4/4</option>
+                <option value="5">5/4</option>
+                <option value="6">6/4</option>
+                <option value="7">7/4</option>
+              </select></label>
           </span>
-          <button class="btn btn-sm btn-toggle" type="button" id="sc-dot" title="1.5 倍の長さ">付点</button>
-          <button class="btn btn-sm btn-toggle" type="button" id="sc-rest" title="クリックしたところを休みにする">休符</button>
-          <label>臨時記号 <select id="scAcc"><option value="auto">調どおり</option><option value="sharp">♯</option><option value="flat">♭</option><option value="natural">♮</option></select></label>
+          <span class="info" id="roll-info"></span>
         </div>
-        <div id="score" class="score"></div>
-        <p class="hint">五線の上をクリックすると、選んだ長さの音符が入ります（その長さのところにあった音は入れ替わります）。音符をクリックで選んで <b>Delete</b> か右クリックで消す、<b>↑ ↓</b> で半音ずつ。入れたあとは次の位置に進むので、続けてクリックできます。最後に空の小節が1つ出ます。表示は16分音符にそろえ（3連符は近い長さ、和音はいちばん上の音）、MusicXML は MuseScore・Finale・Sibelius・Dorico などで開けます（歌詞とコード名つき）。</p>
+        <div class="tracks" id="tracks"></div>
+        <div class="trk-add">
+          <button class="btn btn-sm" type="button" id="add-mel">＋ メロディのトラック</button>
+          <button class="btn btn-sm" type="button" id="add-drum">＋ ドラムのトラック</button>
+          <span class="sp"></span>
+          <button class="btn btn-sm" type="button" id="clear-all">ぜんぶ消す</button>
+        </div>
+        <div class="roll-bar transport">
+          <button class="btn btn-sm rec-mini" type="button" id="rec2" title="録音・停止（R）。選んでいるトラックに録ります。テンポやクリックの設定は上の「録る・読み込む」で">● 録音</button>
+          <span class="rec-live" id="rec-live" hidden></span>
+          <span class="vsep"></span>
+          <span class="grp">
+            <button class="btn btn-sm ic" type="button" id="play-start" disabled title="最初から再生（Home）" aria-label="最初から再生">⏮</button>
+            <button class="btn btn-sm btn-primary play-btn" type="button" id="play" disabled title="再生・停止（Space）">▶ 再生</button>
+            <button class="btn btn-sm btn-toggle ic" type="button" id="repeat" title="リピート（L）。上の目盛りをドラッグすると、くり返す範囲を決められます" aria-label="リピート">🔁</button>
+          </span>
+          <select id="playMode" aria-label="鳴らすもの" title="再生で鳴らすもの">
+            <option value="both">録音＋MIDI</option>
+            <option value="orig">録音だけ</option>
+            <option value="midi">MIDI だけ</option>
+          </select>
+          <label class="check" title="再生中にクリック（メトロノーム）を鳴らす"><input type="checkbox" id="playClick">クリック</label>
+          <span class="vsep"></span>
+          <span class="grp">
+            <button class="btn btn-sm btn-toggle" type="button" id="kb" title="パソコンのキーボードで打ち込む（K）">⌨ キー入力</button>
+            <button class="btn btn-sm btn-toggle" type="button" id="midi-in" title="USB などの MIDI キーボードで打ち込む（Chrome・Edge）">🎹 MIDI</button>
+          </span>
+          <span class="zoom" title="横の幅（Ctrl+ホイールでも変えられます）">🔍 <input type="range" id="zoom" min="16" max="240" step="2" aria-label="横の幅"></span>
+        </div>
+        <div class="tabs" role="tablist" aria-label="道具">
+          <button class="tab" type="button" data-panel="tpl">📦 テンプレート</button>
+          <button class="tab" type="button" data-panel="edit">✂ 編集</button>
+          <button class="tab" type="button" data-panel="text">📝 文字で入力</button>
+          <button class="tab" type="button" data-panel="lyrics">🎤 歌詞・歌声</button>
+          <button class="tab" type="button" data-panel="harmony">🎶 ハモリ</button>
+          <button class="tab" type="button" data-panel="chord">🎸 コード</button>
+          <button class="tab" type="button" data-panel="score">🎼 楽譜</button>
+          <button class="tab" type="button" data-panel="ai">🤖 AI</button>
+          <span class="sp"></span>
+          <span class="grp tab-tools">
+            <button class="btn btn-sm ic" type="button" id="undo" disabled title="戻す（Ctrl+Z）" aria-label="戻す">↶</button>
+            <button class="btn btn-sm ic" type="button" id="redo" disabled title="やり直す（Ctrl+Y）" aria-label="やり直す">↷</button>
+            <button class="btn btn-sm ic" type="button" id="del" disabled title="選んだ音を消す（Delete）" aria-label="選んだ音を消す">🗑</button>
+          </span>
+        </div>
+        <div class="tool-panel" id="panel-edit" hidden>
+          <div class="tp-row">
+            <span class="bar-label">選んだ音を（なければ全部）</span>
+            <button class="btn btn-sm" type="button" data-len="legato" title="次の音までのばしてつなげる">つなげる</button>
+            <button class="btn btn-sm" type="button" data-len="stacc" title="グリッドの半分の長さにする">短く切る</button>
+            <button class="btn btn-sm" type="button" data-len="half">長さ ½</button>
+            <button class="btn btn-sm" type="button" data-len="double">長さ ×2</button>
+            <button class="btn btn-sm" type="button" data-len="vdown">強さ −</button>
+            <button class="btn btn-sm" type="button" data-len="vup">強さ ＋</button>
+          </div>
+          <div class="tp-row"><label class="check"><input type="checkbox" id="velLane">ピアノロールの下に「強さの欄」を出す</label></div>
+          <p class="hint">音を選ぶには：クリック、何もないところをドラッグして囲む、<b>Ctrl</b>+クリックで足す、<b>Ctrl+A</b> で全部。<b>Ctrl+C／X／V</b> でコピー・切り取り・貼り付け、<b>Ctrl+D</b> ですぐ後ろに複製、右クリックで消す。</p>
+        </div>
+        <div class="tool-panel" id="panel-tpl" hidden>
+          <div class="tp-row"><b>① 伴奏を作る</b><span class="tp-info">選んだ形で、伴奏・ベース・ドラムと空のメロディのトラックを作ります。あとは聞きながら歌うだけ</span></div>
+          <div class="tp-row">
+            <label>コード進行 <select id="tplProg"></select></label>
+            <label>調 <select id="tplKey"></select></label>
+            <label>ドラム <select id="tplDrum"></select></label>
+            <label>伴奏 <select id="tplAcc"><option value="quarter">4分で刻む</option><option value="whole">のばす（白玉）</option><option value="arp">アルペジオ</option><option value="none">なし</option></select></label>
+            <label>長さ <select id="tplBars"><option value="4">4小節</option><option value="8">8小節</option><option value="16">16小節</option></select></label>
+            <label class="check"><input type="checkbox" id="tplBass">ベース</label>
+            <span class="sp"></span>
+            <button class="btn btn-sm btn-primary" type="button" id="tpl-make">伴奏を作る</button>
+          </div>
+          <div class="tp-row"><b>② ドラムを1小節</b>
+            <label>パターン <select id="tplDrum1"></select></label>
+            <button class="btn btn-sm" type="button" id="tpl-bar">再生位置の小節に入れる</button>
+            <span class="tp-info">押すたびに次の小節へ進みます（ドラムのトラックがなければ作ります）</span>
+          </div>
+          <div class="tp-row"><b>③ 見本の曲</b>
+            <button class="btn btn-sm" type="button" data-sample="pop">そらをみて（ポップス）</button>
+            <button class="btn btn-sm" type="button" data-sample="waltz">あかいそら（ワルツ）</button>
+            <button class="btn btn-sm" type="button" data-sample="choir">VOICEVOX アカペラ（4人）</button>
+            <span class="tp-info">メロディ・歌詞・コード・ドラム入り（アカペラは声だけ）。VOICEVOX につながるとキャラが歌います。開くと今のトラックは置き換わります</span>
+          </div>
+          <p class="hint">テンポは今の BPM のままです（見本はその曲のテンポにします）。ワルツは3拍子にします。作ったコードは上のコード名をクリックで替えられ、伴奏も作り直します。見本の曲はこのツールのために作ったオリジナルで、自由に使って大丈夫です（VOICEVOX の声で公開するときは「VOICEVOX:ずんだもん」などのクレジットを）。</p>
+        </div>
+        <div class="tool-panel" id="panel-text" hidden>
+          <textarea id="txt-src" rows="3" spellcheck="false" placeholder="例：ドレミー ミレドー ・ ドレミレ ドーー&#10;CDE- EDC- r G^C-"></textarea>
+          <div class="tp-row">
+            <label>1文字の長さ <select id="textLen">
+                <option value="4">全音符</option>
+                <option value="2">2分音符</option>
+                <option value="1.5">付点4分</option>
+                <option value="1">4分音符</option>
+                <option value="0.75">付点8分</option>
+                <option value="0.5">8分音符</option>
+                <option value="0.3333333333333333">8分3連</option>
+                <option value="0.25">16分音符</option>
+              </select></label>
+            <span class="tp-info" id="txt-info"></span>
+            <span class="sp"></span>
+            <button class="btn btn-sm btn-primary" type="button" id="txt-insert">再生位置に入れる</button>
+          </div>
+          <p class="hint">ドレミファソラシ（ひらがな・do re mi も）か C D E F G A B（大文字）。<b>#</b>・<b>b</b> で半音上げ下げ、<b>ー</b> でのばす、<b>・</b> か <b>r</b> で休み。高さは前の音に近いほうを選びます。<b>^</b>（<b>'</b>）でオクターブ上、<b>_</b> で下、<b>ド5</b>・<b>C5</b> のように数字で決めることもできます。</p>
+        </div>
+        <div class="tool-panel" id="panel-lyrics" hidden>
+          <textarea id="ly-src" rows="2" placeholder="例：きらきらひかる おそらのほしよ"></textarea>
+          <div class="tp-row">
+            <label class="check"><input type="checkbox" id="ly-fromSel" checked>選んだ音から</label>
+            <button class="btn btn-sm btn-primary" type="button" id="ly-apply">音に割り当てる</button>
+            <button class="btn btn-sm" type="button" id="ly-clear">歌詞を消す</button>
+            <span class="sp"></span>
+            <label>選んだ1音の歌詞 <input type="text" id="ly-one" maxlength="16" class="tp-input"></label>
+            <label>.mid の文字 <select id="lyricEnc"><option value="sjis">Shift_JIS（日本語の DAW）</option><option value="utf8">UTF-8</option></select></label>
+          </div>
+          <div class="tp-row">
+            <b>歌声ソフトへ</b>
+            <button class="btn btn-sm" type="button" id="ex-ust" title="選んでいるトラックを UTAU の形式で">.ust（UTAU・OpenUtau）</button>
+            <button class="btn btn-sm" type="button" id="ex-xml" title="選んでいるトラックを楽譜の形式で">MusicXML（NEUTRINO など）</button>
+            <button class="btn btn-sm" type="button" id="ex-mid" title="全部のトラックを、歌詞入りの MIDI で">歌詞入り .mid（Synthesizer V など）</button>
+          </div>
+          <p class="hint">VOCALOID（.vpr・.vsqx）や Synthesizer V（.svp）の形式にしたいときは、書き出した .ust か MusicXML を <a href="https://sdercolin.github.io/utaformatix3/" target="_blank" rel="noopener">UtaFormatix</a>（無料の変換ツール）で変換してください。重音テトなどの UTAU 音源は、OpenUtau に .ust を読み込むのがかんたんです。</p>
+          <div class="tp-row vv-row">
+            <b>VOICEVOX</b>
+            <span class="tp-info vv-status" id="vv-status">つないでいません</span>
+            <label>場所 <input type="text" id="vvUrl" class="tp-input vv-url" spellcheck="false"></label>
+            <button class="btn btn-sm" type="button" id="vv-connect">つなぐ</button>
+            <button class="btn btn-sm btn-primary" type="button" id="vv-make">歌声を作る</button>
+          </div>
+          <p class="hint">パソコンに入っている VOICEVOX（0.16 より新しいもの）で歌わせられます。トラックの音色を<b>「VOICEVOX の歌声」</b>にして、となりでキャラを選びます。VOICEVOX は起動しておいてください。はじめに一度だけ、VOICEVOX を起動した状態で<a id="vv-setting" href="http://127.0.0.1:50021/setting" target="_blank" rel="noopener">エンジンの設定</a>を開き、「Allow Origin」に <code id="vv-origin"></code> を書いて保存し、VOICEVOX を起動し直してください。ブラウザに「ローカル ネットワーク上の機器へのアクセス」を聞かれたら許可します。歌声は再生・書き出しの前に自動で作ります（音や歌詞を変えたら作り直し）。歌詞の「ー」は前の母音、かな以外は「ら」で歌います。公開するときは「VOICEVOX:キャラ名」のクレジットなど、各キャラの規約に従ってください。</p>
+          <p class="hint">ひらがな・カタカナは1文字ずつ（「きゃ」のような小さい字はまとめて）音に入ります。ほかの言葉は空白で区切った1語ずつ。音色を<b>「歌（合成の声）」</b>にすると歌詞で歌います（ロボットのような声です）。保存する .mid にも歌詞が入ります（漢字は UTF-8 で入ります）。</p>
+        </div>
+        <div class="tool-panel" id="panel-harmony" hidden>
+          <div class="tp-row">
+            <label>ハモる音 <select id="hm-int"><option value="3">3度上</option><option value="-3">3度下</option><option value="-6">6度下</option><option value="5">5度上</option><option value="8">オクターブ上</option><option value="-8">オクターブ下</option></select></label>
+            <span class="tp-info" id="hm-info"></span>
+            <span class="sp"></span>
+            <button class="btn btn-sm btn-primary" type="button" id="hm-make">ハモリのトラックを作る</button>
+          </div>
+          <p class="hint">選んでいるメロディのトラックから、調に合わせたハモリを新しいトラックに作ります（歌詞もいっしょに）。調は「スケール（調）に寄せる」の設定、寄せないときは当てた調を使います。</p>
+        </div>
+        <div class="tool-panel" id="panel-chord" hidden>
+          <div class="tp-row">
+            <label>コード <select id="chordPer"><option value="1">1小節に1つ</option><option value="2">1小節に2つ</option></select></label>
+            <label>伴奏の形 <select id="accPat"><option value="whole">のばす（白玉）</option><option value="quarter">4分で刻む</option><option value="arp">アルペジオ</option><option value="none">作らない</option></select></label>
+            <label>伴奏の音色 <select id="accInst"></select></label>
+            <label class="check"><input type="checkbox" id="accBass">ベースも作る</label>
+            <span class="sp"></span>
+            <button class="btn btn-sm" type="button" id="ch-clear">コードを消す</button>
+            <button class="btn btn-sm btn-primary" type="button" id="ch-make">コードを付ける</button>
+          </div>
+          <div class="tp-row"><span class="tp-info" id="ch-info"></span><button class="btn btn-sm" type="button" id="ch-copy" hidden>進行をコピー</button></div>
+          <p class="hint">選んでいるメロディのトラックに合うコードを、調の中から選んで「伴奏」「ベース」のトラックを作ります。ピアノロールの上に出るコード名を<b>クリック</b>すると、ほかの候補に替わって伴奏も作り直します（伴奏・ベースを手で直していても上書きします）。.mid にはコード名がマーカーで入ります。</p>
+        </div>
+        <div class="tool-panel" id="panel-ai" hidden>
+          <div class="tp-row">
+            <label>送る範囲 <select id="aiScope"><option value="all">全トラック</option><option value="cur">選んでいるトラックだけ</option></select></label>
+            <span class="tp-info" id="ai-size"></span>
+          </div>
+          <textarea id="ai-ask" rows="2" placeholder="AI へのお願い（例：このメロディに合うサビを8小節足して／ドラムをもっと派手に／ジャズっぽい伴奏にして）"></textarea>
+          <div class="tp-row">
+            <button class="btn btn-sm btn-primary" type="button" id="ai-copy">プロンプトをコピー</button>
+            <button class="btn btn-sm" type="button" id="ai-copy-data">データ（JSON）だけコピー</button>
+            <span class="tp-info">ChatGPT・Gemini・Claude などに貼って、答えを下に貼ります</span>
+          </div>
+          <textarea id="ai-reply" rows="4" spellcheck="false" placeholder="AI の答えをここに貼る（説明の文章がまざっていても、JSON の部分だけ読みます）"></textarea>
+          <div class="tp-row">
+            <button class="btn btn-sm btn-primary" type="button" id="ai-apply">答えを反映する</button>
+            <span class="tp-info" id="ai-info"></span>
+          </div>
+          <p class="hint">時間は拍（4分音符＝1）、音は C4（真ん中のド）のような名前で書いた JSON にします。反映するときは、送ったトラックと入れ替えるか、後ろに足すかを選べます。反映したあとも <b>Ctrl+Z</b> では戻せないので、心配なときは先に「MIDI を保存」しておいてください。</p>
+        </div>
+        <div class="kb-panel" id="kb-panel" hidden>
+          <div class="kb-ctrl">
+            <b class="kb-title" id="kb-title">⌨ キーボード入力中</b>
+            <label class="kb-len">長さ
+              <select id="stepLen">
+                <option value="4">全音符</option>
+                <option value="2">2分音符</option>
+                <option value="1.5">付点4分</option>
+                <option value="1">4分音符</option>
+                <option value="0.75">付点8分</option>
+                <option value="0.5">8分音符</option>
+                <option value="0.3333333333333333">8分3連</option>
+                <option value="0.25">16分音符</option>
+              </select>
+            </label>
+            <span class="kb-oct" id="kb-oct">オクターブ <button class="trk-btn" type="button" id="kb-down" title="下げる（−）">−</button><b id="kb-base">C4</b><button class="trk-btn" type="button" id="kb-up" title="上げる（＾）">＋</button></span>
+            <span class="sp"></span>
+            <button class="btn btn-sm" type="button" id="kb-close">終わる（Esc）</button>
+          </div>
+          <div class="kb-map" id="kb-map"></div>
+          <p class="hint">止まっているとき：押すと再生位置（黄色い線）に置いて、離すと「長さ」だけ進みます。同時に押すと同じ位置（ドラムで重ねるとき）。<kbd>Tab</kbd> で休み、<kbd>Backspace</kbd> で1つ戻して消す。再生中：押していた長さで入ります（リピートと合わせると重ねていけます）。<kbd>−</kbd>／<kbd>＾</kbd> でオクターブ。</p>
+        </div>
+        <div id="roll-wrap">
+          <div id="roll-inner"><canvas id="roll"></canvas></div>
+        </div>
+        <div class="tool-panel score-panel" id="panel-score" hidden>
+          <div class="tp-row">
+            <b>🎼 楽譜</b><span class="tp-info" id="sc-info"></span>
+            <span class="sp"></span>
+            <button class="btn btn-sm" type="button" id="sc-print">印刷</button>
+            <button class="btn btn-sm btn-primary" type="button" id="sc-xml">MusicXML を保存</button>
+          </div>
+          <div class="tp-row sc-tools">
+            <label class="check"><input type="checkbox" id="scEdit">クリックで入力</label>
+            <span class="seg">
+              <button class="btn btn-sm btn-toggle" type="button" data-l16="16">全音符</button>
+              <button class="btn btn-sm btn-toggle" type="button" data-l16="8">2分</button>
+              <button class="btn btn-sm btn-toggle" type="button" data-l16="4">4分</button>
+              <button class="btn btn-sm btn-toggle" type="button" data-l16="2">8分</button>
+              <button class="btn btn-sm btn-toggle" type="button" data-l16="1">16分</button>
+            </span>
+            <button class="btn btn-sm btn-toggle" type="button" id="sc-dot" title="1.5 倍の長さ">付点</button>
+            <button class="btn btn-sm btn-toggle" type="button" id="sc-rest" title="クリックしたところを休みにする">休符</button>
+            <label>臨時記号 <select id="scAcc"><option value="auto">調どおり</option><option value="sharp">♯</option><option value="flat">♭</option><option value="natural">♮</option></select></label>
+          </div>
+          <div id="score" class="score"></div>
+          <p class="hint">五線の上をクリックすると、選んだ長さの音符が入ります（その長さのところにあった音は入れ替わります）。音符をクリックで選んで <b>Delete</b> か右クリックで消す、<b>↑ ↓</b> で半音ずつ。入れたあとは次の位置に進むので、続けてクリックできます。最後に空の小節が1つ出ます。表示は16分音符にそろえ（3連符は近い長さ、和音はいちばん上の音）、MusicXML は MuseScore・Finale・Sibelius・Dorico などで開けます（歌詞とコード名つき）。</p>
+        </div>
       </div>
-    </div>
+    </main>
+
+    <aside class="app-insp" aria-label="録音と変換の設定">
+      <!-- 録る -->
+      <div class="panel" id="in-panel">
+        <div class="panel-head">
+          <span>🎤 録る・読み込む</span>
+          <span class="sp"></span>
+          <button class="btn btn-sm" type="button" id="open">音声ファイルを開く</button>
+          <input type="file" id="file" accept="audio/*,video/*" hidden>
+        </div>
+        <div class="panel-body">
+          <div class="rec-wrap">
+            <button class="btn btn-rec" type="button" id="rec-btn"><span id="rec">● 録音する</span><span id="rec-to"></span></button>
+            <div class="live">
+              <div class="live-top">
+                <span id="live-note">－</span>
+                <span id="live-sub">歌うと音の名前が出ます</span>
+                <span id="live-time">0:00.0</span>
+              </div>
+              <div class="cents" title="真ん中が音程ぴったり"><div id="cents-dot"></div></div>
+              <div class="meter" title="入力の大きさ"><div id="meter-bar"></div></div>
+            </div>
+          </div>
+
+          <div class="opts" style="margin-top:14px">
+            <label class="opt"><span>マイク</span><select id="device"><option value="">いつものマイク</option></select></label>
+            <label class="opt"><span>カウント（録る前）</span>
+              <select id="countIn">
+                <option value="0">なし</option>
+                <option value="1">1小節</option>
+                <option value="2">2小節</option>
+              </select>
+            </label>
+            <label class="opt"><span>クリックの大きさ</span><input type="range" id="clickVol" min="0" max="100"></label>
+          </div>
+          <div class="checks" style="margin-top:10px">
+            <label class="check"><input type="checkbox" id="metro">録音中にクリック（メトロノーム）を鳴らす</label>
+            <label class="check"><input type="checkbox" id="recOthers">録音中にほかのトラックを鳴らす</label>
+          </div>
+          <p class="hint">クリックやほかのトラックを鳴らすときは<b>ヘッドホン</b>で。音声ファイル（歌・楽器の録音、動画も）は、この枠に落としても開けます。<kbd>R</kbd> で録音・停止。</p>
+        </div>
+      </div>
+
+      <!-- 変換の設定 -->
+      <div class="panel">
+        <div class="panel-head">
+          <span>⚙️ 変換の設定<span id="set-track" style="font-weight:500;color:var(--muted)"></span></span>
+          <span class="info set-sum" id="set-sum"></span>
+          <span class="sp"></span>
+          <button class="btn btn-sm" type="button" id="set-toggle" aria-controls="set-body">開く ▾</button>
+        </div>
+        <div class="panel-body" id="set-body">
+          <div class="opts">
+            <label class="opt"><span>音の高さの範囲</span>
+              <select id="range">
+                <option value="voice">声（ふつう）</option>
+                <option value="low">低い声・ベース</option>
+                <option value="high">高い声・笛・口笛</option>
+                <option value="wide">広く</option>
+              </select>
+            </label>
+            <label class="opt"><span>音として拾う基準</span>
+              <select id="sens">
+                <option value="0">きびしめ（きれいな音だけ）</option>
+                <option value="1">ややきびしめ</option>
+                <option value="2">ふつう</option>
+                <option value="3">ややゆるめ</option>
+                <option value="4">ゆるめ（かすれた声も）</option>
+              </select>
+            </label>
+            <label class="opt"><span>小さい音を無視 <b id="gate-v"></b></span><input type="range" id="gate" min="-70" max="-20" step="1"></label>
+            <label class="opt"><span>いちばん短い音</span>
+              <select id="minMs">
+                <option value="40">40 ミリ秒</option>
+                <option value="60">60 ミリ秒</option>
+                <option value="80">80 ミリ秒</option>
+                <option value="120">120 ミリ秒</option>
+                <option value="160">160 ミリ秒</option>
+                <option value="240">240 ミリ秒</option>
+              </select>
+            </label>
+          </div>
+          <div class="checks">
+            <label class="check"><input type="checkbox" id="split">同じ高さでも、音の出だしで区切る</label>
+            <label class="check"><input type="checkbox" id="autoTune">音程のずれを自動で合わせる</label>
+          </div>
+          <p class="note-info" id="tune-info"></p>
+
+          <div class="sub-title">音とリズムを整える</div>
+          <div class="opts">
+            <label class="opt"><span>スケール（調）に寄せる</span>
+              <span class="pair">
+                <select id="key"></select>
+                <select id="scale">
+                  <option value="major">メジャー</option>
+                  <option value="minor">マイナー</option>
+                  <option value="majorPenta">メジャー・ペンタ</option>
+                  <option value="minorPenta">マイナー・ペンタ</option>
+                </select>
+              </span>
+            </label>
+            <label class="opt"><span>&nbsp;</span><button class="btn btn-sm" type="button" id="guess-key">調を当ててみる</button></label>
+            <label class="opt"><span>オクターブ</span>
+              <select id="octave">
+                <option value="-2">2つ下げる</option>
+                <option value="-1">1つ下げる</option>
+                <option value="0">そのまま</option>
+                <option value="1">1つ上げる</option>
+                <option value="2">2つ上げる</option>
+              </select>
+            </label>
+            <label class="opt"><span>クオンタイズ（タイミング）</span>
+              <select id="quant">
+                <option value="off">しない</option>
+                <option value="4">4分音符</option>
+                <option value="8">8分音符</option>
+                <option value="16">16分音符</option>
+                <option value="32">32分音符</option>
+                <option value="8t">8分3連</option>
+                <option value="16t">16分3連</option>
+              </select>
+            </label>
+            <label class="opt"><span>強さ（ベロシティ）</span>
+              <select id="vel">
+                <option value="dyn">声の大きさから</option>
+                <option value="100">ぜんぶ 100</option>
+                <option value="80">ぜんぶ 80</option>
+              </select>
+            </label>
+            <label class="opt"><span>1小節目の頭</span>
+              <select id="align">
+                <option value="auto">おまかせ</option>
+                <option value="first">最初の音</option>
+                <option value="zero">録音のはじめ</option>
+              </select>
+            </label>
+            <label class="opt"><span>ずれ補正（ミリ秒）</span><input type="number" id="latency" min="-500" max="500" step="5" title="音がグリッドより遅れて見えるときはプラス"></label>
+            <label class="opt"><span>音の名前</span>
+              <span class="pair">
+                <select id="names">
+                  <option value="en">C D E</option>
+                  <option value="jp">ド レ ミ</option>
+                </select>
+                <select id="naming" title="真ん中のド（ノート番号 60）の呼び方">
+                  <option value="4">真ん中 C4</option>
+                  <option value="3">真ん中 C3</option>
+                  <option value="5">真ん中 C5</option>
+                </select>
+              </span>
+            </label>
+          </div>
+          <div class="checks" style="margin-top:10px">
+            <label class="check"><input type="checkbox" id="quantLen">長さもそろえる</label>
+          </div>
+          <p class="hint">1小節目の頭の「おまかせ」は、クリックを鳴らして録ったときはクリックに、それ以外は最初の音に合わせます。ずれ補正は、音がグリッドより遅れて見えるときはプラスにします。真ん中のドの呼び方は DAW に合わせると見比べやすくなります（Cakewalk は初期設定で C5）。</p>
+        </div>
+      </div>
+
+    </aside>
   </div>
 
   <section class="guide" aria-label="使い方">
@@ -2565,16 +2992,22 @@
       }
       const ghostTracks = () => (st.kind === 'drum' ? [] : playable().filter(t => t !== st && t.kind !== 'drum'));
 
+      // ピアノロールの欄の高さから、目盛り・強さの欄・横のスクロールバーを引いた高さ
+      function fitH() {
+        const h = wrap.clientHeight > 150 ? wrap.clientHeight : 460;
+        return h - (chords.length ? 40 : 22) - (S.velLane ? VEL_H : 0) - 16;
+      }
       function layout() {
         const vn = viewNotes();
         L.drum = st.kind === 'drum';
         if (L.drum) {
           L.rows = DRUMS.map(d => d.p);
-          L.rowH = 20; L.keyw = 96;
+          L.rowH = clamp(Math.floor(fitH() / L.rows.length), 16, 30); L.keyw = 96;
         } else {
           let lo = Infinity, hi = -Infinity;
           for (const n of vn) { lo = Math.min(lo, n.p); hi = Math.max(hi, n.p); }
-          for (const t of ghostTracks()) for (const n of t.notes) { lo = Math.min(lo, n.p); hi = Math.max(hi, n.p); }
+          // ほかのトラックは範囲を広げない（低いベースなどで行が細くならないように）。範囲の中にある音だけ薄く出す
+          if (lo === Infinity) for (const t of ghostTracks()) for (const n of t.notes) { lo = Math.min(lo, n.p); hi = Math.max(hi, n.p); }
           if (st.fm.length) {
             const th = SENS[S.sens];
             for (let i = 0; i < st.fm.length; i += 3) if (voicedAt(i, th, S.gate)) { const p = Math.round(st.fm[i]) + 12 * Number(st.octave); lo = Math.min(lo, p); hi = Math.max(hi, p); }
@@ -2585,7 +3018,7 @@
           L.lo = clamp(lo, 0, 127); L.hi = clamp(hi, 0, 127);
           L.rows = [];
           for (let p = L.hi; p >= L.lo; p--) L.rows.push(p);
-          L.rowH = clamp(Math.floor(420 / L.rows.length), 7, 16);
+          L.rowH = clamp(Math.floor(fitH() / L.rows.length), 7, 18);
           L.keyw = 46;
         }
         L.idx = new Map(L.rows.map((p, i) => [p, i]));
@@ -3027,6 +3460,24 @@
       window.addEventListener('scroll', () => { if (lyEdNote) lyricCommit(0); }, { passive: true });
       wrap.addEventListener('scroll', draw);
       window.addEventListener('resize', draw);
+      if (window.ResizeObserver) new ResizeObserver(() => draw()).observe(wrap);
+      // 左のツール一覧：広い画面は出す・しまうを覚える。狭い画面は引き出し
+      const SIDE_KEY = 'donnma-toolnav', narrow = window.matchMedia('(max-width: 999px)');
+      {
+        let pref = null;
+        try { pref = localStorage.getItem(SIDE_KEY); } catch (e) { }
+        // 決めていなければ、狭めの画面ではしまっておく
+        if (pref === '0' || (pref == null && window.innerWidth < 1360)) document.body.classList.add('side-closed');
+      }
+      $('side-toggle').addEventListener('click', () => {
+        if (narrow.matches) { document.body.classList.toggle('side-open'); return; }
+        const closed = document.body.classList.toggle('side-closed');
+        try { localStorage.setItem(SIDE_KEY, closed ? '0' : '1'); } catch (e) { }
+        draw();
+      });
+      document.addEventListener('pointerdown', e => {
+        if (document.body.classList.contains('side-open') && !e.target.closest('#app-side, #side-toggle')) document.body.classList.remove('side-open');
+      });
       // Ctrl+ホイールで横の幅
       wrap.addEventListener('wheel', e => {
         if (!e.ctrlKey && !e.metaKey) return;

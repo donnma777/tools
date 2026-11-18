@@ -122,8 +122,33 @@ def tools_list(opts):
     return out
 
 
+def toolnav_list(opts):
+    """作業するページの左に出すツールの一覧（_shared/tools.json から）。
+    目印の設定：root（トップへのパス）・current（今のページの id。光らせる）
+    このサイトの中にページがあるものだけ（href か、外でない links の1つ目）を並べる"""
+    data = json.loads((SHARED / 'tools.json').read_text(encoding='utf-8'))
+    root, cur = opts.get('root', ''), opts.get('current', '')
+    out = ['<nav class="toolnav" aria-label="ツールの一覧">',
+           f'  <a class="toolnav-home" href="{attr(root or "./")}">← ツール一覧のトップ</a>']
+    for s in data['sections']:
+        items = []
+        for c in s['cards']:
+            href = c.get('href') or next((l['href'] for l in c.get('links', []) if not l.get('external')), None)
+            if not href:
+                continue
+            on = c['id'] == cur
+            items += [f'  <a class="toolnav-item{" on" if on else ""}" href="{attr(root + href)}"{" aria-current=\"page\"" if on else ""}>',
+                      '    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ''.join(c['icon']) + '</svg>',
+                      f'    <span>{esc(c["name"])}</span>',
+                      '  </a>']
+        if items:
+            out += [f'  <div class="toolnav-sec">{esc(s["title"])}</div>', *items]
+    out.append('</nav>')
+    return out
+
+
 # テンプレートのファイルではなく、プログラムで中身を作る目印
-GENERATORS = {'tools': tools_list}
+GENERATORS = {'tools': tools_list, 'toolnav': toolnav_list}
 
 
 def build(text):
