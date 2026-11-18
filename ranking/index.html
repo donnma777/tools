@@ -596,7 +596,7 @@
       min-width: 0;
     }
 
-    /* 右のボタン（あるページだけ）。折り返さず、足りないときは真ん中の説明を「…」で縮める */
+    /* 右のボタン（あるページだけ）。折り返さず、足りないときは真ん中の説明を折り返す */
     .app-title> :not(.app-title-text) {
       grid-column: 3;
       justify-self: end;
@@ -630,8 +630,9 @@
       padding: 3px 12px;
       margin: 0;
       min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      /* 切らずに折り返して全部出す（広い画面では1行） */
+      white-space: normal;
+      border-radius: 14px;
     }
 
     .app-title p code {
