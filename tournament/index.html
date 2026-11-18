@@ -1491,12 +1491,14 @@
     .tn-top {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 40px 24px 0;
+      padding: 16px 24px 0;
     }
 
     .tn-stage {
       position: relative;
       width: 100%;
+      max-width: max(480px, calc((100vh - 200px) * 16 / 9));
+      margin: 0 auto;
       aspect-ratio: 16 / 9;
       overflow: hidden;
       border-radius: 0 0 14px 14px;

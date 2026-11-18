@@ -1414,6 +1414,21 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* パソコンの幅：右の欄を画面に張りつけ、画面の高さに収める（左の設定を下へ流しても見えたまま） */
+    @media (min-width: 1001px) {
+      .main {
+        position: sticky;
+        top: 72px;
+        max-height: calc(100vh - 142px);
+        overflow: auto;
+        scrollbar-width: thin;
+      }
+
+      .compare-scroll {
+        max-height: calc(100vh - 330px);
+      }
+    }
+
     @media (max-width: 1000px) {
       .workspace {
         grid-template-columns: minmax(0, 1fr);
