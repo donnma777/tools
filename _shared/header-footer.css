@@ -338,6 +338,12 @@ html.toolmenu-open {
   transition: color 0.15s, border-color 0.15s;
 }
 
+.topnav-site img {
+  height: 17px;
+  width: auto;
+  display: block;
+}
+
 .topnav-site:hover {
   color: var(--text);
   border-color: var(--accent);
