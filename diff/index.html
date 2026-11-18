@@ -1135,6 +1135,17 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* パソコンの幅：入力欄と結果の欄で画面の高さを分け合う（結果が長いときは欄の中でスクロール） */
+    @media (min-width: 801px) {
+      .side textarea {
+        height: clamp(160px, calc(34vh - 50px), 460px);
+      }
+
+      .diff {
+        max-height: clamp(220px, calc(66vh - 330px), 2000px);
+      }
+    }
+
     @media (max-width: 800px) {
       .workspace {
         padding: 12px 12px 24px;

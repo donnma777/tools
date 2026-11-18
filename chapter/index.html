@@ -1191,6 +1191,20 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* パソコンの幅：右の列は画面の高さに収め、はみ出す分は列の中でスクロール。貼る欄も画面に合わせて高く */
+    @media (min-width: 1001px) {
+      .col-out {
+        max-height: calc(100vh - 140px);
+        overflow: auto;
+        scrollbar-width: thin;
+        border-radius: 14px;
+      }
+
+      #bulk {
+        height: clamp(150px, calc(100vh - 640px), 600px);
+      }
+    }
+
     @media (max-width: 1000px) {
       .workspace {
         grid-template-columns: minmax(0, 1fr);

@@ -1098,6 +1098,17 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* パソコンの幅：書く欄と結果の欄を画面の高さに合わせる */
+    @media (min-width: 901px) {
+      #src {
+        height: clamp(240px, calc(100vh - 460px), 1400px);
+      }
+
+      #out {
+        max-height: clamp(240px, calc(100vh - 330px), 2000px);
+      }
+    }
+
     @media (max-width: 900px) {
       .workspace {
         grid-template-columns: minmax(0, 1fr);
