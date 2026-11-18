@@ -597,6 +597,17 @@
         display: none;
       }
     }
+
+    /* 大きな画面：作業の部分（とナビ）を広げる。設定の欄はそのまま、プレビューや編集欄が大きくなる */
+    @media (min-width: 1600px) {
+      body .workspace,
+      body .tn-top,
+      body .rl-top,
+      body .am-top,
+      body .topnav-inner {
+        max-width: 2800px;
+      }
+    }
     /* /shared:apptitle */
 
     /* ── Hero（トップと同じうさぎ柄） ── */
