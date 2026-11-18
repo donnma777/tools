@@ -499,8 +499,9 @@
     /* /shared:header-footer */
 
     /* shared:apptitle */
-    /* ── 作業するページの細い見出し（大きな見出しの代わり） ── */
-    /* 左（☰）・真ん中（タイトルと説明）・右（ページのボタン）の3つ。真ん中は左右の幅に関係なく画面の中央に */
+    /* ── 作業するページの細い見出し（大きな見出しの代わり） ──
+       真ん中（タイトルと説明）・右（ページのボタン。あるページだけ）。
+       ツールの一覧は、上のナビの「どんまうんど Tools」か「ツール一覧 ▾」で開く */
     .app-title {
       display: grid;
       grid-template-columns: 1fr minmax(0, auto) 1fr;
@@ -512,11 +513,9 @@
       border-bottom: 1px solid var(--border, #46162e);
     }
 
-    .app-title > .side-btn {
-      justify-self: start;
-    }
-
+    /* 真ん中は、左右の幅に関係なく画面の中央に */
     .app-title-text {
+      grid-column: 2;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -524,8 +523,9 @@
       min-width: 0;
     }
 
-    /* 右のボタンは折り返さない（足りないときは真ん中の説明を「…」で縮める） */
-    .app-title > :nth-child(3) {
+    /* 右のボタン（あるページだけ）。折り返さず、足りないときは真ん中の説明を「…」で縮める */
+    .app-title> :not(.app-title-text) {
+      grid-column: 3;
       justify-self: end;
       flex-wrap: nowrap;
       white-space: nowrap;
@@ -546,6 +546,7 @@
       line-height: 1.5;
       padding: 2px 14px;
       margin: 0;
+      flex: none;
     }
 
     .app-title p {
@@ -564,43 +565,41 @@
       font-family: var(--mono, monospace);
     }
 
-    /* ☰：ツールの一覧（大きなメニュー）を開く */
-    .side-btn {
-      flex: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      border: 1px solid var(--border-strong, #5e2340);
-      background: var(--surface, #2e1224);
-      color: var(--text, #f6e9ef);
-      font-size: 17px;
-      line-height: 1;
-      cursor: pointer;
-    }
-
-    .side-btn:hover {
-      border-color: var(--accent, #ff85a1);
-    }
-
+    /* スマホ：タイトルの下に説明を折り返して全部出す */
     @media (max-width: 700px) {
       .app-title {
         display: flex;
-        flex-wrap: wrap;
-        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px 12px;
       }
 
       .app-title-text {
-        flex: 1;
-        justify-content: flex-start;
+        flex-direction: column;
+        gap: 6px;
       }
 
       .app-title p {
-        display: none;
+        white-space: normal;
+        text-align: center;
+        border-radius: 12px;
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .app-title> :not(.app-title-text) {
+        justify-self: auto;
+        align-self: center;
+        flex-wrap: wrap;
+        justify-content: center;
+        white-space: normal;
       }
     }
 
     /* 大きな画面：作業の部分（とナビ）を広げる。設定の欄はそのまま、プレビューや編集欄が大きくなる */
     @media (min-width: 1600px) {
+
       body .workspace,
       body .tn-top,
       body .rl-top,
@@ -1770,7 +1769,8 @@
       };
       const open = () => { m.hidden = false; document.documentElement.classList.add('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'true')); q.value = ''; filter(); q.focus(); };
       const close = () => { m.hidden = true; document.documentElement.classList.remove('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'false')); };
-      document.addEventListener('click', e => { if (e.target.closest('.topnav-menu, [data-toolmenu]')) (m.hidden ? open() : close()); });
+      // 「ツール一覧 ▾」と左上のロゴ（どんまうんど Tools）で開く。トップへは、メニューの「トップの一覧へ」から
+      document.addEventListener('click', e => { const b = e.target.closest('.topnav-menu, [data-toolmenu], a.topnav-brand'); if (!b) return; e.preventDefault(); (m.hidden ? open() : close()); });
       m.addEventListener('click', e => { if (e.target === m || e.target.closest('.toolmenu-close')) close(); });
       q.addEventListener('input', filter);
       q.addEventListener('keydown', e => { if (e.key === 'Enter') { const a = m.querySelector('.toolmenu-item:not([hidden])'); if (a) a.click(); } });
@@ -1782,7 +1782,6 @@
 
   <!-- 細い見出し -->
   <header class="app-title">
-    <button class="side-btn" type="button" data-toolmenu aria-haspopup="dialog" aria-controls="toolmenu" title="ツールの一覧" aria-label="ツールの一覧">☰</button>
     <div class="app-title-text">
       <h1>スコアアタック集計</h1>
       <p title="大会の予選で、参加者ごとの点数（タイム）を入れると、合計や順位を自動で出します。OBS に入れれば、点数を入れるたびに順位表がその場で変わります。">大会の予選で、参加者ごとの点数（タイム）を入れると、合計や順位を自動で出します。OBS に入れれば、点数を入れるたびに順位表がその場で変わります。</p>

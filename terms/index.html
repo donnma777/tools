@@ -749,7 +749,8 @@
       };
       const open = () => { m.hidden = false; document.documentElement.classList.add('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'true')); q.value = ''; filter(); q.focus(); };
       const close = () => { m.hidden = true; document.documentElement.classList.remove('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'false')); };
-      document.addEventListener('click', e => { if (e.target.closest('.topnav-menu, [data-toolmenu]')) (m.hidden ? open() : close()); });
+      // 「ツール一覧 ▾」と左上のロゴ（どんまうんど Tools）で開く。トップへは、メニューの「トップの一覧へ」から
+      document.addEventListener('click', e => { const b = e.target.closest('.topnav-menu, [data-toolmenu], a.topnav-brand'); if (!b) return; e.preventDefault(); (m.hidden ? open() : close()); });
       m.addEventListener('click', e => { if (e.target === m || e.target.closest('.toolmenu-close')) close(); });
       q.addEventListener('input', filter);
       q.addEventListener('keydown', e => { if (e.key === 'Enter') { const a = m.querySelector('.toolmenu-item:not([hidden])'); if (a) a.click(); } });
