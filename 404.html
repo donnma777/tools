@@ -343,8 +343,15 @@
         border-radius: 0;
       }
 
-      .toolmenu-top {
-        display: none;
+      /* スマホ：1行目に「どんまうんど Tools」と ×、2行目に検索欄 */
+      .toolmenu-head {
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      .toolmenu-q {
+        order: 3;
+        flex-basis: 100%;
       }
     }
 
