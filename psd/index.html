@@ -184,7 +184,8 @@
 
     .toolmenu-box {
       width: min(1180px, 100%);
-      max-height: calc(100vh - 84px);
+      /* メニューの上下の余白（広告のぶんずらすときも）の内側に収める */
+      max-height: 100%;
       display: flex;
       flex-direction: column;
       background: var(--surface, #2e1224);
@@ -387,7 +388,7 @@
       }
 
       .toolmenu-box {
-        max-height: 100vh;
+        max-height: 100%;
         height: 100%;
         border-radius: 0;
       }
@@ -1759,8 +1760,24 @@
         }
         none.hidden = any;
       };
-      const open = () => { m.hidden = false; document.documentElement.classList.add('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'true')); q.value = ''; filter(); q.focus(); };
-      const close = () => { m.hidden = true; document.documentElement.classList.remove('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'false')); };
+      // 画面の上か下に広告（アンカー広告）が出ているときは、そのぶんメニューをずらす（広告はいちばん手前に出るので）
+      let adTimer = 0;
+      const fitAds = () => {
+        m.style.paddingTop = ''; m.style.paddingBottom = '';
+        const cs = getComputedStyle(m), pt = parseFloat(cs.paddingTop) || 0, pb = parseFloat(cs.paddingBottom) || 0;
+        let top = 0, bot = 0;
+        for (const a of document.querySelectorAll('ins.adsbygoogle')) {
+          const s = getComputedStyle(a);
+          if (s.position !== 'fixed' || s.display === 'none' || s.visibility === 'hidden') continue;
+          const r = a.getBoundingClientRect();
+          if (r.height < 20 || r.width < 100) continue;
+          if (r.top <= 8) top = Math.max(top, r.bottom); else if (r.bottom >= innerHeight - 8) bot = Math.max(bot, innerHeight - r.top);
+        }
+        if (top) m.style.paddingTop = Math.max(pt, top + 8) + 'px';
+        if (bot) m.style.paddingBottom = Math.max(pb, bot + 8) + 'px';
+      };
+      const open = () => { m.hidden = false; document.documentElement.classList.add('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'true')); q.value = ''; filter(); fitAds(); clearInterval(adTimer); adTimer = setInterval(fitAds, 600); q.focus(); };
+      const close = () => { m.hidden = true; clearInterval(adTimer); document.documentElement.classList.remove('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'false')); };
       // 「ツール一覧 ▾」と左上のロゴ（どんまうんど Tools）で開く。トップへは、メニューの「トップの一覧へ」から
       document.addEventListener('click', e => { const b = e.target.closest('.topnav-menu, [data-toolmenu], a.topnav-brand'); if (!b) return; e.preventDefault(); (m.hidden ? open() : close()); });
       m.addEventListener('click', e => { if (e.target === m || e.target.closest('.toolmenu-close')) close(); });

@@ -104,7 +104,8 @@ html.toolmenu-open {
 
 .toolmenu-box {
   width: min(1180px, 100%);
-  max-height: calc(100vh - 84px);
+  /* メニューの上下の余白（広告のぶんずらすときも）の内側に収める */
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--surface, #2e1224);
@@ -307,7 +308,7 @@ html.toolmenu-open {
   }
 
   .toolmenu-box {
-    max-height: 100vh;
+    max-height: 100%;
     height: 100%;
     border-radius: 0;
   }
