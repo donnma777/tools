@@ -1413,12 +1413,80 @@
 
     }
 
+    /* 右の欄（録音・変換の設定）をしまう・出す */
+    .insp-hide {
+      align-self: flex-end;
+      flex: none;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 4px 12px;
+      cursor: pointer;
+    }
+
+    .insp-hide:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .insp-tab {
+      display: none;
+    }
+
     .app.is-expanded {
-      grid-template-columns: minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) 36px;
     }
 
     .app.is-expanded .app-insp {
       display: none;
+    }
+
+    .app.is-expanded .insp-tab {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      writing-mode: vertical-rl;
+      font: inherit;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--label);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .insp-tab .arw {
+      writing-mode: horizontal-tb;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .app.is-expanded .insp-tab:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    /* スマホの幅（縦に並ぶとき）はしまわない */
+    @media (max-width: 999px) {
+
+      .insp-hide,
+      .app.is-expanded .insp-tab {
+        display: none;
+      }
+
+      .app.is-expanded {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .app.is-expanded .app-insp {
+        display: flex;
+      }
     }
 
     /* 再生の帯・タブ・メニュー */
@@ -2277,7 +2345,6 @@
       <div class="panel wide">
         <div class="panel-head">
           <span>🎹 ピアノロール</span>
-          <button class="btn btn-sm" type="button" id="roll-expand" aria-expanded="false" aria-controls="app-insp" title="録音・変換設定を隠してピアノロールを広く表示">↔ 広くする</button>
           <span class="song-set">
             <label title="テンポ（BPM）。曲全体に効きます">♩ = <input type="number" id="bpm" min="30" max="300" step="0.1" aria-label="テンポ（BPM）"></label>
             <button class="btn btn-sm" type="button" id="bpm-guess" title="クリックなしで録った音から、テンポと1小節目の頭を当てる">当てる</button>
@@ -2527,6 +2594,7 @@
     </main>
 
     <aside class="app-insp" id="app-insp" aria-label="録音と変換の設定">
+      <button class="insp-hide" type="button" id="insp-hide" aria-controls="app-insp" aria-expanded="true" title="録音・変換の設定をしまって、ピアノロールを広くする">設定をしまう ›</button>
       <!-- 録る -->
       <div class="panel" id="in-panel">
         <div class="panel-head">
@@ -2684,6 +2752,7 @@
       </div>
 
     </aside>
+    <button class="insp-tab" type="button" id="insp-show" aria-controls="app-insp" title="録音・変換の設定を出す"><span class="arw" aria-hidden="true">‹</span>録音・設定</button>
   </div>
 
   <section class="guide" aria-label="使い方">
@@ -6053,13 +6122,17 @@ ${songJson(list)}
       }
       $('open-mid').addEventListener('click', () => $('mid-file').click());
       $('mid-file').addEventListener('change', e => { importMidi(e.target.files[0]); e.target.value = ''; });
-      $('roll-expand').addEventListener('click', e => {
-        const button = e.currentTarget;
-        const expanded = $('app').classList.toggle('is-expanded');
-        button.textContent = expanded ? '↔ 設定を表示' : '↔ 広くする';
-        button.title = expanded ? '録音・変換設定を表示' : '録音・変換設定を隠してピアノロールを広く表示';
-        button.setAttribute('aria-expanded', String(expanded));
-      });
+      // 右の欄（録音・変換の設定）をしまう・出す。しまったかどうかは覚えておく
+      const INSP_KEY = 'donnma-hum-midi-insp';
+      function setInsp(hide) {
+        $('app').classList.toggle('is-expanded', hide);
+        $('insp-hide').setAttribute('aria-expanded', String(!hide));
+        try { localStorage.setItem(INSP_KEY, hide ? '0' : '1'); } catch (e) { }
+        draw();
+      }
+      $('insp-hide').addEventListener('click', () => setInsp(true));
+      $('insp-show').addEventListener('click', () => setInsp(false));
+      try { if (localStorage.getItem(INSP_KEY) === '0') setInsp(true); } catch (e) { }
 
       // ══════════════════════════════════════
       //  録音をブラウザに残す（IndexedDB。16bit にして入れる）
