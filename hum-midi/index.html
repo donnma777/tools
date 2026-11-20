@@ -1269,6 +1269,13 @@
     }
 
 
+    a.guide-link {
+      text-decoration: none;
+      background: #fff;
+      color: var(--plum-ink, #6e3551);
+      border-color: rgba(110, 53, 81, 0.35);
+    }
+
     .app-badge {
       flex: none;
       font-size: 11px;
@@ -1932,108 +1939,6 @@
       display: none !important;
     }
 
-    /* ── Guide ── */
-    .guide {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 24px 48px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 16px;
-    }
-
-    details.sec {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-      align-self: start;
-    }
-
-    details.sec>summary {
-      list-style: none;
-      cursor: pointer;
-      padding: 13px 16px;
-      font-size: 14px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      user-select: none;
-    }
-
-    details.sec>summary::-webkit-details-marker {
-      display: none;
-    }
-
-    details.sec>summary::after {
-      content: '';
-      margin-left: auto;
-      width: 8px;
-      height: 8px;
-      border-right: 2px solid var(--muted);
-      border-bottom: 2px solid var(--muted);
-      transform: rotate(45deg);
-      transition: transform 0.2s;
-    }
-
-    details.sec[open]>summary::after {
-      transform: rotate(-135deg);
-    }
-
-    details.sec[open]>summary {
-      border-bottom: 1px solid var(--border);
-    }
-
-    .steps {
-      list-style: none;
-      counter-reset: step;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .steps li {
-      counter-increment: step;
-      position: relative;
-      padding-left: 36px;
-      font-size: 13.5px;
-      color: var(--label);
-    }
-
-    .steps li::before {
-      content: counter(step);
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 700;
-      display: grid;
-      place-items: center;
-    }
-
-    .steps b {
-      color: var(--text);
-    }
-
-    .notes {
-      font-size: 12.5px;
-      color: var(--muted);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding-left: 18px;
-    }
-
-    .notes b {
-      color: var(--label);
-    }
-
     .toast {
       position: fixed;
       left: 50%;
@@ -2064,10 +1969,6 @@
         padding: 40px 12px 24px;
       }
 
-      .guide {
-        padding: 0 12px 40px;
-        grid-template-columns: minmax(0, 1fr);
-      }
     }
 
     @media (max-width: 600px) {
@@ -2336,6 +2237,7 @@
       <span class="app-badge" title="試用中のツールです。うまく動かないところがあれば、お問い合わせから教えてください">β版・試用中</span>
       <p>鼻歌や楽器の音を MIDI に。ピアノロールや楽譜で直して、伴奏や歌声もつけて DAW へ。音はどこにも送信しません。</p>
     </div>
+    <a class="btn btn-sm guide-link" href="guide/" target="_blank" rel="noopener" title="使い方・VOICEVOX のつなぎ方・DAW への読み込み・うまくいかないとき（新しいタブで開きます）">📖 説明書</a>
   </header>
 
   <div class="app" id="app">
@@ -2499,7 +2401,7 @@
             <button class="btn btn-sm" type="button" id="vv-connect">つなぐ</button>
             <button class="btn btn-sm btn-primary" type="button" id="vv-make">歌声を作る</button>
           </div>
-          <p class="hint">パソコンに入っている VOICEVOX（0.16 より新しいもの）で歌わせられます。トラックの音色を<b>「VOICEVOX の歌声」</b>にして、となりでキャラを選びます。VOICEVOX は起動しておいてください。はじめに一度だけ、VOICEVOX を起動した状態で<a id="vv-setting" href="http://127.0.0.1:50021/setting" target="_blank" rel="noopener">エンジンの設定</a>を開き、「Allow Origin」に <code id="vv-origin"></code> を書いて保存し、VOICEVOX を起動し直してください。ブラウザに「ローカル ネットワーク上の機器へのアクセス」を聞かれたら許可します。歌声は再生・書き出しの前に自動で作ります（音や歌詞を変えたら作り直し）。歌詞の「ー」は前の母音、かな以外は「ら」で歌います。公開するときは「VOICEVOX:キャラ名」のクレジットなど、各キャラの規約に従ってください。</p>
+          <p class="hint">パソコンに入っている VOICEVOX（0.16 より新しいもの）で歌わせられます。トラックの音色を<b>「VOICEVOX の歌声」</b>にして、となりでキャラを選びます。VOICEVOX は起動しておいてください。はじめに一度だけ、VOICEVOX を起動した状態で<a id="vv-setting" href="http://127.0.0.1:50021/setting" target="_blank" rel="noopener">エンジンの設定</a>を開き、「Allow Origin」に <code id="vv-origin"></code> を書いて保存し、VOICEVOX を起動し直してください。ブラウザに「ローカル ネットワーク上の機器へのアクセス」を聞かれたら許可します（<a href="guide/#voice" target="_blank" rel="noopener">くわしい手順</a>）。歌声は再生・書き出しの前に自動で作ります（音や歌詞を変えたら作り直し）。歌詞の「ー」は前の母音、かな以外は「ら」で歌います。公開するときは「VOICEVOX:キャラ名」のクレジットなど、各キャラの規約に従ってください。</p>
           <p class="hint">ひらがな・カタカナは1文字ずつ（「きゃ」のような小さい字はまとめて）音に入ります。ほかの言葉は空白で区切った1語ずつ。音色を<b>「歌（合成の声）」</b>にすると歌詞で歌います（ロボットのような声です）。保存する .mid にも歌詞が入ります（漢字は UTF-8 で入ります）。</p>
         </div>
         <div class="tool-panel" id="panel-harmony" hidden>
@@ -2754,102 +2656,6 @@
     </aside>
     <button class="insp-tab" type="button" id="insp-show" aria-controls="app-insp" title="録音・変換の設定を出す"><span class="arw" aria-hidden="true">‹</span>録音・設定</button>
   </div>
-
-  <section class="guide" aria-label="使い方">
-    <details class="sec">
-      <summary>📖 使い方</summary>
-      <div class="panel-body">
-        <ol class="steps">
-          <li>ピアノロールの見出しで<b>テンポ（♩=）と拍子</b>を DAW の曲に合わせて、<b>● 録音</b>を押します（はじめはマイクの許可を聞かれます）。カウントのあと、1小節目から歌います。</li>
-          <li>歌い終わったら<b>■ 止める</b>。ピアノロールに音が並びます。薄い点は読み取った音の高さそのもの、四角が MIDI の音です。</li>
-          <li>うまく取れないところは<b>変換の設定</b>（見出しをクリックで開きます）を変えるか、ピアノロールで直します。<b>▶ 再生</b>で録音と MIDI を重ねて聞き比べられます。</li>
-          <li><b>MIDI を保存</b>して、DAW に読み込みます。</li>
-        </ol>
-      </div>
-    </details>
-
-    <details class="sec">
-      <summary>🎹 ピアノロールの操作</summary>
-      <div class="panel-body">
-        <ul class="notes">
-          <li><b>音をドラッグ</b>：上下で音の高さ、左右で位置。右のはしをドラッグすると長さ。クオンタイズ中はグリッドに吸いつきます。</li>
-          <li><b>何もないところをダブルクリック</b>：音を足す。<b>Delete</b>：選んだ音を消す。</li>
-          <li><b>音符をダブルクリック</b>（か、選んで <b>Enter</b>）：歌詞を打つ。<b>Enter</b> で決める、<b>Tab</b> で次の音符へ（<b>Shift+Tab</b> で前へ）。「きらきら」のようにまとめて打つと、後ろの音符へ1文字ずつ入ります。</li>
-          <li><b>↑ ↓</b>：選んだ音を半音ずつ（<b>Shift</b> でオクターブ）。<b>← →</b>：グリッド1つ分ずらす。</li>
-          <li><b>右クリック</b>：音を消す（右ボタンのままなぞると続けて消せる）。</li>
-          <li><b>何もないところをドラッグ</b>：囲んだ音をまとめて選ぶ（ドラムは <b>Shift</b>+ドラッグ）。<b>Ctrl</b>+クリックで1つずつ足す・外す、<b>Ctrl+A</b> で全部。選んだ音はまとめて動かせます。</li>
-          <li><b>Ctrl+C</b>／<b>Ctrl+X</b>／<b>Ctrl+V</b>：コピー・切り取り・貼り付け（再生位置に貼る）。<b>Ctrl+D</b>：すぐ後ろに複製。</li>
-          <li><b>上の目盛りをクリック</b>：そこから再生。<b>目盛りをドラッグ</b>：くり返す範囲（右クリックかダブルクリックで解除）。</li>
-          <li><b>Space</b>：再生・停止。<b>Home</b>：最初から再生。<b>L</b>：リピート。<b>Ctrl+ホイール</b>：横の幅。<b>左の鍵盤</b>：音を鳴らす。</li>
-          <li><b>⌨ キーボード入力</b>（<b>K</b>）：パソコンのキーで打ち込む。<b>Z〜,</b> が白鍵、<b>S D G H J</b> が黒鍵、<b>Q〜I</b> が1オクターブ上。ドラムは <b>Z</b> キック・<b>X</b> スネア・<b>A</b> ハイハットなど。止まっているときは押すたびに置いて進み、再生中は押した長さで入ります。</li>
-          <li><b>Ctrl+Z</b>／<b>Ctrl+Y</b>：戻す・やり直す。変換の設定を変えると音を作り直しますが、手で直したぶんも Ctrl+Z で戻せます。</li>
-          <li><b>ドラムのトラック</b>：何もないところを<b>クリック</b>で置く、<b>ダブルクリック</b>で消す。ドラッグで位置と種類を変えられます。</li>
-        </ul>
-      </div>
-    </details>
-
-    <details class="sec">
-      <summary>🎚️ トラック・音色・ドラム</summary>
-      <div class="panel-body">
-        <ul class="notes">
-          <li><b>＋ メロディのトラック</b>・<b>＋ ドラムのトラック</b>で増やせます（16 まで）。録音や編集は、選んでいるトラック（ピンクの枠）にします。</li>
-          <li>再生すると、全部のトラックがいっしょに鳴ります。<b>M</b> はミュート（鳴らさない）、<b>S</b> はソロ（これだけ鳴らす）。ほかのメロディは、ピアノロールにうすく出ます。</li>
-          <li><b>音色</b>はトラックごとに選べます。保存した .mid にも楽器の番号（GM）が入るので、DAW の GM 音源（Cakewalk の TTS-1 など）でも近い楽器で鳴ります。</li>
-          <li><b>ドラム</b>は、クリックで置いていくか、録音で口ドラム（ボイスパーカッション）を読み取ります。低い「ドッ」はキック、「パッ」「カッ」はスネア、「ツッ」「チッ」はハイハットになります。違うものはドラッグで直してください。</li>
-          <li>「録音中にほかのトラックを鳴らす」をオンにすると、作ったドラムや伴奏を聞きながら次のパートを録れます。</li>
-          <li>トラックと音はこのブラウザに残るので、ページを開き直しても続きから作れます（録音の音そのものは残りません）。</li>
-        </ul>
-      </div>
-    </details>
-
-    <details class="sec">
-      <summary>🎸 作曲の手助け・歌詞・楽譜</summary>
-      <div class="panel-body">
-        <ul class="notes">
-          <li><b>📦 テンプレート</b>：コード進行・ドラムを選んで伴奏を作り、聞きながら歌えます。ドラムを1小節ずつ入れたり、見本の曲を開いたりもできます。</li>
-          <li><b>MIDI を開く</b>：.mid を読み込んで続きを作れます（落としても開けます）。和音のあるトラックは「和」がオンになります。</li>
-          <li><b>強さの欄</b>：ピアノロールの下の棒をなぞると強さ（ベロシティ）が変わります。<b>Shift</b> を押しながらだと選んだ音を全部。</li>
-          <li><b>✂ 編集</b>のタブ：つなげる・短く切る・長さ ½・×2・強さ ± で、選んだ音（なければ全部）をまとめて整えます。</li>
-          <li><b>🎸 コード伴奏</b>：メロディに合うコードを付けて、伴奏とベースのトラックを作ります。コード名をクリックで替えられます。</li>
-          <li><b>🎶 ハモリ</b>：3度上・3度下などのハモリを、調に合わせて別のトラックに作ります。</li>
-          <li><b>テンポを当てる</b>：クリックなしで録ったときに、テンポの「当てる」で BPM と1小節目の頭を合わせます。</li>
-          <li><b>🎹 MIDI 入力</b>：USB の MIDI キーボードで弾いて入れられます（Chrome・Edge）。入れ方はキーボード入力と同じです。</li>
-          <li><b>歌声ソフトへ</b>（🎤 歌詞のパネル）：.ust（UTAU・OpenUtau）、MusicXML（NEUTRINO など）、歌詞入り .mid（Synthesizer V など）で書き出せます。VOCALOID 用は UtaFormatix で変換します。</li>
-          <li><b>📝 文字で入力</b>：「ドレミー ソ」のように書いて入れます。<b>🎤 歌詞・歌声</b>：音に歌詞を付けて、「歌（合成の声）」の音色で歌わせます。パソコンに VOICEVOX があれば、音色「VOICEVOX の歌声」でずんだもんなどに歌わせられます（設定は「🎤 歌詞・歌声」のタブに）。</li>
-          <li><b>🎼 楽譜</b>：五線譜で見て、クリックで音符・休符を入れられます。印刷や MusicXML（楽譜ソフト用）で保存できます。</li>
-          <li><b>🤖 AI</b>：曲を JSON にしたプロンプトをコピーして、ChatGPT・Gemini・Claude などに「サビを作って」などと頼めます。答えを貼ると曲に入ります。</li>
-          <li>録音もこのブラウザに残ります（ページを開き直すと読み戻します）。「ぜんぶ消す」で消えます。</li>
-        </ul>
-      </div>
-    </details>
-
-    <details class="sec">
-      <summary>💻 Cakewalk に読み込む</summary>
-      <div class="panel-body">
-        <ul class="notes">
-          <li>保存した .mid を、トラックビューの空いているところに<b>ドラッグ＆ドロップ</b>します。トラックが分かれた形で入ります（ドラムは 10ch）。入れたい位置（小節の頭）に落とすと、そこから並びます。</li>
-          <li>メニューの<b>ファイル → インポート → MIDI</b> でも読み込めます。</li>
-          <li>ファイルにはテンポと拍子も入っています。プロジェクトのテンポが変わってしまうときは、読み込みのときにテンポを入れない設定にするか、このツールのテンポを曲に合わせてください。</li>
-          <li>ほかの DAW（Cubase・Studio One・FL Studio・Ableton Live・GarageBand・Logic など）でも、同じように .mid を読み込めます。</li>
-        </ul>
-      </div>
-    </details>
-
-    <details class="sec">
-      <summary>💡 うまく取るコツ・注意</summary>
-      <div class="panel-body">
-        <ul class="notes">
-          <li><b>β版（試用中）</b>です。うまく動かないところや、こうなってほしいところがあれば、<a href="https://donnma.com/form/" target="_blank" rel="noopener">お問い合わせ</a>から教えてください。</li>
-          <li><b>1つずつの音（単音）</b>を読み取ります。和音・伴奏つきの曲・何人かの声はうまく取れません。</li>
-          <li>「ラ」「ル」「トゥ」のように、<b>音をはっきり区切って</b>歌うと、同じ高さが続くところも分けやすくなります。息の多い声やささやき声は苦手です。</li>
-          <li>クリックがマイクに入ると音として拾うことがあります。<b>ヘッドホン</b>を使ってください。</li>
-          <li>音がグリッドから少しずつ遅れるときは<b>ずれ補正</b>をプラスに。パソコンやマイクによって数十ミリ秒の遅れがあります。</li>
-          <li>録音はこのブラウザの中にだけ残します（どこにも送りません）。ブラウザのデータを消すと消えるので、大事なものは「その他の保存 ▾」の<b>声の録音を保存（.wav）</b>で保存してください。録音は10分まで。</li>
-          <li>OBS のドックなどでは、マイクの許可が出ないことがあります。Chrome・Edge・Firefox・Safari で使ってください。</li>
-        </ul>
-      </div>
-    </details>
-  </section>
 
   <!-- AdSense -->
   <div style="max-width:1400px; margin:0 auto 32px; padding:0 24px;">

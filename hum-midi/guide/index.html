@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>鼻歌 MIDI 変換の説明書｜歌って MIDI に・直す・伴奏・VOICEVOX で歌わせる・DAW へ | どんまうんど-Tools</title>
+  <link rel="icon" href="../../favicon.ico">
+  <meta name="description" content="鼻歌 MIDI 変換（ブラウザで動く無料ツール）の説明書。マイクで歌って MIDI にする手順、ピアノロール・楽譜・キーボードでの直し方、伴奏・ハモリ・ドラム、VOICEVOX でずんだもんに歌わせる設定、Cakewalk などの DAW や UTAU へ持っていく方法、うまくいかないときの対処をまとめました。">
+  <link rel="canonical" href="https://donnma.com/tool/hum-midi/guide/">
+  <meta property="og:title" content="鼻歌 MIDI 変換の説明書｜歌って MIDI に・直す・伴奏・VOICEVOX で歌わせる・DAW へ | どんまうんど-Tools">
+  <meta property="og:description" content="歌って MIDI に、直して、伴奏や歌声をつけて DAW へ。ブラウザで動く鼻歌 MIDI 変換の使い方をまとめました。">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://donnma.com/tool/hum-midi/guide/">
+  <meta property="og:site_name" content="どんまうんど-Tools">
+  <meta property="og:image" content="https://donnma.com/tool/image/ogp-hum-midi.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="鼻歌 MIDI 変換">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@donnma777">
+  <meta name="twitter:image:alt" content="鼻歌 MIDI 変換">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P08Q4F3Q5F"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-P08Q4F3Q5F');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4863572964771965"
+    crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@type": "TechArticle", "headline": "鼻歌 MIDI 変換の説明書", "description": "鼻歌 MIDI 変換（ブラウザで動く無料ツール）の説明書。マイクで歌って MIDI にする手順、ピアノロール・楽譜・キーボードでの直し方、伴奏・ハモリ・ドラム、VOICEVOX でずんだもんに歌わせる設定、Cakewalk などの DAW や UTAU へ持っていく方法、うまくいかないときの対処をまとめました。", "url": "https://donnma.com/tool/hum-midi/guide/", "inLanguage": "ja", "datePublished": "2026-11-20", "author": {"@type": "Person", "name": "どんま", "url": "https://donnma.com/"}, "about": {"@type": "SoftwareApplication", "name": "鼻歌 MIDI 変換", "url": "https://donnma.com/tool/hum-midi/", "applicationCategory": "MultimediaApplication", "operatingSystem": "Web ブラウザ", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "JPY"}}}
+  </script>
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "どんまうんど-Tools", "item": "https://donnma.com/tool/"}, {"@type": "ListItem", "position": 2, "name": "鼻歌 MIDI 変換", "item": "https://donnma.com/tool/hum-midi/"}, {"@type": "ListItem", "position": 3, "name": "説明書", "item": "https://donnma.com/tool/hum-midi/guide/"}]}
+  </script>
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "「このブラウザでは録音できません」と出ます", "acceptedAnswer": {"@type": "Answer", "text": "ファイルを直接開いた（file://）ときや、OBS のドックなどマイクを使えない画面で出ます。Chrome・Edge・Firefox・Safari で https://donnma.com/tool/hum-midi/ を開いてください。マイクの許可を「ブロック」にしたときは、アドレスバーの左の鍵のマークから許可に戻します。"}}, {"@type": "Question", "name": "音の高さがずれる・1オクターブ違って出ます", "acceptedAnswer": {"@type": "Answer", "text": "「変換の設定」の「音の高さの範囲」を声に合わせて（低い声・高い声）、「音程のずれを自動で合わせる」をオンにします。オクターブだけ違うときは「オクターブ」で上下させます。"}}, {"@type": "Question", "name": "同じ高さの音が1つにつながってしまいます", "acceptedAnswer": {"@type": "Answer", "text": "「ラ」「ル」「トゥ」のように音をはっきり区切って歌い、「同じ高さでも、音の出だしで区切る」をオンにします。つながったところは、ピアノロールで ✂ 編集の「短く切る」を使うか、手で分けます。"}}, {"@type": "Question", "name": "細かい音やノイズまで拾ってしまいます", "acceptedAnswer": {"@type": "Answer", "text": "「いちばん短い音」を長くし、「音として拾う基準」を厳しくします。クリックの音を拾っているときは、ヘッドホンを使ってください。"}}, {"@type": "Question", "name": "音がグリッドから少しずつ遅れます", "acceptedAnswer": {"@type": "Answer", "text": "パソコンやマイクによって数十ミリ秒の遅れがあります。「ずれ補正（ミリ秒）」をプラスにすると前へ寄ります。クリックなしで録ったときは、テンポの「当てる」でテンポと1小節目の頭を合わせます。"}}, {"@type": "Question", "name": "VOICEVOX につながりません", "acceptedAnswer": {"@type": "Answer", "text": "VOICEVOX を起動したまま、エンジンの設定（http://127.0.0.1:50021/setting）の Allow Origin に https://donnma.com を書いて保存し、VOICEVOX を起動し直してください。ブラウザに「ローカル ネットワーク上の機器へのアクセス」を聞かれたら許可します。VOICEVOX は 0.16 より新しいものが必要です。"}}, {"@type": "Question", "name": "作ったものは保存されますか？", "acceptedAnswer": {"@type": "Answer", "text": "トラックと音、録音はこのブラウザの中に残るので、ページを開き直しても続きから作れます。ブラウザのデータを消すと消えるので、大事なものは MIDI（.mid）や声の録音（.wav）で保存してください。"}}, {"@type": "Question", "name": "声はどこかに送られますか？", "acceptedAnswer": {"@type": "Answer", "text": "送りません。読み取りも書き出しも、すべてブラウザの中でします。VOICEVOX の歌声は、あなたのパソコンで動いている VOICEVOX にだけ送ります。"}}]}
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* donnma.com と同じ配色（プラム × ピンク） */
+    :root {
+      --bg: #250e1c;
+      --bg-deep: #1a0a14;
+      --border: #46162e;
+      --border-strong: #a03060;
+      --accent: #ff85a1;
+      --accent-soft: rgba(255, 133, 161, 0.12);
+      --on-accent: #2a1020;
+      --text: #f6e9ef;
+      --muted: #c4a2b3;
+      --cream: #f6f2e2;
+      --plum-ink: #6e3551;
+      --accent-ink: #c2345e;
+      --line-ink: rgba(110, 53, 81, 0.18);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* shared:header-footer */
+    /* ── ヘッダー ── */
+    .topnav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--bg-deep);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topnav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topnav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    a.topnav-brand:hover {
+      opacity: 0.8;
+    }
+
+    .topnav-brand img {
+      display: block;
+      height: 26px;
+      width: auto;
+    }
+
+    .topnav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topnav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      transition: color 0.15s;
+    }
+
+    .topnav-back:hover {
+      color: var(--accent);
+    }
+
+    /* ツールのメニューがあるページ：ロゴの横に ▾（押すとメニューが開く） */
+    body:has(#toolmenu) a.topnav-brand::after {
+      content: '▾';
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: -4px;
+    }
+
+    /* 「ツール一覧 ▾」はメニューを開くボタン（今はロゴで開く。ページの中に置くとき用に残す） */
+    button.topnav-menu {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      background: none;
+      border: 0;
+      cursor: pointer;
+    }
+
+    /* ── ツールの一覧（大きなメニュー） ── */
+    html.toolmenu-open {
+      overflow: hidden;
+    }
+
+    .toolmenu {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 64px 20px 20px;
+      background: rgba(10, 4, 8, 0.72);
+      backdrop-filter: blur(3px);
+    }
+
+    .toolmenu[hidden] {
+      display: none;
+    }
+
+    .toolmenu-box {
+      width: min(1180px, 100%);
+      /* メニューの上下の余白（広告のぶんずらすときも）の内側に収める */
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface, #2e1224);
+      border: 1px solid var(--border-strong, #5e2340);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+      overflow: hidden;
+    }
+
+    .toolmenu-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border, #46162e);
+    }
+
+    .toolmenu-q {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      font-size: 14px;
+      color: var(--text, #f6e9ef);
+      background: var(--bg-deep, #1a0a14);
+      border: 1px solid var(--border-strong, #5e2340);
+      border-radius: 10px;
+      padding: 9px 12px;
+    }
+
+    .toolmenu-q:focus {
+      outline: none;
+      border-color: var(--accent, #ff85a1);
+    }
+
+    .toolmenu-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      color: var(--text, #f6e9ef);
+      text-decoration: none;
+      white-space: nowrap;
+      border: 1px solid var(--border-strong, #5e2340);
+      border-radius: 999px;
+      padding: 5px 14px 5px 12px;
+    }
+
+    .toolmenu-top img {
+      height: 20px;
+      width: auto;
+      display: block;
+    }
+
+    .toolmenu-top:hover {
+      border-color: var(--accent, #ff85a1);
+    }
+
+    .toolmenu-close {
+      font: inherit;
+      font-size: 20px;
+      line-height: 1;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border-strong, #5e2340);
+      background: none;
+      color: var(--text, #f6e9ef);
+      cursor: pointer;
+    }
+
+    .toolmenu-close:hover {
+      border-color: var(--accent, #ff85a1);
+    }
+
+    .toolmenu-body {
+      overflow: auto;
+      padding: 6px 16px 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 6px 18px;
+      align-items: start;
+    }
+
+    .toolmenu-sec h2 {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted, #c4a2b3);
+      letter-spacing: 0.05em;
+      margin: 12px 4px 6px;
+    }
+
+    .toolmenu-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .toolmenu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      color: var(--text, #f6e9ef);
+      text-decoration: none;
+    }
+
+    .toolmenu-item[hidden] {
+      display: none;
+    }
+
+    .toolmenu-item svg {
+      width: 20px;
+      height: 20px;
+      flex: none;
+      color: var(--accent, #ff85a1);
+    }
+
+    .toolmenu-item span {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .toolmenu-item b {
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+
+    .toolmenu-item small {
+      font-size: 11px;
+      color: var(--muted, #c4a2b3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toolmenu-item:hover,
+    .toolmenu-item:focus-visible {
+      background: var(--surface-2, #38172c);
+      outline: none;
+    }
+
+    .toolmenu-item.on {
+      background: var(--accent-soft, rgba(255, 133, 161, 0.12));
+      box-shadow: inset 3px 0 0 var(--accent, #ff85a1);
+    }
+
+    .toolmenu-foot {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 8px;
+      padding: 10px 16px 12px;
+      border-top: 1px solid var(--border, #46162e);
+      background: var(--bg-deep, #1a0a14);
+    }
+
+    .toolmenu-foot a.toolmenu-foot-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 12px 3px 10px;
+      margin-right: 4px;
+    }
+
+    .toolmenu-foot-top img {
+      height: 18px;
+      width: auto;
+      display: block;
+    }
+
+    .toolmenu-foot a {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text, #f6e9ef);
+      text-decoration: none;
+      border: 1px solid var(--border-strong, #5e2340);
+      border-radius: 999px;
+      padding: 4px 12px;
+    }
+
+    .toolmenu-foot a:hover {
+      border-color: var(--accent, #ff85a1);
+      color: var(--accent-2, #ffb3c6);
+    }
+
+    .toolmenu-none {
+      grid-column: 1 / -1;
+      color: var(--muted, #c4a2b3);
+      font-size: 13px;
+      padding: 16px 4px;
+    }
+
+    @media (max-width: 600px) {
+      .toolmenu {
+        padding: 0;
+      }
+
+      .toolmenu-box {
+        max-height: 100%;
+        height: 100%;
+        border-radius: 0;
+      }
+
+      /* スマホ：1行目に「どんまうんど Tools」と ×、2行目に検索欄 */
+      .toolmenu-head {
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      .toolmenu-q {
+        order: 3;
+        flex-basis: 100%;
+      }
+    }
+
+    .topnav-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .topnav-site img {
+      height: 17px;
+      width: auto;
+      display: block;
+    }
+
+    .topnav-site:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .topnav-site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* リンクは下線なし。マウスを乗せるとピンクになる */
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer a.footer-logo {
+      transition: opacity 0.15s;
+    }
+
+    footer a.footer-logo:hover {
+      opacity: 0.8;
+    }
+
+    .footer-logo img {
+      display: block;
+      height: 24px;
+      width: auto;
+    }
+
+    .footer-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.6;
+    }
+
+    /* donnma.com のメニュー */
+    .footer-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 600px) {
+      .topnav {
+        padding: 0 16px;
+      }
+
+      /* スマホでも出す（ロゴ・donnma.com と並ぶように少し詰める） */
+      .topnav-right {
+        gap: 6px;
+      }
+
+      .topnav-back {
+        font-size: 12px;
+        padding: 5px 4px;
+      }
+
+      .topnav-site {
+        font-size: 12px;
+        padding: 4px 11px;
+      }
+
+      .topnav-brand img {
+        height: 22px;
+      }
+
+      .topnav-back,
+      .topnav-site {
+        white-space: nowrap;
+      }
+
+      .footer-inner,
+      .footer-brand {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-menu {
+        justify-content: center;
+      }
+    }
+
+    /* 幅の狭いスマホ：ヘッダーが1行に収まるように、飾りから省く */
+    @media (max-width: 400px) {
+      .topnav-inner {
+        gap: 8px;
+      }
+
+      .topnav-brand {
+        gap: 6px;
+      }
+
+      .topnav-site {
+        padding: 4px 9px;
+      }
+
+      .topnav-site-dot {
+        display: none;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .topnav-brand > span {
+        display: none;
+      }
+    }
+    /* /shared:header-footer */
+
+    main {
+      flex: 1;
+      padding: 40px 24px 64px;
+      background: var(--cream) url("../../image/pattern.svg?v=20260929") center top / 300px 300px repeat;
+    }
+
+    /* 解説ページの台紙 */
+    .guide {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 44px 40px;
+      background: rgba(246, 242, 226, 0.97);
+      border-radius: 28px;
+      box-shadow: 0 0 0 6px rgba(246, 242, 226, 0.5);
+      color: var(--plum-ink);
+      line-height: 1.9;
+    }
+
+    .guide a { color: var(--accent-ink); font-weight: 700; }
+
+    .g-crumbs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .g-crumbs a { text-decoration: none; }
+    .g-crumbs span { color: rgba(110, 53, 81, 0.6); }
+
+    /* いちばん上 */
+    .g-hero { text-align: center; padding-bottom: 8px; }
+
+    .g-kind {
+      display: inline-block;
+      padding: 2px 12px;
+      border-radius: 999px;
+      background: rgba(194, 52, 94, 0.1);
+      color: var(--accent-ink);
+      font-size: 0.8rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+    }
+
+    .g-hero h1 {
+      margin: 8px 0 6px;
+      font-size: clamp(1.6rem, 5vw, 2.3rem);
+      font-weight: 900;
+      color: var(--accent-ink);
+      line-height: 1.3;
+    }
+
+    .g-lead { max-width: 620px; margin: 0 auto; font-weight: 700; }
+
+    .g-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 18px 0 8px;
+    }
+
+    .g-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 8px 22px;
+      border-radius: 999px;
+      font-weight: 900;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .guide a.g-btn-primary { background: var(--accent); color: var(--on-accent); box-shadow: 0 4px 0 #e0607f; }
+    .guide a.g-btn-secondary { background: #fff; color: var(--plum-ink); border: 2px solid var(--line-ink); }
+    .g-btn:hover { transform: translateY(-1px); }
+
+    .g-meta { font-size: 0.82rem; color: rgba(110, 53, 81, 0.8); }
+
+    .g-figures {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 300px));
+      justify-content: center;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .g-figures figure { margin: 0; }
+
+    .g-figures img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      border: 1px solid var(--line-ink);
+      box-shadow: 0 8px 24px rgba(110, 53, 81, 0.18);
+      background: #f5f7fb;
+    }
+
+    .g-figures figcaption { margin-top: 8px; font-size: 0.82rem; font-weight: 700; }
+
+    /* 目次 */
+    .g-toc {
+      margin: 28px 0 8px;
+      padding: 14px 22px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--line-ink);
+    }
+
+    .g-toc p { font-weight: 900; font-size: 0.9rem; }
+    .g-toc ol { display: flex; flex-wrap: wrap; gap: 2px 18px; padding-left: 1.2em; font-size: 0.9rem; }
+    .g-toc a { text-decoration: none; }
+
+    /* 見出しと本文 */
+    .g-section { scroll-margin-top: 72px; }
+
+    .g-section h2 {
+      font-size: 1.2rem;
+      font-weight: 900;
+      border-left: 5px solid var(--accent);
+      padding: 2px 0 2px 12px;
+      margin: 36px 0 12px;
+      color: var(--plum-ink);
+    }
+
+    .g-section h3 { font-size: 1rem; font-weight: 900; margin: 18px 0 6px; }
+    .g-section ul { padding-left: 1.4em; }
+    .g-section li + li { margin-top: 4px; }
+    .g-section p + p, .g-section p + ul, .g-section ul + p, .g-section p + ol, .g-section ol + p { margin-top: 8px; }
+    .g-note { font-size: 0.88rem; padding: 10px 14px; border-radius: 12px; background: rgba(194, 52, 94, 0.07); }
+
+    .g-section code {
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: rgba(110, 53, 81, 0.08);
+      font-family: Consolas, 'Courier New', monospace;
+      font-size: 0.88em;
+      word-break: break-all;
+    }
+
+    .g-code {
+      margin-top: 8px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: #2a1020;
+      color: #f6e9ef;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .g-code code { padding: 0; background: none; color: inherit; }
+
+    /* できること */
+    .g-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+    }
+
+    .g-feature {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line-ink);
+    }
+
+    .g-feature h3 { margin: 0 0 4px; color: var(--accent-ink); font-size: 0.98rem; }
+    .g-feature p { font-size: 0.9rem; line-height: 1.75; }
+
+    /* 手順 */
+    .g-steps { counter-reset: step; list-style: none; padding-left: 0; }
+
+    .g-steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 40px;
+      min-height: 30px;
+    }
+
+    .g-steps li + li { margin-top: 10px; }
+
+    .g-steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 2px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--on-accent);
+      font-weight: 900;
+      font-size: 0.9rem;
+      line-height: 28px;
+      text-align: center;
+    }
+
+    /* 表 */
+    .g-table-wrap { overflow-x: auto; }
+    .g-table-wrap + p { margin-top: 12px; }
+
+    .g-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .g-table th, .g-table td { padding: 8px 12px; border-bottom: 1px solid var(--line-ink); text-align: left; vertical-align: top; }
+    .g-table th { background: rgba(194, 52, 94, 0.08); font-weight: 900; white-space: nowrap; }
+    .g-table tr:last-child td { border-bottom: 0; }
+
+    /* よくある質問 */
+    .g-faq {
+      border-radius: 14px;
+      background: #fff;
+      border: 1px solid var(--line-ink);
+    }
+
+    .g-faq + .g-faq { margin-top: 8px; }
+
+    .g-faq summary {
+      padding: 12px 16px 12px 44px;
+      position: relative;
+      font-weight: 900;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .g-faq summary::-webkit-details-marker { display: none; }
+
+    .g-faq summary::before {
+      content: "Q";
+      position: absolute;
+      left: 16px;
+      top: 12px;
+      color: var(--accent-ink);
+    }
+
+    .g-faq[open] summary { border-bottom: 1px dashed var(--line-ink); }
+    .g-faq p { padding: 10px 16px 14px 44px; font-size: 0.92rem; }
+
+    /* ほかのツール */
+    .g-related ul { list-style: none; padding-left: 0; display: grid; gap: 8px; }
+    .g-related li { padding: 10px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.6); }
+    .g-related li + li { margin-top: 0; }
+    .g-related li span { display: block; font-size: 0.85rem; line-height: 1.6; }
+
+    .g-date { margin-top: 32px; font-size: 0.85rem; text-align: right; }
+
+
+    .g-keys { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    kbd {
+      display: inline-block;
+      min-width: 1.7em;
+      padding: 0 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(110, 53, 81, 0.3);
+      border-bottom-width: 2px;
+      background: #fff;
+      font-family: Consolas, 'Courier New', monospace;
+      font-size: 0.85em;
+      line-height: 1.6;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .g-beta { margin-top: 14px; }
+    .g-toc li { margin-left: 0.6em; }
+    .g-shot { margin-top: 10px; }
+
+    @media (max-width: 600px) {
+      main { padding: 24px 12px 40px; }
+      .guide { padding: 22px 18px 30px; border-radius: 22px; }
+      .g-toc { padding: 12px 16px; }
+      .g-faq summary { padding-left: 38px; }
+      .g-faq summary::before { left: 14px; }
+      .g-faq p { padding-left: 16px; }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- shared:header root="../../" back -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="../../"><img src="../../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+      <div class="topnav-right">
+        <a class="topnav-site" href="https://donnma.com/" target="_blank" rel="noopener" title="どんまうんど（donnma.com）のトップ">
+          <img src="../../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182">
+          <span>TOP ↗</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="toolmenu" id="toolmenu" role="dialog" aria-modal="true" aria-label="ツールの一覧" hidden>
+    <div class="toolmenu-box">
+      <div class="toolmenu-head">
+        <input type="search" class="toolmenu-q" placeholder="ツールを探す（例：qr、歌、画像、OBS）" aria-label="ツールを探す" autocomplete="off">
+        <a class="toolmenu-top" href="../../" title="どんまうんど Tools のトップ（ツールの一覧）"><img src="../../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>Tools</span></a>
+        <button type="button" class="toolmenu-close" aria-label="閉じる">×</button>
+      </div>
+      <div class="toolmenu-body">
+        <section class="toolmenu-sec">
+          <h2>配信の便利ツール</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../../overlay/index.html" data-q="配信オーバーレイテーマ OBS Studio オーバーレイ 配信向け サイバーパンク、ゲーミング、和風などOBS用オーバーレイテーマを公開中。テーマ一覧・使い方は専用ページで確認できます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2" /><path d="M8 21h8M12 17v4M10 8.5v5l4-2.5z" /></svg>
+              <span><b>配信オーバーレイテーマ</b><small>OBS Studio オーバーレイ</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../chat-css-generator/" data-q="チャットCSSジェネレーター YouTube / Twitch チャット 配信向け YouTubeライブ・Twitchのチャット欄をOBSでおしゃれに表示。プレビューを見ながらフォント・縁取り・吹き出し・スパチャ/Bits・アニメーションを設定できます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z" /><path d="M8.5 12h.01M12 12h.01M15.5 12h.01" /></svg>
+              <span><b>チャットCSSジェネレーター</b><small>YouTube / Twitch チャット</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../youtube-subscribers/" data-q="登録者数カウンター・目標ゲージ YouTube 登録者数 配信向け YouTubeの登録者数を自動で取得して、OBSでおしゃれに表示。「目標まであと○人」の目標ゲージも出せます。グラデーション・縁取り・見出しや単位・背景の箱を、プレビューを見ながら設定できます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></svg>
+              <span><b>登録者数カウンター・目標ゲージ</b><small>YouTube 登録者数</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../clock/" data-q="時計・経過時間 時計・配信時間 配信向け OBS のブラウザソースで使える時計です。配信・録画を始めてからの時間を自動で数え、海外の時刻も並べられます。選んで URL をコピーするだけです。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2.5 2.5" /><path d="M9 2h6" /></svg>
+              <span><b>時計・経過時間</b><small>時計・配信時間</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../schedule/" data-q="配信スケジュールメーカー 週・月・時間割・進行表 配信向け 配信予定を入れるだけで、X などに載せるスケジュール画像を作れます。1週間・1か月のカレンダー・週の時間割・1日の進行表から選べて、キャラの画像も置けます。OBS に入れると、今日の予定や今の枠（残り時間つき）を目立たせて配信画面にも出せます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M8 2v4M16 2v4M3 9h18M7 13h4M7 17h8" /></svg>
+              <span><b>配信スケジュールメーカー</b><small>週・月・時間割・進行表</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../chapter/" data-q="YouTube チャプターメーカー YouTube・アーカイブ・目次 配信向け 概要欄に入れるチャプター（目次）を作れます。メモのタイムスタンプを貼るだけで整えて、0:00 から始まる・10秒以上などの YouTube の条件を確かめて直せます。動画を見ながらボタンで区切ることもできます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3" /><path d="M10 9v6l5-3z" /><path d="M6 17h12" /><path d="M9 16v2M14 16v2" /></svg>
+              <span><b>YouTube チャプターメーカー</b><small>YouTube・アーカイブ・目次</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>大会・抽選</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../../tournament/" data-q="トーナメント表メーカー 大会・配信・会場 大会・イベント 参加者を入れるだけで、トーナメント・ダブルエリミネーション・総当たり・スイスドローの表を自動で作成。点数（音ゲーのスコア）や団体戦、敗者復活、課題曲のピック・BAN・ルーレットにも対応。配信（OBS）・会場のモニター・画像保存で使えます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h5v4H3zM3 16h5v4H3z" /><path d="M8 6h3v12H8M11 12h4" /><path d="M15 9h6v6h-6z" /></svg>
+              <span><b>トーナメント表メーカー</b><small>大会・配信・会場</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../ranking/" data-q="スコアアタック集計 予選・スコアアタック・音ゲー 大会・イベント 参加者ごとの点数（タイム）を入れると、合計・曲ごとの順位の合計・理論値比で順位を自動で出します。本戦に進む人の線、Excel からの貼り付け、PNG 保存つき。OBS に入れると、点数を入れるたびに順位表がその場で変わります。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21V11h8v10M3 21v-6h5M16 21v-8h5" /><path d="M2 21h20" /><path d="M12 3l1.2 2.4 2.6.4-1.9 1.8.5 2.6L12 9l-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z" /></svg>
+              <span><b>スコアアタック集計</b><small>予選・スコアアタック・音ゲー</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../roulette/" data-q="ルーレット 抽選・罰ゲーム・順番決め 抽選・ゲーム 項目・当たりやすさ・色を自由に決めて回せるルーレット。ブラウザでそのまま使えて、OBSの配信画面にも出せます（ドック・Chromeから操作、透過背景・履歴表示・効果音つき）。罰ゲーム・順番決め・抽選に。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 13V5M12 13l6.9 4M12 13l-6.9 4" /><path d="M10 2h4l-2 3z" /></svg>
+              <span><b>ルーレット</b><small>抽選・罰ゲーム・順番決め</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../amida/" data-q="あみだくじ 順番決め・チーム分け・罰ゲーム 抽選・ゲーム 参加者と結果を入れるだけで作れるあみだくじ。横線を足してから始めたり、結果を隠して1人ずつ・全員まとめて開けたりできます。ブラウザでそのまま使えて、OBSの配信画面にも出せます（画像保存・効果音つき）。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v18M12 3v18M19 3v18" /><path d="M5 7h7M12 11h7M5 15h7M12 18h7" /></svg>
+              <span><b>あみだくじ</b><small>順番決め・チーム分け・罰ゲーム</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>画像づくり</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../../thumbnail/" data-q="サムネイルメーカー ブログ・YouTube・SNS 画像づくり ブログのアイキャッチ、YouTubeのサムネイル、SNSの共有画像をブラウザだけで作れます。文字を入れて、背景の柄と画像を選ぶだけ。長い文字は自動で収まります。画像はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="8.5" cy="10" r="1.5" /><path d="M21 15l-5-5L5 19" /></svg>
+              <span><b>サムネイルメーカー</b><small>ブログ・YouTube・SNS</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../bg-remove/" data-q="背景透過ツール イラスト・写真・商品画像 画像づくり 背景の色をクリックして透明に。写真は残したいものを囲むだけで切り抜けます。色の塗りつぶし・背景色をつけての保存（JPG も）にも対応。画像はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3" /><circle cx="6" cy="18" r="3" /><line x1="20" y1="4" x2="8.12" y2="15.88" /><line x1="14.47" y1="14.48" x2="20" y2="20" /><line x1="8.12" y1="8.12" x2="12" y2="12" /></svg>
+              <span><b>背景透過ツール</b><small>イラスト・写真・商品画像</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../qr/" data-q="QRコードメーカー URL・Wi-Fi・連絡先 画像づくり URL・Wi-Fi・連絡先・メールなどのQRコードを、期限なし・登録なしで作れます。ドットや角の形、色・グラデーション、まん中のロゴを変えて、PNG・SVG・JPG で保存。画像からの読み取りもできます。入れた内容はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" /></svg>
+              <span><b>QRコードメーカー</b><small>URL・Wi-Fi・連絡先</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../meishi/" data-q="名刺メーカー 名前・SNS・QRコード 画像づくり 名前・SNS・QRコードを入れるだけで名刺を作れます。配信者のイベントや交流会に。4つのレイアウト、色・フォント・写真を選んで、家で印刷できる A4・10面の PDF や、印刷所に出せる PDF・PNG で保存。画像はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" /><circle cx="8" cy="11" r="2" /><path d="M5 16c.6-1.4 1.7-2 3-2s2.4.6 3 2" /><path d="M14 10h5M14 13h4" /></svg>
+              <span><b>名刺メーカー</b><small>名前・SNS・QRコード</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../psd/" data-q="PSD レイヤー書き出し 立ち絵のパーツ分け・差分 画像づくり PSD をブラウザで開いて、レイヤーを選んで PNG で保存できます。表示を切り替えた見た目を1枚で、レイヤーやフォルダを1枚ずつ、全部まとめて ZIP でも。Photoshop がなくても使えて、ファイルはどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z" /><path d="M3 12l9 5 9-5" /><path d="M3 16l9 5 9-5" /></svg>
+              <span><b>PSD レイヤー書き出し</b><small>立ち絵のパーツ分け・差分</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../image-compress/" data-q="画像の圧縮・変換 JPEG・PNG・WebP 画像づくり 画像を軽くしたり、JPEG・PNG・WebP に変換したりできます。何枚でもまとめて変換、画質・大きさ・「○KB 以下」を選べて、変換前と見比べられます。撮影場所の情報も消えます。画像はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="M21 15l-5-5L5 21" /><path d="M15 3v4M15 7l-2-2M15 7l2-2" /></svg>
+              <span><b>画像の圧縮・変換</b><small>JPEG・PNG・WebP</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>便利ツール</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../../markdown/" data-q="マークダウンメーカー GitHub・ブログ・メモ 便利ツール Markdown を書きながら、すぐ見た目を確かめられます。ボタンで見出し・太字・リスト・表を入れられて、表は Excel から貼っても作れます。Web ページや Word の文章を貼ると Markdown に変換。.md・HTML で保存できます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M6 15V9l2.5 3L11 9v6" /><path d="M16 9v6M13.5 12.5L16 15l2.5-2.5" /></svg>
+              <span><b>マークダウンメーカー</b><small>GitHub・ブログ・メモ</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../diff/" data-q="テキスト比較（diff） 原稿・規約・設定ファイル 便利ツール 2つの文章を貼ると、違うところを色分けして見せます。変わった行の中では、どの文字が変わったかまで出します。空白・全角半角・大文字小文字の違いを無視したり、差分をコピーしたりもできます。文章はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="18" rx="1.5" /><rect x="14" y="3" width="7" height="18" rx="1.5" /><path d="M5.5 8h2M5.5 12h2M16.5 12h2M17.5 7v2M16.5 16h2" /></svg>
+              <span><b>テキスト比較（diff）</b><small>原稿・規約・設定ファイル</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../tree/" data-q="フォルダツリーメーカー README・ブログ・構成図 便利ツール 字下げで書いた一覧や、パソコンのフォルダから「├──」のフォルダツリーをテキストで作ります。線の形（全角・記号だけも）、並べ方、コメントの位置そろえ、.gitignore に従う読み込みつき。Markdown 用にコピー、画像（PNG）でも保存できます。ファイルはどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6a1 1 0 0 1 1-1h4l2 2h5a1 1 0 0 1 1 1v1" /><path d="M6 9v9h5M6 13h5" /><rect x="12" y="11" width="8" height="4" rx="1" /><rect x="12" y="16" width="8" height="4" rx="1" /></svg>
+              <span><b>フォルダツリーメーカー</b><small>README・ブログ・構成図</small></span>
+            </a>
+            <a class="toolmenu-item on" href="../../hum-midi/" data-q="鼻歌 MIDI 変換 β版・DAW・作曲・メロディの打ち込み 便利ツール マイクで歌った鼻歌や楽器の音から音の高さを読み取って、MIDI ファイル（.mid）にします。メトロノームに合わせて録音、ピアノロールで手直し、クオンタイズ・スケール補正つき。トラックを重ねて音色を選んだり、ドラムやコード伴奏・ハモリを作ったり、歌詞を付けて歌わせたり、楽譜にしたりもできます。Cakewalk などの DAW に読み込めます。音はどこにも送信しません。" aria-current="page">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="17" cy="16" r="3" /></svg>
+              <span><b>鼻歌 MIDI 変換</b><small>β版・DAW・作曲・メロディの打ち込み</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../rirekisho/" data-q="履歴書メーカー 履歴書・職務経歴書・スキルシート 便利ツール 入力するだけで履歴書・職務経歴書・エンジニアのスキルシートを作れます。履歴書は厚生労働省の様式・転職用・アルバイト用・学生用・JIS 風の5つから。スキルシートはイニシャル表示・案件ごとの技術と工程つきで、出す項目や名前も選べます。AI に頼むプロンプトを作れて、答えを貼るだけで反映。PDF・Excel で保存、スプレッドシートにも貼れます。入力した内容はどこにも送信しません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2" /><rect x="13" y="5" width="4" height="5" rx=".5" /><path d="M7 6h4M7 9h4M7 13h10M7 16h10M7 19h6" /></svg>
+              <span><b>履歴書メーカー</b><small>履歴書・職務経歴書・スキルシート</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>サイトづくり</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../../ogp-checker/" data-q="OGPチェッカー X・Discord・LINE・Facebook サイトづくり URL を入れるだけで、OGP の画像やページの情報を調べられます。X・LINE・Discord など、いろいろなサービスに貼ったときの見え方も確かめられて、問題があれば直し方も案内します。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2" /><path d="M3 13l4-4 4 4 3-3 4 4" /><circle cx="17" cy="17" r="3.2" fill="var(--surface, #2e1224)" /><line x1="19.3" y1="19.3" x2="22" y2="22" /></svg>
+              <span><b>OGPチェッカー</b><small>X・Discord・LINE・Facebook</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../robots-checker/" data-q="robots.txt チェッカー Google・AI・X・AdSense サイトづくり URL を入れるだけで、Google・AI（ChatGPT・Claude など）・X・AdSense などのクローラーがそのページを読めるかを調べます。どの行で止められているか、noindex やサイトマップも確かめられ、robots.txt を書き換えて公開前に試せます。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="2" /><path d="M12 3v4M9 12h.01M15 12h.01M9 16h6" /><path d="M2 12v3M22 12v3" /></svg>
+              <span><b>robots.txt チェッカー</b><small>Google・AI・X・AdSense</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>Chrome 拡張機能</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="../../benri-tools/" data-q="便利ツール拡張機能まとめ Chrome 拡張機能 Chrome拡張 広告ブロック・強制ダークモード・スクリーンショットなどを単体または統合版でまとめたChrome拡張機能リポジトリ。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4a2 2 0 1 1 4 0v2h4a1 1 0 0 1 1 1v4h-2a2 2 0 1 0 0 4h2v4a1 1 0 0 1-1 1h-4v-2a2 2 0 1 0-4 0v2H6a1 1 0 0 1-1-1v-4h2a2 2 0 1 0 0-4H5V7a1 1 0 0 1 1-1h4z" /></svg>
+              <span><b>便利ツール拡張機能まとめ</b><small>Chrome 拡張機能</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../authenticator-autofill/" data-q="Authenticator Autofill Chrome 拡張機能 Chrome拡張 2段階認証のコード・ログイン情報・住所などの個人情報・カード・メモを、端末内で暗号化して保存するChrome拡張機能。Google認証システムのQRや、Chrome・Bitwardenのパスワードを取り込めます。通信はしません。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /><path d="M12 15v2" /></svg>
+              <span><b>Authenticator Autofill</b><small>Chrome 拡張機能</small></span>
+            </a>
+          </div>
+        </section>
+        <section class="toolmenu-sec">
+          <h2>WordPress プラグイン</h2>
+          <div class="toolmenu-grid">
+            <a class="toolmenu-item" href="https://github.com/donnma777/smart-access-control/releases/latest" data-q="Smart Access Control WordPress プラグイン WordPress クローラー・User-Agent・IPアドレスを組み合わせてアクセスを精密に制御するWPプラグイン。AIクローラーやスクレイピングツールの許可/拒否、AIへの画像非表示やテキスト最適化表示に対応。" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z" /><path d="M8.5 12l2.5 2.5 4.5-5" /></svg>
+              <span><b>Smart Access Control ↗</b><small>WordPress プラグイン</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../wp-contact-inbox/" data-q="Contact Inbox WordPress プラグイン WordPress お問い合わせフォームを管理画面で作り、送られた内容を受信一覧で見て、そのまま返信できるWPプラグイン。ブロックで置けて、迷惑メール対策・CSV 書き出し・Discord 通知にも対応。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></svg>
+              <span><b>Contact Inbox</b><small>WordPress プラグイン</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../discord-post-notify/" data-q="Discord Post Notify WordPress プラグイン WordPress 新しい記事の公開・フォームの送信・コメントの投稿を、Discord に通知するWPプラグイン。用途ごとに送り先を分けたり、複数のチャンネルへ同時に送ったりできる。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+              <span><b>Discord Post Notify</b><small>WordPress プラグイン</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../wp-sns-post/" data-q="SNS Post WordPress プラグイン WordPress 記事を公開すると、Bluesky・Threads・X・Facebook ページ・Discord へ自動で投稿するWPプラグイン。送り先ごとのひな形・ハッシュタグ・プレビュー、フォームやコメントの Discord 通知にも対応。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13" /><path d="M22 2 15 22l-4-9-9-4 20-7z" /></svg>
+              <span><b>SNS Post</b><small>WordPress プラグイン</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../wp-folder-upload/" data-q="Folder Upload WordPress プラグイン WordPress uploads の中の好きなフォルダへ、ファイルやフォルダごとアップロードできるWPプラグイン。メディアライブラリへの登録や、記事の URL ごとまとめてのファイル名変更にも対応。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-8l-2-3H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1z" /><path d="M12 17v-6" /><path d="M9 13.5l3-3 3 3" /></svg>
+              <span><b>Folder Upload</b><small>WordPress プラグイン</small></span>
+            </a>
+            <a class="toolmenu-item" href="../../wp-webp-upload/" data-q="WebP Upload WordPress プラグイン WordPress アップロードした JPEG / PNG を自動で WebP に変換して軽くするWPプラグイン。元の画像を残しておけば、あとから JPEG / PNG に戻せる。">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="9" cy="9" r="2" /><path d="M21 15l-3.1-3.1a2 2 0 0 0-2.8 0L6 21" /></svg>
+              <span><b>WebP Upload</b><small>WordPress プラグイン</small></span>
+            </a>
+          </div>
+        </section>
+        <p class="toolmenu-none" hidden>見つかりませんでした</p>
+      </div>
+      <nav class="toolmenu-foot" aria-label="どんまうんど（donnma.com）">
+        <a class="toolmenu-foot-top" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"><span>TOP ↗</span></a>
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">ブログ ↗</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">プロフィール ↗</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">リンク ↗</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">お問い合わせ ↗</a>
+        <a href="https://donnma.booth.pm/item_lists/nevT9GeV" target="_blank" rel="noopener">BOOTH ↗</a>
+        <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">X（@donnma777） ↗</a>
+      </nav>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const m = document.getElementById('toolmenu');
+      const btns = () => document.querySelectorAll('.topnav-menu, [data-toolmenu]');
+      if (!m) return;
+      const q = m.querySelector('.toolmenu-q'), none = m.querySelector('.toolmenu-none');
+      const kana = t => t.toLowerCase().replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+      const filter = () => {
+        const w = kana(q.value.trim()).split(/\s+/).filter(Boolean);
+        let any = false;
+        for (const sec of m.querySelectorAll('.toolmenu-sec')) {
+          let n = 0;
+          for (const a of sec.querySelectorAll('.toolmenu-item')) { const hit = w.every(x => kana(a.dataset.q).includes(x)); a.hidden = !hit; if (hit) n++; }
+          sec.hidden = !n; any = any || n > 0;
+        }
+        none.hidden = any;
+      };
+      // 画面の上か下に広告（アンカー広告）が出ているときは、そのぶんメニューをずらす（広告はいちばん手前に出るので）
+      let adTimer = 0;
+      const fitAds = () => {
+        m.style.paddingTop = ''; m.style.paddingBottom = '';
+        const cs = getComputedStyle(m), pt = parseFloat(cs.paddingTop) || 0, pb = parseFloat(cs.paddingBottom) || 0;
+        let top = 0, bot = 0;
+        for (const a of document.querySelectorAll('ins.adsbygoogle')) {
+          const s = getComputedStyle(a);
+          if (s.position !== 'fixed' || s.display === 'none' || s.visibility === 'hidden') continue;
+          const r = a.getBoundingClientRect();
+          if (r.height < 20 || r.width < 100) continue;
+          if (r.top <= 8) top = Math.max(top, r.bottom); else if (r.bottom >= innerHeight - 8) bot = Math.max(bot, innerHeight - r.top);
+        }
+        if (top) m.style.paddingTop = Math.max(pt, top + 8) + 'px';
+        if (bot) m.style.paddingBottom = Math.max(pb, bot + 8) + 'px';
+      };
+      const open = () => { m.hidden = false; document.documentElement.classList.add('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'true')); q.value = ''; filter(); fitAds(); clearInterval(adTimer); adTimer = setInterval(fitAds, 600); q.focus(); };
+      const close = () => { m.hidden = true; clearInterval(adTimer); document.documentElement.classList.remove('toolmenu-open'); btns().forEach(b => b.setAttribute('aria-expanded', 'false')); };
+      // 「ツール一覧 ▾」と左上のロゴ（どんまうんど Tools）で開く。トップへは、メニューの「トップの一覧へ」から
+      document.addEventListener('click', e => { const b = e.target.closest('.topnav-menu, [data-toolmenu], a.topnav-brand'); if (!b) return; e.preventDefault(); (m.hidden ? open() : close()); });
+      m.addEventListener('click', e => { if (e.target === m || e.target.closest('.toolmenu-close')) close(); });
+      q.addEventListener('input', filter);
+      q.addEventListener('keydown', e => { if (e.key === 'Enter') { const a = m.querySelector('.toolmenu-item:not([hidden])'); if (a) a.click(); } });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && !m.hidden) { e.stopPropagation(); close(); } }, true);
+      // ロゴがメニューを開くボタンだと分かるように
+      document.querySelectorAll('a.topnav-brand').forEach(a => { a.setAttribute('aria-haspopup', 'dialog'); a.setAttribute('aria-controls', 'toolmenu'); a.title = 'ツールの一覧を開く'; });
+      window.openToolMenu = open;
+    })();
+  </script>
+  <!-- /shared:header -->
+
+  <main>
+    <article class="guide">
+      <nav class="g-crumbs" aria-label="パンくずリスト">
+        <a href="../../">Tools</a><span aria-hidden="true">›</span><a href="../">鼻歌 MIDI 変換</a><span aria-hidden="true">›</span><span>説明書</span>
+      </nav>
+
+      <header class="g-hero">
+        <span class="g-kind">説明書</span>
+        <h1>鼻歌 MIDI 変換の使い方</h1>
+        <p class="g-lead">マイクで歌った鼻歌や楽器の音を <strong>MIDI</strong> にするツールです。ピアノロールや楽譜で直して、<strong>伴奏・ドラム・歌声</strong>もつけて、Cakewalk などの DAW へ持っていけます。ブラウザだけで動き、音はどこにも送りません。</p>
+        <div class="g-actions">
+          <a class="g-btn g-btn-primary" href="../">ツールを開く</a>
+        </div>
+        <p class="g-meta">無料・登録なし・Chrome / Edge / Firefox / Safari</p>
+        <p class="g-note g-beta"><b>β版（試用中）</b>です。うまく動かないところや、こうなってほしいところがあれば、<a href="https://donnma.com/form/" target="_blank" rel="noopener">お問い合わせ</a>から教えてください。</p>
+      </header>
+
+      <nav class="g-toc" aria-label="このページの目次">
+        <p>目次</p>
+        <ol>
+          <li><a href="#start">まずは3ステップ</a></li>
+          <li><a href="#screen">画面の見かた</a></li>
+          <li><a href="#record">歌って MIDI にする</a></li>
+          <li><a href="#edit">直す・打ち込む</a></li>
+          <li><a href="#tracks">トラック・音色・ドラム</a></li>
+          <li><a href="#compose">伴奏・ハモリ・テンプレート</a></li>
+          <li><a href="#voice">歌詞と歌声（VOICEVOX）</a></li>
+          <li><a href="#export">DAW・歌声ソフトへ</a></li>
+          <li><a href="#ai">AI に頼む</a></li>
+          <li><a href="#keys">キーボードの操作一覧</a></li>
+          <li><a href="#faq">うまくいかないとき</a></li>
+          <li><a href="#env">動作環境・注意</a></li>
+        </ol>
+      </nav>
+
+      <section class="g-section" id="start">
+        <h2>まずは3ステップ</h2>
+        <ol class="g-steps">
+          <li>ピアノロールの見出しで<b>テンポ（♩=）と拍子</b>を決めて、<b>● 録音</b>を押します（はじめはマイクの許可を聞かれます）。カウントのあと、1小節目から歌います。</li>
+          <li>歌い終わったら <b>■ 止める</b>。ピアノロールに音が並びます。<b>▶ 再生</b>で、録音と MIDI を重ねて聞き比べられます。</li>
+          <li>まちがっている音を直して、<b>MIDI を保存（.mid）</b>。DAW に読み込みます。</li>
+        </ol>
+        <p class="g-note">クリック（メトロノーム）やほかのトラックを鳴らしながら録るときは、<b>ヘッドホン</b>を使ってください。スピーカーの音をマイクが拾うと、音として読み取ってしまいます。</p>
+      </section>
+
+      <section class="g-section" id="screen">
+        <h2>画面の見かた</h2>
+        <div class="g-table-wrap">
+          <table class="g-table">
+            <thead><tr><th>場所</th><th>あるもの</th></tr></thead>
+            <tbody>
+              <tr><td>ピアノロールの見出し</td><td>テンポ（♩=）・当てる・拍子／MIDI を開く・その他の保存 ▾・MIDI を保存</td></tr>
+              <tr><td>トラック</td><td>トラックの名前・音色・音量・M（ミュート）・S（ソロ）・和（和音）／＋ メロディのトラック・＋ ドラムのトラック</td></tr>
+              <tr><td>再生の帯</td><td>● 録音・⏮ 最初から・▶ 再生・🔁 リピート・鳴らすもの・クリック・⌨ キー入力・🎹 MIDI・🔍 横の幅</td></tr>
+              <tr><td>タブ</td><td>📦 テンプレート・✂ 編集・📝 文字で入力・🎤 歌詞・歌声・🎶 ハモリ・🎸 コード・🎼 楽譜・🤖 AI／↶ ↷ 🗑</td></tr>
+              <tr><td>右の欄</td><td>🎤 録る・読み込む（マイク・カウント・クリック）と、変換の設定</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>右の欄は、上の<b>「設定をしまう ›」</b>でしまうと、ピアノロールが広くなります。右端の<b>「‹ 録音・設定」</b>で戻せます（スマホなど幅のせまい画面では、下に並びます）。</p>
+      </section>
+
+      <section class="g-section" id="record">
+        <h2>歌って MIDI にする</h2>
+        <h3>録る</h3>
+        <ul>
+          <li>右の欄の<b>「録る・読み込む」</b>でマイク・カウント（なし／1小節／2小節）・クリックの大きさを決めます。録音中は、今の音の名前と音程のずれ（真ん中がぴったり）が出ます。</li>
+          <li>録音は、選んでいるトラック（ピンクの枠）に入ります。<kbd>R</kbd> で録音・停止。1回10分まで。</li>
+          <li>「録音中にほかのトラックを鳴らす」をオンにすると、作った伴奏やドラムを聞きながら次のパートを録れます。</li>
+          <li>録音しなくても、<b>音声ファイルを開く</b>（wav・mp3・m4a・動画など）か、枠に落とせば読み取れます。</li>
+        </ul>
+        <h3>うまく取るコツ</h3>
+        <ul>
+          <li><b>1つずつの音（単音）</b>を読み取ります。和音・伴奏つきの曲・何人かの声は苦手です。</li>
+          <li>「ラ」「ル」「トゥ」のように<b>音をはっきり区切って</b>歌うと、同じ高さが続くところも分けやすくなります。息の多い声やささやき声は苦手です。</li>
+        </ul>
+        <h3>変換の設定</h3>
+        <p>右の欄の「変換の設定」を変えると、録り直さなくてもすぐ音を作り直します（手で直したぶんも <kbd>Ctrl</kbd>+<kbd>Z</kbd> で戻せます）。</p>
+        <div class="g-table-wrap">
+          <table class="g-table">
+            <thead><tr><th>設定</th><th>使いどころ</th></tr></thead>
+            <tbody>
+              <tr><td>音の高さの範囲</td><td>声・低い声・高い声・広く。1オクターブずれるときはまずここ</td></tr>
+              <tr><td>音として拾う基準・小さい音を無視</td><td>ノイズや息を拾うときは厳しく、音が抜けるときはゆるく</td></tr>
+              <tr><td>いちばん短い音</td><td>細かい音がたくさん出るときは長く</td></tr>
+              <tr><td>同じ高さでも、音の出だしで区切る</td><td>同じ高さの連打がつながるときにオン</td></tr>
+              <tr><td>音程のずれを自動で合わせる</td><td>全体が少し高め・低めに歌ったときに半音へ寄せる</td></tr>
+              <tr><td>スケール（調）に寄せる</td><td>メジャー・マイナー・ペンタに寄せる。調は推測もできます</td></tr>
+              <tr><td>オクターブ</td><td>トラックごとに上下</td></tr>
+              <tr><td>クオンタイズ（タイミング）</td><td>4〜32分・3連にそろえる。「長さもそろえる」で長さも</td></tr>
+              <tr><td>強さ（ベロシティ）</td><td>声の大きさのままか、一定か</td></tr>
+              <tr><td>1小節目の頭・ずれ補正</td><td>グリッドより遅れて見えるときは、ずれ補正をプラスに</td></tr>
+              <tr><td>音の名前</td><td>真ん中のドの呼び方を DAW に合わせる（Cakewalk は初期設定で C5）</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><b>テンポを当てる</b>：クリックなしで録ったときは、テンポの横の「当てる」で BPM と1小節目の頭を合わせます。</p>
+      </section>
+
+      <section class="g-section" id="edit">
+        <h2>直す・打ち込む</h2>
+        <h3>ピアノロール</h3>
+        <ul>
+          <li>薄い点は読み取った音の高さそのもの、四角が MIDI の音です。</li>
+          <li><b>音をドラッグ</b>：上下で高さ、左右で位置。右のはしをドラッグで長さ。</li>
+          <li><b>何もないところをダブルクリック</b>：音を足す。<b>右クリック</b>：消す（右ボタンのままなぞると続けて消せる）。</li>
+          <li><b>何もないところをドラッグ</b>：囲んでまとめて選ぶ。<kbd>Ctrl</kbd>+クリックで1つずつ足す・外す。</li>
+          <li><b>上の目盛りをクリック</b>：そこから再生。<b>目盛りをドラッグ</b>：くり返す範囲（右クリックかダブルクリックで解除）。</li>
+          <li><b>左の鍵盤</b>をクリックすると、その音が鳴ります。</li>
+          <li>下の<b>強さの欄</b>の棒をなぞると強さ（ベロシティ）が変わります。<kbd>Shift</kbd> を押しながらだと選んだ音を全部。</li>
+        </ul>
+        <h3>✂ 編集のタブ</h3>
+        <p>つなげる・短く切る・長さ ½・×2・強さ ± で、選んだ音（選んでいなければ全部）をまとめて整えます。</p>
+        <h3>キーボードで打ち込む</h3>
+        <ul>
+          <li><b>⌨ キー入力</b>（<kbd>K</kbd>）：パソコンのキーがピアノになります。<kbd>Z</kbd>〜<kbd>/</kbd> が下の段、<kbd>Q</kbd>〜<kbd>P</kbd> が上の段（そのすぐ上の段が黒鍵）。<kbd>-</kbd> <kbd>^</kbd> でオクターブ。</li>
+          <li>止まっているときは、押すたびに再生位置に置いて「長さ」だけ進みます（同時押しで和音、<kbd>Tab</kbd> で休み、<kbd>Backspace</kbd> で1つ戻して消す）。再生中は、押していた長さで入ります。</li>
+          <li>ドラムのトラックでは <kbd>Z</kbd> キック・<kbd>X</kbd> スネア・<kbd>A</kbd> ハイハットなど。</li>
+          <li><b>🎹 MIDI</b>：USB の MIDI キーボードで弾いて入れられます（Chrome・Edge）。入れ方はキー入力と同じです。</li>
+        </ul>
+        <h3>📝 文字で入力</h3>
+        <p>「ドレミー ソ」のように書いて入れます。<code>do re mi</code>・<code>CDEFGAB</code>、<code>#</code> <code>b</code>（半音）、<code>ー</code>（のばす）、<code>・</code> か <code>r</code>（休み）、<code>^</code> <code>_</code>（オクターブ）、<code>C5</code> のような書き方も使えます。</p>
+        <h3>🎼 楽譜</h3>
+        <ul>
+          <li>五線譜で見られます（調号・臨時記号・タイ・歌詞・コード名つき）。</li>
+          <li>長さ（全〜16分・付点）・休符・臨時記号を選んで<b>五線をクリック</b>すると、音符が入ります。音符をクリックで選んで <kbd>Delete</kbd> か右クリックで消す、<kbd>↑</kbd> <kbd>↓</kbd> で半音ずつ。</li>
+          <li>印刷と、MusicXML（MuseScore・Finale・Sibelius・Dorico など）で保存できます。</li>
+        </ul>
+      </section>
+
+      <section class="g-section" id="tracks">
+        <h2>トラック・音色・ドラム</h2>
+        <ul>
+          <li><b>＋ メロディのトラック</b>・<b>＋ ドラムのトラック</b>で 16 まで増やせます。録音や編集は、選んでいるトラックにします。</li>
+          <li>再生すると全部のトラックがいっしょに鳴ります。<b>M</b> はミュート、<b>S</b> はソロ。ほかのメロディは、ピアノロールにうすく出ます。</li>
+          <li><b>音色</b>：ピアノ・エレピ・オルガン・ストリングス・ギター・ベース・シンセリード・8bit・フルート・ベル・歌など。保存した .mid にも楽器の番号（GM）が入るので、DAW の GM 音源でも近い楽器で鳴ります。</li>
+          <li><b>和</b>：オンにすると和音を使えます。オフだと、重なった音は前の音を短くして1音ずつにします。</li>
+          <li><b>ドラム</b>：クリックで置く、ダブルクリックで消す、ドラッグで位置と種類を変えます。録音すると<b>口ドラム</b>（ボイスパーカッション）を読み取り、低い「ドッ」はキック、「パッ」「カッ」はスネア、「ツッ」「チッ」はハイハットにします。</li>
+          <li><b>MIDI を開く</b>：.mid を読み込んで続きを作れます（落としても開けます）。</li>
+        </ul>
+      </section>
+
+      <section class="g-section" id="compose">
+        <h2>伴奏・ハモリ・テンプレート</h2>
+        <h3>📦 テンプレート</h3>
+        <ul>
+          <li><b>伴奏</b>：コード進行・調・ドラム・伴奏の形・小節の数を選ぶと、伴奏・ベース・ドラムと空のメロディのトラックを作ります。聞きながらメロディを録れます。</li>
+          <li><b>ドラム1小節</b>：再生位置の小節にドラムのパターンを入れて、次の小節へ進みます。</li>
+          <li><b>見本の曲</b>：このツールのために作ったオリジナルの曲です（自由に使って大丈夫です）。VOICEVOX につながっていれば、ずんだもんたちが歌います。</li>
+        </ul>
+        <h3>🎸 コード</h3>
+        <p>メロディに合うコードを付けて、伴奏（白玉・4分・アルペジオ）とベースのトラックを作ります。コード名をクリックすると、ほかの候補に替えられます。</p>
+        <h3>🎶 ハモリ</h3>
+        <p>3度上・3度下・6度下・5度上・オクターブのハモリを、調に合わせて別のトラックに作ります。歌詞も写します。</p>
+      </section>
+
+      <section class="g-section" id="voice">
+        <h2>歌詞と歌声（VOICEVOX）</h2>
+        <h3>歌詞を入れる</h3>
+        <ul>
+          <li><b>音符をダブルクリック</b>（か、選んで <kbd>Enter</kbd>）で歌詞を打てます。<kbd>Enter</kbd> で決める、<kbd>Tab</kbd> で次の音符へ（<kbd>Shift</kbd>+<kbd>Tab</kbd> で前へ）。</li>
+          <li>「きらきらひかる」のようにまとめて打つと、後ろの音符へ1文字ずつ入ります（小さい「ゃ」などはまとめて1つ）。🎤 歌詞・歌声のタブでも、まとめて入れられます。</li>
+          <li>音色を<b>「歌（合成の声）」</b>にすると、ブラウザだけで歌詞を歌います（ロボットっぽい声です）。</li>
+        </ul>
+        <h3>VOICEVOX でずんだもんたちに歌わせる</h3>
+        <p>パソコンに <a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener">VOICEVOX</a>（0.16 より新しいもの）が入っていれば、その歌声で歌わせられます。はじめに一度だけ、次の設定をします。</p>
+        <ol class="g-steps">
+          <li>VOICEVOX を起動します。</li>
+          <li>ブラウザで <a href="http://127.0.0.1:50021/setting" target="_blank" rel="noopener">http://127.0.0.1:50021/setting</a>（エンジンの設定）を開きます。</li>
+          <li>「Allow Origin」に <code>https://donnma.com</code> と書いて保存します。</li>
+          <li>VOICEVOX を終了して、起動し直します。</li>
+          <li>ツールでトラックの音色を<b>「VOICEVOX の歌声」</b>にして、となりでキャラを選びます。ブラウザに「ローカル ネットワーク上の機器へのアクセス」を聞かれたら許可します。</li>
+        </ol>
+        <ul>
+          <li>歌声は、再生や書き出しの前に自動で作ります（音や歌詞を変えたら作り直します）。</li>
+          <li>歌詞の「ー」は前の母音で、かな以外（漢字・英字）は「ら」で歌います。歌詞はひらがな・カタカナで入れてください。</li>
+          <li>VOICEVOX につながらないときは、合成の声で鳴らします。</li>
+        </ul>
+        <p class="g-note">VOICEVOX の声で作った曲を公開するときは、「VOICEVOX:ずんだもん」のようなクレジットなど、各キャラの利用規約に従ってください。</p>
+      </section>
+
+      <section class="g-section" id="export">
+        <h2>DAW・歌声ソフトへ</h2>
+        <div class="g-table-wrap">
+          <table class="g-table">
+            <thead><tr><th>保存</th><th>中身</th><th>使いみち</th></tr></thead>
+            <tbody>
+              <tr><td>MIDI を保存（.mid）</td><td>全部のトラック・テンポ・拍子・音色・歌詞</td><td>DAW（Cakewalk・Cubase・Studio One・FL Studio など）、Synthesizer V</td></tr>
+              <tr><td>🔊 音で書き出す（.wav）</td><td>全部のトラックを再生と同じ音で1つに（声を混ぜるかは選べる）</td><td>そのまま聞く・SNS に上げる</td></tr>
+              <tr><td>🎤 声の録音を保存（.wav）</td><td>選んでいるトラックの、録った声そのまま</td><td>DAW に歌として貼る・録音を取っておく</td></tr>
+              <tr><td>🎙 .ust</td><td>選んでいるトラックの音と歌詞</td><td>UTAU・OpenUtau（重音テトなど）</td></tr>
+              <tr><td>🎼 MusicXML</td><td>選んでいるトラックの楽譜と歌詞</td><td>楽譜ソフト、NEUTRINO</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>MIDI 以外は「その他の保存 ▾」にあります。VOCALOID（.vpr・.vsqx）へは、.ust か .mid を <a href="https://sdercolin.github.io/utaformatix3/" target="_blank" rel="noopener">UtaFormatix</a> で変換してください。</p>
+        <h3>Cakewalk に読み込む</h3>
+        <ol class="g-steps">
+          <li>保存した .mid を、トラックビューの空いているところに<b>ドラッグ＆ドロップ</b>します（メニューの<b>ファイル → インポート → MIDI</b> でも）。</li>
+          <li>トラックが分かれた形で入ります（ドラムは 10ch）。入れたい小節の頭に落とすと、そこから並びます。</li>
+        </ol>
+        <p>ファイルにはテンポと拍子も入っています。プロジェクトのテンポが変わってしまうときは、読み込むときにテンポを入れない設定にするか、ツールのテンポを曲に合わせてから保存してください。ほかの DAW でも同じように読み込めます。</p>
+      </section>
+
+      <section class="g-section" id="ai">
+        <h2>AI に頼む</h2>
+        <ol class="g-steps">
+          <li><b>🤖 AI</b> のタブで送る範囲（全トラック／選んでいるトラックだけ）を選び、お願い（「サビを8小節足して」「ジャズっぽい伴奏にして」など）を書いて<b>プロンプトをコピー</b>します。</li>
+          <li>ChatGPT・Gemini・Claude などに貼って送ります。曲は JSON（音の名前・拍・歌詞・コード）の形で入っています。</li>
+          <li>返ってきた答えをまるごと下の欄に貼って、<b>答えを反映する</b>を押します。送ったトラックと入れ替えるか、後ろに足すかを選べます。</li>
+        </ol>
+        <p>答えの中の JSON だけを読み取るので、説明の文がついていても大丈夫です。読めない音は飛ばして、いくつ入ったかを出します。</p>
+      </section>
+
+      <section class="g-section" id="keys">
+        <h2>キーボードの操作一覧</h2>
+        <div class="g-keys">
+          <div class="g-table-wrap">
+            <table class="g-table">
+              <thead><tr><th>キー</th><th>再生・録音</th></tr></thead>
+              <tbody>
+                <tr><td><kbd>Space</kbd></td><td>再生・停止</td></tr>
+                <tr><td><kbd>Home</kbd></td><td>最初から再生</td></tr>
+                <tr><td><kbd>L</kbd></td><td>リピート</td></tr>
+                <tr><td><kbd>R</kbd></td><td>録音・停止</td></tr>
+                <tr><td><kbd>K</kbd></td><td>キー入力のオン・オフ</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+ホイール</td><td>横の幅</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="g-table-wrap">
+            <table class="g-table">
+              <thead><tr><th>キー</th><th>編集</th></tr></thead>
+              <tbody>
+                <tr><td><kbd>Delete</kbd></td><td>選んだ音を消す</td></tr>
+                <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>半音ずつ（<kbd>Shift</kbd> でオクターブ）</td></tr>
+                <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>グリッド1つ分ずらす</td></tr>
+                <tr><td><kbd>Enter</kbd></td><td>歌詞を打つ</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>A</kbd></td><td>全部選ぶ</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>X</kbd> / <kbd>V</kbd></td><td>コピー・切り取り・貼り付け（再生位置に）</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>すぐ後ろに複製</td></tr>
+                <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Y</kbd></td><td>戻す・やり直す</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="g-section" id="faq">
+        <h2>うまくいかないとき</h2>
+        <details class="g-faq">
+          <summary>「このブラウザでは録音できません」と出ます</summary>
+          <p>ファイルを直接開いた（file://）ときや、OBS のドックなどマイクを使えない画面で出ます。Chrome・Edge・Firefox・Safari で https://donnma.com/tool/hum-midi/ を開いてください。マイクの許可を「ブロック」にしたときは、アドレスバーの左の鍵のマークから許可に戻します。</p>
+        </details>
+        <details class="g-faq">
+          <summary>音の高さがずれる・1オクターブ違って出ます</summary>
+          <p>「変換の設定」の「音の高さの範囲」を声に合わせて（低い声・高い声）、「音程のずれを自動で合わせる」をオンにします。オクターブだけ違うときは「オクターブ」で上下させます。</p>
+        </details>
+        <details class="g-faq">
+          <summary>同じ高さの音が1つにつながってしまいます</summary>
+          <p>「ラ」「ル」「トゥ」のように音をはっきり区切って歌い、「同じ高さでも、音の出だしで区切る」をオンにします。つながったところは、ピアノロールで ✂ 編集の「短く切る」を使うか、手で分けます。</p>
+        </details>
+        <details class="g-faq">
+          <summary>細かい音やノイズまで拾ってしまいます</summary>
+          <p>「いちばん短い音」を長くし、「音として拾う基準」を厳しくします。クリックの音を拾っているときは、ヘッドホンを使ってください。</p>
+        </details>
+        <details class="g-faq">
+          <summary>音がグリッドから少しずつ遅れます</summary>
+          <p>パソコンやマイクによって数十ミリ秒の遅れがあります。「ずれ補正（ミリ秒）」をプラスにすると前へ寄ります。クリックなしで録ったときは、テンポの「当てる」でテンポと1小節目の頭を合わせます。</p>
+        </details>
+        <details class="g-faq">
+          <summary>VOICEVOX につながりません</summary>
+          <p>VOICEVOX を起動したまま、エンジンの設定（http://127.0.0.1:50021/setting）の Allow Origin に https://donnma.com を書いて保存し、VOICEVOX を起動し直してください。ブラウザに「ローカル ネットワーク上の機器へのアクセス」を聞かれたら許可します。VOICEVOX は 0.16 より新しいものが必要です。</p>
+        </details>
+        <details class="g-faq">
+          <summary>作ったものは保存されますか？</summary>
+          <p>トラックと音、録音はこのブラウザの中に残るので、ページを開き直しても続きから作れます。ブラウザのデータを消すと消えるので、大事なものは MIDI（.mid）や声の録音（.wav）で保存してください。</p>
+        </details>
+        <details class="g-faq">
+          <summary>声はどこかに送られますか？</summary>
+          <p>送りません。読み取りも書き出しも、すべてブラウザの中でします。VOICEVOX の歌声は、あなたのパソコンで動いている VOICEVOX にだけ送ります。</p>
+        </details>
+      </section>
+
+      <section class="g-section" id="env">
+        <h2>動作環境・注意</h2>
+        <ul>
+          <li>パソコンの Chrome・Edge・Firefox・Safari の新しいもの。MIDI キーボードは Chrome・Edge だけです。スマホでも動きますが、パソコン向けに作っています。</li>
+          <li>OBS のドックなどでは、マイクの許可が出ないことがあります。</li>
+          <li>トラック・音・録音は、このブラウザの中だけに残します。「ぜんぶ消す」やブラウザのデータを消すと消えます。</li>
+          <li>録音は1回10分までです。</li>
+          <li>個人で作ったものです。サポートや不具合の対応はお約束できません。</li>
+        </ul>
+      </section>
+
+      <section class="g-section g-related">
+        <h2>ほかのツール</h2>
+        <ul>
+          <li><a href="../../chapter/">YouTube チャプターメーカー</a><span>動画のチャプターを、見ながら区切って作る</span></li>
+          <li><a href="../../thumbnail/">サムネイルメーカー</a><span>YouTube・配信のサムネイルをブラウザで作る</span></li>
+          <li><a href="../../">どんまうんど-Tools のツール一覧</a><span>配信オーバーレイ・画像づくり・サイトづくりなど、ブラウザで使える無料ツール</span></li>
+        </ul>
+      </section>
+
+      <p class="g-date">2026年11月20日 公開</p>
+    </article>
+  </main>
+
+  <!-- shared:footer root="../../" -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="footer-logo" href="https://donnma.com/" target="_blank" rel="noopener"><img src="../../image/logo.webp?v=20260929" alt="どんまうんど" width="720" height="182"></a>
+        <div class="footer-copy">
+          <span>© 2020-2026 <a href="https://donnma.com/" target="_blank" rel="noopener">donnma.com</a></span>
+          <span>どんま / <a href="https://twitter.com/donnma777" target="_blank" rel="noopener">@donnma777</a></span>
+          <span><a href="../../terms/">利用規約</a></span>
+        </div>
+      </div>
+      <nav class="footer-menu" aria-label="donnma.com のメニュー">
+        <a href="https://donnma.com/blog/" target="_blank" rel="noopener">BLOG</a>
+        <a href="https://donnma.com/profile/" target="_blank" rel="noopener">PROFILE</a>
+        <a href="https://donnma.com/link/" target="_blank" rel="noopener">LINK</a>
+        <a href="https://donnma.com/form/" target="_blank" rel="noopener">FORM</a>
+        <a href="https://donnma.com/policy/" target="_blank" rel="noopener">POLICY</a>
+      </nav>
+    </div>
+  </footer>
+  <!-- /shared:footer -->
+
+</body>
+
+</html>
