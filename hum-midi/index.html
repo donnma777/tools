@@ -3344,6 +3344,12 @@
           if (lo === Infinity) { lo = 58; hi = 76; }
           lo -= 3; hi += 3;
           if (hi - lo < 23) { const c = Math.round((hi + lo) / 2); lo = c - 12; hi = c + 11; }
+          // 欄が高くて行が太くなりすぎるときは、上下の音域を広げて欄の高さいっぱいに使う（1行 16px くらい）
+          const want = Math.floor(fitH() / 16);
+          while (hi - lo + 1 < want && (lo > 0 || hi < 127)) {
+            if (hi < 127) hi++;
+            if (hi - lo + 1 < want && lo > 0) lo--;
+          }
           L.lo = clamp(lo, 0, 127); L.hi = clamp(hi, 0, 127);
           L.rows = [];
           for (let p = L.hi; p >= L.lo; p--) L.rows.push(p);
@@ -3357,6 +3363,9 @@
         const b1 = Math.max(songEnd(), bar * 4);
         L.b0 = Math.floor(b0 / bar) * bar;
         L.b1 = Math.max(L.b0 + bar * 4, Math.ceil(b1 / bar) * bar + bar);
+        // 広い画面では、欄の幅いっぱいまで小節を出す（右に空白を残さない）
+        const fillBeats = ((wrap.clientWidth || 0) - L.keyw) / S.zoom;
+        if (fillBeats > 0) L.b1 = Math.max(L.b1, L.b0 + Math.ceil(fillBeats / bar) * bar);
         RULER = chords.length ? 40 : 22;
         L.laneTop = RULER + L.rows.length * L.rowH;
         L.h = L.laneTop + (S.velLane ? VEL_H : 0);
