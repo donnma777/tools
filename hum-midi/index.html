@@ -2789,6 +2789,7 @@
           <span class="grp">
             <button class="btn btn-sm btn-toggle" type="button" id="kb" title="パソコンのキーボードで打ち込む（K）">⌨ キー入力</button>
             <button class="btn btn-sm btn-toggle" type="button" id="midi-in" title="USB などの MIDI キーボードで打ち込む（Chrome・Edge）">🎹 MIDI</button>
+            <button class="btn btn-sm btn-toggle" type="button" id="vox" title="マイクに歌った音を、1音ずつ再生位置に打ち込む">🎤 声で入力</button>
           </span>
           <span class="zoom" title="横の幅（Ctrl+ホイールでも変えられます）">🔍 <input type="range" id="zoom" min="16" max="240" step="2" aria-label="横の幅"></span>
         </div>
@@ -2955,6 +2956,7 @@
             <button class="btn btn-sm" type="button" id="kb-close">終わる（Esc）</button>
           </div>
           <div class="kb-map" id="kb-map"></div>
+          <p class="hint" id="vox-hint" hidden>🎤 <b>声で入力</b>：「ラ」「ル」のように1音ずつ歌うと、音の高さが決まったところで再生位置に置き、声を切ると「長さ」だけ進みます。音と音の間は少し切って歌ってください（つなげて歌っても、高さが変わったところで次の音になります）。声が低すぎ・高すぎるときは「オクターブ」で上げ下げ。打ち込んだ音は鳴らしません。消すときは <kbd>Ctrl+Z</kbd>。再生中に歌うと、歌った長さで入ります。</p>
           <p class="hint">止まっているとき：押すと再生位置（黄色い線）に置いて、離すと「長さ」だけ進みます。同時に押すと同じ位置（ドラムで重ねるとき）。<kbd>Tab</kbd> で休み、<kbd>Backspace</kbd> で1つ戻して消す。再生中：押していた長さで入ります（リピートと合わせると重ねていけます）。<kbd>−</kbd>／<kbd>＾</kbd> でオクターブ。</p>
         </div>
         <div id="roll-wrap">
@@ -4869,6 +4871,7 @@ registerProcessor('hum-rec',R);`;
           if (!ok) return;
         }
         const c = audio();
+        if (VOX.on) setVox(false);
         if (MON.on) monStop(true);
         try {
           rec.stream = await navigator.mediaDevices.getUserMedia({
@@ -5127,6 +5130,7 @@ registerProcessor('hum-rec',R);`;
         MON.timer = setInterval(monTick, 50);
       }
       function monStop(keep) {
+        if (VOX.on) { voxRelease(); VOX.on = false; $('vox').classList.remove('on'); syncKbPanel(); }
         if (MON.on) {
           clearInterval(MON.timer);
           try { MON.src.disconnect(); MON.gain.disconnect(); } catch (e) { }
@@ -5179,7 +5183,43 @@ registerProcessor('hum-rec',R);`;
           $('live-note').textContent = '－'; $('live-sub').textContent = db > S.gate ? '音の高さが取れません' : 'マイクを聞いています'; dot.style.opacity = 0;
         }
         if (prev !== p) draw();
+        voxTick(p, db);
       }
+      // ── 声で入力：同じ高さが 0.15 秒続いたら置き、声が切れたら離す（キーボード入力と同じ入れ方） ──
+      const VOX = { on: false, held: false, heldP: null, cand: null, candN: 0, gap: 0, startedMon: false };
+      function voxRelease() { if (VOX.held) { VOX.held = false; VOX.heldP = null; kbUp('mic'); } }
+      async function setVox(on) {
+        if (on === VOX.on) return;
+        if (on) {
+          if (G.recording || G.busy) return;
+          if (st.kind !== 'melody') { toast('声で入力はメロディのトラックで使えます'); return; }
+          if (KB.on) setKb(false);
+          VOX.startedMon = !MON.on;
+          if (!MON.on) await monStart();
+          if (!MON.on) return;
+          VOX.on = true; VOX.cand = null; VOX.candN = 0;
+          toast('1音ずつ歌うと、再生位置に入ります（ヘッドホンがおすすめ）');
+        } else {
+          voxRelease();
+          VOX.on = false;
+          if (VOX.startedMon && !S.monitor && MON.on) monStop(true);
+        }
+        $('vox').classList.toggle('on', VOX.on);
+        syncKbPanel();
+      }
+      function voxTick(p, db) {
+        if (!VOX.on || st.kind !== 'melody' || G.recording || G.busy) return;
+        const pr = p == null ? null : clamp(Math.round(p) + 12 * (Number(S.kbOct) - 4), 0, 127);
+        if (pr == null) { VOX.cand = null; VOX.candN = 0; if (VOX.held && ++VOX.gap >= 2) voxRelease(); return; }
+        VOX.gap = 0;
+        if (VOX.cand === pr) VOX.candN++; else { VOX.cand = pr; VOX.candN = 1; }
+        if (VOX.candN < 3 || (VOX.held && VOX.heldP === pr)) return;
+        if (VOX.held) voxRelease();          // つなげて歌って、高さが変わった
+        noteDown('mic', pr, clamp(Math.round(50 + (db + 50) * 1.6), 30, 120));
+        VOX.held = true; VOX.heldP = pr;
+      }
+      $('vox').addEventListener('click', () => setVox(!VOX.on));
+      document.addEventListener('keydown', e => { if (VOX.on && e.key === 'Escape' && !document.querySelector('.dn-ask:not([hidden])') && !document.querySelector('dialog[open]')) setVox(false); });
       // ピアノロールの鍵盤：今の音（黄色）と、これまでの音域（左の緑の帯）
       function drawMonitor(Y, KW, W) {
         if (L.drum) return;
@@ -7473,6 +7513,7 @@ ${songJson(list)}
         kbReleaseAll();
         st = t;
         if (KB.on && st.kind === 'audio') setKb(false);
+        if (VOX.on && st.kind !== 'melody') setVox(false);
         else if (KB.on) { KB.hist = []; renderKbMap(); }
         setUI();
         renderTracks();
@@ -7485,6 +7526,7 @@ ${songJson(list)}
         tracks.push(t);
         kbReleaseAll();
         st = t;
+        if (VOX.on && kind !== 'melody') setVox(false);
         if (KB.on) { KB.hist = []; renderKbMap(); }
         setUI(); renderTracks(); resetLive(); refresh();
         toast(kind === 'drum' ? 'ドラムのトラックを足しました。クリックで音を置くか、録音してください' : kind === 'audio' ? '音声のトラックを足しました。録音するか、音声ファイルを開いてください（MIDI には変換しません）' : 'メロディのトラックを足しました');
@@ -7588,6 +7630,7 @@ ${songJson(list)}
         $('play').disabled = lock || !has;
         $('play-start').disabled = lock || !has;
         $('midi-in').classList.toggle('on', MIDI.on);
+        $('vox').disabled = lock && !VOX.on;
         $('bpm-guess').disabled = lock || !st.rawLen || st.notes.length < 6;
         $('open-mid').disabled = lock;
         $('repeat').classList.toggle('on', !!S.repeat);
@@ -8415,7 +8458,8 @@ ${songJson(list)}
       function noteDown(code, p, vel) {
         if (KB.held.has(code) || G.recording || G.busy) return;
         const c = audio();
-        const snd = st.kind === 'drum' ? drumHit(p, c.currentTime + 0.005, vel) : voice(st.inst, p, c.currentTime + 0.005, 30, vel);
+        // 声で入れるときは鳴らさない（スピーカーの音をマイクが拾ってしまうので）
+        const snd = code === 'mic' ? null : st.kind === 'drum' ? drumHit(p, c.currentTime + 0.005, vel) : voice(st.inst, p, c.currentTime + 0.005, 30, vel);
         let b;
         if (G.playing) b = playBeat();
         else {
@@ -8469,11 +8513,12 @@ ${songJson(list)}
       document.addEventListener('keyup', e => { if (KB.held.has(e.code)) kbUp(e.code); });
       window.addEventListener('blur', kbReleaseAll);
       $('kb').addEventListener('click', () => setKb(!KB.on));
-      $('kb-close').addEventListener('click', () => { setKb(false); if (MIDI.on) toggleMidi(); });
+      $('kb-close').addEventListener('click', () => { setKb(false); if (MIDI.on) toggleMidi(); setVox(false); });
       function syncKbPanel() {
-        $('kb-panel').hidden = !(KB.on || MIDI.on);
+        $('kb-panel').hidden = !(KB.on || MIDI.on || VOX.on);
         $('kb-map').hidden = !KB.on;
-        $('kb-title').textContent = KB.on && MIDI.on ? '⌨🎹 キーボード・MIDI 入力中' : KB.on ? '⌨ キーボード入力中' : '🎹 MIDI 入力中';
+        $('kb-title').textContent = [KB.on && '⌨ キーボード', MIDI.on && '🎹 MIDI', VOX.on && '🎤 声'].filter(Boolean).join('・') + ' で入力中';
+        $('vox-hint').hidden = !VOX.on;
       }
 
       // ══════════════════════════════════════
@@ -8579,6 +8624,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        VOX, setVox,
         MON, monStart, monStop, yinPitch,
         normalizeRec,
         ZIP, importZip,
