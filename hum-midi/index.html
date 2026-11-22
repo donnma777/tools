@@ -1939,6 +1939,286 @@
       display: none !important;
     }
 
+    /* ── 曲（タイトル・保存・呼び出し） ── */
+    .song-btn {
+      font: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      max-width: 260px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .song-btn:hover {
+      border-color: var(--accent);
+      background: var(--surface-2);
+    }
+
+    .song-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .song-name.untitled {
+      color: var(--muted);
+    }
+
+    .song-dirty {
+      color: var(--accent);
+      font-size: 10px;
+    }
+
+    .song-caret {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .song-dlg {
+      margin: auto;
+      width: min(760px, calc(100vw - 24px));
+      max-width: calc(100vw - 24px);
+      max-height: calc(100vh - 32px);
+      padding: 0;
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .song-dlg::backdrop {
+      background: rgba(10, 2, 8, 0.6);
+    }
+
+    .sd-head {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sd-head h2 {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--accent);
+    }
+
+    .sd-x {
+      font: inherit;
+      font-size: 20px;
+      line-height: 1;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .sd-body {
+      padding: 16px 18px 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .sd-meta {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .sd-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .sd-f {
+      display: grid;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--label);
+    }
+
+    .sd-f input,
+    .sd-f textarea,
+    #lib-q {
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-deep, #1a0a14);
+      color: var(--text);
+    }
+
+    .sd-title input {
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .sd-f textarea {
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .sd-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 10px;
+    }
+
+    .sd-actions .check {
+      font-size: 13px;
+    }
+
+    .sd-list-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .sd-count {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    #lib-q {
+      width: 180px;
+      padding: 5px 10px;
+      font-size: 13px;
+    }
+
+    .sd-items {
+      list-style: none;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .sd-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px 8px 14px;
+      border-radius: 10px;
+      background: var(--surface-2);
+      border: 1px solid transparent;
+    }
+
+    .sd-item.cur {
+      border-color: var(--accent);
+    }
+
+    .sd-item-main {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .sd-item-t {
+      font-weight: 900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sd-item-s {
+      font-size: 12px;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sd-empty {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 14px;
+      text-align: center;
+      border: 1px dashed var(--border-strong);
+      border-radius: 10px;
+    }
+
+    .sd-file {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .sd-file .hint {
+      flex-basis: 100%;
+      margin: 0;
+    }
+
+    @media (max-width: 600px) {
+      .sd-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .sd-head,
+      .sd-body {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      #lib-q {
+        width: 120px;
+      }
+    }
+
+    /* 楽譜の上のタイトル・作詞・作曲（印刷にも出る） */
+    .score-meta {
+      background: #fffdf8;
+      color: #2a1020;
+      padding: 14px 16px 0;
+      display: grid;
+      gap: 2px;
+    }
+
+    .score-meta .sm-t {
+      text-align: center;
+      font: 900 20px 'Zen Maru Gothic', sans-serif;
+    }
+
+    .score-meta .sm-c {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+    }
+
+    .score-meta .sm-c span:last-child {
+      text-align: right;
+      margin-left: auto;
+    }
+
     .toast {
       position: fixed;
       left: 50%;
@@ -2246,7 +2526,7 @@
       <!-- ピアノロール -->
       <div class="panel wide">
         <div class="panel-head">
-          <span>🎹 ピアノロール</span>
+          <button class="song-btn" type="button" id="song-btn" title="曲のタイトル・作詞・作曲と、保存・呼び出し（Ctrl+S で保存）" aria-haspopup="dialog"><span aria-hidden="true">🎵</span><span class="song-name" id="song-title">無題の曲</span><span class="song-dirty" id="song-dirty" title="保存していない変更があります" hidden>●</span><span class="song-caret" aria-hidden="true">▾</span></button>
           <span class="song-set">
             <label title="テンポ（BPM）。曲全体に効きます">♩ = <input type="number" id="bpm" min="30" max="300" step="0.1" aria-label="テンポ（BPM）"></label>
             <button class="btn btn-sm" type="button" id="bpm-guess" title="クリックなしで録った音から、テンポと1小節目の頭を当てる">当てる</button>
@@ -2691,6 +2971,47 @@
   <!-- /shared:footer -->
 
   <input type="text" id="ly-edit" class="ly-edit" maxlength="64" spellcheck="false" aria-label="歌詞" hidden>
+  <!-- 曲の保存・呼び出し -->
+  <dialog class="song-dlg" id="song-dlg" aria-labelledby="song-dlg-h">
+    <div class="sd-head">
+      <h2 id="song-dlg-h">🎵 曲の保存・呼び出し</h2>
+      <button class="sd-x" type="button" id="song-close" aria-label="閉じる">×</button>
+    </div>
+    <div class="sd-body">
+      <section class="sd-meta" aria-label="今の曲">
+        <label class="sd-f sd-title"><span>タイトル</span><input type="text" id="mt-title" maxlength="60" placeholder="無題の曲" autocomplete="off"></label>
+        <div class="sd-row">
+          <label class="sd-f"><span>作詞</span><input type="text" id="mt-lyricist" maxlength="40" autocomplete="off"></label>
+          <label class="sd-f"><span>作曲</span><input type="text" id="mt-composer" maxlength="40" autocomplete="off"></label>
+          <label class="sd-f"><span>編曲</span><input type="text" id="mt-arranger" maxlength="40" autocomplete="off"></label>
+        </div>
+        <label class="sd-f"><span>メモ</span><textarea id="mt-memo" rows="2" maxlength="1000" placeholder="歌詞の下書き・アイデアなど"></textarea></label>
+        <div class="sd-actions">
+          <button class="btn btn-primary" type="button" id="lib-save">保存する</button>
+          <button class="btn" type="button" id="lib-saveas">別の曲として保存</button>
+          <label class="check"><input type="checkbox" id="libAudio">録音もいっしょに残す</label>
+          <span class="sp"></span>
+          <button class="btn" type="button" id="lib-new">＋ 新しい曲</button>
+        </div>
+        <p class="hint" id="lib-state"></p>
+      </section>
+      <section class="sd-list" aria-label="保存した曲">
+        <div class="sd-list-head">
+          <b>保存した曲</b><span class="sd-count" id="lib-count"></span>
+          <span class="sp"></span>
+          <input type="search" id="lib-q" placeholder="さがす" aria-label="保存した曲をさがす" autocomplete="off">
+        </div>
+        <ul class="sd-items" id="lib-list"></ul>
+      </section>
+      <div class="sd-file">
+        <button class="btn btn-sm" type="button" id="song-export">曲ファイルに書き出す（.json）</button>
+        <button class="btn btn-sm" type="button" id="song-import">曲ファイルを開く</button>
+        <input type="file" id="song-file" accept=".json,application/json" hidden>
+        <p class="hint">保存した曲は<b>このブラウザの中</b>に残ります。ブラウザのデータを消すと消えるので、パソコンを替えるときやバックアップは曲ファイル（タイトル・トラック・歌詞・録音まで入ります）で。<kbd>Ctrl</kbd>+<kbd>S</kbd> で保存。</p>
+      </div>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="../common/ask.js?v=20260929a"></script>
@@ -2703,7 +3024,7 @@
       const escH = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
       const mod = (a, n) => ((a % n) + n) % n;
       const STORE = 'donnma-hum-midi';          // 設定
-      const SONG = 'donnma-hum-midi-song';      // トラックと音（録音は残さない）
+      const SONG = 'donnma-hum-midi-song';      // 作りかけの曲（トラックと音・タイトルなど。録音は IndexedDB）
       const MAX_SEC = 600;          // 録音は10分まで
       const PPQ = 480;              // MIDI の分解能
       const MAX_TRACKS = 16;
@@ -2752,7 +3073,7 @@
         range: 'voice', sens: 2, gate: -50, minMs: 80, split: true, autoTune: true,
         key: 'off', scale: 'major', quant: '16', quantLen: true, vel: 'dyn',
         names: 'en', naming: '4', playMode: 'both', playClick: false, zoom: 60, repeat: false, kbOct: 4, stepLen: '0.5',
-        velLane: true, setOpen: false, aiScope: 'all', tplProg: 'axis', tplKey: '0', tplDrum: 'b8', tplAcc: 'quarter', tplBars: '8', tplBass: true, tplDrum1: 'b8', vvUrl: 'http://127.0.0.1:50021', scEdit: true, scLen: 4, scDot: false, scRest: false, scAcc: 'auto', textLen: '0.5', lyricEnc: 'sjis', chordPer: '1', accPat: 'whole', accInst: 'piano', accBass: true,
+        velLane: true, setOpen: false, libAudio: true, aiScope: 'all', tplProg: 'axis', tplKey: '0', tplDrum: 'b8', tplAcc: 'quarter', tplBars: '8', tplBass: true, tplDrum1: 'b8', vvUrl: 'http://127.0.0.1:50021', scEdit: true, scLen: 4, scDot: false, scRest: false, scAcc: 'auto', textLen: '0.5', lyricEnc: 'sjis', chordPer: '1', accPat: 'whole', accInst: 'piano', accBass: true,
       };
       const S = { ...DEF };
       try { Object.assign(S, JSON.parse(localStorage.getItem(STORE) || '{}')); } catch (e) { }
@@ -4416,6 +4737,7 @@ registerProcessor('hum-rec',R);`;
         const head = [];
         const nm = textBytes(songName());
         head.push({ t: 0, o: 0, d: [0xff, 0x03, ...vlq(nm.length), ...nm] });
+        for (const tx of creditLines()) { const b = textBytes(tx); head.push({ t: 0, o: 0, d: [0xff, 0x01, ...vlq(b.length), ...b] }); }
         const us = Math.round(60000000 / S.bpm);
         head.push({ t: 0, o: 0, d: [0xff, 0x51, 0x03, (us >> 16) & 255, (us >> 8) & 255, us & 255] });
         head.push({ t: 0, o: 0, d: [0xff, 0x58, 0x04, S.beats, 2, 24, 8] });
@@ -4447,7 +4769,7 @@ registerProcessor('hum-rec',R);`;
         }
         return new Uint8Array([0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 1, 0, list.length + 1, (PPQ >> 8) & 255, PPQ & 255, ...out]);
       }
-      const songName = () => (tracks.find(t => t.file) || {}).file || 'Hum MIDI';
+      const songName = () => meta.title.trim() || (tracks.find(t => t.file) || {}).file || 'Hum MIDI';
 
       // 全部のトラックを OfflineAudioContext で鳴らして1つの音にする（再生と同じ音色・ミュート・ソロ・音量）
       async function renderMix(withVoice) {
@@ -4513,7 +4835,7 @@ registerProcessor('hum-rec',R);`;
         const stamp = `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
         const a = document.createElement('a');
         a.href = URL.createObjectURL(new Blob([data], { type }));
-        a.download = (base || 'hum') + '-' + stamp + ext;
+        a.download = String(base || 'hum').replace(/[\\/:*?"<>|\r\n\t]/g, '_').trim().slice(0, 80) + '-' + stamp + ext;
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 4000);
       }
@@ -5061,7 +5383,7 @@ registerProcessor('hum-rec',R);`;
         }
         const H = 46 + rows.length * lineH - 40;
         const style = `<style>.sl{stroke:#8a5a72;stroke-width:1}.bl{stroke:#6e3551;stroke-width:1.2}.nh{fill:#2a1020}.nh.o{fill:#fffdf8;stroke:#2a1020;stroke-width:1.5}.st{stroke:#2a1020;stroke-width:1.3}.fl{fill:none;stroke:#2a1020;stroke-width:1.8}.dt,.rs{fill:#2a1020}.rq{fill:none;stroke:#2a1020;stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}.clef{font-size:40px;font-family:'Segoe UI Symbol','Noto Music','Noto Sans Symbols 2',serif;fill:#2a1020}.clef.f{font-size:30px}.acc{font-size:15px;font-family:'Segoe UI Symbol','Noto Sans Symbols 2',serif;fill:#2a1020}.ts{font:700 17px serif;fill:#2a1020;text-anchor:middle}.cn{font:700 13px sans-serif;fill:#b0306a}.ly{font:12px 'Zen Maru Gothic',sans-serif;fill:#2a1020;text-anchor:middle}.mn{font:9px sans-serif;fill:#8a5a72}.tie{fill:none;stroke:#2a1020;stroke-width:1.2}.lg{stroke:#2a1020;stroke-width:1}.nh.sel{fill:#e0306a}.nh.o.sel{fill:#fffdf8;stroke:#e0306a;stroke-width:2}.gh{font:700 11px sans-serif;fill:#e0306a}</style>`;
-        box.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${style}<rect width="${W}" height="${H}" fill="#fffdf8"/>${svg}<g id="sc-ghost"></g></svg>`;
+        box.innerHTML = scoreMetaHtml() + `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${style}<rect width="${W}" height="${H}" fill="#fffdf8"/>${svg}<g id="sc-ghost"></g></svg>`;
         scoreMap = map;
         $('sc-info').textContent = `${st.name} ・ ${md.measures.length} 小節 ・ ${NAMES.en[md.ks.k.k]} ${md.ks.mode === 'major' ? 'メジャー' : 'マイナー'}（${md.ks.k.from}）`;
       }
@@ -5214,7 +5536,8 @@ registerProcessor('hum-rec',R);`;
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="4.0">
 <work><work-title>${escX(songName())}</work-title></work>
-<identification><encoding><software>どんまうんど-Tools 鼻歌 MIDI 変換</software></encoding></identification>
+<movement-title>${escX(songName())}</movement-title>
+<identification>${[['composer', meta.composer], ['lyricist', meta.lyricist], ['arranger', meta.arranger]].filter(([, v]) => v.trim()).map(([k, v]) => `<creator type="${k}">${escX(v.trim())}</creator>`).join('')}<encoding><software>どんまうんど-Tools 鼻歌 MIDI 変換</software></encoding></identification>
 <part-list><score-part id="P1"><part-name>${escX(st.name)}</part-name></score-part></part-list>
 <part id="P1">
 `;
@@ -5245,7 +5568,7 @@ registerProcessor('hum-rec',R);`;
       }
       $('sc-xml').addEventListener('click', () => {
         if (st.kind === 'drum') { toast('メロディのトラックを選んでください'); return; }
-        download(musicXml(), 'application/vnd.recordare.musicxml+xml', st.name, '.musicxml');
+        download(musicXml(), 'application/vnd.recordare.musicxml+xml', withTitle(st.name), '.musicxml');
         toast('MusicXML を保存しました');
       });
       $('sc-print').addEventListener('click', () => { renderScore(); document.body.classList.add('print-score'); window.print(); });
@@ -5502,6 +5825,7 @@ registerProcessor('hum-rec',R);`;
         }
         stopPlay();
         for (const t of tracks) delAudio(t.uid);
+        meta = blankMeta(); meta.title = sm.name; libId = ''; savedSig = ''; showSong();
         S.bpm = sm.bpm; S.beats = sm.beats; S.key = 'off'; S.accPat = sm.acc; S.accInst = sm.accInst; S.accBass = true;
         save();
         const vv = VV.ok || await vvConnect(true);
@@ -5582,7 +5906,7 @@ registerProcessor('hum-rec',R);`;
           if (ly !== 'R') prev = ly;
           cur = t1;
         }
-        const name = tr.name.replace(/[\r\n=]/g, ' ');
+        const name = (meta.title.trim() || tr.name).replace(/[\r\n=]/g, ' ');
         return ['[#VERSION]', 'UST Version1.2', '[#SETTING]', `Tempo=${S.bpm.toFixed(2)}`, 'Tracks=1', `ProjectName=${name}`, 'VoiceDir=%VOICE%uta', 'OutFile=', 'CacheDir=', 'Tool1=wavtool.exe', 'Tool2=resampler.exe', 'Mode2=True', ...L2, '[#TRACKEND]', ''].join('\r\n');
       }
       function ustBytes(tr) {
@@ -5594,12 +5918,12 @@ registerProcessor('hum-rec',R);`;
         const tr = singTarget();
         if (!tr) { toast('音のあるメロディのトラックを選んでください'); return; }
         const r = ustBytes(tr);
-        download(r.bytes, 'application/octet-stream', tr.name, '.ust');
+        download(r.bytes, 'application/octet-stream', withTitle(tr.name), '.ust');
         toast(r.lost ? '.ust を保存しました（かな以外の歌詞は ? になっています）' : '.ust を保存しました');
       });
       $('ex-xml').addEventListener('click', () => {
         if (!singTarget()) { toast('音のあるメロディのトラックを選んでください'); return; }
-        download(musicXml(), 'application/vnd.recordare.musicxml+xml', st.name, '.musicxml');
+        download(musicXml(), 'application/vnd.recordare.musicxml+xml', withTitle(st.name), '.musicxml');
         toast('MusicXML を保存しました');
       });
       $('ex-mid').addEventListener('click', () => {
@@ -5914,7 +6238,7 @@ ${songJson(list)}
         const replace = await window.DonnmaAsk.ask(`「${file.name}」から ${made.length} トラックを読み込みます。今のトラックはどうしますか？`, { yes: '置き換える', no: '後ろに足す' });
         if (replace == null) return;
         stopPlay(); kbReleaseAll();
-        if (replace) { for (const t of tracks) delAudio(t.uid); tracks = []; chords = []; }
+        if (replace) { for (const t of tracks) delAudio(t.uid); tracks = []; chords = []; if (!meta.title.trim()) { meta.title = base.slice(0, 60); showSong(); } }
         const room = MAX_TRACKS - tracks.length;
         if (room <= 0) { toast('トラックがいっぱいです（16 まで）'); return; }
         tracks.push(...made.slice(0, room));
@@ -5946,15 +6270,20 @@ ${songJson(list)}
       const IDB = (() => {
         let dbp = null;
         const open = () => dbp || (dbp = new Promise((res, rej) => {
-          const r = indexedDB.open('donnma-hum-midi', 1);
-          r.onupgradeneeded = () => r.result.createObjectStore('audio');
+          const r = indexedDB.open('donnma-hum-midi', 2);
+          r.onupgradeneeded = () => {
+            const db = r.result;
+            if (!db.objectStoreNames.contains('audio')) db.createObjectStore('audio');      // 作りかけの曲の録音（トラックの uid ごと）
+            if (!db.objectStoreNames.contains('songs')) db.createObjectStore('songs', { keyPath: 'id' });      // 保存した曲
+          };
+          r.onblocked = () => toast('ほかのタブでこのツールを開いていたら、閉じてから開き直してください');
           r.onsuccess = () => res(r.result);
           r.onerror = () => rej(r.error);
         }));
-        const tx = async (mode, fn) => {
+        const tx = async (mode, fn, store = 'audio') => {
           const db = await open();
           return new Promise((res, rej) => {
-            const t = db.transaction('audio', mode), req = fn(t.objectStore('audio'));
+            const t = db.transaction(store, mode), req = fn(t.objectStore(store));
             t.oncomplete = () => res(req && req.result);
             t.onerror = () => rej(t.error);
             t.onabort = () => rej(t.error);
@@ -5965,6 +6294,10 @@ ${songJson(list)}
           get: k => tx('readonly', s1 => s1.get(k)),
           del: k => tx('readwrite', s1 => s1.delete(k)),
           clear: () => tx('readwrite', s1 => s1.clear()),
+          songPut: v => tx('readwrite', s1 => s1.put(v), 'songs'),
+          songGet: k => tx('readonly', s1 => s1.get(k), 'songs'),
+          songDel: k => tx('readwrite', s1 => s1.delete(k), 'songs'),
+          songAll: () => tx('readonly', s1 => s1.getAll(), 'songs'),
         };
       })();
       function saveAudio(tr) {
@@ -6046,30 +6379,55 @@ ${songJson(list)}
       //  作りかけを残す（音だけ。録音は残さない）
       // ══════════════════════════════════════
       let songTimer = 0;
+      // 今の曲をデータに（音は拍で。録音は入れない）
+      function songData() {
+        const r = x => Math.round(x * 10000) / 10000;
+        return {
+          v: 1, cur: tracks.indexOf(st),
+          tracks: tracks.map(t => ({
+            name: t.name, kind: t.kind, inst: t.inst, vol: t.vol, mute: t.mute, solo: t.solo, poly: t.poly, auto: t.auto, uid: t.uid,
+            align: t.align, latency: t.latency, octave: t.octave, hasAudio: !!t.rawLen || t.hasAudio, vvStyle: t.vvStyle,
+            notes: t.notes.map(n => {
+              const a = [r(toBeat(t, n.s)), r(toBeat(t, n.e)), n.p, n.v];
+              if (n.lyric) a.push(n.lyric);
+              return a;
+            }),
+          })),
+          chords: chords.map(c => ({ b: c.b, len: c.len, root: c.root, q: c.q, cands: c.cands })),
+        };
+      }
+      // 保存したときと中身が違うか（選んでいるトラックは見ない）。中身を文字にして短い値に
+      function songSig(data = songData()) {
+        const str = JSON.stringify([data.tracks, data.chords, meta, S.bpm, S.beats]);
+        let h = 0x811c9dc5;
+        for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+        return (h >>> 0).toString(36) + ':' + str.length;
+      }
+      // 作りかけを残す（いつ呼んでもよい。変わったかどうかは中身で決める）
       function saveSong() {
         clearTimeout(songTimer);
         songTimer = setTimeout(() => {
           if (G.busy) { saveSong(); return; }     // 録音を読み戻している間は、秒と拍がまざるので待つ
-          const r = x => Math.round(x * 10000) / 10000;
-          const data = {
-            v: 1, cur: tracks.indexOf(st),
-            tracks: tracks.map(t => ({
-              name: t.name, kind: t.kind, inst: t.inst, vol: t.vol, mute: t.mute, solo: t.solo, poly: t.poly, auto: t.auto, uid: t.uid,
-              align: t.align, latency: t.latency, octave: t.octave, hasAudio: !!t.rawLen || t.hasAudio, vvStyle: t.vvStyle,
-              notes: t.notes.map(n => {
-                const a = [r(toBeat(t, n.s)), r(toBeat(t, n.e)), n.p, n.v];
-                if (n.lyric) a.push(n.lyric);
-                return a;
-              }),
-            })),
-            chords: chords.map(c => ({ b: c.b, len: c.len, root: c.root, q: c.q, cands: c.cands })),
-          };
+          const d0 = songData();
+          setDirty(libId ? songSig(d0) !== savedSig : hasContent());
+          const data = { ...d0, meta, libId, savedSig, bpm: S.bpm, beats: S.beats };
           try { localStorage.setItem(SONG, JSON.stringify(data)); } catch (e) { }
         }, 400);
       }
       function loadSong() {
         try {
           const d = JSON.parse(localStorage.getItem(SONG) || 'null');
+          if (!applySongData(d)) return false;
+          meta = cleanMeta(d.meta);
+          libId = typeof d.libId === 'string' ? d.libId : '';
+          savedSig = typeof d.savedSig === 'string' ? d.savedSig : '';
+          dirty = libId ? songSig() !== savedSig : hasContent();
+          return true;
+        } catch (e) { return false; }
+      }
+      // データから曲を組み立てる（作りかけ・保存した曲・曲ファイルで共通）
+      function applySongData(d) {
+        try {
           if (!d || !Array.isArray(d.tracks) || !d.tracks.length) return false;
           tracks = d.tracks.slice(0, MAX_TRACKS).map(o => {
             const t = newTrack(o.kind === 'drum' ? 'drum' : 'melody');
@@ -6098,6 +6456,232 @@ ${songJson(list)}
           return true;
         } catch (e) { return false; }
       }
+
+      // ══════════════════════════════════════
+      //  曲（タイトル・作詞・作曲）と、保存した曲の一覧
+      // ══════════════════════════════════════
+      const META_KEYS = { title: 60, lyricist: 40, composer: 40, arranger: 40, memo: 1000 };
+      const blankMeta = () => ({ title: '', lyricist: '', composer: '', arranger: '', memo: '' });
+      function cleanMeta(o) {
+        const m = blankMeta();
+        if (o && typeof o === 'object') for (const [k, n] of Object.entries(META_KEYS)) if (typeof o[k] === 'string') m[k] = o[k].slice(0, n);
+        return m;
+      }
+      let meta = blankMeta();
+      let libId = '';        // 保存した曲の id（まだ保存していなければ ''）
+      let dirty = false;     // 保存してから変わったか
+      let savedSig = '';     // 保存したときの中身（songSig）
+      let libSavedAt = 0;
+      function creditLines() {
+        return [['作詞', meta.lyricist], ['作曲', meta.composer], ['編曲', meta.arranger]].filter(([, v]) => v.trim()).map(([k, v]) => `${k}：${v.trim()}`);
+      }
+      const withTitle = name => (meta.title.trim() ? `${meta.title.trim()}-${name}` : name);
+      function scoreMetaHtml() {
+        const t = meta.title.trim(), ly = meta.lyricist.trim(), cp = [meta.composer.trim() && `作曲：${meta.composer.trim()}`, meta.arranger.trim() && `編曲：${meta.arranger.trim()}`].filter(Boolean).join('　');
+        if (!t && !ly && !cp) return '';
+        return `<div class="score-meta">${t ? `<div class="sm-t">${escH(t)}</div>` : ''}${ly || cp ? `<div class="sm-c"><span>${ly ? '作詞：' + escH(ly) : ''}</span><span>${escH(cp)}</span></div>` : ''}</div>`;
+      }
+      function setDirty(v) {
+        if (dirty === v) return;
+        dirty = v;
+        showSong();
+      }
+      function showSong() {
+        const t = meta.title.trim();
+        const el = $('song-title');
+        el.textContent = t || '無題の曲';
+        el.classList.toggle('untitled', !t);
+        $('song-dirty').hidden = !dirty || !hasContent();
+        document.title = (t ? t + '｜' : '') + DOC_TITLE;
+        if ($('song-dlg').open) libStateText();
+      }
+      const DOC_TITLE = document.title;
+      const hasContent = () => tracks.some(t => t.notes.length || t.rawLen);
+      const fmtDate = ms => { const d = new Date(ms), p = x => String(x).padStart(2, '0'); return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+      function libStateText() {
+        $('lib-state').textContent = !libId ? 'この曲はまだ保存していません（作りかけは自動でこのブラウザに残ります）。'
+          : dirty ? '保存してから変更があります。「保存する」で上書きします。'
+            : `保存済み${libSavedAt ? '（' + fmtDate(libSavedAt) + '）' : ''}。`;
+        $('lib-save').textContent = libId ? '上書き保存' : '保存する';
+        $('lib-saveas').hidden = !libId;
+      }
+      const libIdNew = () => 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      // 今の曲の録音（作りかけの IndexedDB から）
+      async function currentAudio() {
+        const out = [];
+        for (const t of tracks) {
+          if (!(t.rawLen || t.hasAudio)) continue;
+          let a = null;
+          try { a = await IDB.get(t.uid); } catch (e) { }
+          if (a && a.pcm && a.sr) out.push({ uid: t.uid, ...a });
+        }
+        return out;
+      }
+      function songStats(d) {
+        let notes = 0, end = 0;
+        for (const t of d.tracks) for (const n of t.notes) { notes++; end = Math.max(end, n[1]); }
+        return { tracks: d.tracks.length, notes, bars: Math.ceil(end / (S.beats || 4)) };
+      }
+      async function libSave(asNew) {
+        if (G.recording || G.busy) { toast('録音・読み込みが終わってから保存してください'); return; }
+        if (!window.indexedDB) { toast('このブラウザでは保存できません。曲ファイルに書き出してください'); return; }
+        if (!meta.title.trim()) meta.title = '無題の曲';
+        const data = songData();
+        const audio = S.libAudio ? await currentAudio() : [];
+        if (!S.libAudio) for (const t of data.tracks) t.hasAudio = false;
+        let created = Date.now();
+        const id = asNew || !libId ? libIdNew() : libId;
+        if (id === libId) { try { const old = await IDB.songGet(id); if (old) created = old.created || created; } catch (e) { } }
+        if (asNew && libCache.some(x => x.id === libId && (x.meta || {}).title === meta.title)) meta.title = (meta.title + '（コピー）').slice(0, 60);
+        const rec = { id, meta: { ...meta }, created, updated: Date.now(), bpm: S.bpm, beats: S.beats, song: data, audio, stats: songStats(data) };
+        try { await IDB.songPut(rec); } catch (e) { toast('保存できませんでした（空き容量が足りないかもしれません。「録音もいっしょに残す」を外すと小さくなります）'); return; }
+        libId = id; libSavedAt = rec.updated; savedSig = songSig(data); dirty = false;
+        saveSong(); showSong(); syncMetaInputs();
+        if ($('song-dlg').open) { libStateText(); renderLib(); }
+        toast(`「${meta.title}」を保存しました` + (audio.length ? `（録音 ${audio.length} つも）` : ''));
+      }
+      // 保存した曲・曲ファイルを開く
+      async function openSongRecord(rec, fromLib) {
+        stopPlay(); kbReleaseAll();
+        const d = rec.song;
+        if (!applySongData(d)) { toast('曲を読めませんでした'); return false; }
+        const have = new Set((rec.audio || []).map(a => a.uid));
+        for (const t of tracks) if (!have.has(t.uid)) t.hasAudio = false;
+        if (window.indexedDB) {
+          try { await IDB.clear(); } catch (e) { }
+          for (const a of rec.audio || []) { const { uid, ...v } = a; try { await IDB.put(uid, v); } catch (e) { } }
+        }
+        if (isFinite(rec.bpm)) S.bpm = clamp(Number(rec.bpm), 30, 300);
+        if ([2, 3, 4, 5, 6, 7].includes(Number(rec.beats))) S.beats = Number(rec.beats);
+        save();
+        meta = cleanMeta(rec.meta);
+        libId = fromLib ? rec.id : '';
+        libSavedAt = fromLib ? rec.updated || 0 : 0;
+        savedSig = fromLib ? songSig() : '';
+        dirty = libId ? false : hasContent();
+        G.cursor = 0; wrap.scrollLeft = 0;
+        setUI(); renderTracks(); resetLive(); refresh();
+        saveSong(); showSong(); syncMetaInputs();
+        restoreAudio();
+        if (tracks.some(t => INST[t.inst] && INST[t.inst].vvox)) vvConnect(true);
+        return true;
+      }
+      async function askDiscard(what, yes) {
+        if (!dirty || !hasContent()) return true;
+        return !!(await window.DonnmaAsk.ask(`今の曲「${meta.title.trim() || '無題の曲'}」には、保存していない変更があります。保存しないで${what}か？`, { yes, no: 'やめる', danger: true }));
+      }
+      async function libOpen(id) {
+        if (G.recording || G.busy) return;
+        if (id === libId && !dirty) { $('song-dlg').close(); return; }
+        if (!(await askDiscard('開きます', '保存しないで開く'))) return;
+        let rec = null;
+        try { rec = await IDB.songGet(id); } catch (e) { }
+        if (!rec) { toast('曲が見つかりませんでした'); renderLib(); return; }
+        if (await openSongRecord(rec, true)) { $('song-dlg').close(); toast(`「${meta.title || '無題の曲'}」を開きました`); }
+      }
+      async function libDelete(id) {
+        let rec = null;
+        try { rec = await IDB.songGet(id); } catch (e) { }
+        if (!rec) return;
+        const ok = await window.DonnmaAsk.ask(`保存した曲「${rec.meta.title || '無題の曲'}」を消しますか？（元に戻せません）`, { yes: '消す', no: 'やめる' });
+        if (!ok) return;
+        try { await IDB.songDel(id); } catch (e) { }
+        if (id === libId) { libId = ''; libSavedAt = 0; savedSig = ''; saveSong(); showSong(); libStateText(); }
+        renderLib();
+      }
+      async function libNew() {
+        if (G.recording || G.busy) return;
+        if (!(await askDiscard('新しい曲にします', '保存しないで新しくする'))) return;
+        stopPlay(); kbReleaseAll();
+        nextId = 1;
+        if (window.indexedDB) IDB.clear().catch(() => { });
+        chords = [];
+        tracks = [newTrack('melody')];
+        st = tracks[0];
+        meta = blankMeta(); libId = ''; libSavedAt = 0; savedSig = ''; dirty = false;
+        G.cursor = 0; wrap.scrollLeft = 0;
+        setUI(); renderTracks(); resetLive(); refresh();
+        saveSong(); showSong(); syncMetaInputs(); libStateText(); renderLib();
+        $('mt-title').focus();
+      }
+      let libCache = [];
+      async function renderLib() {
+        try { libCache = window.indexedDB ? await IDB.songAll() : []; } catch (e) { libCache = []; }
+        libCache.sort((a, b) => b.updated - a.updated);
+        const q = $('lib-q').value.trim().toLowerCase();
+        const list = q ? libCache.filter(r => Object.values(r.meta || {}).join(' ').toLowerCase().includes(q)) : libCache;
+        $('lib-count').textContent = libCache.length ? `${libCache.length} 曲` : '';
+        $('lib-list').innerHTML = list.length ? list.map(r => {
+          const m = cleanMeta(r.meta), cr = [m.lyricist && '作詞 ' + m.lyricist, m.composer && '作曲 ' + m.composer].filter(Boolean).join('・');
+          const sub = [fmtDate(r.updated), cr, r.stats ? `${r.stats.tracks} トラック・${r.stats.notes} 音` : '', (r.audio || []).length ? '録音あり' : ''].filter(Boolean).join(' ／ ');
+          return `<li class="sd-item${r.id === libId ? ' cur' : ''}" data-id="${escH(r.id)}">
+            <div class="sd-item-main" data-act="open" title="開く"><div class="sd-item-t">${escH(m.title || '無題の曲')}</div><div class="sd-item-s">${escH(sub)}</div></div>
+            <button class="btn btn-sm" type="button" data-act="open">${r.id === libId ? '開いています' : '開く'}</button>
+            <button class="btn btn-sm ic" type="button" data-act="del" title="消す" aria-label="消す">🗑</button>
+          </li>`;
+        }).join('') : `<li class="sd-empty">${q ? '見つかりませんでした' : 'まだありません。タイトルを入れて「保存する」と、ここに並びます。'}</li>`;
+      }
+      function syncMetaInputs() {
+        for (const k of Object.keys(META_KEYS)) { const el = $('mt-' + k); if (el && document.activeElement !== el) el.value = meta[k]; }
+      }
+      function openSongDlg(focusTitle) {
+        syncMetaInputs();
+        $('libAudio').checked = !!S.libAudio;
+        libStateText();
+        renderLib();
+        if (!$('song-dlg').open) $('song-dlg').showModal();
+        if (focusTitle || !meta.title.trim()) $('mt-title').focus();
+      }
+      for (const k of Object.keys(META_KEYS)) {
+        $('mt-' + k).addEventListener('input', e => {
+          meta[k] = e.target.value.slice(0, META_KEYS[k]);
+          saveSong();
+          showSong();
+          if ($('score').offsetParent && (k !== 'memo')) renderScore();
+        });
+      }
+      $('mt-title').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); libSave(false); } });
+      $('libAudio').addEventListener('change', e => { S.libAudio = e.target.checked; save(); });
+      $('song-btn').addEventListener('click', () => openSongDlg(false));
+      $('song-close').addEventListener('click', () => $('song-dlg').close());
+      $('song-dlg').addEventListener('click', e => { if (e.target === $('song-dlg')) $('song-dlg').close(); });
+      $('lib-save').addEventListener('click', () => libSave(false));
+      $('lib-saveas').addEventListener('click', () => libSave(true));
+      $('lib-new').addEventListener('click', libNew);
+      $('lib-q').addEventListener('input', renderLib);
+      $('lib-list').addEventListener('click', e => {
+        const b = e.target.closest('[data-act]'), li = e.target.closest('.sd-item');
+        if (!b || !li) return;
+        if (b.dataset.act === 'open') libOpen(li.dataset.id);
+        else if (b.dataset.act === 'del') libDelete(li.dataset.id);
+      });
+      // 曲ファイル（.json）：タイトル・トラック・歌詞・コード・録音まで
+      const b64 = buf => { const u = new Uint8Array(buf); let s1 = ''; for (let i = 0; i < u.length; i += 0x8000) s1 += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s1); };
+      const unb64 = str => { const b = atob(str), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u.buffer; };
+      $('song-export').addEventListener('click', async () => {
+        if (G.recording || G.busy) return;
+        const audio = S.libAudio ? (await currentAudio()).map(a => ({ ...a, pcm: b64(a.pcm) })) : [];
+        const data = songData();
+        if (!S.libAudio) for (const t of data.tracks) t.hasAudio = false;
+        const out = { app: 'donnma-hum-midi', format: 1, saved: new Date().toISOString(), meta, bpm: S.bpm, beats: S.beats, song: data, audio };
+        download(JSON.stringify(out), 'application/json', meta.title.trim() || 'hum-song', '.json');
+        toast('曲ファイルを書き出しました' + (audio.length ? `（録音 ${audio.length} つ入り）` : ''));
+      });
+      $('song-import').addEventListener('click', () => $('song-file').click());
+      $('song-file').addEventListener('change', async e => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (!f || G.recording || G.busy) return;
+        let o;
+        try { o = JSON.parse(await f.text()); } catch (err) { toast('曲ファイルを読めませんでした'); return; }
+        if (!o || o.app !== 'donnma-hum-midi' || !o.song) { toast('このツールの曲ファイルではありません'); return; }
+        if (!(await askDiscard('開きます', '保存しないで開く'))) return;
+        const rec = { meta: o.meta, bpm: o.bpm, beats: o.beats, song: o.song, audio: [] };
+        for (const a of Array.isArray(o.audio) ? o.audio : []) {
+          try { if (a && typeof a.uid === 'string' && a.sr && typeof a.pcm === 'string') rec.audio.push({ ...a, pcm: unb64(a.pcm) }); } catch (err) { }
+        }
+        if (await openSongRecord(rec, false)) { libStateText(); renderLib(); toast(`「${meta.title || f.name}」を開きました。「保存する」でこのブラウザに残せます`); }
+      });
 
       // ══════════════════════════════════════
       //  トラックの一覧
@@ -6313,6 +6897,7 @@ ${songJson(list)}
           S[k] = readUI(k);
           if (k === 'gate') $('gate-v').textContent = S.gate + ' dB';
           save();
+          if (k === 'bpm' || k === 'beats') saveSong();
           if (ANALYZE.includes(k)) reanalyze();
           else if (REBUILD.includes(k)) { if (!G.recording && st.fm.length) regenerate(); }
           else if (k === 'zoom') { const z = S.zoom; S.zoom = old; setZoom(z); }
@@ -6355,7 +6940,7 @@ ${songJson(list)}
         download(midiBytes(), 'audio/midi', songName() === 'Hum MIDI' ? 'hum' : songName(), '.mid');
         toast(`MIDI を保存しました（${exportTracks().length} トラック）`);
       });
-      $('save-wav').addEventListener('click', () => { download(wavBytes(), 'audio/wav', st.file || st.name, '.wav'); toast('声の録音を保存しました'); });
+      $('save-wav').addEventListener('click', () => { download(wavBytes(), 'audio/wav', withTitle(st.file || st.name), '.wav'); toast('声の録音を保存しました'); });
       $('export-wav').addEventListener('click', async () => {
         if (G.recording || G.busy) return;
         let withVoice = false;
@@ -6580,6 +7165,13 @@ ${songJson(list)}
 
       // キー操作
       document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === 's') {
+          e.preventDefault();
+          if (document.querySelector('.dn-ask:not([hidden])')) return;
+          if (libId) libSave(false); else openSongDlg(true);
+          return;
+        }
+        if ($('song-dlg').open) return;
         const t = e.target;
         if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
         if (document.querySelector('.dn-ask:not([hidden])')) return;
@@ -6626,6 +7218,8 @@ ${songJson(list)}
       });
 
       if (!loadSong()) { tracks = [newTrack('melody')]; st = tracks[0]; }
+      showSong();
+      if (libId && window.indexedDB) IDB.songGet(libId).then(r => { if (r) libSavedAt = r.updated || 0; else { libId = ''; } showSong(); }).catch(() => { });
       $('accInst').innerHTML = instOptions(S.accInst);
       setUI();
       renderTracks();
@@ -6638,6 +7232,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        lib: { save: libSave, open: libOpen, del: libDelete, all: () => IDB.songAll(), get meta() { return meta; }, get libId() { return libId; }, get dirty() { return dirty; } },
         get st() { return st; }, get tracks() { return tracks; }, get chords() { return chords; }, S, G,
         loadSample, PROGS, DRUM_PAT, ustText, ustBytes, lyricEdit, lyricCommit, vvConnect, vvNotes, vvPrepare, vvFresh, VV, songJson, aiPrompt, extractJson, readAiSong, applyAi, renderMix, mixWav, scoreHit, scoreInsert, getScoreMap: () => scoreMap, parseMidi, parseText, splitLyrics, makeChords, makeAccomp, guessTempo, scoreModel, musicXml, renderScore, openPanel, lenTool, sjis, diatonic, kanaSound, IDB, append, resetData, buildNotes, buildDrums, regenerate,
         viewNotes, midiBytes, analyzeAll, finish, guessKey, addTrack, selectTrack, play, stopPlay, songEnd,
