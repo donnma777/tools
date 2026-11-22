@@ -6251,7 +6251,7 @@ ${songJson(list)}
           }
         }
         if (!made.length) { toast('音の入っているトラックがありませんでした'); return; }
-        const replace = await window.DonnmaAsk.ask(`「${file.name}」から ${made.length} トラックを読み込みます。今のトラックはどうしますか？`, { yes: '置き換える', no: '後ろに足す' });
+        const replace = await window.DonnmaAsk.ask(`「${file.name}」から ${made.length} トラックを読み込みます。今のトラックはどうしますか？${unsavedNote()}`, { yes: '置き換える', no: '後ろに足す' });
         if (replace == null) return;
         stopPlay(); kbReleaseAll();
         if (replace) { for (const t of tracks) delAudio(t.uid); tracks = []; chords = []; if (!meta.title.trim()) { meta.title = base.slice(0, 60); showSong(); } }
@@ -6582,6 +6582,8 @@ ${songJson(list)}
         if (tracks.some(t => INST[t.inst] && INST[t.inst].vvox)) vvConnect(true);
         return true;
       }
+      // 置き換えるか聞くときに添える一言（保存していない変更があるときだけ）
+      const unsavedNote = () => (dirty && hasContent() ? `\n\n※ 今の曲「${meta.title.trim() || '無題の曲'}」には保存していない変更があります。置き換えると消えます（後ろに足すなら消えません）。` : '');
       async function askDiscard(what, yes) {
         if (!dirty || !hasContent()) return true;
         return !!(await window.DonnmaAsk.ask(`今の曲「${meta.title.trim() || '無題の曲'}」には、保存していない変更があります。保存しないで${what}か？`, { yes, no: 'やめる', danger: true }));
@@ -6694,9 +6696,8 @@ ${songJson(list)}
         const r = readAiSong(o);
         if (!r.tracks.some(t => t.notes.length)) { toast(o ? 'JSON に音の入ったトラックが見つかりませんでした' : 'JSON を読めませんでした'); return; }
         const nNotes = r.tracks.reduce((a, t) => a + t.notes.length, 0);
-        const replace = await window.DonnmaAsk.ask(`「${f.name}」から ${r.tracks.length} トラック・${nNotes} 音を読み込みます。今のトラックはどうしますか？`, { yes: '置き換える', no: '後ろに足す' });
+        const replace = await window.DonnmaAsk.ask(`「${f.name}」から ${r.tracks.length} トラック・${nNotes} 音を読み込みます。今のトラックはどうしますか？${unsavedNote()}`, { yes: '置き換える', no: '後ろに足す' });
         if (replace == null) return;
-        if (replace && !(await askDiscard('置き換えます', '保存しないで置き換える'))) return;
         const res = putSong(r, replace, null);
         if (!res) return;
         if (replace) {
