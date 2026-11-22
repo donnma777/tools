@@ -1939,6 +1939,76 @@
       display: none !important;
     }
 
+    /* ── 音で書き出す ── */
+    .song-dlg.aud-dlg {
+      width: min(560px, calc(100vw - 24px));
+    }
+
+    .aud-dlg .check {
+      font-size: 13px;
+    }
+
+    .aud-fmts {
+      display: grid;
+      gap: 6px;
+    }
+
+    .aud-fmt {
+      display: grid;
+      grid-template-columns: auto auto minmax(0, 1fr);
+      align-items: baseline;
+      gap: 4px 10px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      background: var(--surface-2);
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .aud-fmt:has(input:checked) {
+      border-color: var(--accent);
+    }
+
+    .aud-fmt span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .aud-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .aud-row [hidden] {
+      display: none;
+    }
+
+    .aud-row select {
+      font: inherit;
+      font-size: 13px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-deep, #1a0a14);
+      color: var(--text);
+    }
+
+    @media (max-width: 600px) {
+      .aud-fmt {
+        grid-template-columns: auto minmax(0, 1fr);
+      }
+
+      .aud-fmt span {
+        grid-column: 2;
+      }
+
+      .aud-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
     /* ── 動画にする ── */
     .song-dlg.video-dlg {
       width: min(1100px, calc(100vw - 24px));
@@ -2661,7 +2731,7 @@
             <details class="menu" id="save-menu">
               <summary class="btn btn-sm">その他の保存 ▾</summary>
               <div class="menu-list">
-                <button type="button" id="export-wav" disabled>🔊 音で書き出す（.wav）<small>全部のトラックを、再生と同じ音で1つに</small></button>
+                <button type="button" id="export-wav" disabled>🔊 音で書き出す（WAV・M4A・MP3・FLAC）<small>全部のトラックを、再生と同じ音で1つに</small></button>
                 <button type="button" id="save-wav" disabled>🎤 声の録音を保存（.wav）<small>選んでいるトラックの、録った声そのまま</small></button>
                 <button type="button" data-proxy="ex-ust">🎙 .ust（UTAU・OpenUtau）<small>選んでいるトラックを歌声ソフト用に</small></button>
                 <button type="button" data-proxy="ex-xml">🎼 MusicXML（楽譜・NEUTRINO）<small>選んでいるトラックを楽譜に</small></button>
@@ -3091,6 +3161,37 @@
   <!-- /shared:footer -->
 
   <input type="text" id="ly-edit" class="ly-edit" maxlength="64" spellcheck="false" aria-label="歌詞" hidden>
+  <!-- 音で書き出す -->
+  <dialog class="song-dlg aud-dlg" id="aud-dlg" aria-labelledby="aud-dlg-h">
+    <div class="sd-head">
+      <h2 id="aud-dlg-h">🔊 音で書き出す</h2>
+      <button class="sd-x" type="button" id="aud-close" aria-label="閉じる">×</button>
+    </div>
+    <div class="sd-body">
+      <p class="hint" style="margin:0">全部のトラックを、再生と同じ音で1つのファイルにします。</p>
+      <div class="aud-fmts" role="radiogroup" aria-label="形式">
+        <label class="aud-fmt"><input type="radio" name="audFmt" value="wav"><b>WAV</b><span>そのままの音・いちばん大きい（約 10MB／分）。DAW に読み込むなら</span></label>
+        <label class="aud-fmt"><input type="radio" name="audFmt" value="m4a"><b>M4A（AAC）</b><span>小さい（約 1.4MB／分）。スマホ・LINE・SNS で聞くなら</span></label>
+        <label class="aud-fmt"><input type="radio" name="audFmt" value="mp3"><b>MP3</b><span>小さい（約 1.4〜2.4MB／分）。どこでも再生できる</span></label>
+        <label class="aud-fmt"><input type="radio" name="audFmt" value="flac"><b>FLAC</b><span>音を落とさずに小さく（WAV の半分くらい）。保存用に</span></label>
+      </div>
+      <div class="aud-row">
+        <label class="sd-f" id="aud-mp3q"><span>MP3 の音質</span>
+          <select id="audMp3Kbps"><option value="128">128kbps（小さい）</option><option value="192">192kbps（ふつう）</option><option value="256">256kbps</option><option value="320">320kbps（いちばんよい）</option></select></label>
+        <label class="sd-f" id="aud-m4aq"><span>M4A の音質</span>
+          <select id="audM4aKbps"><option value="128">128kbps（小さい）</option><option value="192">192kbps（ふつう）</option><option value="256">256kbps（よい）</option></select></label>
+        <label class="sd-f"><span>範囲</span>
+          <select id="audRange"><option value="all">曲の全部</option><option value="loop">リピートの範囲</option></select></label>
+      </div>
+      <label class="check"><input type="checkbox" id="audVoice">歌った声（録音）もいっしょに入れる</label>
+      <div class="sd-actions">
+        <button class="btn btn-primary" type="button" id="aud-go">書き出す</button>
+        <span class="hint" id="aud-info" style="margin:0"></span>
+      </div>
+      <div class="vd-prog" id="aud-prog" hidden><div id="aud-bar"></div></div>
+    </div>
+  </dialog>
+
   <!-- 動画にする（X・YouTube 用） -->
   <dialog class="song-dlg video-dlg" id="video-dlg" aria-labelledby="video-dlg-h">
     <div class="sd-head">
@@ -3252,7 +3353,7 @@
         range: 'voice', sens: 2, gate: -50, minMs: 80, split: true, autoTune: true,
         key: 'off', scale: 'major', quant: '16', quantLen: true, vel: 'dyn',
         names: 'en', naming: '4', playMode: 'both', playClick: false, zoom: 60, repeat: false, kbOct: 4, stepLen: '0.5',
-        velLane: true, setOpen: false, libAudio: true, vdShape: 'wide', vdQuality: '720', vdTheme: 'plum', vdRange: 'all', vdLyrics: true, vdChords: true, aiScope: 'all', tplProg: 'axis', tplKey: '0', tplDrum: 'b8', tplAcc: 'quarter', tplBars: '8', tplBass: true, tplDrum1: 'b8', vvUrl: 'http://127.0.0.1:50021', scEdit: true, scLen: 4, scDot: false, scRest: false, scAcc: 'auto', textLen: '0.5', lyricEnc: 'sjis', chordPer: '1', accPat: 'whole', accInst: 'piano', accBass: true,
+        velLane: true, setOpen: false, libAudio: true, vdShape: 'wide', vdQuality: '720', vdTheme: 'plum', vdRange: 'all', vdLyrics: true, vdChords: true, audFmt: 'wav', audMp3Kbps: 192, audM4aKbps: 192, audRange: 'all', audVoice: true, aiScope: 'all', tplProg: 'axis', tplKey: '0', tplDrum: 'b8', tplAcc: 'quarter', tplBars: '8', tplBass: true, tplDrum1: 'b8', vvUrl: 'http://127.0.0.1:50021', scEdit: true, scLen: 4, scDot: false, scRest: false, scAcc: 'auto', textLen: '0.5', lyricEnc: 'sjis', chordPer: '1', accPat: 'whole', accInst: 'piano', accBass: true,
       };
       const S = { ...DEF };
       try { Object.assign(S, JSON.parse(localStorage.getItem(STORE) || '{}')); } catch (e) { }
@@ -7189,28 +7290,266 @@ ${songJson(list)}
         toast(`MIDI を保存しました（${exportTracks().length} トラック）`);
       });
       $('save-wav').addEventListener('click', () => { download(wavBytes(), 'audio/wav', withTitle(st.file || st.name), '.wav'); toast('声の録音を保存しました'); });
-      $('export-wav').addEventListener('click', async () => {
-        if (G.recording || G.busy) return;
-        let withVoice = false;
-        if (playable().some(t => t.rawLen)) {
-          const a = await window.DonnmaAsk.ask('歌った声（録音）もいっしょに入れますか？', { yes: '声も入れる', no: '楽器の音だけ' });
-          if (a == null) return;
-          withVoice = a;
+
+      // ══════════════════════════════════════
+      //  音で書き出す（WAV・M4A・MP3・FLAC）
+      // ══════════════════════════════════════
+      // FLAC（自前）：16bit・ブロック 4096・固定の予測（0〜4次）＋ライス符号。左右／ミッド・サイドは小さくなるほう
+      const FLAC = (() => {
+        const crc8T = new Uint8Array(256), crc16T = new Uint16Array(256);
+        for (let i = 0; i < 256; i++) {
+          let c = i; for (let j = 0; j < 8; j++) c = c & 0x80 ? ((c << 1) ^ 0x07) & 0xff : (c << 1) & 0xff; crc8T[i] = c;
+          let d = i << 8; for (let j = 0; j < 8; j++) d = d & 0x8000 ? ((d << 1) ^ 0x8005) & 0xffff : (d << 1) & 0xffff; crc16T[i] = d;
         }
+        class BW {
+          constructor(n) { this.b = new Uint8Array(n); this.p = 0; this.acc = 0; this.nb = 0; }
+          byte(v) { if (this.p >= this.b.length) { const nb = new Uint8Array(this.b.length * 2); nb.set(this.b); this.b = nb; } this.b[this.p++] = v; }
+          w(v, n) {        // n は 24 まで
+            if (!n) return;
+            v &= n === 32 ? -1 : (1 << n) - 1;
+            this.acc = (this.acc << n) | v; this.nb += n;
+            while (this.nb >= 8) { this.nb -= 8; this.byte((this.acc >>> this.nb) & 0xff); }
+            this.acc &= (1 << this.nb) - 1;
+          }
+          unary(q) { while (q >= 24) { this.w(0, 24); q -= 24; } this.w(1, q + 1); }
+          align() { if (this.nb) this.w(0, 8 - this.nb); }
+        }
+        // 予測の次数を選んで、残りの符号の大きさを見積もる
+        function plan(x, n, bps) {
+          let same = true;
+          for (let i = 1; i < n; i++) if (x[i] !== x[0]) { same = false; break; }
+          if (same) return { type: 'c', bits: 8 + bps };
+          const maxO = Math.min(4, n - 1), s = [0, 0, 0, 0, 0];
+          for (let i = 4; i < n; i++) {
+            const a = x[i], b = x[i - 1], c = x[i - 2], d = x[i - 3], e = x[i - 4];
+            s[0] += Math.abs(a); s[1] += Math.abs(a - b); s[2] += Math.abs(a - 2 * b + c); s[3] += Math.abs(a - 3 * b + 3 * c - d); s[4] += Math.abs(a - 4 * b + 6 * c - 4 * d + e);
+          }
+          let ord = 0;
+          for (let o = 1; o <= maxO; o++) if (s[o] < s[ord]) ord = o;
+          const u = new Uint32Array(n);
+          for (let i = ord; i < n; i++) {
+            let r;
+            switch (ord) {
+              case 0: r = x[i]; break;
+              case 1: r = x[i] - x[i - 1]; break;
+              case 2: r = x[i] - 2 * x[i - 1] + x[i - 2]; break;
+              case 3: r = x[i] - 3 * x[i - 1] + 3 * x[i - 2] - x[i - 3]; break;
+              default: r = x[i] - 4 * x[i - 1] + 6 * x[i - 2] - 4 * x[i - 3] + x[i - 4];
+            }
+            u[i] = r >= 0 ? 2 * r : -2 * r - 1;
+          }
+          // 区切り方（2^p 個）と、区切りごとのライスの値
+          let best = null;
+          for (let p = 0; p <= 8; p++) {
+            const parts = 1 << p, ps = n >> p;
+            if (n % parts || ps <= ord) break;
+            let bits = 6;
+            const ks = [];
+            for (let q = 0; q < parts; q++) {
+              const a = q === 0 ? ord : q * ps, b = (q + 1) * ps, cnt = b - a;
+              let sum = 0;
+              for (let i = a; i < b; i++) sum += u[i];
+              let k = 0, kb = Infinity;
+              const k0 = Math.max(0, Math.floor(Math.log2(sum / Math.max(1, cnt) + 1)));
+              for (let kk = Math.max(0, k0 - 1); kk <= Math.min(14, k0 + 1); kk++) { const c = cnt * (kk + 1) + sum / 2 ** kk; if (c < kb) { kb = c; k = kk; } }
+              bits += 4 + kb; ks.push(k);
+            }
+            if (!best || bits < best.rb) best = { p, ks, rb: bits };
+          }
+          const fb = 8 + ord * bps + best.rb, vb = 8 + bps * n;
+          if (fb >= vb) return { type: 'v', bits: vb };
+          return { type: 'f', bits: fb, ord, u, p: best.p, ks: best.ks };
+        }
+        function writeSub(bw, x, n, bps, pl) {
+          if (pl.type === 'c') { bw.w(0, 8); bw.w(x[0], bps); return; }
+          if (pl.type === 'v') { bw.w(2, 8); for (let i = 0; i < n; i++) bw.w(x[i], bps); return; }
+          bw.w((8 | pl.ord) << 1, 8);
+          for (let i = 0; i < pl.ord; i++) bw.w(x[i], bps);
+          bw.w(0, 2); bw.w(pl.p, 4);
+          const ps = n >> pl.p;
+          for (let q = 0; q < (1 << pl.p); q++) {
+            const k = pl.ks[q], a = q === 0 ? pl.ord : q * ps, b = (q + 1) * ps, m = (1 << k) - 1;
+            bw.w(k, 4);
+            for (let i = a; i < b; i++) { const v = pl.u[i]; bw.unary(v >>> k); if (k) bw.w(v & m, k); }
+          }
+        }
+        // L・R は Int16Array。onProgress(0〜1)
+        async function encode(L, R, sr, onProgress) {
+          const N = L.length, BS = 4096, bw = new BW(Math.max(1024, N * 2));
+          const head = n => { };
+          // fLaC ＋ STREAMINFO
+          for (const c of [0x66, 0x4c, 0x61, 0x43]) bw.byte(c);
+          bw.w(1, 1); bw.w(0, 7); bw.w(34, 24);
+          const bsz = Math.max(16, Math.min(BS, N));
+          bw.w(bsz, 16); bw.w(bsz, 16); bw.w(0, 24); bw.w(0, 24);
+          bw.w(sr, 20); bw.w(1, 3); bw.w(15, 5);
+          bw.w(Math.floor(N / 16777216), 12); bw.w(N % 16777216, 24);
+          for (let i = 0; i < 16; i++) bw.byte(0);
+          const srCode = sr === 44100 ? 9 : sr === 48000 ? 10 : 0;
+          const xl = new Int32Array(BS), xr = new Int32Array(BS), xm = new Int32Array(BS), xs = new Int32Array(BS);
+          let fi = 0;
+          for (let o = 0; o < N; o += BS, fi++) {
+            const n = Math.min(BS, N - o), start = bw.p;
+            for (let i = 0; i < n; i++) { const l = L[o + i], r = R[o + i]; xl[i] = l; xr[i] = r; xs[i] = l - r; xm[i] = (l + r) >> 1; }
+            const pL = plan(xl, n, 16), pR = plan(xr, n, 16), pS = plan(xs, n, 17), pM = plan(xm, n, 16);
+            const opts = [[1, pL.bits + pR.bits], [8, pL.bits + pS.bits], [9, pS.bits + pR.bits], [10, pM.bits + pS.bits]];
+            let ca = opts[0];
+            for (const c of opts) if (c[1] < ca[1]) ca = c;
+            // 見出し
+            bw.w(0xfff8, 16); bw.w(7, 4); bw.w(srCode, 4); bw.w(ca[0], 4); bw.w(4, 3); bw.w(0, 1);
+            if (fi < 0x80) bw.w(fi, 8);
+            else if (fi < 0x800) { bw.w(0xc0 | (fi >> 6), 8); bw.w(0x80 | (fi & 63), 8); }
+            else if (fi < 0x10000) { bw.w(0xe0 | (fi >> 12), 8); bw.w(0x80 | ((fi >> 6) & 63), 8); bw.w(0x80 | (fi & 63), 8); }
+            else { bw.w(0xf0 | (fi >> 18), 8); bw.w(0x80 | ((fi >> 12) & 63), 8); bw.w(0x80 | ((fi >> 6) & 63), 8); bw.w(0x80 | (fi & 63), 8); }
+            bw.w(n - 1, 16);
+            let c8 = 0; for (let i = start; i < bw.p; i++) c8 = crc8T[c8 ^ bw.b[i]];
+            bw.w(c8, 8);
+            if (ca[0] === 1) { writeSub(bw, xl, n, 16, pL); writeSub(bw, xr, n, 16, pR); }
+            else if (ca[0] === 8) { writeSub(bw, xl, n, 16, pL); writeSub(bw, xs, n, 17, pS); }
+            else if (ca[0] === 9) { writeSub(bw, xs, n, 17, pS); writeSub(bw, xr, n, 16, pR); }
+            else { writeSub(bw, xm, n, 16, pM); writeSub(bw, xs, n, 17, pS); }
+            bw.align();
+            let c16 = 0; for (let i = start; i < bw.p; i++) c16 = ((c16 << 8) & 0xffff) ^ crc16T[(c16 >> 8) ^ bw.b[i]];
+            bw.w(c16, 16);
+            if (fi % 24 === 0) { if (onProgress) onProgress(o / N); await new Promise(r => setTimeout(r, 0)); }
+          }
+          return bw.b.slice(0, bw.p);
+        }
+        return { encode };
+      })();
+      function loadLame() {
+        if (window.lamejs && window.lamejs.Mp3Encoder) return Promise.resolve();
+        return new Promise((res, rej) => { const s1 = document.createElement('script'); s1.src = 'lame.min.js?v=1.2.1'; s1.onload = res; s1.onerror = rej; document.head.appendChild(s1); });
+      }
+      const AUD_FMT = {
+        wav: { ext: '.wav', type: 'audio/wav', name: 'WAV' },
+        m4a: { ext: '.m4a', type: 'audio/mp4', name: 'M4A' },
+        mp3: { ext: '.mp3', type: 'audio/mpeg', name: 'MP3' },
+        flac: { ext: '.flac', type: 'audio/flac', name: 'FLAC' },
+      };
+      function audSync() {
+        const f = S.audFmt;
+        for (const r of document.querySelectorAll('input[name="audFmt"]')) r.checked = r.value === f;
+        $('aud-mp3q').hidden = f !== 'mp3';
+        $('aud-m4aq').hidden = f !== 'm4a';
+      }
+      function openAudDlg() {
+        if (G.recording || G.busy) return;
+        if (!playable().some(t => t.notes.length || t.rawLen)) { toast('鳴らす音がありません'); return; }
         stopPlay();
-        G.busy = true; updateButtons();
-        toast('書き出し中…');
+        const hasLoop = loop.a != null;
+        $('audRange').querySelector('[value="loop"]').disabled = !hasLoop;
+        $('audRange').querySelector('[value="loop"]').textContent = hasLoop ? 'リピートの範囲' : 'リピートの範囲（目盛りをドラッグで決める）';
+        $('audRange').value = hasLoop ? (S.audRange || 'all') : 'all';
+        const hasVoice = playable().some(t => t.rawLen);
+        $('audVoice').disabled = !hasVoice; $('audVoice').checked = hasVoice && S.audVoice !== false;
+        $('audMp3Kbps').value = String(S.audMp3Kbps); $('audM4aKbps').value = String(S.audM4aKbps);
+        audSync();
+        $('aud-info').textContent = ''; $('aud-prog').hidden = true; $('aud-go').disabled = false;
+        if (!$('aud-dlg').open) $('aud-dlg').showModal();
+      }
+      for (const r of document.querySelectorAll('input[name="audFmt"]')) r.addEventListener('change', () => { if (r.checked) { S.audFmt = r.value; save(); audSync(); } });
+      $('audMp3Kbps').addEventListener('change', e => { S.audMp3Kbps = Number(e.target.value); save(); });
+      $('audM4aKbps').addEventListener('change', e => { S.audM4aKbps = Number(e.target.value); save(); });
+      $('audRange').addEventListener('change', e => { S.audRange = e.target.value; save(); });
+      $('audVoice').addEventListener('change', e => { S.audVoice = e.target.checked; save(); });
+      $('aud-close').addEventListener('click', () => $('aud-dlg').close());
+      let audBusy = false;
+      $('aud-dlg').addEventListener('cancel', e => { if (audBusy) e.preventDefault(); });
+      $('aud-dlg').addEventListener('click', e => { if (e.target === $('aud-dlg') && !audBusy) $('aud-dlg').close(); });
+      $('export-wav').addEventListener('click', openAudDlg);
+      // 範囲を切り出して、割れないように下げた左右
+      function audSlice(buf, loopOnly) {
+        const sr = buf.sampleRate;
+        let i0 = 0, i1 = buf.length;
+        if (loopOnly && loop.a != null) { const [a, b] = loopRange(); i0 = Math.max(0, Math.floor(a * spb() * sr)); i1 = Math.min(buf.length, Math.ceil(b * spb() * sr)); }
+        const L0 = buf.getChannelData(0), R0 = buf.numberOfChannels > 1 ? buf.getChannelData(1) : L0;
+        let peak = 0;
+        for (let i = i0; i < i1; i++) peak = Math.max(peak, Math.abs(L0[i]), Math.abs(R0[i]));
+        const k = peak > 0.98 ? 0.98 / peak : 1, n = Math.max(0, i1 - i0);
+        const L = new Float32Array(n), R = new Float32Array(n);
+        for (let i = 0; i < n; i++) { L[i] = L0[i0 + i] * k; R[i] = R0[i0 + i] * k; }
+        return { L, R, sr, n };
+      }
+      const toI16 = f => { const o = new Int16Array(f.length); for (let i = 0; i < f.length; i++) { const v = Math.max(-1, Math.min(1, f[i])); o[i] = v < 0 ? Math.round(v * 32768) : Math.round(v * 32767); } return o; };
+      function wavFrom(L, R, sr) {
+        const n = L.length, out = new ArrayBuffer(44 + n * 4), v = new DataView(out);
+        const w = (o, t) => { for (let i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); };
+        w(0, 'RIFF'); v.setUint32(4, 36 + n * 4, true); w(8, 'WAVE'); w(12, 'fmt ');
+        v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 2, true);
+        v.setUint32(24, sr, true); v.setUint32(28, sr * 4, true); v.setUint16(32, 4, true); v.setUint16(34, 16, true);
+        w(36, 'data'); v.setUint32(40, n * 4, true);
+        const l16 = toI16(L), r16 = toI16(R);
+        for (let i = 0, o = 44; i < n; i++, o += 4) { v.setInt16(o, l16[i], true); v.setInt16(o + 2, r16[i], true); }
+        return out;
+      }
+      async function m4aFrom(L, R, sr, kbps, prog) {
+        if (!window.AudioEncoder) throw new Error('このブラウザでは M4A を作れません（Chrome・Edge・Safari で）');
+        let ok = false;
+        try { ok = (await AudioEncoder.isConfigSupported({ codec: 'mp4a.40.2', sampleRate: sr, numberOfChannels: 2, bitrate: kbps * 1000 })).supported; } catch (e) { }
+        if (!ok) throw new Error('このブラウザでは M4A（AAC）を作れません（Chrome・Edge・Safari で）');
+        await loadMuxer();
+        const muxer = new Mp4Muxer.Muxer({ target: new Mp4Muxer.ArrayBufferTarget(), audio: { codec: 'aac', numberOfChannels: 2, sampleRate: sr }, fastStart: 'in-memory', firstTimestampBehavior: 'offset' });
+        let err = null;
+        const ae = new AudioEncoder({ output: (c, m) => muxer.addAudioChunk(c, m), error: e => { err = e; } });
+        ae.configure({ codec: 'mp4a.40.2', sampleRate: sr, numberOfChannels: 2, bitrate: kbps * 1000 });
+        const n = L.length, CH = 4096;
+        for (let o = 0; o < n; o += CH) {
+          const m = Math.min(CH, n - o), d = new Float32Array(m * 2);
+          d.set(L.subarray(o, o + m), 0); d.set(R.subarray(o, o + m), m);
+          const ad = new AudioData({ format: 'f32-planar', sampleRate: sr, numberOfFrames: m, numberOfChannels: 2, timestamp: Math.round(o / sr * 1e6), data: d });
+          ae.encode(ad); ad.close();
+          if (o % (CH * 64) === 0) { prog(o / n); await new Promise(r => setTimeout(r, 0)); }
+        }
+        await ae.flush(); ae.close();
+        if (err) throw err;
+        muxer.finalize();
+        return muxer.target.buffer;
+      }
+      async function mp3From(L, R, sr, kbps, prog) {
+        await loadLame();
+        const enc = new lamejs.Mp3Encoder(2, sr, kbps), l16 = toI16(L), r16 = toI16(R), parts = [], CH = 1152 * 20;
+        for (let o = 0; o < l16.length; o += CH) {
+          const b = enc.encodeBuffer(l16.subarray(o, o + CH), r16.subarray(o, o + CH));
+          if (b.length) parts.push(b);
+          if (o % (CH * 10) === 0) { prog(o / l16.length); await new Promise(r => setTimeout(r, 0)); }
+        }
+        const e = enc.flush(); if (e.length) parts.push(e);
+        return new Blob(parts, { type: 'audio/mpeg' });
+      }
+      $('aud-go').addEventListener('click', async () => {
+        if (audBusy || G.recording || G.busy) return;
+        const fmt = AUD_FMT[S.audFmt] ? S.audFmt : 'wav', F = AUD_FMT[fmt];
+        audBusy = true; G.busy = true; updateButtons();
+        $('aud-go').disabled = true; $('aud-prog').hidden = false;
+        const bar = p => { $('aud-bar').style.width = Math.round(p * 100) + '%'; };
+        bar(0.02);
+        $('aud-info').textContent = '音を作っています…';
         try {
+          const withVoice = !$('audVoice').disabled && $('audVoice').checked;
           const buf = await renderMix(withVoice);
-          download(mixWav(buf), 'audio/wav', songName() === 'Hum MIDI' ? 'hum-mix' : songName() + '-mix', '.wav');
-          toast(`書き出しました（${fmtTime(buf.duration)}）`);
+          const { L, R, sr, n } = audSlice(buf, $('audRange').value === 'loop');
+          bar(0.3);
+          $('aud-info').textContent = `${F.name} にしています…`;
+          const prog = p => bar(0.3 + 0.7 * p);
+          let data;
+          if (fmt === 'wav') data = wavFrom(L, R, sr);
+          else if (fmt === 'm4a') data = await m4aFrom(L, R, sr, S.audM4aKbps, prog);
+          else if (fmt === 'mp3') data = await mp3From(L, R, sr, S.audMp3Kbps, prog);
+          else data = await FLAC.encode(toI16(L), toI16(R), sr, prog);
+          bar(1);
+          const size = data.size ?? data.byteLength;
+          download(data, F.type, songName() === 'Hum MIDI' ? 'hum-mix' : songName(), F.ext);
+          $('aud-info').textContent = `${F.name} で書き出しました（${fmtTime(n / sr)}・${(size / 1048576).toFixed(1)}MB）`;
+          toast(`${F.name} で書き出しました`);
         } catch (e) {
-          toast('書き出せませんでした');
+          $('aud-info').textContent = '書き出せませんでした' + (e && e.message ? `（${e.message}）` : '');
+          $('aud-prog').hidden = true;
         } finally {
-          G.busy = false; updateButtons();
+          audBusy = false; G.busy = false; updateButtons();
+          $('aud-go').disabled = false;
         }
       });
-
       // ══════════════════════════════════════
       //  動画にする（MIDI が流れる画面＋音 → MP4。WebCodecs で1コマずつ作り、mp4-muxer で MP4 に）
       // ══════════════════════════════════════
@@ -7810,6 +8149,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        FLAC, wavFrom, toI16,
         vdDur: () => (VD.model ? VD.model.dur : 0), vdModel, vdDraw,
         lib: { save: libSave, open: libOpen, del: libDelete, all: () => IDB.songAll(), get meta() { return meta; }, get libId() { return libId; }, get dirty() { return dirty; } },
         get st() { return st; }, get tracks() { return tracks; }, get chords() { return chords; }, S, G,
