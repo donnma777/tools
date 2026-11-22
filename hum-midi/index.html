@@ -1224,6 +1224,18 @@
       white-space: nowrap;
     }
 
+    .sf-credit {
+      max-width: 1400px;
+      margin: 10px auto 18px;
+      padding: 0 24px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .sf-credit a {
+      color: inherit;
+    }
+
     .key-set {
       display: inline-flex;
       align-items: center;
@@ -3188,6 +3200,8 @@
     <button class="insp-tab" type="button" id="insp-show" aria-controls="app-insp" title="録音・変換の設定を出す"><span class="arw" aria-hidden="true">‹</span>録音・設定</button>
   </div>
 
+  <p class="sf-credit">楽器の音：<a href="https://member.keymusician.com/Member/FluidR3_GM/index.html" target="_blank" rel="noopener">FluidR3 GM</a>（Frank Wen・<a href="https://creativecommons.org/licenses/by/3.0/deed.ja" target="_blank" rel="noopener">CC BY 3.0</a>）を <a href="https://github.com/gleitz/midi-js-soundfonts" target="_blank" rel="noopener">midi-js-soundfonts</a> から（3半音おきに抜き出して使用）</p>
+
   <!-- AdSense -->
   <div style="max-width:1400px; margin:0 auto 32px; padding:0 24px;">
     <!-- どんまうんど -->
@@ -3401,6 +3415,45 @@
         vvox: { name: 'VOICEVOX の歌声', gm: 54, sing: true, vvox: true },
         simple: { name: 'シンプル', gm: 0, osc: [['triangle', 1, 1], ['sine', 2, 0.25]], env: { a: 0.008, d: 0.15, s: 0.6, r: 0.05 }, gain: 0.22 },
       };
+      // 本物の楽器の音（FluidR3 GM）。[id, 音のフォルダ, 名前, GM の番号, 見せる場所, 読み込むまでの合成の音, のばす音か, 消えるまで(秒)]
+      const INST_SF = [
+        ['sf_piano', 'acoustic_grand_piano', 'ピアノ', 0, 'star', 'piano'],
+        ['sf_aguitar', 'acoustic_guitar_steel', 'アコースティックギター', 25, 'star', 'guitar'],
+        ['sf_ebass', 'electric_bass_finger', 'エレキベース', 33, 'star', 'bass'],
+        ['sf_strings', 'string_ensemble_1', 'ストリングス', 48, 'star', 'strings', 1, 0.4],
+        ['sf_brass', 'brass_section', 'ブラス', 61, 'star', 'lead', 1],
+        ['sf_epiano', 'electric_piano_1', 'エレピ', 4, 'star', 'epiano'],
+        ['sf_harpsi', 'harpsichord', 'チェンバロ', 6, 'key', 'piano'],
+        ['sf_musicbox', 'music_box', 'オルゴール', 10, 'key', 'bell'],
+        ['sf_vibes', 'vibraphone', 'ビブラフォン', 11, 'key', 'bell'],
+        ['sf_marimba', 'marimba', 'マリンバ', 12, 'key', 'bell'],
+        ['sf_organ', 'drawbar_organ', 'オルガン', 16, 'key', 'organ', 1, 0.1],
+        ['sf_accordion', 'accordion', 'アコーディオン', 21, 'key', 'organ', 1],
+        ['sf_nylon', 'acoustic_guitar_nylon', 'ナイロンギター', 24, 'gtr', 'guitar'],
+        ['sf_eguitar', 'electric_guitar_clean', 'エレキギター（クリーン）', 27, 'gtr', 'guitar'],
+        ['sf_dist', 'overdriven_guitar', 'エレキギター（歪み）', 29, 'gtr', 'lead', 1],
+        ['sf_wbass', 'acoustic_bass', 'ウッドベース', 32, 'gtr', 'bass'],
+        ['sf_sbass', 'synth_bass_1', 'シンセベース', 38, 'gtr', 'bass'],
+        ['sf_violin', 'violin', 'バイオリン', 40, 'str', 'strings', 1],
+        ['sf_cello', 'cello', 'チェロ', 42, 'str', 'strings', 1],
+        ['sf_pizz', 'pizzicato_strings', 'ピチカート', 45, 'str', 'strings'],
+        ['sf_harp', 'orchestral_harp', 'ハープ', 46, 'str', 'bell'],
+        ['sf_trumpet', 'trumpet', 'トランペット', 56, 'wind', 'lead', 1],
+        ['sf_sax', 'alto_sax', 'サックス', 65, 'wind', 'lead', 1],
+        ['sf_clarinet', 'clarinet', 'クラリネット', 71, 'wind', 'flute', 1],
+        ['sf_flute', 'flute', 'フルート', 73, 'wind', 'flute', 1],
+        ['sf_ocarina', 'ocarina', 'オカリナ', 79, 'wind', 'flute', 1],
+        ['sf_pad', 'pad_2_warm', 'パッド（ふわっと）', 89, 'syn', 'strings', 1, 0.6],
+        ['sf_lead', 'lead_2_sawtooth', 'シンセリード', 81, 'syn', 'lead', 1],
+        ['sf_shamisen', 'shamisen', '三味線', 106, 'world', 'guitar'],
+        ['sf_koto', 'koto', '琴', 107, 'world', 'bell'],
+        ['sf_steel', 'steel_drums', 'スチールドラム', 114, 'world', 'bell'],
+        ['sf_choir', 'choir_aahs', 'コーラス（アー）', 52, 'voice', 'strings', 1, 0.4],
+      ];
+      for (const [id, sf, name, gm, group, fb, sus, rel] of INST_SF) INST[id] = { name, gm, sf, group, fb, sus: !!sus, rel: rel || 0.25 };
+      // 音色の選び方：種類ごとにまとめる（よく使うものを上に）
+      const INST_GROUPS = [['star', '★ よく使う（本物の音）'], ['key', '鍵盤'], ['gtr', 'ギター・ベース'], ['str', '弦'], ['wind', '管'], ['syn', 'シンセ'], ['world', '和・民族'], ['voice', '声・歌'], ['synth', '合成の音（軽い・すぐ鳴る）']];
+      const instGroup = v => v.group || (v.sing ? 'voice' : 'synth');
       // ドラム（上から下の並び。番号は GM のドラム）
       const DRUMS = [
         { p: 49, n: 'クラッシュ' }, { p: 51, n: 'ライド' }, { p: 46, n: 'ハット（開）' }, { p: 42, n: 'ハット（閉）' },
@@ -3415,7 +3468,7 @@
         range: 'voice', sens: 2, gate: -50, minMs: 80, split: true, autoTune: true,
         key: 'off', scale: 'major', quant: '16', quantLen: true, vel: 'dyn',
         names: 'en', naming: '4', playMode: 'both', playClick: false, zoom: 60, repeat: false, kbOct: 4, stepLen: '0.5',
-        velLane: true, setOpen: false, libAudio: true, vdShape: 'wide', vdQuality: '720', vdTheme: 'plum', vdRange: 'all', vdLyrics: true, vdChords: true, audFmt: 'wav', audMp3Kbps: 192, audM4aKbps: 192, audRange: 'all', audVoice: true, aiScope: 'all', tplProg: 'axis', tplKey: '0', tplDrum: 'b8', tplAcc: 'quarter', tplBars: '8', tplBass: true, tplDrum1: 'b8', vvUrl: 'http://127.0.0.1:50021', scEdit: true, scLen: 4, scDot: false, scRest: false, scAcc: 'auto', textLen: '0.5', lyricEnc: 'sjis', chordPer: '1', accPat: 'whole', accInst: 'piano', accBass: true,
+        velLane: true, setOpen: false, libAudio: true, vdShape: 'wide', vdQuality: '720', vdTheme: 'plum', vdRange: 'all', vdLyrics: true, vdChords: true, audFmt: 'wav', audMp3Kbps: 192, audM4aKbps: 192, audRange: 'all', audVoice: true, aiScope: 'all', tplProg: 'axis', tplKey: '0', tplDrum: 'b8', tplAcc: 'quarter', tplBars: '8', tplBass: true, tplDrum1: 'b8', vvUrl: 'http://127.0.0.1:50021', scEdit: true, scLen: 4, scDot: false, scRest: false, scAcc: 'auto', textLen: '0.5', lyricEnc: 'sjis', chordPer: '1', accPat: 'whole', accInst: 'sf_piano', accBass: true,
       };
       const S = { ...DEF };
       try { Object.assign(S, JSON.parse(localStorage.getItem(STORE) || '{}')); } catch (e) { }
@@ -3440,7 +3493,7 @@
         return {
           id: nextId++, kind, name: (kind === 'drum' ? 'ドラム ' : kind === 'audio' ? '音声 ' : 'メロディ ') + n,
           audioOff: 0, abuf: null, pk: null, pkN: 0,      // 音声のトラック：1小節目の頭が録音の何秒目か・鳴らす音・波形
-          inst: kind === 'drum' ? 'drum' : 'piano', vol: 80, mute: false, solo: false,
+          inst: kind === 'drum' ? 'drum' : 'sf_piano', vol: 80, mute: false, solo: false,
           align: 'auto', latency: 0, octave: 0,
           sr: 0, F: 1, dsr: 0, h: null, M: 0,
           raw: new Float32Array(0), rawLen: 0, ds: new Float32Array(0), dsLen: 0,
@@ -4476,6 +4529,7 @@
       function voice(instId, p, t, dur, vel, out, lyric) {
         const c = audio(), P = INST[instId] || INST.piano, f = hz(p);
         if (P.sing) return sing(p, t, dur, vel, out, lyric);
+        if (P.sf) return sfVoice(instId, p, t, dur, vel, out);
         const amp = c.createGain();
         let dest = amp;
         if (P.f) {
@@ -4525,6 +4579,89 @@
         };
         return nodes;
       }
+      // ══════════════════════════════════════
+      //  本物の楽器の音（FluidR3 GM のサンプル。3半音おきに持ち、間は高さを少し変えて鳴らす）
+      //  音は sf/<名前>/<ノート番号>.mp3。使う楽器だけ、はじめて鳴らすときに読み込む
+      // ══════════════════════════════════════
+      const SF = { bank: {}, loading: {}, failed: {} };
+      function sfLoad(id) {
+        const P = INST[id];
+        if (!P || !P.sf) return Promise.resolve(false);
+        if (SF.bank[P.sf]) return Promise.resolve(true);
+        if (SF.loading[P.sf]) return SF.loading[P.sf];
+        const c = audio(), ms = [];
+        for (let m = 21; m <= 108; m += 3) ms.push(m);
+        let done = 0;
+        SF.loading[P.sf] = (async () => {
+          const bank = new Map();
+          let i = 0;
+          const worker = async () => {
+            while (i < ms.length) {
+              const m = ms[i++];
+              const r = await fetch(`sf/${P.sf}/${m}.mp3`);
+              if (!r.ok) throw new Error(r.status);
+              const buf = await c.decodeAudioData(await r.arrayBuffer());
+              // mp3 の頭の無音をとばす
+              const d = buf.getChannelData(0);
+              let pk = 0; for (let k = 0; k < Math.min(d.length, 8000); k++) pk = Math.max(pk, Math.abs(d[k]));
+              let on = 0; while (on < d.length && Math.abs(d[on]) < pk * 0.05) on++;
+              let bp = 0; for (let k = 0; k < d.length; k++) { const v = Math.abs(d[k]); if (v > bp) bp = v; }
+              bank.set(m, { buf, off: Math.min(on, 4000) / buf.sampleRate, peak: bp });
+              done++;
+              if (done % 6 === 0) toast(`「${P.name.replace(/^★ /, '')}」の音を読み込んでいます… ${Math.round(done / ms.length * 100)}%`);
+            }
+          };
+          try {
+            await Promise.all([worker(), worker(), worker(), worker(), worker(), worker()]);
+            // 楽器ごとに大きさをそろえる（いちばん大きい音で合わせる）
+            let mx = 0; for (const v of bank.values()) mx = Math.max(mx, v.peak);
+            bank.norm = mx > 0 ? 1 / mx : 1;
+            SF.bank[P.sf] = bank;
+            return true;
+          } catch (e) {
+            SF.failed[P.sf] = true;
+            toast(`「${P.name}」の音を読み込めませんでした。かわりに合成の音で鳴らします` + (location.protocol === 'file:' ? '（ファイルを直接開いているときは使えません）' : ''));
+            return false;
+          } finally { delete SF.loading[P.sf]; }
+        })();
+        return SF.loading[P.sf];
+      }
+      const sfTracks = () => tracks.filter(t => t.kind === 'melody' && INST[t.inst] && INST[t.inst].sf && t.notes.length);
+      const sfNeeds = () => sfTracks().some(t => !SF.bank[INST[t.inst].sf] && !SF.failed[INST[t.inst].sf]);
+      async function sfPrepare() {
+        const ids = [...new Set(sfTracks().map(t => t.inst))];
+        await Promise.all(ids.map(sfLoad));
+      }
+      function sfVoice(id, p, t, dur, vel, out) {
+        const c = audio(), P = INST[id], bank = SF.bank[P.sf];
+        if (!bank) { if (!SF.failed[P.sf]) sfLoad(id); return voice(P.fb || 'piano', p, t, dur, vel, out); }      // 読み込み中は合成の音
+        let best = null;
+        for (const m of bank.keys()) if (best == null || Math.abs(m - p) < Math.abs(best - p)) best = m;
+        const smp = bank.get(best);
+        const src = c.createBufferSource();
+        src.buffer = smp.buf;
+        src.playbackRate.value = Math.pow(2, (p - best) / 12);
+        const g = c.createGain(), r = P.rel || 0.25;
+        const peak = 0.5 * (bank.norm || 1) * (P.vol || 1) * (0.25 + 0.75 * Math.pow(vel / 127, 1.4));
+        const end = t + Math.max(0.05, dur);
+        g.gain.setValueAtTime(peak, t);
+        g.gain.setValueAtTime(peak, end);
+        g.gain.setTargetAtTime(0, end, r / 3);
+        // のばす音（弦・オルガン・管・声）は、まん中をくり返して長い音にする
+        if (P.sus && end - t > 2.2) { src.loop = true; src.loopStart = smp.off + 1.0; src.loopEnd = smp.off + 2.7; }
+        src.connect(g); g.connect(out || c.destination);
+        src.start(t, smp.off);
+        src.stop(end + r * 2 + 0.05);
+        const nodes = [src];
+        nodes.release = () => {
+          const now = c.currentTime;
+          g.gain.cancelScheduledValues(now); g.gain.setValueAtTime(g.gain.value, now);
+          g.gain.setTargetAtTime(0, now, Math.max(0.02, r / 3));
+          try { src.stop(now + r * 2 + 0.1); } catch (e) { }
+        };
+        return nodes;
+      }
+
       // 「歌」：のこぎり波を3つの帯域（フォルマント）に通して母音にし、子音はノイズで足す
       const KANA = {};
       {
@@ -4822,6 +4959,7 @@
       let vvSkip = false;
       function play(fromStart) {
         if (G.recording || G.playing || G.busy) return;
+        if (sfNeeds()) { sfPrepare().then(() => play(fromStart)); return; }
         if (!vvSkip && vvNeeds()) {
           vvPrepare().then(() => { vvSkip = true; play(fromStart); vvSkip = false; });
           return;
@@ -4902,6 +5040,7 @@ registerProcessor('hum-rec',R);`;
           const ok = await window.DonnmaAsk.ask(`「${st.name}」の今の録音は消えます。録り直しますか？（重ねたいときは「＋ 音声のトラック」で増やしてください）`, { yes: '録り直す', no: 'やめる' });
           if (!ok) return;
         }
+        if (S.recOthers && sfNeeds()) await sfPrepare();
         const c = audio();
         if (VOX.on) setVox(false);
         if (MON.on) monStop(true);
@@ -5502,6 +5641,7 @@ registerProcessor('hum-rec',R);`;
       // 全部のトラックを OfflineAudioContext で鳴らして1つの音にする（再生と同じ音色・ミュート・ソロ・音量）
       async function renderMix(withVoice) {
         await vvPrepare();
+        await sfPrepare();
         const trs = playable();
         let end = 0;
         for (const t of trs) for (const n of viewNotes(t)) end = Math.max(end, n.e);
@@ -6424,6 +6564,7 @@ registerProcessor('hum-rec',R);`;
         if (!list.length) { toast('音色が「VOICEVOX の歌声」で、音のあるトラックがありません'); return; }
         for (const t of list) t.vv = null;
         await vvPrepare();
+        await sfPrepare();
         if (list.every(vvFresh)) toast('歌声を作りました');
       });
       $('vvUrl').value = S.vvUrl;
@@ -6965,7 +7106,9 @@ ${songJson(list)}
         return out;
       }
       function gmToInst(g) {
-        if (g == null) return 'piano';
+        if (g == null) return 'sf_piano';
+        const ex = Object.keys(INST).find(k => INST[k].sf && INST[k].gm === g);
+        if (ex) return ex;
         if (g === 4 || g === 5) return 'epiano';
         if (g < 8) return 'piano';
         if (g < 16) return 'bell';
@@ -7679,7 +7822,10 @@ ${songJson(list)}
       // ══════════════════════════════════════
       //  トラックの一覧
       // ══════════════════════════════════════
-      const instOptions = sel => Object.entries(INST).map(([k, v]) => `<option value="${k}"${k === sel ? ' selected' : ''}>${v.name}</option>`).join('');
+      const instOptions = sel => INST_GROUPS.map(([g, label]) => {
+        const items = Object.entries(INST).filter(([, v]) => instGroup(v) === g);
+        return items.length ? `<optgroup label="${label}">${items.map(([k, v]) => `<option value="${k}"${k === sel ? ' selected' : ''}>${v.name}</option>`).join('')}</optgroup>` : '';
+      }).join('');
       function renderTracks() {
         $('tracks').innerHTML = tracks.map(t => `
           <div class="trk${t === st ? ' sel' : ''}${t === st && G.recording ? ' rec' : ''}" data-id="${t.id}">
@@ -7765,7 +7911,8 @@ ${songJson(list)}
           if (INST[t.inst].vvox) {
             if (VV.ok) { if (!vvHas(t.vvStyle)) t.vvStyle = vvDefault(); renderTracks(); }
             else vvConnect(false);
-          } else { voice(t.inst, 60, audio().currentTime + 0.01, 0.5, 100); renderTracks(); }
+          } else if (INST[t.inst].sf) { renderTracks(); sfLoad(t.inst).then(ok => { if (ok) voice(t.inst, 60, audio().currentTime + 0.02, 0.8, 100); }); }
+          else { voice(t.inst, 60, audio().currentTime + 0.01, 0.5, 100); renderTracks(); }
         }
         if (e.target.matches('.trk-vv')) { t.vvStyle = Number(e.target.value) || null; t.vv = null; }
         saveSong();
@@ -8844,6 +8991,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        SF, sfLoad, sfPrepare, INST, instOptions, gmToInst,
         voxNext,
         rec, loop, punchMerge,
         transposeSong, fitKey, get songKey() { return songKey; },

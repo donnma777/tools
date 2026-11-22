@@ -7,6 +7,7 @@
 | `index.html` | 画面と処理（1ファイル。外部のライブラリは使わない。確認は `../common/ask.js`） |
 | `mp4-muxer.js` | 動画（MP4）を組み立てる部品 [mp4-muxer](https://github.com/Vanilagy/mp4-muxer) 5.2.2（MIT、`mp4-muxer-LICENSE.txt`）。動画を作るときだけ読み込む |
 | `lame.min.js` | MP3 を作る部品 [lamejs](https://github.com/zhuker/lamejs) 1.2.1（LGPL-3.0、`lamejs-LICENSE.txt`。手を入れずにそのまま置く）。MP3 で書き出すときだけ読み込む |
+| `sf/<楽器>/<ノート番号>.mp3` | 本物の楽器の音。FluidR3 GM（Frank Wen、CC BY 3.0）を [midi-js-soundfonts](https://github.com/gleitz/midi-js-soundfonts) から A0〜C8 の3半音おき（30 音）に抜き出したもの。32 楽器・約 19MB。クレジットはツールの下・説明書・`sf/README.txt` |
 | `guide/index.html` | 説明書（`/tool/hum-midi/guide/`）。使い方はここに書き、ツールの画面には細い見出しの「📖 説明書」と VOICEVOX の「くわしい手順」のリンクだけ置く |
 
 ## できること
@@ -50,6 +51,7 @@
 - **曲の保存・呼び出し**：ピアノロールの見出しの「🎵 曲の名前」でダイアログ（`#song-dlg`）。タイトル・作詞・作曲・編曲・メモ（`meta`）。保存は IndexedDB の `songs`（keyPath `id`。`{ id, meta, created, updated, bpm, beats, song: songData(), audio: [{ uid, sr, pcm, … }], stats }`）。上書き・別の曲として保存・新しい曲・開く・消す・さがす。Ctrl+S で保存（未保存ならダイアログ）。変更ありの ● は、保存したときの中身の値（`songSig()`：トラック・コード・meta・テンポ・拍子の FNV ハッシュ）と比べる
 - **AI のタブのファイル**：「⬇ JSON を保存」は送る範囲（aiScope）を `saveNotesJson()` でファイルに（aiSent も決める）、「⬆ JSON ファイルを開く」は中身を答えの欄に入れて `applyAi()`（送ったトラックと置き換え／トラックを追加）
 - **音で書き出す**：「その他の保存 ▾」→ `#aud-dlg`。`renderMix()` を範囲で切り出して割れないように下げ（`audSlice()`）、WAV（`wavFrom()`）・M4A（WebCodecs の AAC ＋ mp4-muxer の音だけの MP4）・MP3（lamejs）・FLAC（自前の `FLAC.encode()`：16bit・4096 ずつ・固定予測 0〜4 次・ライス符号・左右／ミッド・サイドの小さいほう。MD5 は 0）。FLAC は Chrome で読み戻して元と1サンプルも違わないことを確かめてある（Chrome は正の値を 1/32767 で float にする）
+- **本物の音**（`INST_SF`、id は `sf_…`）：音色の `sf` があれば `sfVoice()`。いちばん近いサンプルを playbackRate で ±1 半音ずらし、のばす音（`sus`）は 2.2 秒より長いとき 1.0〜2.7 秒をくり返す。はじめて鳴らすときに `sfLoad()`（6 本ずつ fetch → decode、頭の無音をとばし、楽器ごとにいちばん大きい音で大きさをそろえる）。再生・書き出し・録音中のほかのトラックの前に `sfPrepare()`。読み込むまで・読めないときは `fb` の合成の音。音色の一覧は `INST_GROUPS` で種類ごとの optgroup（★ よく使う が先頭）。新しいトラックと伴奏は `sf_piano`。.mid を開くと同じ GM の番号の本物の音を選ぶ
 - **音声のトラック**（kind `audio`）：MIDI にしない音のままのトラック。録音（読み取りはするが音符は作らない：`buildFor()` が空）か音声ファイル（読み取らずに raw へ）。位置は `audioOff`（1小節目の頭が録音の何秒目か。`origin()` はこれだけを見る）で、波形のドラッグで変える（グリッドに合わせる、Alt で自由）。鳴らすのは `trackEvents()`（`audioBufOf()`）なので、再生・録音中のほかのトラック・`renderMix()` に自然に入る（「録音だけ」でも鳴る。書き出しの「声」はメロディの録音のこと）。波形は `wavePeaks()`（1/400 秒ごとの最大）と `drawWave()`。音符を置く操作（キー入力・MIDI 入力・文字・歌詞・楽譜）は止める。「→ MIDI」（`audioToMidi()`）は raw を写したメロディのトラックを `t0Metro = audioOff` で作る。曲の保存では「録音を残さない」でも音声のトラックの音は残す
 - **動画にする**：「その他の保存 ▾」→ `#video-dlg`。`vdModel()`（範囲・トラック・歌詞の行）と `vdDraw()`（1コマ。タイトル・作詞作曲・流れるピアノロール・コード・カラオケの歌詞・進み具合）。形 横 1280×720／縦 720×1280／正方形 720×720（1080p は ×1.5）、色は夜・昼。WebCodecs の VideoEncoder（H.264、avc1.640028 から順に試す）と AudioEncoder（AAC 192kbps）、音は `renderMix()` を範囲で切り出す。mp4-muxer で fastStart の MP4。30fps、コマは 1 枚ずつ（再生しないので曲より早い）。X へは intent（文と URL）を開くだけ、`navigator.share` で動画を渡せるときは 📤 共有も
 - **JSON（AI・ほかのツール用）**：「その他の保存 ▾」。AI の「データ（JSON）だけコピー」と同じ形（`songJson()`）を全部のトラックでファイルに。title・lyricist・composer・arranger があれば頭に足す。読み戻しは `openJsonFile()`：「MIDI を開く」「曲ファイル・JSON を開く」・画面に落とす、のどれでも。`app` があれば曲ファイル、なければ `readAiSong()` で読んで `putSong()`（AI の反映と共通）。置き換えなら新しい曲として title などを使う（なければファイル名）
