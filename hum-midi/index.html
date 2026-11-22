@@ -7538,7 +7538,7 @@ ${songJson(list)}
         if (!VD.blob) return;
         try { await navigator.share({ files: [new File([VD.blob], VD.name + '.mp4', { type: 'video/mp4' })], text: vdPostText() }); } catch (e) { }
       });
-      const vdPostText = () => `${meta.title.trim() ? `「${meta.title.trim()}」を作りました🎵` : '鼻歌から曲を作りました🎵'}\n#鼻歌MIDI変換\nhttps://donnma.com/tool/hum-midi/`;
+      const vdPostText = () => `${meta.title.trim() ? `「${meta.title.trim()}」を作りました🎵` : '鼻歌から曲を作りました🎵'}\n#鼻歌MIDI変換 #どんまうんどTools\nhttps://donnma.com/tool/hum-midi/`;
       $('vd-x').addEventListener('click', () => { window.open('https://x.com/intent/post?text=' + encodeURIComponent(vdPostText()), '_blank', 'noopener'); });
 
       // ドロップで開く
