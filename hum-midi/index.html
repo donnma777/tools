@@ -3020,7 +3020,8 @@
     (() => {
       'use strict';
       const $ = id => document.getElementById(id);
-      const toast = msg => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); };
+      // お知らせ。曲の画面（showModal）が開いていると body のものは後ろに隠れるので、その中に置く
+      const toast = msg => { const t = $('toast'), dlg = document.querySelector('dialog[open]'); const host = dlg && dlg.matches(':modal') ? dlg : document.body; if (t.parentNode !== host) host.appendChild(t); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); };
       const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
       const escH = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
       const mod = (a, n) => ((a % n) + n) % n;
@@ -6686,7 +6687,8 @@ ${songJson(list)}
         toast('曲ファイルを書き出しました' + (audio.length ? `（録音 ${audio.length} つ入り）` : ''));
       });
       $('song-import').addEventListener('click', () => $('song-file').click());
-      $('song-file').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; openJsonFile(f); });
+      // 開いたら曲の画面は閉じて、読み込んだ曲（と確認・お知らせ）をそのまま見せる
+      $('song-file').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; if ($('song-dlg').open) $('song-dlg').close(); openJsonFile(f); });
       // .json を開く：このツールの曲ファイル（録音まで）か、AI・ほかのツール用の JSON（音・歌詞・コード）か
       async function openJsonFile(f) {
         if (!f || G.recording || G.busy) return;
@@ -6719,7 +6721,7 @@ ${songJson(list)}
         for (const a of Array.isArray(o.audio) ? o.audio : []) {
           try { if (a && typeof a.uid === 'string' && a.sr && typeof a.pcm === 'string') rec.audio.push({ ...a, pcm: unb64(a.pcm) }); } catch (err) { }
         }
-        if (await openSongRecord(rec, false)) { libStateText(); renderLib(); toast(`「${meta.title || f.name}」を開きました。「保存する」でこのブラウザに残せます`); }
+        if (await openSongRecord(rec, false)) { libStateText(); renderLib(); toast(`「${meta.title || f.name}」を開きました。残すときは 🎵 曲の名前から「保存する」`); }
       }
 
       // ══════════════════════════════════════
