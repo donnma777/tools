@@ -1201,6 +1201,20 @@
       width: 90px;
     }
 
+    .mon-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+      margin-top: 10px;
+    }
+
+    .mon-range {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ok, #7fd8a4);
+    }
+
     .trk-btn.trk-tomidi {
       width: auto;
       padding: 0 8px;
@@ -2995,6 +3009,11 @@
               <div class="meter" title="入力の大きさ"><div id="meter-bar"></div></div>
             </div>
           </div>
+          <div class="mon-row">
+            <button class="btn btn-sm btn-toggle" type="button" id="mon" title="録らずにマイクを聞いて、今の音の高さをピアノロールの鍵盤に出します。歌った音域も覚えます">🎧 マイクを聞く（録らない）</button>
+            <span class="mon-range" id="mon-range"></span>
+            <button class="btn btn-sm" type="button" id="mon-reset" hidden title="覚えた音域を消す">音域をリセット</button>
+          </div>
 
           <div class="opts" style="margin-top:14px">
             <label class="opt"><span>マイク</span><select id="device"><option value="">いつものマイク</option></select></label>
@@ -3359,7 +3378,7 @@
 
       // ── 設定 ──
       const DEF = {
-        device: '', bpm: 120, beats: 4, countIn: 1, clickVol: 60, metro: true, recOthers: true, micGain: 0, micAgc: false,
+        device: '', bpm: 120, beats: 4, countIn: 1, clickVol: 60, metro: true, recOthers: true, micGain: 0, micAgc: false, monitor: false, monLo: null, monHi: null,
         range: 'voice', sens: 2, gate: -50, minMs: 80, split: true, autoTune: true,
         key: 'off', scale: 'major', quant: '16', quantLen: true, vel: 'dyn',
         names: 'en', naming: '4', playMode: 'both', playClick: false, zoom: 60, repeat: false, kbOct: 4, stepLen: '0.5',
@@ -4066,6 +4085,7 @@
             if (p % 12 === 0 && rh >= 8) { g2.fillStyle = '#6e3551'; g2.font = `700 ${Math.min(10, rh - 2)}px ui-monospace, Consolas, monospace`; g2.textAlign = 'right'; g2.fillText(noteName(p), KW - 4, Y(p) + rh / 2 + 0.5); g2.textAlign = 'start'; }
           }
         }
+        drawMonitor(Y, KW, W);
         if (S.velLane) {
           g2.fillStyle = '#2e1224'; g2.fillRect(0, L.laneTop, KW - 1, VEL_H);
           g2.fillStyle = COL.rulerText; g2.font = '700 11px "Zen Maru Gothic", sans-serif';
@@ -4849,12 +4869,14 @@ registerProcessor('hum-rec',R);`;
           if (!ok) return;
         }
         const c = audio();
+        if (MON.on) monStop(true);
         try {
           rec.stream = await navigator.mediaDevices.getUserMedia({
             audio: { deviceId: S.device ? { exact: S.device } : undefined, echoCancellation: false, noiseSuppression: false, autoGainControl: !!S.micAgc, channelCount: 1 },
           });
         } catch (e) {
           toast(e && e.name === 'NotAllowedError' ? 'マイクが許可されていません（アドレスバーの左から許可できます）' : 'マイクを開けませんでした');
+          if (S.monitor) monStart();
           return;
         }
         listDevices();
@@ -4946,6 +4968,7 @@ registerProcessor('hum-rec',R);`;
           rec.stream.getTracks().forEach(t => t.stop());
           if (st.kind === 'audio') normalizeRec(st);
           finish();
+          if (S.monitor) monStart();
         }, 120);
       }
 
@@ -5055,6 +5078,133 @@ registerProcessor('hum-rec',R);`;
           sel.value = list.some(d => d.deviceId === S.device) ? S.device : '';
         } catch (e) { }
       }
+
+      // ══════════════════════════════════════
+      //  マイクを聞く（録らずに、今の音の高さと音域を出す）
+      // ══════════════════════════════════════
+      const MON = { on: false, stream: null, src: null, gain: null, an: null, buf: null, timer: 0, p: null, hist: [], cand: null, candN: 0 };
+      // YIN（短い窓用）
+      function yinPitch(x, sr, fmin, fmax) {
+        const tmin = Math.max(2, Math.floor(sr / fmax)), tmax = Math.min(Math.floor(sr / fmin), (x.length >> 1) - 1), W = x.length - tmax - 1;
+        const d = new Float32Array(tmax + 2);
+        for (let t = 1; t <= tmax + 1; t++) { let s1 = 0; for (let i = 0; i < W; i++) { const v = x[i] - x[i + t]; s1 += v * v; } d[t] = s1; }
+        let run = 0; d[0] = 1;
+        for (let t = 1; t <= tmax + 1; t++) { run += d[t]; d[t] = run ? d[t] * t / run : 1; }
+        for (let t = tmin; t <= tmax; t++) {
+          if (d[t] < 0.15) {
+            while (t + 1 <= tmax && d[t + 1] < d[t]) t++;
+            const a = d[t - 1], b = d[t], c = d[t + 1], den = a - 2 * b + c, sh = den ? (a - c) / (2 * den) : 0;
+            return { hz: sr / (t + Math.max(-1, Math.min(1, sh))), ap: b };
+          }
+        }
+        return null;
+      }
+      const monRangeText = () => (S.monLo != null && S.monHi != null ? `あなたの音域 ${noteName(S.monLo)}〜${noteName(S.monHi)}（${((S.monHi - S.monLo) / 12).toFixed(1)} オクターブ）` : '');
+      function monShowRange() {
+        $('mon-range').textContent = monRangeText() || (MON.on ? 'いちばん低い音から高い音まで、ゆっくり歌ってみてください' : '');
+        $('mon-reset').hidden = S.monLo == null;
+      }
+      async function monStart() {
+        if (MON.on || G.recording) return;
+        const c = audio();
+        try {
+          MON.stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: S.device ? { exact: S.device } : undefined, echoCancellation: false, noiseSuppression: false, autoGainControl: !!S.micAgc, channelCount: 1 } });
+        } catch (e) {
+          toast(e && e.name === 'NotAllowedError' ? 'マイクが許可されていません（アドレスバーの左から許可できます）' : 'マイクを開けませんでした');
+          S.monitor = false; save(); $('mon').classList.remove('on');
+          return;
+        }
+        if (G.recording) { MON.stream.getTracks().forEach(t => t.stop()); return; }
+        MON.src = c.createMediaStreamSource(MON.stream);
+        MON.gain = c.createGain(); MON.gain.gain.value = Math.pow(10, (S.micGain || 0) / 20);
+        MON.an = c.createAnalyser(); MON.an.fftSize = 2048;
+        MON.src.connect(MON.gain); MON.gain.connect(MON.an);
+        MON.buf = new Float32Array(MON.an.fftSize);
+        MON.on = true; MON.p = null; MON.hist = [];
+        $('mon').classList.add('on');
+        monShowRange();
+        listDevices();
+        MON.timer = setInterval(monTick, 50);
+      }
+      function monStop(keep) {
+        if (MON.on) {
+          clearInterval(MON.timer);
+          try { MON.src.disconnect(); MON.gain.disconnect(); } catch (e) { }
+          MON.stream.getTracks().forEach(t => t.stop());
+        }
+        MON.on = false; MON.p = null;
+        if (!keep) { S.monitor = false; save(); }
+        $('mon').classList.remove('on');
+        if (!G.recording) resetLive();
+        monShowRange();
+        draw();
+      }
+      function monTick() {
+        if (!MON.on || G.recording) return;
+        const c = audio(), sr = c.sampleRate;
+        MON.an.getFloatTimeDomainData(MON.buf);
+        // 16kHz くらいに間引く（3つずつ平均して、高い音を少し落としてから）
+        const F = Math.max(1, Math.round(sr / 16000)), n = Math.floor(MON.buf.length / F), x = new Float32Array(n);
+        let e = 0;
+        for (let i = 0; i < n; i++) { let s1 = 0; for (let j = 0; j < F; j++) s1 += MON.buf[i * F + j]; x[i] = s1 / F; e += x[i] * x[i]; }
+        const db = 10 * Math.log10(e / n + 1e-12);
+        $('meter-bar').style.width = clamp((db + 70) / 64 * 100, 0, 100) + '%';
+        const [lo, hi] = RANGES[S.range] || RANGES.voice;
+        const r = db > S.gate ? yinPitch(x, sr / F, Math.max(lo, 60), hi) : null;
+        const dot = $('cents-dot');
+        let p = null;
+        if (r && r.ap < 0.2) {
+          const m = 69 + 12 * Math.log2(r.hz / 440);
+          MON.hist.push(m); if (MON.hist.length > 3) MON.hist.shift();
+          p = MON.hist.slice().sort((a, b) => a - b)[MON.hist.length >> 1];
+        } else MON.hist = [];
+        const prev = MON.p;
+        MON.p = p;
+        if (p != null) {
+          const pr = Math.round(p), cents = Math.round((p - pr) * 100);
+          $('live-note').textContent = noteName(pr);
+          $('live-sub').textContent = `${hz(p).toFixed(1)} Hz ・ ${cents >= 0 ? '+' : ''}${cents} セント`;
+          dot.style.left = (50 + cents) + '%'; dot.style.opacity = 1;
+          dot.style.background = Math.abs(cents) <= 15 ? 'var(--ok)' : 'var(--warn)';
+          // 音域：同じ音が 0.2 秒続いたら数える（ひっくり返った一瞬の音は入れない）
+          if (MON.cand === pr) MON.candN++; else { MON.cand = pr; MON.candN = 1; }
+          if (MON.candN === 4) {
+            let ch = false;
+            if (S.monLo == null || pr < S.monLo) { S.monLo = pr; ch = true; }
+            if (S.monHi == null || pr > S.monHi) { S.monHi = pr; ch = true; }
+            if (ch) { save(); monShowRange(); }
+          }
+        } else {
+          MON.cand = null; MON.candN = 0;
+          $('live-note').textContent = '－'; $('live-sub').textContent = db > S.gate ? '音の高さが取れません' : 'マイクを聞いています'; dot.style.opacity = 0;
+        }
+        if (prev !== p) draw();
+      }
+      // ピアノロールの鍵盤：今の音（黄色）と、これまでの音域（左の緑の帯）
+      function drawMonitor(Y, KW, W) {
+        if (L.drum) return;
+        const rh = L.rowH;
+        if (S.monLo != null && S.monHi != null) {
+          const a = Math.max(L.lo, S.monLo), b = Math.min(L.hi, S.monHi);
+          if (a <= b) { g2.fillStyle = 'rgba(127,216,164,0.95)'; g2.fillRect(0, Y(b), 5, Y(a) + rh - Y(b)); }
+        }
+        if (MON.on && MON.p != null && MON.p >= L.lo - 0.5 && MON.p <= L.hi + 0.5) {
+          const pr = Math.round(MON.p);
+          if (L.idx.has(pr)) { g2.fillStyle = 'rgba(255,196,107,0.9)'; g2.fillRect(5, Y(pr), KW - 6, rh); }
+          const yy = RULER + (L.hi - MON.p) * rh + rh / 2;
+          g2.fillStyle = 'rgba(255,196,107,0.45)'; g2.fillRect(KW, yy - 1, W - KW, 2);
+        }
+      }
+      $('mon').addEventListener('click', () => { if (MON.on) monStop(false); else { S.monitor = true; save(); monStart(); } });
+      $('mon-reset').addEventListener('click', () => { S.monLo = S.monHi = null; save(); monShowRange(); draw(); });
+      $('device').addEventListener('change', () => { if (MON.on) { monStop(true); monStart(); } });
+      $('micGain').addEventListener('input', e => { if (MON.gain) MON.gain.gain.value = Math.pow(10, (Number(e.target.value) || 0) / 20); });
+      monShowRange();
+      // 前に聞いていて、マイクがもう許可されていれば、開いたときから聞く
+      if (S.monitor && navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'microphone' }).then(p => { if (p.state === 'granted') monStart(); }).catch(() => { });
+      }
+
 
       // ══════════════════════════════════════
       //  音声ファイル（今のトラックに入れる）
@@ -8429,6 +8579,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        MON, monStart, monStop, yinPitch,
         normalizeRec,
         ZIP, importZip,
         FLAC, wavFrom, toI16,
