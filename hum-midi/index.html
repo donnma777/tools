@@ -3283,10 +3283,11 @@
         <ul class="sd-items" id="lib-list"></ul>
       </section>
       <div class="sd-file">
-        <button class="btn btn-sm" type="button" id="song-export" title="曲をまるごと（録音・音色の設定まで）1つのファイルに。開くと元通りに戻ります">曲ファイルに書き出す（.json・録音までまるごと）</button>
-        <button class="btn btn-sm" type="button" id="song-import" title="曲ファイルと、「その他の保存」の JSON を開けます">曲ファイル・JSON を開く</button>
-        <input type="file" id="song-file" accept=".json,application/json" hidden>
-        <p class="hint">保存した曲は<b>このブラウザの中</b>に残ります。ブラウザのデータを消すと消えるので、パソコンを替えるときやバックアップは曲ファイル（タイトル・トラック・歌詞・録音まで入ります）で。<kbd>Ctrl</kbd>+<kbd>S</kbd> で保存。</p>
+        <button class="btn btn-sm" type="button" id="song-export" title="今の曲をまるごと（録音・音色の設定まで）1つのファイルに。開くと元通りに戻ります">今の曲を書き出す（.json）</button>
+        <button class="btn btn-sm" type="button" id="song-export-all" title="保存した曲を全部、1曲ずつの曲ファイルにして ZIP にまとめます（録音も）">全部の曲を書き出す（.zip）</button>
+        <button class="btn btn-sm" type="button" id="song-import" title="曲ファイル（.json）・「その他の保存」の JSON・全部の曲の ZIP を開けます">開く（.json・.zip）</button>
+        <input type="file" id="song-file" accept=".json,application/json,.zip,application/zip" hidden>
+        <p class="hint">保存した曲は<b>このブラウザの中</b>に残ります。ブラウザのデータを消すと消えるので、パソコンを替えるときやバックアップは「全部の曲を書き出す（.zip）」で（タイトル・トラック・歌詞・録音まで入ります）。ZIP を開くと、中の曲が全部この一覧に入ります。<kbd>Ctrl</kbd>+<kbd>S</kbd> で保存。</p>
       </div>
     </div>
   </dialog>
@@ -6303,7 +6304,7 @@ ${songJson(list)}
       const JSON_WARN = 'donnma-hum-midi-jsonwarned';
       async function jsonWarnOk() {
         try { if (localStorage.getItem(JSON_WARN)) return true; } catch (e) { }
-        const r = await window.DonnmaAsk.ask('この JSON は「AI・ほかのツールに渡す」ためのもので、音・歌詞・コード・テンポだけが入ります。\n録音（声）・音色や音量・変換の設定は入らないので、曲の保存の代わりにはなりません。\n\n曲を取っておくときは、🎵 曲の名前から「保存する」か「曲ファイルに書き出す」を使ってください。（この案内は次から出ません）', { yes: 'JSON を保存', no: '曲の保存を開く', danger: false });
+        const r = await window.DonnmaAsk.ask('この JSON は「AI・ほかのツールに渡す」ためのもので、音・歌詞・コード・テンポだけが入ります。\n録音（声）・音色や音量・変換の設定は入らないので、曲の保存の代わりにはなりません。\n\n曲を取っておくときは、🎵 曲の名前から「保存する」か「今の曲を書き出す」を使ってください。（この案内は次から出ません）', { yes: 'JSON を保存', no: '曲の保存を開く', danger: false });
         if (r == null) return false;
         try { localStorage.setItem(JSON_WARN, '1'); } catch (e) { }
         if (r === false) { openSongDlg(false); return false; }
@@ -6996,7 +6997,7 @@ ${songJson(list)}
       });
       $('song-import').addEventListener('click', () => $('song-file').click());
       // 開いたら曲の画面は閉じて、読み込んだ曲（と確認・お知らせ）をそのまま見せる
-      $('song-file').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; if ($('song-dlg').open) $('song-dlg').close(); openJsonFile(f); });
+      $('song-file').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; if (/\.zip$/i.test(f.name)) { importZip(f); return; } if ($('song-dlg').open) $('song-dlg').close(); openJsonFile(f); });
       // .json を開く：このツールの曲ファイル（録音まで）か、AI・ほかのツール用の JSON（音・歌詞・コード）か
       async function openJsonFile(f) {
         if (!f || G.recording || G.busy) return;
@@ -7030,6 +7031,122 @@ ${songJson(list)}
           try { if (a && typeof a.uid === 'string' && a.sr && typeof a.pcm === 'string') rec.audio.push({ ...a, pcm: unb64(a.pcm) }); } catch (err) { }
         }
         if (await openSongRecord(rec, false)) { libStateText(); renderLib(); toast(`「${meta.title || f.name}」を開きました。残すときは 🎵 曲の名前から「保存する」`); }
+      }
+      // ══════════════════════════════════════
+      //  ZIP（自前）：保存した曲を全部まとめて書き出す・読み込む
+      // ══════════════════════════════════════
+      const ZIP = (() => {
+        const T = new Uint32Array(256);
+        for (let i = 0; i < 256; i++) { let c = i; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; T[i] = c >>> 0; }
+        const crc32 = u => { let c = 0xffffffff; for (let i = 0; i < u.length; i++) c = T[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+        const pipe = async (u, stream) => new Uint8Array(await new Response(new Blob([u]).stream().pipeThrough(stream)).arrayBuffer());
+        const canDeflate = typeof CompressionStream === 'function';
+        async function make(files) {         // files: [{ name, data: Uint8Array }]
+          const parts = [], cen = [];
+          let off = 0;
+          const d = new Date(), dt = ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)), dd = (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate());
+          for (const f of files) {
+            const name = new TextEncoder().encode(f.name), crc = crc32(f.data);
+            let body = f.data, method = 0;
+            if (canDeflate) { try { const z = await pipe(f.data, new CompressionStream('deflate-raw')); if (z.length < f.data.length) { body = z; method = 8; } } catch (e) { } }
+            const h = new DataView(new ArrayBuffer(30));
+            h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, method, true);
+            h.setUint16(10, dt, true); h.setUint16(12, dd, true); h.setUint32(14, crc, true); h.setUint32(18, body.length, true); h.setUint32(22, f.data.length, true);
+            h.setUint16(26, name.length, true); h.setUint16(28, 0, true);
+            parts.push(new Uint8Array(h.buffer), name, body);
+            const c = new DataView(new ArrayBuffer(46));
+            c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(10, method, true);
+            c.setUint16(12, dt, true); c.setUint16(14, dd, true); c.setUint32(16, crc, true); c.setUint32(20, body.length, true); c.setUint32(24, f.data.length, true);
+            c.setUint16(28, name.length, true); c.setUint32(42, off, true);
+            cen.push(new Uint8Array(c.buffer), name);
+            off += 30 + name.length + body.length;
+          }
+          const csize = cen.reduce((a, u) => a + u.length, 0);
+          const e = new DataView(new ArrayBuffer(22));
+          e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, csize, true); e.setUint32(16, off, true);
+          return new Blob([...parts, ...cen, new Uint8Array(e.buffer)], { type: 'application/zip' });
+        }
+        async function read(buf) {           // → [{ name, data: Uint8Array }]
+          const u = new Uint8Array(buf), v = new DataView(buf);
+          let e = -1;
+          for (let i = u.length - 22; i >= Math.max(0, u.length - 22 - 65535); i--) if (v.getUint32(i, true) === 0x06054b50) { e = i; break; }
+          if (e < 0) throw new Error('ZIP ではありません');
+          const n = v.getUint16(e + 10, true);
+          let p = v.getUint32(e + 16, true);
+          const out = [];
+          for (let k = 0; k < n; k++) {
+            if (v.getUint32(p, true) !== 0x02014b50) break;
+            const method = v.getUint16(p + 10, true), csz = v.getUint32(p + 20, true), nl = v.getUint16(p + 28, true), xl = v.getUint16(p + 30, true), cl = v.getUint16(p + 32, true), lo = v.getUint32(p + 42, true);
+            const name = new TextDecoder().decode(u.subarray(p + 46, p + 46 + nl));
+            p += 46 + nl + xl + cl;
+            if (name.endsWith('/')) continue;
+            const ds = lo + 30 + v.getUint16(lo + 26, true) + v.getUint16(lo + 28, true), raw = u.subarray(ds, ds + csz);
+            let data = null;
+            if (method === 0) data = raw.slice();
+            else if (method === 8 && typeof DecompressionStream === 'function') { try { data = await pipe(raw, new DecompressionStream('deflate-raw')); } catch (err) { } }
+            if (data) out.push({ name, data });
+          }
+          return out;
+        }
+        return { make, read };
+      })();
+      // 保存した曲 → 曲ファイル（.json の中身）
+      const songFileObj = rec => ({
+        app: 'donnma-hum-midi', format: 1, saved: new Date(rec.updated || Date.now()).toISOString(), libId: rec.id, created: rec.created, updated: rec.updated,
+        meta: rec.meta, bpm: rec.bpm, beats: rec.beats, song: rec.song, audio: (rec.audio || []).map(a => ({ ...a, pcm: b64(a.pcm) })),
+      });
+      $('song-export-all').addEventListener('click', async () => {
+        if (G.recording || G.busy) return;
+        let all = [];
+        try { all = await IDB.songAll(); } catch (e) { }
+        if (!all.length) { toast('保存した曲がありません'); return; }
+        all.sort((a, b) => b.updated - a.updated);
+        toast(`${all.length} 曲をまとめています…`);
+        const used = new Set(), files = [];
+        for (const r of all) {
+          let base = String((r.meta && r.meta.title) || '無題の曲').replace(/[\\/:*?"<>|\r\n\t]/g, '_').trim().slice(0, 60) || '無題の曲', name = base, i = 2;
+          while (used.has(name)) name = `${base} (${i++})`;
+          used.add(name);
+          files.push({ name: name + '.json', data: new TextEncoder().encode(JSON.stringify(songFileObj(r))) });
+        }
+        const zip = await ZIP.make(files);
+        download(zip, 'application/zip', '鼻歌MIDI変換-全部の曲', '.zip');
+        toast(`${all.length} 曲を ZIP に書き出しました（${(zip.size / 1048576).toFixed(1)}MB）`);
+      });
+      // ZIP の中の曲ファイルを、保存した曲の一覧に入れる
+      async function importZip(f) {
+        if (!f || G.recording || G.busy) return;
+        if (!window.indexedDB) { toast('このブラウザでは保存できません'); return; }
+        let entries;
+        try { entries = await ZIP.read(await f.arrayBuffer()); } catch (e) { toast('ZIP を読めませんでした'); return; }
+        const recs = [];
+        for (const en of entries) {
+          if (!/\.json$/i.test(en.name)) continue;
+          let o = null;
+          try { o = JSON.parse(new TextDecoder().decode(en.data)); } catch (e) { }
+          if (!o || o.app !== 'donnma-hum-midi' || !o.song || !Array.isArray(o.song.tracks)) continue;
+          const audio = [];
+          for (const a of Array.isArray(o.audio) ? o.audio : []) { try { if (a && typeof a.uid === 'string' && a.sr && typeof a.pcm === 'string') audio.push({ ...a, pcm: unb64(a.pcm) }); } catch (e) { } }
+          const now = Date.now();
+          recs.push({ id: typeof o.libId === 'string' && o.libId ? o.libId.slice(0, 40) : libIdNew(), meta: cleanMeta(o.meta), created: Number(o.created) || now, updated: Number(o.updated) || now, bpm: o.bpm, beats: o.beats, song: o.song, audio, stats: songStats(o.song) });
+        }
+        if (!recs.length) { toast('ZIP の中に、このツールの曲ファイルがありませんでした'); return; }
+        let have = new Set();
+        try { have = new Set((await IDB.songAll()).map(r => r.id)); } catch (e) { }
+        const dup = recs.filter(r => have.has(r.id));
+        let over = true;
+        if (dup.length) {
+          const a = await window.DonnmaAsk.ask(`${recs.length} 曲のうち ${dup.length} 曲は、もう一覧にあります（${dup.slice(0, 3).map(r => '「' + (r.meta.title || '無題の曲') + '」').join('')}${dup.length > 3 ? ' など' : ''}）。上書きしますか？ それとも別の曲として足しますか？`, { yes: '上書きする', no: '別の曲として足す' });
+          if (a == null) return;
+          over = a;
+        }
+        let n = 0;
+        for (const r of recs) {
+          if (have.has(r.id) && !over) r.id = libIdNew();
+          try { await IDB.songPut(r); n++; } catch (e) { toast('入りきりませんでした（空き容量が足りないかもしれません）'); break; }
+        }
+        if ($('song-dlg').open) { libStateText(); renderLib(); }
+        toast(`${n} 曲を、保存した曲の一覧に入れました`);
       }
 
       // ══════════════════════════════════════
@@ -7884,7 +8001,7 @@ ${songJson(list)}
       const inPanel = $('in-panel');
       inPanel.addEventListener('dragover', e => { if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); inPanel.classList.add('drag'); } });
       inPanel.addEventListener('dragleave', e => { if (!inPanel.contains(e.relatedTarget)) inPanel.classList.remove('drag'); });
-      const dropOpen = f => { if (f && /\.midi?$/i.test(f.name)) importMidi(f); else if (f && /\.json$/i.test(f.name)) openJsonFile(f); else loadFile(f); };
+      const dropOpen = f => { if (f && /\.midi?$/i.test(f.name)) importMidi(f); else if (f && /\.json$/i.test(f.name)) openJsonFile(f); else if (f && /\.zip$/i.test(f.name)) { openSongDlg(false); importZip(f); } else loadFile(f); };
       inPanel.addEventListener('drop', e => { e.preventDefault(); inPanel.classList.remove('drag'); dropOpen(e.dataTransfer.files[0]); });
       const rollPanel = document.querySelector('.panel.wide');
       rollPanel.addEventListener('dragover', e => { if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); rollPanel.classList.add('drag'); } });
@@ -8149,6 +8266,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        ZIP, importZip,
         FLAC, wavFrom, toI16,
         vdDur: () => (VD.model ? VD.model.dur : 0), vdModel, vdDraw,
         lib: { save: libSave, open: libOpen, del: libDelete, all: () => IDB.songAll(), get meta() { return meta; }, get libId() { return libId; }, get dirty() { return dirty; } },
