@@ -2541,8 +2541,8 @@
           </span>
           <span class="info" id="roll-info"></span>
           <div class="export">
-            <button class="btn btn-sm" type="button" id="open-mid">MIDI を開く</button>
-            <input type="file" id="mid-file" accept=".mid,.midi,audio/midi,audio/x-midi" hidden>
+            <button class="btn btn-sm" type="button" id="open-mid" title=".mid と .json（曲ファイル・AI 用の JSON）を開けます。画面に落としても開けます">MIDI を開く</button>
+            <input type="file" id="mid-file" accept=".mid,.midi,audio/midi,audio/x-midi,.json,application/json" hidden>
             <details class="menu" id="save-menu">
               <summary class="btn btn-sm">その他の保存 ▾</summary>
               <div class="menu-list">
@@ -3006,7 +3006,7 @@
       </section>
       <div class="sd-file">
         <button class="btn btn-sm" type="button" id="song-export">曲ファイルに書き出す（.json）</button>
-        <button class="btn btn-sm" type="button" id="song-import">曲ファイルを開く</button>
+        <button class="btn btn-sm" type="button" id="song-import" title="曲ファイルと、「その他の保存」の JSON を開けます">曲ファイル・JSON を開く</button>
         <input type="file" id="song-file" accept=".json,application/json" hidden>
         <p class="hint">保存した曲は<b>このブラウザの中</b>に残ります。ブラウザのデータを消すと消えるので、パソコンを替えるときやバックアップは曲ファイル（タイトル・トラック・歌詞・録音まで入ります）で。<kbd>Ctrl</kbd>+<kbd>S</kbd> で保存。</p>
       </div>
@@ -6120,6 +6120,13 @@ ${songJson(list)}
         const what = sent.length ? (sent.length === tracks.length ? '今の全トラック' : `送った ${sent.length} トラック（${sent.map(t => t.name).join('・')}）`) : '今の全トラック';
         const rep2 = await window.DonnmaAsk.ask(`${r.tracks.length} トラック・${r.tracks.reduce((a, t) => a + t.notes.length, 0)} 音を読みました。${what}と入れ替えますか？`, { yes: '入れ替える', no: '後ろに足す' });
         if (rep2 == null) return;
+        const res = putSong(r, rep2, sent);
+        if (!res) return;
+        $('ai-info').textContent = `${res.tracks} トラック・${res.notes} 音を入れました` + (r.bad ? `（読めなかった音 ${r.bad} 個は飛ばしました）` : '') + (res.over ? '。入りきらないトラックがありました' : '');
+        toast('AI の答えを反映しました');
+      }
+      // 読んだ曲（readAiSong の形）を入れる。replace なら gone（なければ全部）と入れ替え、でなければ後ろに足す
+      function putSong(r, replace, gone) {
         stopPlay(); kbReleaseAll();
         const made = r.tracks.map(o => {
           const t = newTrack(o.drum ? 'drum' : 'melody');
@@ -6129,15 +6136,15 @@ ${songJson(list)}
           return t;
         });
         let at = tracks.length;
-        if (rep2) {
-          const gone = sent.length ? sent : tracks.slice();
+        if (replace) {
+          if (!gone || !gone.length) gone = tracks.slice();
           at = Math.max(0, tracks.indexOf(gone[0]));
           for (const t of gone) delAudio(t.uid);
           tracks = tracks.filter(t => !gone.includes(t));
           at = Math.min(at, tracks.length);
         }
         const room = MAX_TRACKS - tracks.length;
-        if (room <= 0) { toast('トラックがいっぱいです（16 まで）'); return; }
+        if (room <= 0) { toast('トラックがいっぱいです（16 まで）'); return null; }
         tracks.splice(at, 0, ...made.slice(0, room));
         if (!tracks.length) tracks.push(newTrack('melody'));
         if (r.bpm) S.bpm = r.bpm;
@@ -6147,9 +6154,7 @@ ${songJson(list)}
         st = made[0] && tracks.includes(made[0]) ? made[0] : tracks[0];
         aiSent = made.map(t => t.id);
         setUI(); renderTracks(); resetLive(); refresh();
-        const n = made.slice(0, room).reduce((a, t) => a + t.notes.length, 0);
-        $('ai-info').textContent = `${Math.min(made.length, room)} トラック・${n} 音を入れました` + (r.bad ? `（読めなかった音 ${r.bad} 個は飛ばしました）` : '') + (made.length > room ? '。入りきらないトラックがありました' : '');
-        toast('AI の答えを反映しました');
+        return { tracks: Math.min(made.length, room), notes: made.slice(0, room).reduce((a, t) => a + t.notes.length, 0), over: made.length > room };
       }
       $('ai-apply').addEventListener('click', applyAi);
 
@@ -6262,7 +6267,7 @@ ${songJson(list)}
         toast(`${Math.min(made.length, room)} トラックを読み込みました（♩=${S.bpm}）` + (made.length > room ? '。多いぶんは入りませんでした' : ''));
       }
       $('open-mid').addEventListener('click', () => $('mid-file').click());
-      $('mid-file').addEventListener('change', e => { importMidi(e.target.files[0]); e.target.value = ''; });
+      $('mid-file').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f && /\.json$/i.test(f.name)) openJsonFile(f); else importMidi(f); });
       // 右の欄（録音・変換の設定）をしまう・出す。しまったかどうかは覚えておく
       const INSP_KEY = 'donnma-hum-midi-insp';
       function setInsp(hide) {
@@ -6679,20 +6684,41 @@ ${songJson(list)}
         toast('曲ファイルを書き出しました' + (audio.length ? `（録音 ${audio.length} つ入り）` : ''));
       });
       $('song-import').addEventListener('click', () => $('song-file').click());
-      $('song-file').addEventListener('change', async e => {
-        const f = e.target.files[0];
-        e.target.value = '';
+      $('song-file').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; openJsonFile(f); });
+      // .json を開く：このツールの曲ファイル（録音まで）か、AI・ほかのツール用の JSON（音・歌詞・コード）か
+      async function openJsonFile(f) {
         if (!f || G.recording || G.busy) return;
         let o;
-        try { o = JSON.parse(await f.text()); } catch (err) { toast('曲ファイルを読めませんでした'); return; }
-        if (!o || o.app !== 'donnma-hum-midi' || !o.song) { toast('このツールの曲ファイルではありません'); return; }
+        try { o = JSON.parse(await f.text()); } catch (err) { o = null; }
+        if (o && o.app === 'donnma-hum-midi' && o.song) { openSongFile(o, f); return; }
+        const r = readAiSong(o);
+        if (!r.tracks.some(t => t.notes.length)) { toast(o ? 'JSON に音の入ったトラックが見つかりませんでした' : 'JSON を読めませんでした'); return; }
+        const nNotes = r.tracks.reduce((a, t) => a + t.notes.length, 0);
+        const replace = await window.DonnmaAsk.ask(`「${f.name}」から ${r.tracks.length} トラック・${nNotes} 音を読み込みます。今のトラックはどうしますか？`, { yes: '置き換える', no: '後ろに足す' });
+        if (replace == null) return;
+        if (replace && !(await askDiscard('置き換えます', '保存しないで置き換える'))) return;
+        const res = putSong(r, replace, null);
+        if (!res) return;
+        if (replace) {
+          // 新しい曲として（タイトル・作詞・作曲が入っていれば使う）
+          const m = cleanMeta({ title: o.title, lyricist: o.lyricist, composer: o.composer, arranger: o.arranger, memo: o.memo });
+          if (!m.title) m.title = f.name.replace(/\.json$/i, '').replace(/-notes-\d{8}-\d{6}$|-\d{8}-\d{6}$/, '').replace(/^notes$/, '').slice(0, 60);
+          if (!r.chords) { chords = []; refresh(); }
+          meta = m; libId = ''; libSavedAt = 0; savedSig = '';
+          G.cursor = 0; wrap.scrollLeft = 0;
+          saveSong(); showSong(); syncMetaInputs();
+          if ($('song-dlg').open) { libStateText(); renderLib(); }
+        }
+        toast(`${res.tracks} トラック・${res.notes} 音を読み込みました` + (r.bad ? `（読めなかった音 ${r.bad} 個は飛ばしました）` : '') + (res.over ? '。入りきらないトラックがありました' : ''));
+      }
+      async function openSongFile(o, f) {
         if (!(await askDiscard('開きます', '保存しないで開く'))) return;
         const rec = { meta: o.meta, bpm: o.bpm, beats: o.beats, song: o.song, audio: [] };
         for (const a of Array.isArray(o.audio) ? o.audio : []) {
           try { if (a && typeof a.uid === 'string' && a.sr && typeof a.pcm === 'string') rec.audio.push({ ...a, pcm: unb64(a.pcm) }); } catch (err) { }
         }
         if (await openSongRecord(rec, false)) { libStateText(); renderLib(); toast(`「${meta.title || f.name}」を開きました。「保存する」でこのブラウザに残せます`); }
-      });
+      }
 
       // ══════════════════════════════════════
       //  トラックの一覧
@@ -6978,7 +7004,7 @@ ${songJson(list)}
       const inPanel = $('in-panel');
       inPanel.addEventListener('dragover', e => { if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); inPanel.classList.add('drag'); } });
       inPanel.addEventListener('dragleave', e => { if (!inPanel.contains(e.relatedTarget)) inPanel.classList.remove('drag'); });
-      const dropOpen = f => { if (f && /\.midi?$/i.test(f.name)) importMidi(f); else loadFile(f); };
+      const dropOpen = f => { if (f && /\.midi?$/i.test(f.name)) importMidi(f); else if (f && /\.json$/i.test(f.name)) openJsonFile(f); else loadFile(f); };
       inPanel.addEventListener('drop', e => { e.preventDefault(); inPanel.classList.remove('drag'); dropOpen(e.dataTransfer.files[0]); });
       const rollPanel = document.querySelector('.panel.wide');
       rollPanel.addEventListener('dragover', e => { if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); rollPanel.classList.add('drag'); } });
