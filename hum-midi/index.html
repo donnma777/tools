@@ -2723,7 +2723,7 @@
             <button class="btn btn-sm btn-primary" type="button" id="ai-apply">答えを反映する</button>
             <span class="tp-info" id="ai-info"></span>
           </div>
-          <p class="hint">時間は拍（4分音符＝1）、音は C4（真ん中のド）のような名前で書いた JSON にします。反映するときは、送ったトラックと入れ替えるか、後ろに足すかを選べます。反映したあとも <b>Ctrl+Z</b> では戻せないので、心配なときは先に「MIDI を保存」しておいてください。</p>
+          <p class="hint">時間は拍（4分音符＝1）、音は C4（真ん中のド）のような名前で書いた JSON にします。反映するときは、送ったトラックと置き換えるか、新しいトラックとして追加するかを選べます。反映したあとも <b>Ctrl+Z</b> では戻せないので、心配なときは先に「MIDI を保存」しておいてください。</p>
         </div>
         <div class="kb-panel" id="kb-panel" hidden>
           <div class="kb-ctrl">
@@ -6118,14 +6118,14 @@ ${songJson(list)}
         }
         const sent = aiSent ? tracks.filter(t => aiSent.includes(t.id)) : [];
         const what = sent.length ? (sent.length === tracks.length ? '今の全トラック' : `送った ${sent.length} トラック（${sent.map(t => t.name).join('・')}）`) : '今の全トラック';
-        const rep2 = await window.DonnmaAsk.ask(`${r.tracks.length} トラック・${r.tracks.reduce((a, t) => a + t.notes.length, 0)} 音を読みました。${what}と入れ替えますか？`, { yes: '入れ替える', no: '後ろに足す' });
+        const rep2 = await window.DonnmaAsk.ask(`${r.tracks.length} トラック・${r.tracks.reduce((a, t) => a + t.notes.length, 0)} 音を読みました。${what}と置き換えますか？ それとも新しいトラックとして追加しますか？`, { yes: '置き換える', no: 'トラックを追加' });
         if (rep2 == null) return;
         const res = putSong(r, rep2, sent);
         if (!res) return;
         $('ai-info').textContent = `${res.tracks} トラック・${res.notes} 音を入れました` + (r.bad ? `（読めなかった音 ${r.bad} 個は飛ばしました）` : '') + (res.over ? '。入りきらないトラックがありました' : '');
         toast('AI の答えを反映しました');
       }
-      // 読んだ曲（readAiSong の形）を入れる。replace なら gone（なければ全部）と入れ替え、でなければ後ろに足す
+      // 読んだ曲（readAiSong の形）を入れる。replace なら gone（なければ全部）と入れ替え、でなければ新しいトラックとして最後に足す
       function putSong(r, replace, gone) {
         stopPlay(); kbReleaseAll();
         const made = r.tracks.map(o => {
@@ -6251,7 +6251,7 @@ ${songJson(list)}
           }
         }
         if (!made.length) { toast('音の入っているトラックがありませんでした'); return; }
-        const replace = await window.DonnmaAsk.ask(`「${file.name}」から ${made.length} トラックを読み込みます。今のトラックはどうしますか？${unsavedNote()}`, { yes: '置き換える', no: '後ろに足す' });
+        const replace = await window.DonnmaAsk.ask(`「${file.name}」から ${made.length} トラックを読み込みます。今のトラックと置き換えますか？ それとも新しいトラックとして追加しますか？${unsavedNote()}`, { yes: '置き換える', no: 'トラックを追加' });
         if (replace == null) return;
         stopPlay(); kbReleaseAll();
         if (replace) { for (const t of tracks) delAudio(t.uid); tracks = []; chords = []; if (!meta.title.trim()) { meta.title = base.slice(0, 60); showSong(); } }
@@ -6583,7 +6583,7 @@ ${songJson(list)}
         return true;
       }
       // 置き換えるか聞くときに添える一言（保存していない変更があるときだけ）
-      const unsavedNote = () => (dirty && hasContent() ? `\n\n※ 今の曲「${meta.title.trim() || '無題の曲'}」には保存していない変更があります。置き換えると消えます（後ろに足すなら消えません）。` : '');
+      const unsavedNote = () => (dirty && hasContent() ? `\n\n※ 今の曲「${meta.title.trim() || '無題の曲'}」には保存していない変更があります。置き換えると消えます（トラックを追加なら消えません）。` : '');
       async function askDiscard(what, yes) {
         if (!dirty || !hasContent()) return true;
         return !!(await window.DonnmaAsk.ask(`今の曲「${meta.title.trim() || '無題の曲'}」には、保存していない変更があります。保存しないで${what}か？`, { yes, no: 'やめる', danger: true }));
@@ -6696,7 +6696,7 @@ ${songJson(list)}
         const r = readAiSong(o);
         if (!r.tracks.some(t => t.notes.length)) { toast(o ? 'JSON に音の入ったトラックが見つかりませんでした' : 'JSON を読めませんでした'); return; }
         const nNotes = r.tracks.reduce((a, t) => a + t.notes.length, 0);
-        const replace = await window.DonnmaAsk.ask(`「${f.name}」から ${r.tracks.length} トラック・${nNotes} 音を読み込みます。今のトラックはどうしますか？${unsavedNote()}`, { yes: '置き換える', no: '後ろに足す' });
+        const replace = await window.DonnmaAsk.ask(`「${f.name}」から ${r.tracks.length} トラック・${nNotes} 音を読み込みます。今のトラックと置き換えますか？ それとも新しいトラックとして追加しますか？${unsavedNote()}`, { yes: '置き換える', no: 'トラックを追加' });
         if (replace == null) return;
         const res = putSong(r, replace, null);
         if (!res) return;
