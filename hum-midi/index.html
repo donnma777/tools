@@ -3006,10 +3006,12 @@
               </select>
             </label>
             <label class="opt"><span>クリックの大きさ</span><input type="range" id="clickVol" min="0" max="100"></label>
+            <label class="opt" title="マイクの音が小さいときに上げます。録る音そのものが大きくなります（割れそうなところは抑えます）"><span>マイクの大きさ <b id="micGain-v"></b></span><input type="range" id="micGain" min="0" max="24" step="1"></label>
           </div>
           <div class="checks" style="margin-top:10px">
             <label class="check"><input type="checkbox" id="metro">録音中にクリック（メトロノーム）を鳴らす</label>
             <label class="check"><input type="checkbox" id="recOthers">録音中にほかのトラックを鳴らす</label>
+            <label class="check" title="ブラウザの「自動で音量を合わせる」を使います。歌の強弱も平らになるので、ふだんはオフがおすすめ"><input type="checkbox" id="micAgc">マイクの音量をブラウザに自動で合わせてもらう</label>
           </div>
           <p class="hint">クリックやほかのトラックを鳴らすときは<b>ヘッドホン</b>で。音声ファイル（歌・楽器の録音、動画も）は、この枠に落としても開けます。<kbd>R</kbd> で録音・停止。</p>
         </div>
@@ -3357,7 +3359,7 @@
 
       // ── 設定 ──
       const DEF = {
-        device: '', bpm: 120, beats: 4, countIn: 1, clickVol: 60, metro: true, recOthers: true,
+        device: '', bpm: 120, beats: 4, countIn: 1, clickVol: 60, metro: true, recOthers: true, micGain: 0, micAgc: false,
         range: 'voice', sens: 2, gate: -50, minMs: 80, split: true, autoTune: true,
         key: 'off', scale: 'major', quant: '16', quantLen: true, vel: 'dyn',
         names: 'en', naming: '4', playMode: 'both', playClick: false, zoom: 60, repeat: false, kbOct: 4, stepLen: '0.5',
@@ -4849,7 +4851,7 @@ registerProcessor('hum-rec',R);`;
         const c = audio();
         try {
           rec.stream = await navigator.mediaDevices.getUserMedia({
-            audio: { deviceId: S.device ? { exact: S.device } : undefined, echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 },
+            audio: { deviceId: S.device ? { exact: S.device } : undefined, echoCancellation: false, noiseSuppression: false, autoGainControl: !!S.micAgc, channelCount: 1 },
           });
         } catch (e) {
           toast(e && e.name === 'NotAllowedError' ? 'マイクが許可されていません（アドレスバーの左から許可できます）' : 'マイクを開けませんでした');
@@ -4909,7 +4911,12 @@ registerProcessor('hum-rec',R);`;
           }
           const gap = m.f - (rec.frame0 + st.rawLen);
           if (gap > 0 && gap < st.sr) append(new Float32Array(gap));
-          append(m.d);
+          if (S.micGain) {
+            // マイクの大きさ：上げて、1 を超えそうなところはなめらかに抑える
+            const k = Math.pow(10, S.micGain / 20), d = new Float32Array(m.d.length);
+            for (let i = 0; i < d.length; i++) d[i] = Math.tanh(m.d[i] * k);
+            append(d);
+          } else append(m.d);
           if (st.rawLen > MAX_SEC * st.sr) { stopRec(); toast('10分になったので止めました'); }
         }
         G.recording = true;
@@ -4937,10 +4944,21 @@ registerProcessor('hum-rec',R);`;
           G.recording = false;
           try { rec.src.disconnect(); node.disconnect(); rec.mute.disconnect(); } catch (e) { }
           rec.stream.getTracks().forEach(t => t.stop());
+          if (st.kind === 'audio') normalizeRec(st);
           finish();
         }, 120);
       }
 
+      // 音声のトラック：録った音が小さければ、いちばん大きいところが -1dB くらいになるまで上げる（16 倍まで）
+      function normalizeRec(t) {
+        t.normDb = 0;
+        let pk = 0;
+        for (let i = 0; i < t.rawLen; i++) { const v = Math.abs(t.raw[i]); if (v > pk) pk = v; }
+        if (!(pk > 0.001) || pk >= 0.5) return;
+        const k = Math.min(0.89 / pk, 16);
+        for (let i = 0; i < t.rawLen; i++) t.raw[i] *= k;
+        t.normDb = Math.round(20 * Math.log10(k));
+      }
       function finish() {
         if (st.kind === 'audio') {
           st.notes = []; st.undo = []; st.redo = []; st.edited = false; st.abuf = null; st.pk = null; st.pkN = 0;
@@ -4948,7 +4966,8 @@ registerProcessor('hum-rec',R);`;
           refresh();
           G.cursor = Math.min(0, L.b0);
           resetLive(); renderTracks(); updateButtons(); draw();
-          toast(st.rawLen ? `「${st.name}」に ${fmtTime(st.rawLen / st.sr)} の音を入れました（ピアノロールをドラッグで位置をずらせます）` : '音が入りませんでした');
+          toast(st.rawLen ? `「${st.name}」に ${fmtTime(st.rawLen / st.sr)} の音を入れました` + (st.normDb ? `（小さかったので +${st.normDb} dB 大きくしました）` : '（ピアノロールをドラッグで位置をずらせます）') : '音が入りませんでした');
+          st.normDb = 0;
           return;
         }
         st.undo = []; st.redo = [];
@@ -4977,6 +4996,12 @@ registerProcessor('hum-rec',R);`;
           $('live-sub').textContent = 'カウント…';
         } else if (n) showLive(n - 1);
         $('rec-live').textContent = rec.useGrid && c.currentTime < rec.downbeat ? `カウント ${$('live-note').textContent}` : `${$('live-note').textContent}　${$('live-time').textContent}`;
+        // 3秒たっても音が小さいままなら知らせる
+        if (n > 300 && !(rec.useGrid && c.currentTime < rec.downbeat)) {
+          let mx = -120;
+          for (let i = n - 300; i < n; i++) if (st.fd[i] > mx) mx = st.fd[i];
+          if (mx < -42) { $('live-sub').textContent = '🔈 マイクの音が小さいです。「マイクの大きさ」を上げるか、マイクに近づいて'; $('rec-live').textContent += '　🔈 小さい'; }
+        }
         // 0.2 秒ごとに音を作り直して描く
         const now = performance.now();
         if (now - rec.lastBuild > 200) {
@@ -7464,7 +7489,7 @@ ${songJson(list)}
 
       const ANALYZE = ['range'];
       const REBUILD = ['sens', 'gate', 'minMs', 'split', 'autoTune', 'key', 'scale', 'vel'];
-      const VIEW = ['tplProg', 'tplKey', 'tplDrum', 'tplAcc', 'tplBars', 'tplBass', 'tplDrum1', 'aiScope', 'velLane', 'textLen', 'lyricEnc', 'chordPer', 'accPat', 'accInst', 'accBass', 'stepLen', 'bpm', 'beats', 'quant', 'quantLen', 'names', 'naming', 'zoom', 'playMode', 'playClick', 'countIn', 'clickVol', 'metro', 'recOthers', 'device'];
+      const VIEW = ['tplProg', 'tplKey', 'tplDrum', 'tplAcc', 'tplBars', 'tplBass', 'tplDrum1', 'aiScope', 'velLane', 'textLen', 'lyricEnc', 'chordPer', 'accPat', 'accInst', 'accBass', 'stepLen', 'bpm', 'beats', 'quant', 'quantLen', 'names', 'naming', 'zoom', 'playMode', 'playClick', 'countIn', 'clickVol', 'metro', 'recOthers', 'device', 'micGain', 'micAgc'];
       const TRACK = ['align', 'latency'];        // トラックごとの設定
       function setUI() {
         for (const k of [...ANALYZE, ...REBUILD, ...VIEW]) {
@@ -7475,6 +7500,7 @@ ${songJson(list)}
         for (const k of TRACK) $(k).value = String(st[k]);
         $('octave').value = String(st.octave);
         $('gate-v').textContent = S.gate + ' dB';
+        $('micGain-v').textContent = S.micGain ? `+${S.micGain} dB` : 'そのまま';
       }
       function readUI(k) {
         const el = $(k);
@@ -7496,6 +7522,7 @@ ${songJson(list)}
           const old = S[k];
           S[k] = readUI(k);
           if (k === 'gate') $('gate-v').textContent = S.gate + ' dB';
+          if (k === 'micGain') $('micGain-v').textContent = S.micGain ? `+${S.micGain} dB` : 'そのまま';
           save();
           if (k === 'bpm' || k === 'beats') saveSong();
           if (ANALYZE.includes(k)) reanalyze();
@@ -8402,6 +8429,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        normalizeRec,
         ZIP, importZip,
         FLAC, wavFrom, toI16,
         vdDur: () => (VD.model ? VD.model.dur : 0), vdModel, vdDraw,
