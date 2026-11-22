@@ -40,6 +40,7 @@
 - **再生**：最初から（Home）・再生と停止（Space）・リピート（L。目盛りをドラッグで範囲、右クリック・ダブルクリックで解除）。録音と MIDI を重ねて、クリックも
 - **書き出し**：.mid（フォーマット 1・480 分解能。1つ目にテンポ・拍子・調号、あとはトラックごとに音色・音量。ドラムは 10ch）、声の録音（選んだトラックの .wav、16bit モノラル）、音で書き出す（全トラックを OfflineAudioContext で鳴らした .wav、44.1kHz・2ch。声を混ぜるかは選べる。割れそうなら下げる）
 - **曲の保存・呼び出し**：ピアノロールの見出しの「🎵 曲の名前」でダイアログ（`#song-dlg`）。タイトル・作詞・作曲・編曲・メモ（`meta`）。保存は IndexedDB の `songs`（keyPath `id`。`{ id, meta, created, updated, bpm, beats, song: songData(), audio: [{ uid, sr, pcm, … }], stats }`）。上書き・別の曲として保存・新しい曲・開く・消す・さがす。Ctrl+S で保存（未保存ならダイアログ）。変更ありの ● は、保存したときの中身の値（`songSig()`：トラック・コード・meta・テンポ・拍子の FNV ハッシュ）と比べる
+- **JSON（AI・ほかのツール用）**：「その他の保存 ▾」。AI の「データ（JSON）だけコピー」と同じ形（`songJson()`）を全部のトラックでファイルに。title・lyricist・composer・arranger があれば頭に足す。AI のタブの答えの欄に貼れば読み戻せる
 - **曲ファイル**（.json、`app: 'donnma-hum-midi'`）：同じ中身を1ファイルに。録音は base64。開くと未保存の曲として入る
 - タイトル・作詞・作曲は書き出しにも：.mid は FF 03（曲名）と FF 01（「作詞：〜」など）、MusicXML は work-title・movement-title・creator、.ust は ProjectName、楽譜の上（`scoreMetaHtml()`。印刷にも出る）。ファイル名もタイトルから
 - 設定は localStorage（`donnma-hum-midi`）、作りかけの曲は `donnma-hum-midi-song`（拍で。meta・libId・savedSig も）に残す。録音は IndexedDB の `audio`（作りかけの曲のトラックの uid ごと）

@@ -2550,6 +2550,7 @@
                 <button type="button" id="save-wav" disabled>🎤 声の録音を保存（.wav）<small>選んでいるトラックの、録った声そのまま</small></button>
                 <button type="button" data-proxy="ex-ust">🎙 .ust（UTAU・OpenUtau）<small>選んでいるトラックを歌声ソフト用に</small></button>
                 <button type="button" data-proxy="ex-xml">🎼 MusicXML（楽譜・NEUTRINO）<small>選んでいるトラックを楽譜に</small></button>
+                <button type="button" id="export-json">🤖 JSON（AI・ほかのツール用）<small>全部のトラックの音・歌詞・コードを、読みやすい形で</small></button>
               </div>
             </details>
             <button class="btn btn-primary" type="button" id="save-mid" disabled>MIDI を保存（.mid）</button>
@@ -6017,6 +6018,16 @@ ${songJson(list)}
         if (!list.some(t => t.notes.length)) { toast('送る音がありません'); return; }
         aiSent = list.map(t => t.id);
         toast(await copyText(aiPrompt(list)) ? 'プロンプトをコピーしました。AI に貼ってください' : 'コピーできませんでした');
+      });
+      // AI 用と同じ形の JSON をファイルに（全部のトラック。タイトルなどがあれば頭に）
+      $('export-json').addEventListener('click', () => {
+        const list = tracks.filter(t => t.notes.length);
+        if (!list.length) { toast('音の入っているトラックがありません'); return; }
+        let txt = songJson(list);
+        const head = Object.fromEntries([['title', meta.title], ['lyricist', meta.lyricist], ['composer', meta.composer], ['arranger', meta.arranger]].filter(([, v]) => v.trim()).map(([k, v]) => [k, v.trim()]));
+        if (Object.keys(head).length) txt = '{\n' + Object.entries(head).map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)},\n`).join('') + txt.replace(/^\{\n/, '');
+        download(txt, 'application/json', withTitle('notes'), '.json');
+        toast('JSON を保存しました（🤖 AI のタブの答えの欄に貼ると、読み戻せます）');
       });
       $('ai-copy-data').addEventListener('click', async () => {
         const list = aiTracks();
