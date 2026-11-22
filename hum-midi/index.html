@@ -1201,6 +1201,12 @@
       width: 90px;
     }
 
+    .trk-btn.trk-tomidi {
+      width: auto;
+      padding: 0 8px;
+      font-size: 11px;
+    }
+
     .trk-btn {
       font: inherit;
       font-size: 11.5px;
@@ -2746,6 +2752,7 @@
         <div class="trk-add">
           <button class="btn btn-sm" type="button" id="add-mel">＋ メロディのトラック</button>
           <button class="btn btn-sm" type="button" id="add-drum">＋ ドラムのトラック</button>
+          <button class="btn btn-sm" type="button" id="add-audio" title="録音や音声ファイルを、MIDI に変換せずに音のまま重ねるトラック（伴奏の音源・ギター・歌など）">＋ 音声のトラック</button>
           <span class="sp"></span>
           <button class="btn btn-sm" type="button" id="clear-all">ぜんぶ消す</button>
         </div>
@@ -3377,7 +3384,8 @@
       function newTrack(kind) {
         const n = tracks.filter(t => t.kind === kind).length + 1;
         return {
-          id: nextId++, kind, name: (kind === 'drum' ? 'ドラム ' : 'メロディ ') + n,
+          id: nextId++, kind, name: (kind === 'drum' ? 'ドラム ' : kind === 'audio' ? '音声 ' : 'メロディ ') + n,
+          audioOff: 0, abuf: null, pk: null, pkN: 0,      // 音声のトラック：1小節目の頭が録音の何秒目か・鳴らす音・波形
           inst: kind === 'drum' ? 'drum' : 'piano', vol: 80, mute: false, solo: false,
           align: 'auto', latency: 0, octave: 0,
           sr: 0, F: 1, dsr: 0, h: null, M: 0,
@@ -3423,7 +3431,7 @@
           for (let n = 0; n < h.length; n++) h[n] /= sum;
           st.h = h;
         } else { st.M = 0; st.h = null; }
-        st.raw = new Float32Array(0); st.rawLen = 0;
+        st.raw = new Float32Array(0); st.rawLen = 0; st.abuf = null; st.pk = null; st.pkN = 0;
         st.ds = new Float32Array(0); st.dsLen = 0;
         st.t0Metro = null; st.audioBuf = null; st.file = '';
         st.notes = []; st.undo = []; st.redo = []; st.sel = new Set(); st.edited = false;
@@ -3667,7 +3675,7 @@
         return out;
       }
 
-      const buildFor = () => (st.kind === 'drum' ? buildDrums() : buildNotes());
+      const buildFor = () => (st.kind === 'audio' ? [] : st.kind === 'drum' ? buildDrums() : buildNotes());
 
       function regenerate() {
         if (!st.rawLen) return;
@@ -3720,6 +3728,7 @@
       const spb = () => 60 / S.bpm;
       function origin(tr = st) {
         if (!tr.rawLen) return 0;
+        if (tr.kind === 'audio') return tr.audioOff || 0;
         let mode = tr.align;
         if (mode === 'auto') mode = tr.t0Metro != null ? 'metro' : 'first';
         const o = mode === 'metro' && tr.t0Metro != null ? tr.t0Metro + tr.autoLat : mode === 'zero' ? 0 : tr.firstS;
@@ -3866,6 +3875,38 @@
         return vn;
       }
 
+      // 波形（1/400 秒ごとの大きさの最大をとっておく）
+      function wavePeaks(t) {
+        const blk = Math.max(1, Math.round(t.sr / 400)), n = Math.floor(t.rawLen / blk);
+        if (!t.pk || t.pk.length < n) { const a = new Float32Array(Math.max(n, 1024)); if (t.pk) a.set(t.pk.subarray(0, t.pkN)); t.pk = a; }
+        for (let i = t.pkN; i < n; i++) { let m = 0; for (let j = i * blk, e = j + blk; j < e; j++) { const v = Math.abs(t.raw[j]); if (v > m) m = v; } t.pk[i] = m; }
+        t.pkN = n;
+        return blk;
+      }
+      function drawWave(t, X, vb1) {
+        const top = RULER, h = L.rows.length * L.rowH, KW = L.keyw, W = L.w;
+        if (!t.rawLen) {
+          g2.fillStyle = COL.rulerText; g2.font = '700 13px "Zen Maru Gothic", sans-serif'; g2.textBaseline = 'middle';
+          g2.fillText('音声のトラック：「● 録音」か「音声ファイルを開く」で音を入れます（MIDI には変換しません）', KW + 16, top + h / 2);
+          return;
+        }
+        const blk = wavePeaks(t), b0 = toBeat(t, 0), b1 = toBeat(t, t.rawLen / t.sr);
+        const x0 = Math.max(KW, X(b0)), x1 = Math.min(W, X(b1));
+        if (x1 <= x0) return;
+        g2.fillStyle = 'rgba(127,216,164,0.10)'; g2.fillRect(x0, top, x1 - x0, h);
+        const mid = top + h / 2, amp = h * 0.46, spx = spb() / S.zoom * t.sr / blk;     // 1px あたりのブロック数
+        g2.fillStyle = 'rgba(127,216,164,0.85)';
+        for (let x = Math.floor(x0); x < x1; x++) {
+          const bt = L.vb0 + (x - KW) / S.zoom, i0 = Math.floor(toTime(t, bt) * t.sr / blk), i1 = Math.max(i0 + 1, Math.floor(i0 + spx));
+          let m = 0;
+          for (let i = Math.max(0, i0); i < Math.min(t.pkN, i1); i++) if (t.pk[i] > m) m = t.pk[i];
+          const hh = Math.max(1, m * amp);
+          g2.fillRect(x, mid - hh, 1, hh * 2);
+        }
+        g2.fillStyle = 'rgba(127,216,164,0.9)'; g2.fillRect(x0, top, 2, h);
+        g2.fillStyle = COL.rulerText; g2.font = '700 12px "Zen Maru Gothic", sans-serif'; g2.textBaseline = 'top';
+        g2.fillText(`${t.file || t.name}　${fmtTime(t.rawLen / t.sr)}`, x0 + 6, top + 6);
+      }
       let drawQueued = false;
       const draw = () => { if (!drawQueued) { drawQueued = true; requestAnimationFrame(() => { drawQueued = false; render(); }); } };
 
@@ -3915,8 +3956,10 @@
             g2.fillRect(X(n.s), Y(n.p) + 2, Math.max(2, (n.e - n.s) * S.zoom - 1), rh - 4);
           }
         }
+        // 音声のトラック：波形
+        if (st.kind === 'audio') drawWave(st, X, vb1);
         // 読み取った音の高さ（点）
-        if (!L.drum && st.fm.length) {
+        if (!L.drum && st.kind !== 'audio' && st.fm.length) {
           const th = SENS[S.sens], oct = 12 * Number(st.octave);
           const t0 = toTime(st, L.vb0), t1 = toTime(st, vb1);
           const i0 = Math.max(0, Math.floor((t0 * st.dsr - st.W / 2) / st.hop) - 1);
@@ -4123,6 +4166,12 @@
           velAt(x, y, ev.shiftKey);
           return;
         }
+        if (st.kind === 'audio') {
+          if (ev.button !== 0 || x < L.keyw || !st.rawLen) return;
+          drag = { mode: 'audio', x, off: st.audioOff, moved: false };
+          cv.setPointerCapture(ev.pointerId);
+          return;
+        }
         if (x < L.keyw) { if (ev.button === 0) preview(pitchAtY(y), 0.35); return; }
         if (ev.button === 2) {
           drag = { mode: 'erase', erased: false };
@@ -4175,6 +4224,17 @@
           }
           return;
         }
+        if (drag.mode === 'audio') {
+          // 拍のグリッドに合わせて動かす（クオンタイズがオフなら自由に）。Alt を押すと自由に
+          let db = (x - drag.x) / S.zoom;
+          const gq = grid();
+          if (gq && !ev.altKey) db = Math.round(db / gq) * gq;
+          st.audioOff = drag.off - db * spb();
+          drag.moved = db !== 0;
+          $('roll-info').textContent = `${st.name} ・ 頭の位置 ${(toBeat(st, 0) / S.beats + 1).toFixed(2)} 小節目`;
+          draw();
+          return;
+        }
         if (drag.mode === 'erase') { eraseAt(x, y); return; }
         if (drag.mode === 'vel') { velAt(x, y, ev.shiftKey); return; }
         if (drag.mode === 'box') {
@@ -4217,7 +4277,8 @@
         if (d.mode === 'ruler' && !d.moved) {
           G.cursor = Math.max(L.b0, d.b0);
           if (G.playing) { stopPlay(); play(); } else draw();
-        } else if ((d.mode === 'erase' && d.erased) || (d.mode === 'vel' && d.changed) || ((d.mode === 'move' || d.mode === 'len') && d.moved)) refresh();
+        } else if (d.mode === 'audio') { if (d.moved) { saveSong(); refresh(); } else { G.cursor = Math.max(L.b0, beatAtX(d.x)); draw(); } }
+        else if ((d.mode === 'erase' && d.erased) || (d.mode === 'vel' && d.changed) || ((d.mode === 'move' || d.mode === 'len') && d.moved)) refresh();
         else { updateButtons(); draw(); }
       };
       cv.addEventListener('pointerup', endDrag);
@@ -4227,6 +4288,7 @@
         const { x, y } = posOf(ev);
         if (x < L.keyw) return;
         if (y < RULER) { loop.a = loop.b = null; draw(); return; }
+        if (st.kind === 'audio') return;
         const h = hit(x, y);
         if (L.drum) { if (h) { st.sel = new Set([h.n.src]); delSel(); } return; }
         if (h) { lyricEdit(h.n.src); return; }
@@ -4238,7 +4300,7 @@
       let lyEdNote = null;
       const lyOrder = () => viewNotes().filter((n, i, a) => !i || n.s > a[i - 1].s + 1e-6);
       function lyricEdit(src) {
-        if (st.kind === 'drum' || G.recording || G.busy) return;
+        if (st.kind !== 'melody' || G.recording || G.busy) return;
         const vn = viewNotes().find(n => n.src === src);
         if (!vn) return;
         // 見えるところへ
@@ -4600,6 +4662,16 @@
         return () => clearInterval(id);
       }
       // トラックの MIDI を鳴らす予定を作る（T(b) が拍 b の時刻。from より前は鳴らさない）
+      // 音声のトラックの音（AudioBuffer はどの AudioContext でも使える）
+      function audioBufOf(tr) {
+        if (!tr.rawLen) return null;
+        if (!tr.abuf || tr.abuf.length !== tr.rawLen) {
+          const b = new AudioBuffer({ numberOfChannels: 1, length: tr.rawLen, sampleRate: tr.sr });
+          b.copyToChannel(tr.raw.subarray(0, tr.rawLen), 0);
+          tr.abuf = b;
+        }
+        return tr.abuf;
+      }
       function trackEvents(trs, from, T, list, to = Infinity) {
         const c = audio(), events = [];
         for (const tr of trs) {
@@ -4607,6 +4679,20 @@
           out.gain.value = tr.vol / 100;
           out.connect(c.destination);
           list.push({ stop() { setTimeout(() => out.disconnect(), 400); } });
+          if (tr.kind === 'audio') {
+            const buf = audioBufOf(tr);
+            if (buf) events.push({
+              t: T(from), fn: t => {
+                const src = c.createBufferSource();
+                src.buffer = buf; src.connect(out);
+                const off = toTime(tr, from), dur = to === Infinity ? buf.duration : (to - from) * spb();
+                if (off >= 0) { if (off < buf.duration) src.start(t, off, Math.min(dur, buf.duration - off)); }
+                else if (dur + off > 0) src.start(t - off, 0, dur + off);
+                list.push(src);
+              },
+            });
+            continue;
+          }
           if (INST[tr.inst] && INST[tr.inst].vvox && vvFresh(tr)) {
             const buf = tr.vv.buf;
             events.push({
@@ -4662,7 +4748,7 @@
       function schedulePass(from, to, t0) {
         const c = audio(), nodes = [];
         const T = b => t0 + (b - from) * spb();
-        if (S.playMode !== 'midi' && st.rawLen) {
+        if (S.playMode !== 'midi' && st.rawLen && st.kind !== 'audio') {
           const src = c.createBufferSource();
           src.buffer = audioBuffer();
           src.connect(c.destination);
@@ -4671,7 +4757,7 @@
           else if (dur + a > 0) src.start(t0 - a, 0, dur + a);
           nodes.push(src);
         }
-        const events = S.playMode === 'orig' ? [] : trackEvents(playable(), from, T, nodes, to);
+        const events = trackEvents(S.playMode === 'orig' ? playable().filter(t => t.kind === 'audio') : playable(), from, T, nodes, to);
         if (S.playClick) for (let b = Math.ceil(from - 1e-6); b < to - 1e-6; b++) events.push({ t: T(b), fn: t => click(t, mod(b, S.beats) === 0, nodes) });
         events.sort((a, b) => a.t - b.t);
         passes.push({ t: t0, from, to, nodes, stop: sequencer(events) });
@@ -4756,6 +4842,10 @@ registerProcessor('hum-rec',R);`;
           const ok = await window.DonnmaAsk.ask(`「${st.name}」には手で直した音があります。録り直すと消えますが、よいですか？`, { yes: '録り直す', no: 'やめる' });
           if (!ok) return;
         }
+        if (st.kind === 'audio' && st.rawLen) {
+          const ok = await window.DonnmaAsk.ask(`「${st.name}」の今の録音は消えます。録り直しますか？（重ねたいときは「＋ 音声のトラック」で増やしてください）`, { yes: '録り直す', no: 'やめる' });
+          if (!ok) return;
+        }
         const c = audio();
         try {
           rec.stream = await navigator.mediaDevices.getUserMedia({
@@ -4797,7 +4887,7 @@ registerProcessor('hum-rec',R);`;
         rec.src.connect(rec.node); rec.node.connect(rec.mute); rec.mute.connect(c.destination);
         rec.frame0 = null;
         // クリックを鳴らすか、ほかのトラックを鳴らすときは、小節の頭を決めてから始める
-        const others = S.recOthers ? playable().filter(t => t !== st && t.notes.length) : [];
+        const others = S.recOthers ? playable().filter(t => t !== st && (t.notes.length || (t.kind === 'audio' && t.rawLen))) : [];
         rec.useGrid = S.metro || others.length > 0;
         rec.stops = []; rec.nodes = [];
         if (rec.useGrid) {
@@ -4815,6 +4905,7 @@ registerProcessor('hum-rec',R);`;
           if (rec.frame0 == null) {
             rec.frame0 = m.f;
             if (rec.useGrid) st.t0Metro = rec.downbeat - m.f / st.sr;
+            if (st.kind === 'audio') st.audioOff = rec.useGrid ? st.t0Metro + st.autoLat : 0;
           }
           const gap = m.f - (rec.frame0 + st.rawLen);
           if (gap > 0 && gap < st.sr) append(new Float32Array(gap));
@@ -4851,6 +4942,15 @@ registerProcessor('hum-rec',R);`;
       }
 
       function finish() {
+        if (st.kind === 'audio') {
+          st.notes = []; st.undo = []; st.redo = []; st.edited = false; st.abuf = null; st.pk = null; st.pkN = 0;
+          saveAudio(st);
+          refresh();
+          G.cursor = Math.min(0, L.b0);
+          resetLive(); renderTracks(); updateButtons(); draw();
+          toast(st.rawLen ? `「${st.name}」に ${fmtTime(st.rawLen / st.sr)} の音を入れました（ピアノロールをドラッグで位置をずらせます）` : '音が入りませんでした');
+          return;
+        }
         st.undo = []; st.redo = [];
         st.edited = false;
         regenerate();
@@ -4918,7 +5018,7 @@ registerProcessor('hum-rec',R);`;
         $('meter-bar').style.width = '0';
         $('cents-dot').style.opacity = 0;
         $('live-note').textContent = '－';
-        $('live-sub').textContent = st.rawLen ? `「${st.name}」の録音 ${fmtTime(st.rawLen / st.sr)}` : (st.kind === 'drum' ? '口で「ドッ」「パッ」「ツッ」' : '歌うと音の名前が出ます');
+        $('live-sub').textContent = st.rawLen ? `「${st.name}」の録音 ${fmtTime(st.rawLen / st.sr)}` : st.kind === 'audio' ? '音のまま入れます（MIDI にしません）' : (st.kind === 'drum' ? '口で「ドッ」「パッ」「ツッ」' : '歌うと音の名前が出ます');
         $('live-time').textContent = fmtTime(st.rawLen / (st.sr || 1));
       }
 
@@ -4954,6 +5054,7 @@ registerProcessor('hum-rec',R);`;
         }
         resetData(buf.sampleRate);
         st.file = file.name.replace(/\.[^.]+$/, '');
+        if (st.kind === 'audio') { st.raw = mono; st.rawLen = len; st.audioOff = 0; st.t0Metro = null; finish(); return; }
         await analyzeAll(mono);
         finish();
       }
@@ -5058,7 +5159,7 @@ registerProcessor('hum-rec',R);`;
         const trs = playable();
         let end = 0;
         for (const t of trs) for (const n of viewNotes(t)) end = Math.max(end, n.e);
-        if (withVoice) for (const t of trs) if (t.rawLen) end = Math.max(end, toBeat(t, t.rawLen / t.sr));
+        for (const t of trs) if (t.rawLen && (withVoice || t.kind === 'audio')) end = Math.max(end, toBeat(t, t.rawLen / t.sr));
         const sr = 44100, dur = Math.max(1, end * spb() + 2);
         const oc = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, Math.ceil(dur * sr), sr);
         RC = oc;
@@ -5068,7 +5169,7 @@ registerProcessor('hum-rec',R);`;
           for (const e of trackEvents(trs, 0, T, nodes)) e.fn(e.t);
           if (withVoice) {
             for (const t of trs) {
-              if (!t.rawLen) continue;
+              if (!t.rawLen || t.kind === 'audio') continue;
               const b = oc.createBuffer(1, t.rawLen, t.sr);
               b.copyToChannel(t.raw.subarray(0, t.rawLen), 0);
               const src = oc.createBufferSource(), g = oc.createGain();
@@ -5240,7 +5341,7 @@ registerProcessor('hum-rec',R);`;
       $('txt-src').addEventListener('input', textInfo);
       $('txt-insert').addEventListener('click', () => {
         if (G.recording || G.busy) return;
-        if (st.kind === 'drum') { toast('文字の入力はメロディのトラックで使えます'); return; }
+        if (st.kind !== 'melody') { toast('文字の入力はメロディのトラックで使えます'); return; }
         const r = parseText($('txt-src').value);
         if (!r.notes.length) { toast('音がありません'); return; }
         const b0 = snapBeat(G.cursor);
@@ -5275,7 +5376,7 @@ registerProcessor('hum-rec',R);`;
       }
       $('ly-apply').addEventListener('click', () => {
         if (G.recording || G.busy) return;
-        if (st.kind === 'drum') { toast('ドラムのトラックには歌詞を付けられません'); return; }
+        if (st.kind !== 'melody') { toast('歌詞はメロディのトラックに付けます'); return; }
         const ly = splitLyrics($('ly-src').value);
         if (!ly.length) { toast('歌詞を入れてください'); return; }
         const vn = viewNotes().filter((n, i, a) => !i || n.s > a[i - 1].s + 1e-6);
@@ -5595,6 +5696,7 @@ registerProcessor('hum-rec',R);`;
       }
       function renderScore() {
         const box = $('score');
+        if (st.kind === 'audio') { box.innerHTML = '<p class="score-msg">音声のトラックは楽譜にできません。メロディのトラックを選んでください（「→ MIDI」で変換もできます）。</p>'; $('sc-info').textContent = ''; return; }
         if (st.kind === 'drum') { box.innerHTML = '<p class="score-msg">ドラムのトラックは楽譜にできません。メロディのトラックを選んでください。</p>'; $('sc-info').textContent = ''; return; }
         const md = scoreModel(st, 1);
         const W = Math.max(360, box.clientWidth - 2), gap = 9, LH = gap * 4, lineH = 150;
@@ -5768,7 +5870,7 @@ registerProcessor('hum-rec',R);`;
       scBox.addEventListener('pointermove', ev => {
         const g = scBox.querySelector('#sc-ghost');
         if (!g) return;
-        if (!S.scEdit || st.kind === 'drum' || G.recording || G.busy) { g.innerHTML = ''; return; }
+        if (!S.scEdit || st.kind !== 'melody' || G.recording || G.busy) { g.innerHTML = ''; return; }
         const h = scoreHit(ev);
         if (!h || h.head || h.d == null) { g.innerHTML = ''; scBox.style.cursor = h && h.head ? 'pointer' : 'default'; return; }
         scBox.style.cursor = 'crosshair';
@@ -5848,7 +5950,7 @@ registerProcessor('hum-rec',R);`;
         return x + `</part>\n</score-partwise>\n`;
       }
       $('sc-xml').addEventListener('click', () => {
-        if (st.kind === 'drum') { toast('メロディのトラックを選んでください'); return; }
+        if (st.kind !== 'melody') { toast('メロディのトラックを選んでください'); return; }
         download(musicXml(), 'application/vnd.recordare.musicxml+xml', withTitle(st.name), '.musicxml');
         toast('MusicXML を保存しました');
       });
@@ -6226,7 +6328,7 @@ registerProcessor('hum-rec',R);`;
       };
       const r3 = x => Math.round(x * 1000) / 1000;
       let aiSent = null;     // 送ったトラック（入れ替えるときに使う）
-      function aiTracks() { return S.aiScope === 'cur' ? [st] : tracks.slice(); }
+      function aiTracks() { return (S.aiScope === 'cur' ? [st] : tracks.slice()).filter(t => t.kind !== 'audio'); }
       function songJson(list) {
         const k = scaleInfo();
         const out = { bpm: S.bpm, beats: S.beats, key: `${PN[k.k]} ${k.scale}` };
@@ -6646,6 +6748,14 @@ ${songJson(list)}
           try { a = await IDB.get(tr.uid); } catch (e) { }
           if (!a || !a.pcm || !a.sr) { tr.hasAudio = false; continue; }
           st = tr;
+          if (tr.kind === 'audio') {
+            const off = tr.audioOff;
+            resetData(a.sr);
+            const pcm = new Int16Array(a.pcm), mono = new Float32Array(pcm.length);
+            for (let i = 0; i < pcm.length; i++) mono[i] = pcm[i] / 32767;
+            tr.raw = mono; tr.rawLen = mono.length; tr.audioOff = off; tr.file = a.file || ''; tr.hasAudio = true;
+            continue;
+          }
           const notes = tr.notes, keep = { align: tr.align, latency: tr.latency, octave: tr.octave };
           resetData(a.sr);
           Object.assign(tr, keep);
@@ -6712,7 +6822,7 @@ ${songJson(list)}
           v: 1, cur: tracks.indexOf(st),
           tracks: tracks.map(t => ({
             name: t.name, kind: t.kind, inst: t.inst, vol: t.vol, mute: t.mute, solo: t.solo, poly: t.poly, auto: t.auto, uid: t.uid,
-            align: t.align, latency: t.latency, octave: t.octave, hasAudio: !!t.rawLen || t.hasAudio, vvStyle: t.vvStyle,
+            align: t.align, latency: t.latency, octave: t.octave, hasAudio: !!t.rawLen || t.hasAudio, vvStyle: t.vvStyle, audioOff: t.kind === 'audio' ? Math.round((t.audioOff || 0) * 10000) / 10000 : undefined,
             notes: t.notes.map(n => {
               const a = [r(toBeat(t, n.s)), r(toBeat(t, n.e)), n.p, n.v];
               if (n.lyric) a.push(n.lyric);
@@ -6756,7 +6866,8 @@ ${songJson(list)}
         try {
           if (!d || !Array.isArray(d.tracks) || !d.tracks.length) return false;
           tracks = d.tracks.slice(0, MAX_TRACKS).map(o => {
-            const t = newTrack(o.kind === 'drum' ? 'drum' : 'melody');
+            const t = newTrack(o.kind === 'drum' ? 'drum' : o.kind === 'audio' ? 'audio' : 'melody');
+            if (t.kind === 'audio') t.audioOff = Number(o.audioOff) || 0;
             if (typeof o.name === 'string') t.name = o.name.slice(0, 24);
             if (t.kind !== 'drum' && INST[o.inst]) t.inst = o.inst;
             t.vol = clamp(Number(o.vol) || 0, 0, 100);
@@ -6833,10 +6944,11 @@ ${songJson(list)}
       }
       const libIdNew = () => 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       // 今の曲の録音（作りかけの IndexedDB から）
-      async function currentAudio() {
+      async function currentAudio(onlyAudioTracks) {
         const out = [];
         for (const t of tracks) {
           if (!(t.rawLen || t.hasAudio)) continue;
+          if (onlyAudioTracks && t.kind !== 'audio') continue;
           let a = null;
           try { a = await IDB.get(t.uid); } catch (e) { }
           if (a && a.pcm && a.sr) out.push({ uid: t.uid, ...a });
@@ -6853,8 +6965,8 @@ ${songJson(list)}
         if (!window.indexedDB) { toast('このブラウザでは保存できません。曲ファイルに書き出してください'); return; }
         if (!meta.title.trim()) meta.title = '無題の曲';
         const data = songData();
-        const audio = S.libAudio ? await currentAudio() : [];
-        if (!S.libAudio) for (const t of data.tracks) t.hasAudio = false;
+        const audio = await currentAudio(!S.libAudio);
+        if (!S.libAudio) for (const t of data.tracks) if (t.kind !== 'audio') t.hasAudio = false;
         let created = Date.now();
         const id = asNew || !libId ? libIdNew() : libId;
         if (id === libId) { try { const old = await IDB.songGet(id); if (old) created = old.created || created; } catch (e) { } }
@@ -6988,9 +7100,9 @@ ${songJson(list)}
       const unb64 = str => { const b = atob(str), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u.buffer; };
       $('song-export').addEventListener('click', async () => {
         if (G.recording || G.busy) return;
-        const audio = S.libAudio ? (await currentAudio()).map(a => ({ ...a, pcm: b64(a.pcm) })) : [];
+        const audio = (await currentAudio(!S.libAudio)).map(a => ({ ...a, pcm: b64(a.pcm) }));
         const data = songData();
-        if (!S.libAudio) for (const t of data.tracks) t.hasAudio = false;
+        if (!S.libAudio) for (const t of data.tracks) if (t.kind !== 'audio') t.hasAudio = false;
         const out = { app: 'donnma-hum-midi', format: 1, saved: new Date().toISOString(), meta, bpm: S.bpm, beats: S.beats, song: data, audio };
         download(JSON.stringify(out), 'application/json', meta.title.trim() || 'hum-song', '.json');
         toast('曲ファイルを書き出しました' + (audio.length ? `（録音 ${audio.length} つ入り）` : ''));
@@ -7158,24 +7270,25 @@ ${songJson(list)}
           <div class="trk${t === st ? ' sel' : ''}${t === st && G.recording ? ' rec' : ''}" data-id="${t.id}">
             <span class="trk-dot" title="${t === st ? '録音・編集するトラック' : 'クリックで選ぶ'}"></span>
             <input class="trk-name" value="${escH(t.name)}" maxlength="24" aria-label="トラックの名前">
-            ${t.kind === 'drum' ? '<span class="trk-kind">🥁 ドラム</span>' : `<select class="trk-inst" aria-label="音色">${instOptions(t.inst)}</select>${INST[t.inst] && INST[t.inst].vvox ? vvSelect(t) : ''}`}
+            ${t.kind === 'audio' ? '<span class="trk-kind">🎤 音声</span><button class="trk-btn trk-tomidi" type="button" title="この音を MIDI に変換して、メロディのトラックを作る">→ MIDI</button>' : t.kind === 'drum' ? '<span class="trk-kind">🥁 ドラム</span>' : `<select class="trk-inst" aria-label="音色">${instOptions(t.inst)}</select>${INST[t.inst] && INST[t.inst].vvox ? vvSelect(t) : ''}`}
             <label class="trk-vol" title="音量"><span>音量</span><input type="range" min="0" max="100" value="${t.vol}"></label>
             <button class="trk-btn trk-m${t.mute ? ' on' : ''}" type="button" title="ミュート（鳴らさない）">M</button>
             <button class="trk-btn trk-s${t.solo ? ' on' : ''}" type="button" title="ソロ（これだけ鳴らす）">S</button>
-            ${t.kind === 'drum' ? '' : `<button class="trk-btn trk-poly${t.poly ? ' on' : ''}" type="button" title="和音（同じときに鳴る音）を使う。オフだと1つずつの音にそろえる">和</button>`}
+            ${t.kind !== 'melody' ? '' : `<button class="trk-btn trk-poly${t.poly ? ' on' : ''}" type="button" title="和音（同じときに鳴る音）を使う。オフだと1つずつの音にそろえる">和</button>`}
             <span class="trk-info"></span>
             <button class="trk-btn trk-del" type="button" title="トラックを消す">×</button>
           </div>`).join('');
         trackInfo();
-        $('add-mel').disabled = $('add-drum').disabled = tracks.length >= MAX_TRACKS || G.recording || G.busy;
+        $('add-mel').disabled = $('add-drum').disabled = $('add-audio').disabled = tracks.length >= MAX_TRACKS || G.recording || G.busy;
         $('set-track').textContent = `（${st.name}）`;
       }
       function trackInfo() {
         for (const el of $('tracks').querySelectorAll('.trk')) {
           const t = tracks.find(x => x.id === Number(el.dataset.id));
           if (!t) continue;
-          const parts = [`${t.notes.length} 音`];
-          if (t.rawLen) parts.push('録音 ' + fmtTime(t.rawLen / t.sr));
+          const parts = t.kind === 'audio' ? [] : [`${t.notes.length} 音`];
+          if (t.rawLen) parts.push((t.kind === 'audio' ? '' : '録音 ') + fmtTime(t.rawLen / t.sr));
+          else if (t.kind === 'audio') parts.push('空');
           el.querySelector('.trk-info').textContent = parts.join(' ・ ');
         }
       }
@@ -7184,7 +7297,8 @@ ${songJson(list)}
         if (!t || t === st || G.recording || G.busy) return;
         kbReleaseAll();
         st = t;
-        if (KB.on) { KB.hist = []; renderKbMap(); }
+        if (KB.on && st.kind === 'audio') setKb(false);
+        else if (KB.on) { KB.hist = []; renderKbMap(); }
         setUI();
         renderTracks();
         resetLive();
@@ -7198,7 +7312,7 @@ ${songJson(list)}
         st = t;
         if (KB.on) { KB.hist = []; renderKbMap(); }
         setUI(); renderTracks(); resetLive(); refresh();
-        toast(kind === 'drum' ? 'ドラムのトラックを足しました。クリックで音を置くか、録音してください' : 'メロディのトラックを足しました');
+        toast(kind === 'drum' ? 'ドラムのトラックを足しました。クリックで音を置くか、録音してください' : kind === 'audio' ? '音声のトラックを足しました。録音するか、音声ファイルを開いてください（MIDI には変換しません）' : 'メロディのトラックを足しました');
       }
       async function deleteTrack(t) {
         if (G.recording || G.busy) return;
@@ -7220,6 +7334,7 @@ ${songJson(list)}
         if (e.target.closest('.trk-m')) { t.mute = !t.mute; e.target.classList.toggle('on', t.mute); saveSong(); draw(); return; }
         if (e.target.closest('.trk-s')) { t.solo = !t.solo; e.target.classList.toggle('on', t.solo); saveSong(); draw(); return; }
         if (e.target.closest('.trk-del')) { deleteTrack(t); return; }
+        if (e.target.closest('.trk-tomidi')) { audioToMidi(t); return; }
         if (e.target.closest('.trk-poly')) { t.poly = !t.poly; e.target.classList.toggle('on', t.poly); saveSong(); if (t === st) refresh(); else draw(); return; }
         selectTrack(t);
       });
@@ -7245,6 +7360,25 @@ ${songJson(list)}
       $('tracks').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('.trk-name')) e.target.blur(); });
       $('add-mel').addEventListener('click', () => addTrack('melody'));
       $('add-drum').addEventListener('click', () => addTrack('drum'));
+      $('add-audio').addEventListener('click', () => addTrack('audio'));
+      // 音声のトラックの音を MIDI に（すぐ下にメロディのトラックを作る。位置は音声と同じ）
+      async function audioToMidi(t) {
+        if (G.recording || G.busy) return;
+        if (!t.rawLen) { toast('音が入っていません'); return; }
+        if (tracks.length >= MAX_TRACKS) { toast('トラックがいっぱいです（16 まで）'); return; }
+        stopPlay(); kbReleaseAll();
+        const m = newTrack('melody');
+        m.name = (t.name + '（MIDI）').slice(0, 24);
+        tracks.splice(tracks.indexOf(t) + 1, 0, m);
+        st = m;
+        resetData(t.sr);
+        m.file = t.file;
+        renderTracks();
+        await analyzeAll(t.raw.slice(0, t.rawLen));
+        m.t0Metro = t.audioOff || 0; m.autoLat = 0; m.align = 'auto'; m.latency = 0;
+        setUI();
+        finish();
+      }
       $('clear-all').addEventListener('click', async () => {
         if (G.recording || G.busy) return;
         const ok = await window.DonnmaAsk.ask('トラックと音をぜんぶ消して、はじめからにしますか？（元に戻せません）', { yes: 'ぜんぶ消す', no: 'やめる' });
@@ -7290,7 +7424,7 @@ ${songJson(list)}
         $('redo').disabled = lock || !st.redo.length;
         $('del').disabled = lock || !st.sel.size;
         if (panel === 'lyrics') syncLyricOne();
-        $('guess-key').disabled = lock || st.kind === 'drum' || (!st.fm.length && !st.notes.length);
+        $('guess-key').disabled = lock || st.kind !== 'melody' || (!st.fm.length && !st.notes.length);
         $('add-mel').disabled = $('add-drum').disabled = tracks.length >= MAX_TRACKS || lock;
         $('clear-all').disabled = lock;
       }
@@ -7558,7 +7692,7 @@ ${songJson(list)}
         $('audRange').querySelector('[value="loop"]').disabled = !hasLoop;
         $('audRange').querySelector('[value="loop"]').textContent = hasLoop ? 'リピートの範囲' : 'リピートの範囲（目盛りをドラッグで決める）';
         $('audRange').value = hasLoop ? (S.audRange || 'all') : 'all';
-        const hasVoice = playable().some(t => t.rawLen);
+        const hasVoice = playable().some(t => t.rawLen && t.kind !== 'audio');
         $('audVoice').disabled = !hasVoice; $('audVoice').checked = hasVoice && S.audVoice !== false;
         $('audMp3Kbps').value = String(S.audMp3Kbps); $('audM4aKbps').value = String(S.audM4aKbps);
         audSync();
@@ -7857,7 +7991,7 @@ ${songJson(list)}
         $('vdRange').querySelector('[value="loop"]').disabled = !hasLoop;
         $('vdRange').querySelector('[value="loop"]').textContent = hasLoop ? 'リピートの範囲' : 'リピートの範囲（目盛りをドラッグで決める）';
         if (!hasLoop) S.vdRange = 'all';
-        const hasVoice = playable().some(t => t.rawLen);
+        const hasVoice = playable().some(t => t.rawLen && t.kind !== 'audio');
         $('vdVoice').disabled = !hasVoice; $('vdVoice').checked = hasVoice && VD.voice !== false;
         for (const k of ['vdShape', 'vdQuality', 'vdTheme', 'vdRange']) $(k).value = S[k];
         $('vdLyrics').checked = !!S.vdLyrics; $('vdChords').checked = !!S.vdChords;
@@ -8049,6 +8183,7 @@ ${songJson(list)}
       }
       function setKb(on) {
         if (on && (G.recording || G.busy)) return;
+        if (on && st.kind === 'audio') { toast('音声のトラックには音符を置けません。メロディかドラムのトラックを選んでください'); return; }
         kbReleaseAll();
         KB.on = on;
         KB.hist = [];
@@ -8171,6 +8306,7 @@ ${songJson(list)}
       const DRUM_FIX = { 35: 36, 40: 38, 44: 42, 41: 45, 43: 45, 48: 50, 52: 49, 55: 49, 57: 49, 53: 51, 59: 51, 54: 42, 56: 37, 69: 42, 70: 42, 75: 37, 76: 37, 77: 37 };
       function onMidi(e) {
         const [s0, d1, d2] = e.data, hi = s0 & 0xf0;
+        if (st.kind === 'audio') return;
         if (hi === 0x90 && d2 > 0) {
           const p = st.kind === 'drum' ? (DRUM_NAME[d1] ? d1 : DRUM_FIX[d1]) : d1;
           if (p != null) noteDown('midi' + d1, p, d2);
