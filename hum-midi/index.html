@@ -1215,6 +1215,28 @@
       color: var(--ok, #7fd8a4);
     }
 
+    /* ピアノロールの見出し：説明の文字は縮めて、ボタンを折り返さない */
+    #roll-info {
+      flex: 1 1 0;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .key-set {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .key-set b {
+      min-width: 4.4em;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
     .trk-btn.trk-tomidi {
       width: auto;
       padding: 0 8px;
@@ -2743,6 +2765,9 @@
                 <option value="6">6/4</option>
                 <option value="7">7/4</option>
               </select></label>
+            <span class="key-set" title="曲全体のキーを半音ずつ上げ下げします（メロディ・伴奏・コード。ドラムと音声のトラックはそのまま）">
+              <button class="btn btn-sm ic" type="button" id="key-down" aria-label="キーを半音下げる" title="キーを半音下げる">♭</button><b>キー <span id="key-val">±0</span></b><button class="btn btn-sm ic" type="button" id="key-up" aria-label="キーを半音上げる" title="キーを半音上げる">♯</button><button class="btn btn-sm ic" type="button" id="key-fit" aria-label="あなたの音域に合わせる" title="あなたの音域に合わせる（「🎧 マイクを聞く」で覚えた音域に、メロディが入るキーにする）">🎤</button>
+            </span>
           </span>
           <span class="info" id="roll-info"></span>
           <div class="export">
@@ -3648,7 +3673,7 @@
         for (const s of segs) {
           if (s.drop || s.end - s.start < minF) continue;
           const vals = s.vals.slice().sort((a, b) => a - b);
-          const p = clamp(snapPitch(vals[vals.length >> 1]) + 12 * Number(st.octave), 0, 127);
+          const p = clamp(snapPitch(vals[vals.length >> 1] + (st.semi || 0)) + 12 * Number(st.octave), 0, 127);
           const vel = velOf(s.peak);
           const note = { s: frameTime(s.start) - hopS / 2, e: frameTime(s.end - 1) + hopS / 2, p, v: vel, onset: s.onset };
           const prev = out[out.length - 1];
@@ -3865,7 +3890,7 @@
           if (lo === Infinity) for (const t of ghostTracks()) for (const n of t.notes) { lo = Math.min(lo, n.p); hi = Math.max(hi, n.p); }
           if (st.fm.length) {
             const th = SENS[S.sens];
-            for (let i = 0; i < st.fm.length; i += 3) if (voicedAt(i, th, S.gate)) { const p = Math.round(st.fm[i]) + 12 * Number(st.octave); lo = Math.min(lo, p); hi = Math.max(hi, p); }
+            for (let i = 0; i < st.fm.length; i += 3) if (voicedAt(i, th, S.gate)) { const p = Math.round(st.fm[i]) + 12 * Number(st.octave) + (st.semi || 0); lo = Math.min(lo, p); hi = Math.max(hi, p); }
           }
           if (lo === Infinity) { lo = 58; hi = 76; }
           lo -= 3; hi += 3;
@@ -3983,7 +4008,7 @@
         if (st.kind === 'audio') drawWave(st, X, vb1);
         // 読み取った音の高さ（点）
         if (!L.drum && st.kind !== 'audio' && st.fm.length) {
-          const th = SENS[S.sens], oct = 12 * Number(st.octave);
+          const th = SENS[S.sens], oct = 12 * Number(st.octave) + (st.semi || 0);
           const t0 = toTime(st, L.vb0), t1 = toTime(st, vb1);
           const i0 = Math.max(0, Math.floor((t0 * st.dsr - st.W / 2) / st.hop) - 1);
           const i1 = Math.min(st.fm.length - 1, Math.ceil((t1 * st.dsr - st.W / 2) / st.hop) + 1);
@@ -5176,7 +5201,7 @@ registerProcessor('hum-rec',R);`;
             let ch = false;
             if (S.monLo == null || pr < S.monLo) { S.monLo = pr; ch = true; }
             if (S.monHi == null || pr > S.monHi) { S.monHi = pr; ch = true; }
-            if (ch) { save(); monShowRange(); }
+            if (ch) { save(); monShowRange(); showKey(); }
           }
         } else {
           MON.cand = null; MON.candN = 0;
@@ -5236,7 +5261,7 @@ registerProcessor('hum-rec',R);`;
         }
       }
       $('mon').addEventListener('click', () => { if (MON.on) monStop(false); else { S.monitor = true; save(); monStart(); } });
-      $('mon-reset').addEventListener('click', () => { S.monLo = S.monHi = null; save(); monShowRange(); draw(); });
+      $('mon-reset').addEventListener('click', () => { S.monLo = S.monHi = null; save(); monShowRange(); showKey(); draw(); });
       $('device').addEventListener('change', () => { if (MON.on) { monStop(true); monStart(); } });
       $('micGain').addEventListener('input', e => { if (MON.gain) MON.gain.gain.value = Math.pow(10, (Number(e.target.value) || 0) / 20); });
       monShowRange();
@@ -6423,7 +6448,7 @@ registerProcessor('hum-rec',R);`;
         }
         stopPlay();
         for (const t of tracks) delAudio(t.uid);
-        meta = blankMeta(); meta.title = sm.name; libId = ''; savedSig = ''; showSong();
+        meta = blankMeta(); meta.title = sm.name; libId = ''; savedSig = ''; songKey = 0; showSong();
         S.bpm = sm.bpm; S.beats = sm.beats; S.key = 'off'; S.accPat = sm.acc; S.accInst = sm.accInst; S.accBass = true;
         save();
         const vv = VV.ok || await vvConnect(true);
@@ -7037,7 +7062,7 @@ ${songJson(list)}
           v: 1, cur: tracks.indexOf(st),
           tracks: tracks.map(t => ({
             name: t.name, kind: t.kind, inst: t.inst, vol: t.vol, mute: t.mute, solo: t.solo, poly: t.poly, auto: t.auto, uid: t.uid,
-            align: t.align, latency: t.latency, octave: t.octave, hasAudio: !!t.rawLen || t.hasAudio, vvStyle: t.vvStyle, audioOff: t.kind === 'audio' ? Math.round((t.audioOff || 0) * 10000) / 10000 : undefined,
+            align: t.align, latency: t.latency, octave: t.octave, hasAudio: !!t.rawLen || t.hasAudio, vvStyle: t.vvStyle, audioOff: t.kind === 'audio' ? Math.round((t.audioOff || 0) * 10000) / 10000 : undefined, semi: t.semi || undefined,
             notes: t.notes.map(n => {
               const a = [r(toBeat(t, n.s)), r(toBeat(t, n.e)), n.p, n.v];
               if (n.lyric) a.push(n.lyric);
@@ -7045,6 +7070,7 @@ ${songJson(list)}
             }),
           })),
           chords: chords.map(c => ({ b: c.b, len: c.len, root: c.root, q: c.q, cands: c.cands })),
+          key: songKey || undefined,
         };
       }
       // 保存したときと中身が違うか（選んでいるトラックは見ない）。中身を文字にして短い値に
@@ -7083,6 +7109,7 @@ ${songJson(list)}
           tracks = d.tracks.slice(0, MAX_TRACKS).map(o => {
             const t = newTrack(o.kind === 'drum' ? 'drum' : o.kind === 'audio' ? 'audio' : 'melody');
             if (t.kind === 'audio') t.audioOff = Number(o.audioOff) || 0;
+            if (Number.isInteger(o.semi)) t.semi = clamp(o.semi, -48, 48);
             if (typeof o.name === 'string') t.name = o.name.slice(0, 24);
             if (t.kind !== 'drum' && INST[o.inst]) t.inst = o.inst;
             t.vol = clamp(Number(o.vol) || 0, 0, 100);
@@ -7105,9 +7132,76 @@ ${songJson(list)}
           chords = (Array.isArray(d.chords) ? d.chords : []).filter(c => c && isFinite(c.b) && isFinite(c.len) && isFinite(c.root))
             .map(c => ({ b: c.b, len: c.len, root: mod(c.root | 0, 12), q: ['M', 'm', 'dim'].includes(c.q) ? c.q : 'M', cands: Array.isArray(c.cands) ? c.cands.slice(0, 4) : [] }));
           st = tracks[clamp(d.cur | 0, 0, tracks.length - 1)];
+          songKey = Number.isInteger(d.key) ? d.key : 0;
+          if (typeof showKey === 'function') try { showKey(); } catch (e) { }
           return true;
         } catch (e) { return false; }
       }
+
+      // ══════════════════════════════════════
+      //  キーを変える（曲全体を半音ずつ）
+      // ══════════════════════════════════════
+      let songKey = 0;      // 最初から何半音動かしたか（見せるだけ）
+      const semiLabel = d => (d > 0 ? '+' + d : d < 0 ? '−' + -d : '±0');
+      function showKey() {
+        $('key-val').textContent = semiLabel(songKey);
+        $('key-fit').disabled = S.monLo == null || S.monHi == null || !keyMelody() || G.recording || G.busy;
+      }
+      // 歌うメロディ（歌詞のあるトラック → 伴奏でないメロディ）
+      const keyMelody = () => tracks.find(t => t.kind === 'melody' && t.notes.some(n => n.lyric)) || tracks.find(t => t.kind === 'melody' && !t.auto && t.notes.length) || tracks.find(t => t.kind === 'melody' && t.notes.length);
+      function transposeSong(d) {
+        if (!d || G.recording || G.busy) return;
+        stopPlay(); kbReleaseAll();
+        const mel = tracks.filter(t => t.kind === 'melody');
+        let over = 0;
+        for (const t of mel) {
+          if (t.notes.length) {
+            pushUndoFor(t);
+            for (const n of t.notes) { const q = n.p + d; if (q < 0 || q > 127) over++; n.p = clamp(q, 0, 127); }
+          }
+          t.semi = (t.semi || 0) + d;       // 録音から作り直しても同じキーになるように
+          if (t.vv) t.vv = null;
+        }
+        for (const c of chords) {
+          c.root = mod(c.root + d, 12);
+          if (Array.isArray(c.cands)) c.cands = c.cands.map(x => (x && typeof x === 'object' && isFinite(x.root) ? { ...x, root: mod(x.root + d, 12) } : x));
+        }
+        if (S.key !== 'off') { S.key = String(mod(Number(S.key) + d, 12)); save(); }
+        songKey += d;
+        setUI(); renderTracks(); refresh(); showKey();
+        if ($('score').offsetParent) renderScore();
+        const audioT = tracks.some(t => t.kind === 'audio' && t.rawLen);
+        toast(`キーを${d > 0 ? '上げ' : '下げ'}ました（${semiLabel(songKey)}）` + (audioT ? '。音声のトラックはそのままです' : '') + (over ? `。範囲を超えた音が ${over} 個あります` : ''));
+      }
+      // 選んでいないトラックでも Ctrl+Z で戻せるように
+      function pushUndoFor(t) { const cur = st; st = t; try { pushUndo(); } finally { st = cur; } }
+      // あなたの音域にメロディが入るキー（はみ出しが少ない → 真ん中が近い → 動かす量が少ない）
+      function fitKey() {
+        const m = keyMelody();
+        if (!m || S.monLo == null || S.monHi == null) return null;
+        const vn = viewNotes(m);
+        let lo = 127, hi = 0;
+        for (const n of vn) { lo = Math.min(lo, n.p); hi = Math.max(hi, n.p); }
+        if (lo > hi) return null;
+        let best = null;
+        for (let d = -12; d <= 12; d++) {
+          const out = Math.max(0, S.monLo - (lo + d)) + Math.max(0, hi + d - S.monHi);
+          const mid = Math.abs((lo + hi) / 2 + d - (S.monLo + S.monHi) / 2);
+          const sc = out * 100 + mid * 2 + Math.abs(d) * 0.1;
+          if (!best || sc < best.sc) best = { d, sc, out, lo: lo + d, hi: hi + d };
+        }
+        return best;
+      }
+      $('key-down').addEventListener('click', () => transposeSong(-1));
+      $('key-up').addEventListener('click', () => transposeSong(1));
+      $('key-fit').addEventListener('click', async () => {
+        const b = fitKey();
+        if (!b) { toast('先に「🎧 マイクを聞く」で、低い音から高い音まで歌って音域を覚えさせてください'); return; }
+        const m = keyMelody();
+        if (!b.d) { toast(`今のキーで、メロディ（${noteName(b.lo)}〜${noteName(b.hi)}）はあなたの音域（${noteName(S.monLo)}〜${noteName(S.monHi)}）に${b.out ? 'いちばん近いです' : '入っています'}`); return; }
+        const ok = await window.DonnmaAsk.ask(`「${m.name}」のメロディを ${noteName(b.lo)}〜${noteName(b.hi)} にすると、あなたの音域（${noteName(S.monLo)}〜${noteName(S.monHi)}）に${b.out ? 'いちばん近くなります' : '入ります'}。キーを ${semiLabel(b.d)} しますか？`, { yes: `${semiLabel(b.d)} にする`, no: 'やめる' });
+        if (ok) transposeSong(b.d);
+      });
 
       // ══════════════════════════════════════
       //  曲（タイトル・作詞・作曲）と、保存した曲の一覧
@@ -7253,7 +7347,7 @@ ${songJson(list)}
         chords = [];
         tracks = [newTrack('melody')];
         st = tracks[0];
-        meta = blankMeta(); libId = ''; libSavedAt = 0; savedSig = ''; dirty = false;
+        meta = blankMeta(); libId = ''; libSavedAt = 0; savedSig = ''; dirty = false; songKey = 0; showKey();
         G.cursor = 0; wrap.scrollLeft = 0;
         setUI(); renderTracks(); resetLive(); refresh();
         saveSong(); showSong(); syncMetaInputs(); libStateText(); renderLib();
@@ -7630,6 +7724,8 @@ ${songJson(list)}
         $('play').disabled = lock || !has;
         $('play-start').disabled = lock || !has;
         $('midi-in').classList.toggle('on', MIDI.on);
+        $('key-down').disabled = $('key-up').disabled = lock;
+        showKey();
         $('vox').disabled = lock && !VOX.on;
         $('bpm-guess').disabled = lock || !st.rawLen || st.notes.length < 6;
         $('open-mid').disabled = lock;
@@ -8624,6 +8720,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        transposeSong, fitKey, get songKey() { return songKey; },
         VOX, setVox,
         MON, monStart, monStop, yinPitch,
         normalizeRec,
