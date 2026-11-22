@@ -1939,6 +1939,121 @@
       display: none !important;
     }
 
+    /* ── 動画にする ── */
+    .song-dlg.video-dlg {
+      width: min(1100px, calc(100vw - 24px));
+    }
+
+    .vd-body {
+      padding: 16px 18px 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .vd-stage {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #0d0409;
+      border-radius: 10px;
+      padding: 8px;
+    }
+
+    .vd-stage canvas {
+      display: block;
+      max-width: 100%;
+      max-height: min(56vh, 560px);
+      width: auto;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    .vd-seek {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .vd-seek input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .vd-t {
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .vd-opts {
+      display: grid;
+      gap: 10px;
+    }
+
+    .vd-opts select {
+      font: inherit;
+      font-size: 13px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-deep, #1a0a14);
+      color: var(--text);
+    }
+
+    .vd-checks {
+      display: grid;
+      gap: 4px;
+    }
+
+    .vd-checks .check {
+      font-size: 13px;
+    }
+
+    .vd-opts .hint {
+      margin: 0;
+    }
+
+    .vd-make,
+    .vd-done {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .vd-done .hint {
+      flex-basis: 100%;
+    }
+
+    .vd-prog {
+      height: 8px;
+      border-radius: 99px;
+      background: var(--bg-deep, #1a0a14);
+      overflow: hidden;
+    }
+
+    .vd-prog div {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      transition: width 0.15s;
+    }
+
+    @media (max-width: 760px) {
+      .vd-body {
+        grid-template-columns: minmax(0, 1fr);
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .vd-stage canvas {
+        max-height: 44vh;
+      }
+    }
+
     /* ── 曲（タイトル・保存・呼び出し） ── */
     .song-btn {
       font: inherit;
@@ -2551,6 +2666,7 @@
                 <button type="button" data-proxy="ex-ust">🎙 .ust（UTAU・OpenUtau）<small>選んでいるトラックを歌声ソフト用に</small></button>
                 <button type="button" data-proxy="ex-xml">🎼 MusicXML（楽譜・NEUTRINO）<small>選んでいるトラックを楽譜に</small></button>
                 <button type="button" id="export-json">🤖 AI 用の JSON（音・歌詞だけ）<small>AI・ほかのツールに渡す形。録音や音色の設定は入りません（曲を残すなら 🎵 曲の名前から保存）</small></button>
+                <button type="button" id="video-open">🎬 動画にする（X・YouTube 用）<small>MIDI が流れる画面を、音つきの MP4 に</small></button>
               </div>
             </details>
             <button class="btn btn-primary" type="button" id="save-mid" disabled>MIDI を保存（.mid）</button>
@@ -2975,6 +3091,64 @@
   <!-- /shared:footer -->
 
   <input type="text" id="ly-edit" class="ly-edit" maxlength="64" spellcheck="false" aria-label="歌詞" hidden>
+  <!-- 動画にする（X・YouTube 用） -->
+  <dialog class="song-dlg video-dlg" id="video-dlg" aria-labelledby="video-dlg-h">
+    <div class="sd-head">
+      <h2 id="video-dlg-h">🎬 動画にする</h2>
+      <button class="sd-x" type="button" id="video-close" aria-label="閉じる">×</button>
+    </div>
+    <div class="vd-body">
+      <div class="vd-preview">
+        <div class="vd-stage"><canvas id="vd-canvas" width="1280" height="720" aria-label="動画のプレビュー"></canvas></div>
+        <div class="vd-seek">
+          <button class="btn btn-sm ic" type="button" id="vd-play" title="プレビューを動かす（音は出ません）" aria-label="プレビューを動かす">▶</button>
+          <input type="range" id="vd-time" min="0" max="1000" value="0" aria-label="プレビューの位置">
+          <span class="vd-t" id="vd-tlabel">0:00</span>
+        </div>
+      </div>
+      <div class="vd-opts">
+        <label class="sd-f"><span>形</span>
+          <select id="vdShape">
+            <option value="wide">横 16:9（X・YouTube）</option>
+            <option value="tall">縦 9:16（ショート・リール）</option>
+            <option value="square">正方形 1:1</option>
+          </select></label>
+        <label class="sd-f"><span>画質</span>
+          <select id="vdQuality">
+            <option value="720">720p（軽い・おすすめ）</option>
+            <option value="1080">1080p（きれい・時間がかかる）</option>
+          </select></label>
+        <label class="sd-f"><span>色</span>
+          <select id="vdTheme">
+            <option value="plum">夜（プラム）</option>
+            <option value="cream">昼（クリーム）</option>
+          </select></label>
+        <label class="sd-f"><span>範囲</span>
+          <select id="vdRange">
+            <option value="all">曲の全部</option>
+            <option value="loop">リピートの範囲</option>
+          </select></label>
+        <div class="vd-checks">
+          <label class="check"><input type="checkbox" id="vdVoice">歌った声（録音）も入れる</label>
+          <label class="check"><input type="checkbox" id="vdLyrics">歌詞を出す</label>
+          <label class="check"><input type="checkbox" id="vdChords">コードを出す</label>
+        </div>
+        <p class="hint" id="vd-info"></p>
+        <div class="vd-make">
+          <button class="btn btn-primary" type="button" id="vd-make">🎬 動画を作る</button>
+          <button class="btn" type="button" id="vd-cancel" hidden>やめる</button>
+        </div>
+        <div class="vd-prog" id="vd-prog" hidden><div id="vd-bar"></div></div>
+        <div class="vd-done" id="vd-done" hidden>
+          <button class="btn btn-primary" type="button" id="vd-save">⬇ MP4 を保存</button>
+          <button class="btn" type="button" id="vd-share" hidden>📤 共有</button>
+          <button class="btn" type="button" id="vd-x">𝕏 に投稿</button>
+          <p class="hint">X には動画を直接送れないので、「𝕏 に投稿」で開いた投稿画面に、保存した MP4 を添付してください。</p>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
   <!-- 曲の保存・呼び出し -->
   <dialog class="song-dlg" id="song-dlg" aria-labelledby="song-dlg-h">
     <div class="sd-head">
@@ -3078,7 +3252,7 @@
         range: 'voice', sens: 2, gate: -50, minMs: 80, split: true, autoTune: true,
         key: 'off', scale: 'major', quant: '16', quantLen: true, vel: 'dyn',
         names: 'en', naming: '4', playMode: 'both', playClick: false, zoom: 60, repeat: false, kbOct: 4, stepLen: '0.5',
-        velLane: true, setOpen: false, libAudio: true, aiScope: 'all', tplProg: 'axis', tplKey: '0', tplDrum: 'b8', tplAcc: 'quarter', tplBars: '8', tplBass: true, tplDrum1: 'b8', vvUrl: 'http://127.0.0.1:50021', scEdit: true, scLen: 4, scDot: false, scRest: false, scAcc: 'auto', textLen: '0.5', lyricEnc: 'sjis', chordPer: '1', accPat: 'whole', accInst: 'piano', accBass: true,
+        velLane: true, setOpen: false, libAudio: true, vdShape: 'wide', vdQuality: '720', vdTheme: 'plum', vdRange: 'all', vdLyrics: true, vdChords: true, aiScope: 'all', tplProg: 'axis', tplKey: '0', tplDrum: 'b8', tplAcc: 'quarter', tplBars: '8', tplBass: true, tplDrum1: 'b8', vvUrl: 'http://127.0.0.1:50021', scEdit: true, scLen: 4, scDot: false, scRest: false, scAcc: 'auto', textLen: '0.5', lyricEnc: 'sjis', chordPer: '1', accPat: 'whole', accInst: 'piano', accBass: true,
       };
       const S = { ...DEF };
       try { Object.assign(S, JSON.parse(localStorage.getItem(STORE) || '{}')); } catch (e) { }
@@ -7037,6 +7211,336 @@ ${songJson(list)}
         }
       });
 
+      // ══════════════════════════════════════
+      //  動画にする（MIDI が流れる画面＋音 → MP4。WebCodecs で1コマずつ作り、mp4-muxer で MP4 に）
+      // ══════════════════════════════════════
+      const VD = { model: null, t: 0, playing: false, raf: 0, making: false, cancel: false, blob: null, name: '' };
+      const VD_SIZE = { wide: [1280, 720], tall: [720, 1280], square: [720, 720] };
+      const VD_COL = ['#ff6f96', '#3fbf8a', '#f2a93b', '#5b8cff', '#b46cff', '#22b5b5', '#ff8a5b', '#8bc34a'];
+      const VD_THEME = {
+        plum: { bg0: '#1a0a14', bg1: '#2c1022', roll: 'rgba(255,255,255,0.035)', grid: 'rgba(255,255,255,0.06)', bar: 'rgba(255,133,161,0.28)', text: '#f6e9ef', muted: '#c4a2b3', accent: '#ff85a1', head: '#ffc46b', badge: 'rgba(255,133,161,0.16)', drum: '#ff9fbc' },
+        cream: { bg0: '#f6f2e2', bg1: '#efe4d0', roll: 'rgba(255,255,255,0.75)', grid: 'rgba(110,53,81,0.09)', bar: 'rgba(194,52,94,0.3)', text: '#2a1020', muted: '#8a5a72', accent: '#c2345e', head: '#e08a00', badge: 'rgba(194,52,94,0.1)', drum: '#c2345e' },
+      };
+      const vdSize = () => { const [w, h] = VD_SIZE[S.vdShape] || VD_SIZE.wide; const k = S.vdQuality === '1080' ? 1.5 : 1; return [Math.round(w * k / 2) * 2, Math.round(h * k / 2) * 2]; };
+      // 絵にするもの（拍で）。範囲・トラック・歌詞の行
+      function vdModel() {
+        const trs = playable().filter(t => t.notes.length);
+        let a = 0, b = songEnd() + 1.5 / spb();
+        if (S.vdRange === 'loop' && loop.a != null) [a, b] = loopRange();
+        const mel = [], drums = [];
+        let lo = 127, hi = 0, ci = 0, lyTrack = null;
+        for (const t of trs) {
+          const ns = viewNotes(t).filter(n => n.e > a && n.s < b).map(n => ({ s: n.s, e: n.e, p: n.p, v: n.v, ly: n.src && n.src.lyric || '' })).sort((x, y) => x.s - y.s);
+          if (t.kind === 'drum') { drums.push(...ns); continue; }
+          for (const n of ns) { lo = Math.min(lo, n.p); hi = Math.max(hi, n.p); }
+          const tr = { color: VD_COL[ci++ % VD_COL.length], notes: ns };
+          mel.push(tr);
+          if (!lyTrack && ns.some(n => n.ly)) lyTrack = tr;
+        }
+        if (lo > hi) { lo = 60; hi = 72; }
+        lo -= 2; hi += 2;
+        if (hi - lo < 14) { const m = (lo + hi) / 2; lo = Math.floor(m - 7); hi = Math.ceil(m + 7); }
+        // 歌詞の行：2小節ごと
+        const lines = [];
+        if (lyTrack) {
+          const per = S.beats * 2;
+          for (const n of lyTrack.notes) {
+            if (!n.ly) continue;
+            const k = Math.floor(n.s / per);
+            let L = lines[lines.length - 1];
+            if (!L || L.k !== k) { L = { k, s: n.s, e: n.e, ns: [] }; lines.push(L); }
+            L.ns.push(n); L.e = n.e;
+          }
+        }
+        const credit = [['作詞', meta.lyricist], ['作曲', meta.composer], ['編曲', meta.arranger]].filter(([, v]) => v.trim()).map(([k, v]) => `${k}：${v.trim()}`).join('　');
+        return { a, b, dur: (b - a) * spb(), mel, drums, lo, hi, lines, lyTrack, chords: chords.slice(), title: meta.title.trim(), credit };
+      }
+      function vdRound(g, x, y, w, h, r) { r = Math.min(r, w / 2, h / 2); g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+      // 1コマを描く（t は範囲のはじめからの秒）
+      function vdDraw(g, W, H, M, t) {
+        const T = VD_THEME[S.vdTheme] || VD_THEME.plum, u = Math.min(W, H) / 720, beat = M.a + t / spb();
+        const font = (w, px) => `${w} ${Math.round(px)}px 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif`;
+        const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, T.bg0); bg.addColorStop(1, T.bg1);
+        g.fillStyle = bg; g.fillRect(0, 0, W, H);
+        const pad = Math.round(28 * u);
+        let y = pad;
+        g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+        if (M.title) {
+          g.fillStyle = T.text; g.font = font(900, 40 * u);
+          let ts = 40 * u; while (g.measureText(M.title).width > W - pad * 2 && ts > 18 * u) { ts -= 2 * u; g.font = font(900, ts); }
+          y += ts; g.fillText(M.title, W / 2, y);
+          y += 10 * u;
+        }
+        if (M.credit) { g.fillStyle = T.muted; g.font = font(700, 18 * u); y += 18 * u; g.fillText(M.credit, W / 2, y); y += 6 * u; }
+        if (M.title || M.credit) y += 14 * u;
+        // 下：歌詞・進み具合・名前
+        const showLy = S.vdLyrics && M.lines.length;
+        const lyH = showLy ? 76 * u : 0;
+        const foot = 40 * u + lyH;
+        const R = { x: pad, y, w: W - pad * 2, h: H - y - foot - pad * 0.5 };
+        g.fillStyle = T.roll; vdRound(g, R.x, R.y, R.w, R.h, 14 * u); g.fill();
+        g.save(); vdRound(g, R.x, R.y, R.w, R.h, 14 * u); g.clip();
+        const span = S.beats * (S.vdShape === 'wide' ? 3 : S.vdShape === 'square' ? 2.5 : 2);
+        const ppb = R.w / span, playX = R.x + R.w * 0.28, X = b => playX + (b - beat) * ppb;
+        const dH = M.drums.length ? Math.min(R.h * 0.2, 84 * u) : 0;
+        const mH = R.h - dH, rows = M.hi - M.lo + 1, rh = mH / rows;
+        const Y = p => R.y + (M.hi - p) * rh;
+        // 拍と小節の線
+        const b0 = Math.floor(beat - (playX - R.x) / ppb), b1 = Math.ceil(beat + (R.x + R.w - playX) / ppb);
+        for (let k = b0; k <= b1; k++) {
+          if (k < 0) continue;
+          const x = X(k), bar = k % S.beats === 0;
+          g.fillStyle = bar ? T.bar : T.grid; g.fillRect(Math.round(x), R.y, bar ? Math.max(1, 2 * u) : 1, R.h);
+          if (bar) { g.fillStyle = T.muted; g.font = font(700, 12 * u); g.textAlign = 'left'; g.fillText(String(k / S.beats + 1), x + 5 * u, R.y + 16 * u); }
+        }
+        if (dH) { g.fillStyle = T.grid; g.fillRect(R.x, R.y + mH, R.w, 1); }
+        // 音
+        const inView = n => X(n.e) > R.x - 4 && X(n.s) < R.x + R.w + 4;
+        for (let i = M.mel.length - 1; i >= 0; i--) {
+          const tr = M.mel[i];
+          for (const n of tr.notes) {
+            if (!inView(n)) continue;
+            const x = X(n.s), w = Math.max(3 * u, (n.e - n.s) * ppb - 2 * u), hh = Math.max(9 * u, rh * 0.8), yy = Y(n.p) + rh / 2 - hh / 2;
+            const on = n.s <= beat && beat < n.e, past = n.e <= beat;
+            g.globalAlpha = past ? 0.4 : 1;
+            if (on) { g.shadowColor = tr.color; g.shadowBlur = 18 * u; }
+            g.fillStyle = tr.color; vdRound(g, x, yy, w, hh, Math.min(6 * u, hh / 2)); g.fill();
+            g.shadowBlur = 0;
+            if (on) { g.fillStyle = 'rgba(255,255,255,0.45)'; vdRound(g, x, yy, w, hh, Math.min(6 * u, hh / 2)); g.fill(); }
+            if (S.vdLyrics && tr === M.lyTrack && n.ly && rh > 9 * u) {
+              g.fillStyle = T.text; g.font = font(700, Math.min(18 * u, Math.max(11 * u, rh * 1.1))); g.textAlign = 'left';
+              g.fillText(n.ly, x + 2 * u, yy - 4 * u);
+            }
+          }
+        }
+        g.globalAlpha = 1;
+        // ドラム
+        if (dH) {
+          const ord = DRUMS.map(d => d.p), dr = dH / ord.length;
+          for (const n of M.drums) {
+            if (!inView(n)) continue;
+            const k = Math.max(0, ord.indexOf(n.p)), x = X(n.s), yy = R.y + mH + k * dr;
+            const on = beat >= n.s && beat < n.s + 0.25;
+            g.globalAlpha = n.s + 0.25 <= beat ? 0.4 : 1;
+            g.fillStyle = T.drum; if (on) { g.shadowColor = T.drum; g.shadowBlur = 14 * u; }
+            vdRound(g, x - 1, yy + dr * 0.1, Math.max(4 * u, 0.2 * ppb), Math.max(2, dr * 0.8), 3 * u); g.fill();
+            g.shadowBlur = 0;
+          }
+          g.globalAlpha = 1;
+        }
+        // 今の位置
+        g.fillStyle = T.head; g.fillRect(Math.round(playX - u), R.y, Math.max(2, 2.5 * u), R.h);
+        // コード
+        if (S.vdChords && M.chords.length) {
+          const c = M.chords.find(q => q.b <= beat && beat < q.b + q.len);
+          if (c) {
+            const nm = chordName(c);
+            g.font = font(900, 26 * u); g.textAlign = 'left';
+            const tw = g.measureText(nm).width;
+            g.fillStyle = T.badge; vdRound(g, R.x + 12 * u, R.y + 26 * u, tw + 24 * u, 40 * u, 10 * u); g.fill();
+            g.fillStyle = T.accent; g.fillText(nm, R.x + 24 * u, R.y + 55 * u);
+          }
+        }
+        g.restore();
+        // 歌詞の行（歌ったところから色が変わる）
+        let fy = R.y + R.h + 14 * u;
+        if (showLy) {
+          let li = -1;
+          for (let i = 0; i < M.lines.length; i++) if (M.lines[i].s - 1 <= beat) li = i;
+          const L = li >= 0 ? M.lines[li] : M.lines[0];
+          if (L && !(li >= 0 && beat > L.e + 2 && (!M.lines[li + 1] || M.lines[li + 1].s - 1 > beat))) {
+            let fs = 32 * u; g.font = font(900, fs);
+            const parts = L.ns.map(n => n.ly), total = () => parts.reduce((s1, p) => s1 + g.measureText(p).width, 0);
+            while (total() > R.w && fs > 14 * u) { fs -= 2 * u; g.font = font(900, fs); }
+            let x = W / 2 - total() / 2;
+            g.textAlign = 'left';
+            for (let i = 0; i < parts.length; i++) {
+              g.fillStyle = L.ns[i].s <= beat ? T.accent : T.text;
+              g.fillText(parts[i], x, fy + fs);
+              x += g.measureText(parts[i]).width;
+            }
+            const nx = M.lines[li + 1];
+            if (nx && li >= 0) {
+              g.font = font(700, 18 * u); g.fillStyle = T.muted; g.textAlign = 'center';
+              g.fillText(nx.ns.map(n => n.ly).join(''), W / 2, fy + fs + 26 * u);
+            }
+          }
+          fy += lyH;
+        }
+        // 進み具合と名前
+        const pw = R.w, px = R.x, prog = Math.min(1, Math.max(0, t / M.dur));
+        g.fillStyle = T.grid; vdRound(g, px, fy, pw, 6 * u, 3 * u); g.fill();
+        g.fillStyle = T.accent; vdRound(g, px, fy, Math.max(6 * u, pw * prog), 6 * u, 3 * u); g.fill();
+        g.font = font(700, 13 * u); g.fillStyle = T.muted;
+        g.textAlign = 'left'; g.fillText(`${fmtMS(t)} / ${fmtMS(M.dur)}`, px, fy + 24 * u);
+        g.textAlign = 'right'; g.fillText('鼻歌 MIDI 変換 ｜ donnma.com/tool/hum-midi', px + pw, fy + 24 * u);
+      }
+      const fmtMS = s => { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+      function vdPreview() {
+        const M = VD.model; if (!M) return;
+        const cv = $('vd-canvas'), [W, H] = VD_SIZE[S.vdShape] || VD_SIZE.wide;
+        if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+        vdDraw(cv.getContext('2d'), W, H, M, VD.t);
+        $('vd-time').value = String(Math.round(VD.t / M.dur * 1000));
+        $('vd-tlabel').textContent = `${fmtMS(VD.t)} / ${fmtMS(M.dur)}`;
+      }
+      function vdRefresh() {
+        VD.model = vdModel();
+        VD.t = Math.min(VD.t, VD.model.dur);
+        const [W, H] = vdSize(), d = VD.model.dur;
+        $('vd-info').innerHTML = `長さ ${fmtMS(d)} ・ ${W}×${H} ・ 30fps` + (d > 140 ? '<br><b>※ X（ふつうのアカウント）に上げられるのは 2分20秒まで。</b>ピアノロールの目盛りをドラッグしてリピートの範囲を決めると、そこだけにできます。' : '');
+        VD.blob = null; $('vd-done').hidden = true;
+        vdPreview();
+      }
+      function vdStop() { VD.playing = false; cancelAnimationFrame(VD.raf); $('vd-play').textContent = '▶'; }
+      async function openVideoDlg() {
+        if (G.recording || G.busy) return;
+        if (!playable().some(t => t.notes.length)) { toast('音の入っているトラックがありません'); return; }
+        stopPlay();
+        const hasLoop = loop.a != null;
+        $('vdRange').querySelector('[value="loop"]').disabled = !hasLoop;
+        $('vdRange').querySelector('[value="loop"]').textContent = hasLoop ? 'リピートの範囲' : 'リピートの範囲（目盛りをドラッグで決める）';
+        if (!hasLoop) S.vdRange = 'all';
+        const hasVoice = playable().some(t => t.rawLen);
+        $('vdVoice').disabled = !hasVoice; $('vdVoice').checked = hasVoice && VD.voice !== false;
+        for (const k of ['vdShape', 'vdQuality', 'vdTheme', 'vdRange']) $(k).value = S[k];
+        $('vdLyrics').checked = !!S.vdLyrics; $('vdChords').checked = !!S.vdChords;
+        $('vd-prog').hidden = true; $('vd-make').disabled = false;
+        VD.t = 0;
+        try { await document.fonts.load("900 40px 'Zen Maru Gothic'"); await document.fonts.load("700 18px 'Zen Maru Gothic'"); } catch (e) { }
+        if (!$('video-dlg').open) $('video-dlg').showModal();
+        vdRefresh();
+        // 最初のコマは少し進めたところ（音が見えるように）
+        if (VD.model.mel.some(t => t.notes.length) || VD.model.drums.length) { VD.t = Math.min(VD.model.dur, 2 * spb() * S.beats * 0.5); vdPreview(); }
+      }
+      for (const k of ['vdShape', 'vdQuality', 'vdTheme', 'vdRange']) $(k).addEventListener('change', e => { S[k] = e.target.value; save(); vdRefresh(); });
+      $('vdLyrics').addEventListener('change', e => { S.vdLyrics = e.target.checked; save(); vdRefresh(); });
+      $('vdChords').addEventListener('change', e => { S.vdChords = e.target.checked; save(); vdRefresh(); });
+      $('vdVoice').addEventListener('change', e => { VD.voice = e.target.checked; VD.blob = null; $('vd-done').hidden = true; });
+      $('vd-time').addEventListener('input', e => { vdStop(); if (VD.model) { VD.t = Number(e.target.value) / 1000 * VD.model.dur; vdPreview(); } });
+      $('vd-play').addEventListener('click', () => {
+        if (VD.playing) { vdStop(); return; }
+        if (!VD.model) return;
+        if (VD.t >= VD.model.dur - 0.05) VD.t = 0;
+        VD.playing = true; $('vd-play').textContent = '❚❚';
+        let last = performance.now();
+        const step = now => {
+          if (!VD.playing) return;
+          VD.t = Math.min(VD.model.dur, VD.t + (now - last) / 1000); last = now;
+          vdPreview();
+          if (VD.t >= VD.model.dur) { vdStop(); return; }
+          VD.raf = requestAnimationFrame(step);
+        };
+        VD.raf = requestAnimationFrame(step);
+      });
+      $('video-close').addEventListener('click', () => $('video-dlg').close());
+      $('video-dlg').addEventListener('cancel', e => { if (VD.making) e.preventDefault(); });
+      $('video-dlg').addEventListener('close', () => { vdStop(); if (VD.making) VD.cancel = true; });
+      $('video-dlg').addEventListener('click', e => { if (e.target === $('video-dlg') && !VD.making) $('video-dlg').close(); });
+      $('video-open').addEventListener('click', openVideoDlg);
+      function loadMuxer() {
+        if (window.Mp4Muxer) return Promise.resolve();
+        return new Promise((res, rej) => { const s1 = document.createElement('script'); s1.src = 'mp4-muxer.js?v=5.2.2'; s1.onload = res; s1.onerror = rej; document.head.appendChild(s1); });
+      }
+      async function pickVideoCodec(W, H, bitrate) {
+        for (const codec of ['avc1.640028', 'avc1.4d0028', 'avc1.42002a', 'avc1.42001f']) {
+          try { const r = await VideoEncoder.isConfigSupported({ codec, width: W, height: H, bitrate, framerate: 30 }); if (r.supported) return codec; } catch (e) { }
+        }
+        return null;
+      }
+      async function makeVideo() {
+        if (VD.making || G.recording || G.busy) return;
+        if (!window.VideoEncoder || !window.AudioEncoder || !window.VideoFrame) { toast('このブラウザでは動画を作れません。Chrome か Edge で開いてください'); return; }
+        vdStop();
+        const M = vdModel(), [W, H] = vdSize(), fps = 30, bitrate = S.vdQuality === '1080' ? 8e6 : 4.5e6;
+        const vcodec = await pickVideoCodec(W, H, bitrate);
+        const asr = 44100;
+        let aok = false;
+        try { aok = (await AudioEncoder.isConfigSupported({ codec: 'mp4a.40.2', sampleRate: asr, numberOfChannels: 2, bitrate: 192000 })).supported; } catch (e) { }
+        if (!vcodec || !aok) { toast('このブラウザでは X 向けの MP4（H.264・AAC）を作れません。Chrome か Edge で開いてください'); return; }
+        VD.making = true; VD.cancel = false; VD.blob = null;
+        G.busy = true; updateButtons();
+        $('vd-make').disabled = true; $('vd-cancel').hidden = false; $('vd-done').hidden = true; $('vd-prog').hidden = false;
+        const bar = p => { $('vd-bar').style.width = Math.round(p * 100) + '%'; };
+        bar(0);
+        let ve = null, ae = null;
+        try {
+          await loadMuxer();
+          $('vd-info').textContent = '音を作っています…';
+          const withVoice = !$('vdVoice').disabled && $('vdVoice').checked;
+          const buf = await renderMix(withVoice);
+          if (VD.cancel) throw new Error('cancel');
+          const muxer = new Mp4Muxer.Muxer({
+            target: new Mp4Muxer.ArrayBufferTarget(),
+            video: { codec: 'avc', width: W, height: H, frameRate: fps },
+            audio: { codec: 'aac', numberOfChannels: 2, sampleRate: buf.sampleRate },
+            fastStart: 'in-memory',
+            firstTimestampBehavior: 'offset',
+          });
+          let err = null;
+          ve = new VideoEncoder({ output: (c, m) => muxer.addVideoChunk(c, m), error: e => { err = e; } });
+          ve.configure({ codec: vcodec, width: W, height: H, bitrate, framerate: fps, latencyMode: 'quality', avc: { format: 'avc' } });
+          ae = new AudioEncoder({ output: (c, m) => muxer.addAudioChunk(c, m), error: e => { err = e; } });
+          ae.configure({ codec: 'mp4a.40.2', sampleRate: buf.sampleRate, numberOfChannels: 2, bitrate: 192000 });
+          // 音：範囲を切り出して、割れないように下げる
+          const sr = buf.sampleRate, i0 = Math.floor(M.a * spb() * sr), i1 = Math.min(buf.length, Math.ceil((M.a * spb() + M.dur) * sr));
+          const L0 = buf.getChannelData(0), R0 = buf.numberOfChannels > 1 ? buf.getChannelData(1) : L0;
+          let peak = 0;
+          for (let i = i0; i < i1; i++) peak = Math.max(peak, Math.abs(L0[i]), Math.abs(R0[i]));
+          const kk = peak > 0.98 ? 0.98 / peak : 1, n = Math.max(0, i1 - i0), CH = 4096;
+          for (let o = 0; o < n; o += CH) {
+            const m = Math.min(CH, n - o), d = new Float32Array(m * 2);
+            for (let i = 0; i < m; i++) { d[i] = L0[i0 + o + i] * kk; d[m + i] = R0[i0 + o + i] * kk; }
+            const ad = new AudioData({ format: 'f32-planar', sampleRate: sr, numberOfFrames: m, numberOfChannels: 2, timestamp: Math.round(o / sr * 1e6), data: d });
+            ae.encode(ad); ad.close();
+          }
+          // 絵：1コマずつ
+          const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+          const g = cv.getContext('2d', { alpha: false });
+          const N = Math.max(1, Math.ceil(M.dur * fps));
+          $('vd-info').textContent = '動画を作っています…';
+          for (let i = 0; i < N; i++) {
+            if (VD.cancel) throw new Error('cancel');
+            if (err) throw err;
+            vdDraw(g, W, H, M, i / fps);
+            const fr = new VideoFrame(cv, { timestamp: Math.round(i * 1e6 / fps), duration: Math.round(1e6 / fps) });
+            ve.encode(fr, { keyFrame: i % (fps * 2) === 0 });
+            fr.close();
+            while (ve.encodeQueueSize > 6) await new Promise(r => setTimeout(r, 4));
+            if (i % 6 === 0) { bar(0.05 + 0.9 * i / N); $('vd-info').textContent = `動画を作っています… ${Math.round(i / N * 100)}%`; await new Promise(r => setTimeout(r, 0)); }
+          }
+          await ve.flush(); await ae.flush();
+          if (err) throw err;
+          muxer.finalize();
+          VD.blob = new Blob([muxer.target.buffer], { type: 'video/mp4' });
+          VD.name = (meta.title.trim() || 'hum-video').replace(/[\\/:*?"<>|\r\n\t]/g, '_').slice(0, 60);
+          bar(1);
+          $('vd-info').textContent = `できました（${fmtMS(M.dur)}・${(VD.blob.size / 1048576).toFixed(1)}MB）。`;
+          $('vd-done').hidden = false;
+          let canShare = false;
+          try { canShare = !!(navigator.canShare && navigator.canShare({ files: [new File([VD.blob], VD.name + '.mp4', { type: 'video/mp4' })] })); } catch (e) { }
+          $('vd-share').hidden = !canShare;
+        } catch (e) {
+          if (e && e.message === 'cancel') { $('vd-info').textContent = 'やめました。'; }
+          else { $('vd-info').textContent = '動画を作れませんでした' + (e && e.message ? `（${e.message}）` : ''); }
+          $('vd-prog').hidden = true;
+        } finally {
+          try { if (ve && ve.state !== 'closed') ve.close(); } catch (e) { }
+          try { if (ae && ae.state !== 'closed') ae.close(); } catch (e) { }
+          VD.making = false; G.busy = false; updateButtons();
+          $('vd-make').disabled = false; $('vd-cancel').hidden = true;
+        }
+      }
+      $('vd-make').addEventListener('click', makeVideo);
+      $('vd-cancel').addEventListener('click', () => { VD.cancel = true; });
+      $('vd-save').addEventListener('click', () => { if (VD.blob) { download(VD.blob, 'video/mp4', VD.name, '.mp4'); toast('MP4 を保存しました'); } });
+      $('vd-share').addEventListener('click', async () => {
+        if (!VD.blob) return;
+        try { await navigator.share({ files: [new File([VD.blob], VD.name + '.mp4', { type: 'video/mp4' })], text: vdPostText() }); } catch (e) { }
+      });
+      const vdPostText = () => `${meta.title.trim() ? `「${meta.title.trim()}」を作りました🎵` : '鼻歌から曲を作りました🎵'}\n#鼻歌MIDI変換\nhttps://donnma.com/tool/hum-midi/`;
+      $('vd-x').addEventListener('click', () => { window.open('https://x.com/intent/post?text=' + encodeURIComponent(vdPostText()), '_blank', 'noopener'); });
+
       // ドロップで開く
       const inPanel = $('in-panel');
       inPanel.addEventListener('dragover', e => { if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); inPanel.classList.add('drag'); } });
@@ -7306,6 +7810,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        vdDur: () => (VD.model ? VD.model.dur : 0), vdModel, vdDraw,
         lib: { save: libSave, open: libOpen, del: libDelete, all: () => IDB.songAll(), get meta() { return meta; }, get libId() { return libId; }, get dirty() { return dirty; } },
         get st() { return st; }, get tracks() { return tracks; }, get chords() { return chords; }, S, G,
         loadSample, PROGS, DRUM_PAT, ustText, ustBytes, lyricEdit, lyricCommit, vvConnect, vvNotes, vvPrepare, vvFresh, VV, songJson, aiPrompt, extractJson, readAiSong, applyAi, renderMix, mixWav, scoreHit, scoreInsert, getScoreMap: () => scoreMap, parseMidi, parseText, splitLyrics, makeChords, makeAccomp, guessTempo, scoreModel, musicXml, renderScore, openPanel, lenTool, sjis, diatonic, kanaSound, IDB, append, resetData, buildNotes, buildDrums, regenerate,
