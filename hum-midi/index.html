@@ -2716,11 +2716,14 @@
           <div class="tp-row">
             <button class="btn btn-sm btn-primary" type="button" id="ai-copy">プロンプトをコピー</button>
             <button class="btn btn-sm" type="button" id="ai-copy-data">データ（JSON）だけコピー</button>
+            <button class="btn btn-sm" type="button" id="ai-save-json" title="送る範囲のトラックを JSON ファイルに（AI にファイルで渡すとき）">⬇ JSON を保存</button>
             <span class="tp-info">ChatGPT・Gemini・Claude などに貼って、答えを下に貼ります</span>
           </div>
           <textarea id="ai-reply" rows="4" spellcheck="false" placeholder="AI の答えをここに貼る（説明の文章がまざっていても、JSON の部分だけ読みます）"></textarea>
           <div class="tp-row">
             <button class="btn btn-sm btn-primary" type="button" id="ai-apply">答えを反映する</button>
+            <button class="btn btn-sm" type="button" id="ai-open-json" title="AI が返した JSON ファイルを読んで反映する（下の欄に入れてから反映）">⬆ JSON ファイルを開く</button>
+            <input type="file" id="ai-json-file" accept=".json,.txt,application/json,text/plain" hidden>
             <span class="tp-info" id="ai-info"></span>
           </div>
           <p class="hint">時間は拍（4分音符＝1）、音は C4（真ん中のド）のような名前で書いた JSON にします。反映するときは、送ったトラックと置き換えるか、新しいトラックとして追加するかを選べます。反映したあとも <b>Ctrl+Z</b> では戻せないので、心配なときは先に「MIDI を保存」しておいてください。</p>
@@ -6021,14 +6024,33 @@ ${songJson(list)}
         toast(await copyText(aiPrompt(list)) ? 'プロンプトをコピーしました。AI に貼ってください' : 'コピーできませんでした');
       });
       // AI 用と同じ形の JSON をファイルに（全部のトラック。タイトルなどがあれば頭に）
-      $('export-json').addEventListener('click', () => {
-        const list = tracks.filter(t => t.notes.length);
-        if (!list.length) { toast('音の入っているトラックがありません'); return; }
+      function saveNotesJson(list) {
+        list = list.filter(t => t.notes.length);
+        if (!list.length) { toast('音の入っているトラックがありません'); return false; }
         let txt = songJson(list);
         const head = Object.fromEntries([['title', meta.title], ['lyricist', meta.lyricist], ['composer', meta.composer], ['arranger', meta.arranger]].filter(([, v]) => v.trim()).map(([k, v]) => [k, v.trim()]));
         if (Object.keys(head).length) txt = '{\n' + Object.entries(head).map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)},\n`).join('') + txt.replace(/^\{\n/, '');
         download(txt, 'application/json', withTitle('notes'), '.json');
-        toast('JSON を保存しました（🤖 AI のタブの答えの欄に貼ると、読み戻せます）');
+        return true;
+      }
+      $('export-json').addEventListener('click', () => {
+        if (saveNotesJson(tracks.slice())) toast('JSON を保存しました（「MIDI を開く」か、画面に落とすと読み戻せます）');
+      });
+      // AI のタブ：送る範囲を JSON ファイルに（答えは、そのトラックと置き換えられる）
+      $('ai-save-json').addEventListener('click', () => {
+        const list = aiTracks();
+        if (saveNotesJson(list)) { aiSent = list.map(t => t.id); toast('JSON を保存しました。AI にファイルで渡せます'); }
+      });
+      // AI のタブ：答えの JSON ファイルを、下の欄に入れて反映する
+      $('ai-open-json').addEventListener('click', () => $('ai-json-file').click());
+      $('ai-json-file').addEventListener('change', async e => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (!f || G.recording || G.busy) return;
+        let text = '';
+        try { text = await f.text(); } catch (err) { toast('ファイルを読めませんでした'); return; }
+        $('ai-reply').value = text;
+        applyAi();
       });
       $('ai-copy-data').addEventListener('click', async () => {
         const list = aiTracks();
