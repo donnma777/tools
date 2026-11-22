@@ -2974,6 +2974,7 @@
                 <option value="0.5">8分音符</option>
                 <option value="0.3333333333333333">8分3連</option>
                 <option value="0.25">16分音符</option>
+                <option value="auto">自動（押した・歌った長さ）</option>
               </select>
             </label>
             <span class="kb-oct" id="kb-oct">オクターブ <button class="trk-btn" type="button" id="kb-down" title="下げる（−）">−</button><b id="kb-base">C4</b><button class="trk-btn" type="button" id="kb-up" title="上げる（＾）">＋</button></span>
@@ -2981,7 +2982,10 @@
             <button class="btn btn-sm" type="button" id="kb-close">終わる（Esc）</button>
           </div>
           <div class="kb-map" id="kb-map"></div>
-          <p class="hint" id="vox-hint" hidden>🎤 <b>声で入力</b>：「ラ」「ル」のように1音ずつ歌うと、音の高さが決まったところで再生位置に置き、声を切ると「長さ」だけ進みます。音と音の間は少し切って歌ってください（つなげて歌っても、高さが変わったところで次の音になります）。声が低すぎ・高すぎるときは「オクターブ」で上げ下げ。打ち込んだ音は鳴らしません。消すときは <kbd>Ctrl+Z</kbd>。再生中に歌うと、歌った長さで入ります。</p>
+          <div class="vox-opts" id="vox-opts" hidden>
+            <label class="check"><input type="checkbox" id="voxRange">リピートの範囲だけ入れ直す（範囲の音を消して、はじめから）</label>
+          </div>
+          <p class="hint" id="vox-hint" hidden>🎤 <b>声で入力</b>：<b>音を選んでから</b>オンにすると、選んだ音を前から1つずつ歌い直して高さだけ直せます。長さを「自動」にすると、歌った長さで入ります。「ラ」「ル」のように1音ずつ歌うと、音の高さが決まったところで再生位置に置き、声を切ると「長さ」だけ進みます。音と音の間は少し切って歌ってください（つなげて歌っても、高さが変わったところで次の音になります）。声が低すぎ・高すぎるときは「オクターブ」で上げ下げ。打ち込んだ音は鳴らしません。消すときは <kbd>Ctrl+Z</kbd>。再生中に歌うと、歌った長さで入ります。</p>
           <p class="hint">止まっているとき：押すと再生位置（黄色い線）に置いて、離すと「長さ」だけ進みます。同時に押すと同じ位置（ドラムで重ねるとき）。<kbd>Tab</kbd> で休み、<kbd>Backspace</kbd> で1つ戻して消す。再生中：押していた長さで入ります（リピートと合わせると重ねていけます）。<kbd>−</kbd>／<kbd>＾</kbd> でオクターブ。</p>
         </div>
         <div id="roll-wrap">
@@ -3057,6 +3061,7 @@
           <div class="checks" style="margin-top:10px">
             <label class="check"><input type="checkbox" id="metro">録音中にクリック（メトロノーム）を鳴らす</label>
             <label class="check"><input type="checkbox" id="recOthers">録音中にほかのトラックを鳴らす</label>
+            <label class="check" title="ピアノロールの目盛りをドラッグで決めた範囲だけ、今のトラックの音を録り直します。範囲の外はそのまま。カウントのあと範囲のはじめから鳴らして、範囲の終わりで止まります"><input type="checkbox" id="recPunch">リピートの範囲だけ録り直す（パンチイン）</label>
             <label class="check" title="ブラウザの「自動で音量を合わせる」を使います。歌の強弱も平らになるので、ふだんはオフがおすすめ"><input type="checkbox" id="micAgc">マイクの音量をブラウザに自動で合わせてもらう</label>
           </div>
           <p class="hint">クリックやほかのトラックを鳴らすときは<b>ヘッドホン</b>で。音声ファイル（歌・楽器の録音、動画も）は、この枠に落としても開けます。<kbd>R</kbd> で録音・停止。</p>
@@ -3405,7 +3410,7 @@
 
       // ── 設定 ──
       const DEF = {
-        device: '', bpm: 120, beats: 4, countIn: 1, clickVol: 60, metro: true, recOthers: true, micGain: 0, micAgc: false, monitor: false, monLo: null, monHi: null,
+        device: '', bpm: 120, beats: 4, countIn: 1, clickVol: 60, metro: true, recOthers: true, micGain: 0, micAgc: false, monitor: false, monLo: null, monHi: null, recPunch: false, voxRange: false,
         range: 'voice', sens: 2, gate: -50, minMs: 80, split: true, autoTune: true,
         key: 'off', scale: 'major', quant: '16', quantLen: true, vel: 'dyn',
         names: 'en', naming: '4', playMode: 'both', playClick: false, zoom: 60, repeat: false, kbOct: 4, stepLen: '0.5',
@@ -3865,6 +3870,7 @@
         rulerText: '#e6cfd9', pre: 'rgba(0,0,0,0.28)', head: '#7fd8a4', cursor: '#ffc46b', ghost: 'rgba(196,162,179,0.28)',
       };
       const loop = { a: null, b: null };     // リピートの範囲（拍）。null なら曲の全部
+      const hasLoop = () => loop.a != null;     // 関数の中に同じ名前（loop）があっても使えるように
       function loopRange() {
         if (loop.a != null) return [loop.a, loop.b];
         const end = Math.ceil(songEnd() / S.beats - 1e-6) * S.beats;
@@ -4881,7 +4887,7 @@ flush(){if(this.n){this.port.postMessage({f:this.f0,d:this.b.slice(0,this.n)});t
 process(i){const c=i[0]&&i[0][0];if(c&&this.on){if(this.n===0)this.f0=currentFrame;if(this.n+c.length>this.b.length){this.flush();this.f0=currentFrame;}this.b.set(c,this.n);this.n+=c.length;if(this.n>=this.b.length)this.flush();}return this.on;}}
 registerProcessor('hum-rec',R);`;
       let workletReady = false;
-      const rec = { stream: null, node: null, src: null, mute: null, frame0: null, downbeat: 0, useGrid: false, stops: [], nodes: [], lastBuild: 0, raf: 0 };
+      const rec = { stream: null, node: null, src: null, mute: null, frame0: null, downbeat: 0, useGrid: false, stops: [], nodes: [], lastBuild: 0, raf: 0, punch: null };
 
       async function startRec() {
         if (G.busy || G.recording) return;
@@ -4908,6 +4914,17 @@ registerProcessor('hum-rec',R);`;
           return;
         }
         listDevices();
+        rec.punch = null;
+        if (S.recPunch && st.kind !== 'audio') {
+          if (!hasLoop()) toast('リピートの範囲がないので、ふつうに録ります（目盛りをドラッグで範囲を決めます）');
+          else {
+            const [a, b] = loopRange(), target = st, tmp = newTrack(st.kind);
+            tmp.name = (st.name + '（入れ直し中）').slice(0, 24); tmp.inst = st.inst; tmp.octave = st.octave; tmp.semi = st.semi || 0; tmp.vol = st.vol;
+            tracks.splice(tracks.indexOf(target) + 1, 0, tmp);
+            st = tmp;
+            rec.punch = { target, tmp, a, b };
+          }
+        }
         // AudioWorklet を読む（blob → data の順。ファイルを直接開いたとき（file://）はどちらも断られることがある）
         if (!workletReady && c.audioWorklet) {
           const blobUrl = URL.createObjectURL(new Blob([WORKLET], { type: 'application/javascript' }));
@@ -4939,16 +4956,18 @@ registerProcessor('hum-rec',R);`;
         rec.src.connect(rec.node); rec.node.connect(rec.mute); rec.mute.connect(c.destination);
         rec.frame0 = null;
         // クリックを鳴らすか、ほかのトラックを鳴らすときは、小節の頭を決めてから始める
-        const others = S.recOthers ? playable().filter(t => t !== st && (t.notes.length || (t.kind === 'audio' && t.rawLen))) : [];
-        rec.useGrid = S.metro || others.length > 0;
+        const P = rec.punch;
+        const others = S.recOthers ? playable().filter(t => t !== st && (!P || t !== P.target) && (t.notes.length || (t.kind === 'audio' && t.rawLen))) : [];
+        rec.useGrid = S.metro || others.length > 0 || !!P;
         rec.stops = []; rec.nodes = [];
         if (rec.useGrid) {
-          const beats = Number(S.countIn) * S.beats;
-          rec.downbeat = c.currentTime + 0.15 + beats * spb();
+          // パンチインのときは、カウントのあと範囲のはじめ（P.a）から鳴らす
+          const beats = Number(S.countIn) * S.beats, a0 = P ? P.a : 0;
+          rec.downbeat = c.currentTime + 0.15 + beats * spb() - a0 * spb();
           const T = b => rec.downbeat + b * spb();
-          if (S.metro) rec.stops.push(clicker(-beats, T, rec.nodes));
+          if (S.metro) rec.stops.push(clicker(a0 - beats, T, rec.nodes));
           if (others.length) {
-            const ev = trackEvents(others, 0, T, rec.nodes).sort((a, b) => a.t - b.t);
+            const ev = trackEvents(others, Math.max(0, a0 - beats), T, rec.nodes).sort((a, b) => a.t - b.t);
             rec.stops.push(sequencer(ev));
           }
         }
@@ -4970,8 +4989,8 @@ registerProcessor('hum-rec',R);`;
           if (st.rawLen > MAX_SEC * st.sr) { stopRec(); toast('10分になったので止めました'); }
         }
         G.recording = true;
-        G.cursor = 0;
-        wrap.scrollLeft = 0;
+        G.cursor = P ? P.a : 0;
+        if (!P) wrap.scrollLeft = 0;
         renderTracks();
         updateButtons();
         rec.lastBuild = 0;
@@ -5010,6 +5029,23 @@ registerProcessor('hum-rec',R);`;
         for (let i = 0; i < t.rawLen; i++) t.raw[i] *= k;
         t.normDb = Math.round(20 * Math.log10(k));
       }
+      // パンチイン：仮のトラックで録った音のうち、範囲の中だけを元のトラックへ入れ替える
+      function punchMerge() {
+        const P = rec.punch, tmp = P.tmp, T = P.target;
+        rec.punch = null;
+        const ins = tmp.notes.map(n => ({ sb: toBeat(tmp, n.s), eb: toBeat(tmp, n.e), p: n.p, v: n.v })).filter(n => n.sb >= P.a - 1e-6 && n.sb < P.b - 1e-6);
+        tracks.splice(tracks.indexOf(tmp), 1);
+        delAudio(tmp.uid);
+        st = T;
+        pushUndo();
+        T.notes = T.notes.filter(n => { const sb = toBeat(T, n.s); return sb < P.a - 1e-6 || sb >= P.b - 1e-6; });
+        for (const n of ins) T.notes.push({ s: toTime(T, n.sb), e: toTime(T, Math.min(n.eb, P.b)), p: n.p, v: n.v });
+        T.notes.sort((a, b) => a.s - b.s);
+        edited();
+        G.cursor = P.a;
+        setUI(); resetLive(); renderTracks(); updateButtons(); refresh();
+        toast(`リピートの範囲に ${ins.length} 個の音を録り直しました（範囲の外はそのまま。Ctrl+Z で戻せます）`);
+      }
       function finish() {
         if (st.kind === 'audio') {
           st.notes = []; st.undo = []; st.redo = []; st.edited = false; st.abuf = null; st.pk = null; st.pkN = 0;
@@ -5024,6 +5060,7 @@ registerProcessor('hum-rec',R);`;
         st.undo = []; st.redo = [];
         st.edited = false;
         regenerate();
+        if (rec.punch) { punchMerge(); return; }
         saveAudio(st);
         refresh();
         G.cursor = Math.min(0, L.b0);
@@ -5039,6 +5076,7 @@ registerProcessor('hum-rec',R);`;
 
       function liveUpdate() {
         const c = audio();
+        if (rec.punch && c.currentTime > rec.downbeat + rec.punch.b * spb() + 0.25) { stopRec(); return; }
         const n = st.fm.length;
         $('live-time').textContent = fmtTime(st.rawLen / st.sr);
         if (rec.useGrid && c.currentTime < rec.downbeat) {
@@ -5211,8 +5249,25 @@ registerProcessor('hum-rec',R);`;
         voxTick(p, db);
       }
       // ── 声で入力：同じ高さが 0.15 秒続いたら置き、声が切れたら離す（キーボード入力と同じ入れ方） ──
-      const VOX = { on: false, held: false, heldP: null, cand: null, candN: 0, gap: 0, startedMon: false };
-      function voxRelease() { if (VOX.held) { VOX.held = false; VOX.heldP = null; kbUp('mic'); } }
+      const VOX = { on: false, held: false, heldP: null, cand: null, candN: 0, gap: 0, startedMon: false, mode: 'step', targets: null, ti: 0, rangeEnd: 0 };
+      function voxRelease() {
+        if (!VOX.held) return;
+        VOX.held = false; VOX.heldP = null;
+        if (VOX.mode === 'repitch') {
+          // 次の選んだ音へ
+          VOX.ti++;
+          const nx = VOX.targets[VOX.ti];
+          if (!nx) { st.sel = new Set(VOX.targets); toast(`選んだ ${VOX.targets.length} 個の音を歌い直しました`); setVox(false); refresh(); return; }
+          st.sel = new Set([nx]); G.cursor = toBeat(st, nx.s); followCursor(); refresh();
+          return;
+        }
+        kbUp('mic');
+        if (VOX.mode === 'range') {
+          const h = KB.hist[KB.hist.length - 1];
+          if (h) for (const n of h.notes) if (toBeat(st, n.e) > VOX.rangeEnd) n.e = toTime(st, VOX.rangeEnd);
+          if (G.cursor >= VOX.rangeEnd - 1e-6) { G.cursor = VOX.rangeEnd; toast('範囲の終わりまで入れました'); setVox(false); refresh(); }
+        }
+      }
       async function setVox(on) {
         if (on === VOX.on) return;
         if (on) {
@@ -5222,8 +5277,26 @@ registerProcessor('hum-rec',R);`;
           VOX.startedMon = !MON.on;
           if (!MON.on) await monStart();
           if (!MON.on) return;
-          VOX.on = true; VOX.cand = null; VOX.candN = 0;
-          toast('1音ずつ歌うと、再生位置に入ります（ヘッドホンがおすすめ）');
+          VOX.on = true; VOX.cand = null; VOX.candN = 0; VOX.mode = 'step'; VOX.targets = null; VOX.ti = 0;
+          if (st.sel.size) {
+            // 選んだ音を、前から1つずつ歌い直す（位置と長さはそのまま、高さだけ）
+            VOX.mode = 'repitch';
+            VOX.targets = [...st.sel].sort((a, b) => a.s - b.s);
+            pushUndo();
+            st.sel = new Set([VOX.targets[0]]); G.cursor = toBeat(st, VOX.targets[0].s); followCursor(); draw();
+            toast(`選んだ ${VOX.targets.length} 個の音を、前から1つずつ歌ってください（高さだけ直します）`);
+          } else if (S.voxRange && loop.a != null) {
+            // リピートの範囲の音を消して、範囲のはじめから入れ直す
+            const [a, b] = loopRange();
+            VOX.mode = 'range'; VOX.rangeEnd = b;
+            pushUndo();
+            st.notes = st.notes.filter(n => { const sb = toBeat(st, n.s); return sb < a - 1e-6 || sb >= b - 1e-6; });
+            G.cursor = a; edited(); refresh(); followCursor();
+            toast('リピートの範囲の音を消しました。範囲のはじめから歌ってください');
+          } else {
+            if (S.voxRange) toast('リピートの範囲がありません（目盛りをドラッグで決めます）。ふつうに入れます');
+            else toast('1音ずつ歌うと、再生位置に入ります（ヘッドホンがおすすめ）');
+          }
         } else {
           voxRelease();
           VOX.on = false;
@@ -5239,7 +5312,15 @@ registerProcessor('hum-rec',R);`;
         VOX.gap = 0;
         if (VOX.cand === pr) VOX.candN++; else { VOX.cand = pr; VOX.candN = 1; }
         if (VOX.candN < 3 || (VOX.held && VOX.heldP === pr)) return;
-        if (VOX.held) voxRelease();          // つなげて歌って、高さが変わった
+        if (VOX.held) { voxRelease(); if (!VOX.on) return; }          // つなげて歌って、高さが変わった
+        if (VOX.mode === 'repitch') {
+          const n = VOX.targets[VOX.ti];
+          if (!n) return;
+          n.p = pr; edited(); refresh();
+          VOX.held = true; VOX.heldP = pr;
+          return;
+        }
+        if (VOX.mode === 'range' && !G.playing && snapBeat(G.cursor) >= VOX.rangeEnd - 1e-6) { toast('範囲の終わりまで入れました'); setVox(false); return; }
         noteDown('mic', pr, clamp(Math.round(50 + (db + 50) * 1.6), 30, 120));
         VOX.held = true; VOX.heldP = pr;
       }
@@ -7778,7 +7859,7 @@ ${songJson(list)}
 
       const ANALYZE = ['range'];
       const REBUILD = ['sens', 'gate', 'minMs', 'split', 'autoTune', 'key', 'scale', 'vel'];
-      const VIEW = ['tplProg', 'tplKey', 'tplDrum', 'tplAcc', 'tplBars', 'tplBass', 'tplDrum1', 'aiScope', 'velLane', 'textLen', 'lyricEnc', 'chordPer', 'accPat', 'accInst', 'accBass', 'stepLen', 'bpm', 'beats', 'quant', 'quantLen', 'names', 'naming', 'zoom', 'playMode', 'playClick', 'countIn', 'clickVol', 'metro', 'recOthers', 'device', 'micGain', 'micAgc'];
+      const VIEW = ['tplProg', 'tplKey', 'tplDrum', 'tplAcc', 'tplBars', 'tplBass', 'tplDrum1', 'aiScope', 'velLane', 'textLen', 'lyricEnc', 'chordPer', 'accPat', 'accInst', 'accBass', 'stepLen', 'bpm', 'beats', 'quant', 'quantLen', 'names', 'naming', 'zoom', 'playMode', 'playClick', 'countIn', 'clickVol', 'metro', 'recOthers', 'device', 'micGain', 'micAgc', 'recPunch', 'voxRange'];
       const TRACK = ['align', 'latency'];        // トラックごとの設定
       function setUI() {
         for (const k of [...ANALYZE, ...REBUILD, ...VIEW]) {
@@ -8474,7 +8555,9 @@ ${songJson(list)}
       const KB_LABEL = { Comma: ',', Period: '.', Semicolon: ';', Slash: '/' };
       const keyLabel = code => KB_LABEL[code] || code.replace(/^Key|^Digit/, '');
       const KB = { on: false, held: new Map(), stepPos: null, stepNotes: [], hist: [] };
-      const stepLen = () => Number(S.stepLen) || 0.5;
+      const stepAuto = () => S.stepLen === 'auto';
+      // 自動のときは、クオンタイズの細かさ（オフなら16分）を1つ分として使う
+      const stepLen = () => (stepAuto() ? (grid() || 0.25) : Number(S.stepLen) || 0.5);
       const kbBase = () => 12 * (Number(S.kbOct) + 1);
       function kbPitch(code) {
         if (st.kind === 'drum') return KB_DRUM[code];
@@ -8568,7 +8651,7 @@ ${songJson(list)}
         st.notes.push(n);
         st.notes.sort((a, x) => a.s - x.s);
         if (!G.playing) KB.stepNotes.push(n);
-        KB.held.set(code, { n, p, snd, start: b, live: G.playing });
+        KB.held.set(code, { n, p, snd, start: b, live: G.playing, t0: performance.now() });
         const el = $('kb-map').querySelector(`[data-code="${code}"]`);
         if (el) el.classList.add('on');
         edited(); refresh();
@@ -8596,10 +8679,17 @@ ${songJson(list)}
           const e = b >= h.start ? b : (S.repeat ? loopRange()[1] : h.start);
           h.n.e = toTime(st, Math.max(h.start + 1 / 16, e));
         }
+        // 長さが自動：押していた（歌っていた）長さを、クオンタイズの細かさにそろえる
+        if (!h.live && stepAuto() && st.kind !== 'drum') {
+          const g = grid() || 0.25, held = (performance.now() - h.t0) / 1000 / spb();
+          h.n.e = toTime(st, h.start + Math.max(g, Math.round(held / g) * g));
+        }
         if (!h.live && !KB.held.size && KB.stepPos != null) {
           KB.hist.push({ pos: KB.stepPos, notes: KB.stepNotes });
           if (KB.hist.length > 200) KB.hist.shift();
-          G.cursor = KB.stepPos + stepLen();
+          let adv = stepLen();
+          if (stepAuto() && st.kind !== 'drum') for (const n of KB.stepNotes) adv = Math.max(adv, toBeat(st, n.e) - KB.stepPos);
+          G.cursor = KB.stepPos + adv;
           KB.stepPos = null;
           followCursor();
         }
@@ -8615,6 +8705,7 @@ ${songJson(list)}
         $('kb-map').hidden = !KB.on;
         $('kb-title').textContent = [KB.on && '⌨ キーボード', MIDI.on && '🎹 MIDI', VOX.on && '🎤 声'].filter(Boolean).join('・') + ' で入力中';
         $('vox-hint').hidden = !VOX.on;
+        $('vox-opts').hidden = !VOX.on;
       }
 
       // ══════════════════════════════════════
@@ -8720,6 +8811,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        rec, loop, punchMerge,
         transposeSong, fitKey, get songKey() { return songKey; },
         VOX, setVox,
         MON, monStart, monStop, yinPitch,
