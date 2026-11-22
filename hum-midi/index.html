@@ -2984,6 +2984,7 @@
           <div class="kb-map" id="kb-map"></div>
           <div class="vox-opts" id="vox-opts" hidden>
             <label class="check"><input type="checkbox" id="voxRange">リピートの範囲だけ入れ直す（範囲の音を消して、はじめから）</label>
+            <label class="check"><input type="checkbox" id="voxStack">同じ位置に重ねる（和音。<kbd>→</kbd> か <kbd>Tab</kbd> で次の位置へ）</label>
           </div>
           <p class="hint" id="vox-hint" hidden>🎤 <b>声で入力</b>：<b>音を選んでから</b>オンにすると、選んだ音を前から1つずつ歌い直して高さだけ直せます。長さを「自動」にすると、歌った長さで入ります。「ラ」「ル」のように1音ずつ歌うと、音の高さが決まったところで再生位置に置き、声を切ると「長さ」だけ進みます。音と音の間は少し切って歌ってください（つなげて歌っても、高さが変わったところで次の音になります）。声が低すぎ・高すぎるときは「オクターブ」で上げ下げ。打ち込んだ音は鳴らしません。消すときは <kbd>Ctrl+Z</kbd>。再生中に歌うと、歌った長さで入ります。</p>
           <p class="hint">止まっているとき：押すと再生位置（黄色い線）に置いて、離すと「長さ」だけ進みます。同時に押すと同じ位置（ドラムで重ねるとき）。<kbd>Tab</kbd> で休み、<kbd>Backspace</kbd> で1つ戻して消す。再生中：押していた長さで入ります（リピートと合わせると重ねていけます）。<kbd>−</kbd>／<kbd>＾</kbd> でオクターブ。</p>
@@ -3410,7 +3411,7 @@
 
       // ── 設定 ──
       const DEF = {
-        device: '', bpm: 120, beats: 4, countIn: 1, clickVol: 60, metro: true, recOthers: true, micGain: 0, micAgc: false, monitor: false, monLo: null, monHi: null, recPunch: false, voxRange: false,
+        device: '', bpm: 120, beats: 4, countIn: 1, clickVol: 60, metro: true, recOthers: true, micGain: 0, micAgc: false, monitor: false, monLo: null, monHi: null, recPunch: false, voxRange: false, voxStack: false,
         range: 'voice', sens: 2, gate: -50, minMs: 80, split: true, autoTune: true,
         key: 'off', scale: 'major', quant: '16', quantLen: true, vel: 'dyn',
         names: 'en', naming: '4', playMode: 'both', playClick: false, zoom: 60, repeat: false, kbOct: 4, stepLen: '0.5',
@@ -5281,10 +5282,10 @@ registerProcessor('hum-rec',R);`;
           if (st.sel.size) {
             // 選んだ音を、前から1つずつ歌い直す（位置と長さはそのまま、高さだけ）
             VOX.mode = 'repitch';
-            VOX.targets = [...st.sel].sort((a, b) => a.s - b.s);
+            VOX.targets = [...st.sel].sort((a, b) => a.s - b.s || a.p - b.p);     // 同じ位置（和音）は低い音から
             pushUndo();
             st.sel = new Set([VOX.targets[0]]); G.cursor = toBeat(st, VOX.targets[0].s); followCursor(); draw();
-            toast(`選んだ ${VOX.targets.length} 個の音を、前から1つずつ歌ってください（高さだけ直します）`);
+            toast(`選んだ ${VOX.targets.length} 個の音を、前から1つずつ歌ってください（高さだけ直します。和音は低い音から。今の音は黄色）`);
           } else if (S.voxRange && loop.a != null) {
             // リピートの範囲の音を消して、範囲のはじめから入れ直す
             const [a, b] = loopRange();
@@ -5294,7 +5295,9 @@ registerProcessor('hum-rec',R);`;
             G.cursor = a; edited(); refresh(); followCursor();
             toast('リピートの範囲の音を消しました。範囲のはじめから歌ってください');
           } else {
+            if (S.voxStack && !st.poly) { st.poly = true; saveSong(); renderTracks(); }
             if (S.voxRange) toast('リピートの範囲がありません（目盛りをドラッグで決めます）。ふつうに入れます');
+            else if (S.voxStack) toast('同じ位置に重ねます。和音の音を1つずつ歌って、→ か Tab で次の位置へ');
             else toast('1音ずつ歌うと、再生位置に入ります（ヘッドホンがおすすめ）');
           }
         } else {
@@ -5325,6 +5328,28 @@ registerProcessor('hum-rec',R);`;
         VOX.held = true; VOX.heldP = pr;
       }
       $('vox').addEventListener('click', () => setVox(!VOX.on));
+      // 和音を重ねる：→ か Tab で、今の位置の音のいちばん長いぶん（なければ「長さ」）進む
+      function voxNext() {
+        const b = snapBeat(G.cursor);
+        let adv = 0;
+        for (const n of st.notes) { const sb = toBeat(st, n.s); if (Math.abs(sb - b) < 1e-6) adv = Math.max(adv, toBeat(st, n.e) - sb); }
+        G.cursor = b + (adv || stepLen());
+        followCursor(); draw();
+      }
+      document.addEventListener('keydown', e => {
+        if (!VOX.on || !S.voxStack || G.playing || VOX.mode !== 'step') return;
+        if (e.key !== 'ArrowRight' && e.key !== 'Tab') return;
+        const t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA') && t.id !== 'voxStack') return;
+        if (document.querySelector('.dn-ask:not([hidden])') || document.querySelector('dialog[open]')) return;
+        e.preventDefault(); e.stopImmediatePropagation();
+        voxRelease();
+        voxNext();
+      }, true);
+      // 重ねるなら、トラックの「和」をオンに（オフだと重なりを1音ずつにそろえてしまう）
+      $('voxStack').addEventListener('change', e => {
+        if (e.target.checked && st.kind === 'melody' && !st.poly) { st.poly = true; saveSong(); renderTracks(); refresh(); toast(`「${st.name}」の「和」（和音）をオンにしました`); }
+      });
       document.addEventListener('keydown', e => { if (VOX.on && e.key === 'Escape' && !document.querySelector('.dn-ask:not([hidden])') && !document.querySelector('dialog[open]')) setVox(false); });
       // ピアノロールの鍵盤：今の音（黄色）と、これまでの音域（左の緑の帯）
       function drawMonitor(Y, KW, W) {
@@ -7859,7 +7884,7 @@ ${songJson(list)}
 
       const ANALYZE = ['range'];
       const REBUILD = ['sens', 'gate', 'minMs', 'split', 'autoTune', 'key', 'scale', 'vel'];
-      const VIEW = ['tplProg', 'tplKey', 'tplDrum', 'tplAcc', 'tplBars', 'tplBass', 'tplDrum1', 'aiScope', 'velLane', 'textLen', 'lyricEnc', 'chordPer', 'accPat', 'accInst', 'accBass', 'stepLen', 'bpm', 'beats', 'quant', 'quantLen', 'names', 'naming', 'zoom', 'playMode', 'playClick', 'countIn', 'clickVol', 'metro', 'recOthers', 'device', 'micGain', 'micAgc', 'recPunch', 'voxRange'];
+      const VIEW = ['tplProg', 'tplKey', 'tplDrum', 'tplAcc', 'tplBars', 'tplBass', 'tplDrum1', 'aiScope', 'velLane', 'textLen', 'lyricEnc', 'chordPer', 'accPat', 'accInst', 'accBass', 'stepLen', 'bpm', 'beats', 'quant', 'quantLen', 'names', 'naming', 'zoom', 'playMode', 'playClick', 'countIn', 'clickVol', 'metro', 'recOthers', 'device', 'micGain', 'micAgc', 'recPunch', 'voxRange', 'voxStack'];
       const TRACK = ['align', 'latency'];        // トラックごとの設定
       function setUI() {
         for (const k of [...ANALYZE, ...REBUILD, ...VIEW]) {
@@ -8684,6 +8709,14 @@ ${songJson(list)}
           const g = grid() || 0.25, held = (performance.now() - h.t0) / 1000 / spb();
           h.n.e = toTime(st, h.start + Math.max(g, Math.round(held / g) * g));
         }
+        // 声で和音を重ねるときは進まない（→ か Tab で進む）
+        if (code === 'mic' && !h.live && !KB.held.size && KB.stepPos != null && VOX.on && S.voxStack) {
+          KB.hist.push({ pos: KB.stepPos, notes: KB.stepNotes });
+          G.cursor = KB.stepPos;
+          KB.stepPos = null;
+          refresh();
+          return;
+        }
         if (!h.live && !KB.held.size && KB.stepPos != null) {
           KB.hist.push({ pos: KB.stepPos, notes: KB.stepNotes });
           if (KB.hist.length > 200) KB.hist.shift();
@@ -8811,6 +8844,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        voxNext,
         rec, loop, punchMerge,
         transposeSong, fitKey, get songKey() { return songKey; },
         VOX, setVox,
