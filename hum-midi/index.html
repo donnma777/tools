@@ -3015,7 +3015,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="../common/ask.js?v=20260929a"></script>
+  <script src="../common/ask.js?v=20261123a"></script>
   <script>
     (() => {
       'use strict';
@@ -6710,6 +6710,7 @@ ${songJson(list)}
           saveSong(); showSong(); syncMetaInputs();
           if ($('song-dlg').open) { libStateText(); renderLib(); }
         }
+        if ($('song-dlg').open) $('song-dlg').close();
         toast(`${res.tracks} トラック・${res.notes} 音を読み込みました` + (r.bad ? `（読めなかった音 ${r.bad} 個は飛ばしました）` : '') + (res.over ? '。入りきらないトラックがありました' : ''));
       }
       async function openSongFile(o, f) {

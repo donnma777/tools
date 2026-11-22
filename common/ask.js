@@ -71,6 +71,10 @@
   function open(msg, yes, no, danger) {
     build();
     finish(null);   // 前のが開いていたら閉じる
+    // showModal() で開いた dialog があると、その上にしか出られない（body に置くと後ろに隠れて押せない）ので、いちばん上の dialog の中に置く
+    const modal = [...document.querySelectorAll('dialog[open]')].reverse().find(d => { try { return d.matches(':modal'); } catch (e) { return true; } });
+    const host = modal || document.body;
+    if (root.parentNode !== host) host.appendChild(root);
     msgEl.textContent = msg;
     yesEl.textContent = yes;
     yesEl.classList.toggle('danger', !!danger);
