@@ -1323,7 +1323,7 @@
     }
 
 
-    a.guide-link {
+    .guide-link {
       text-decoration: none;
       background: #fff;
       color: var(--plum-ink, #6e3551);
@@ -2350,10 +2350,30 @@
       font-size: 13px;
     }
 
+    .song-dlg.sample-dlg {
+      width: min(900px, calc(100vw - 24px));
+    }
+
     .sd-sample-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 8px;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 10px;
+    }
+
+    .sd-sample-mood {
+      font-size: 12px;
+      color: var(--label);
+    }
+
+    .app-title-acts {
+      display: inline-flex;
+      gap: 6px;
+    }
+
+    @media (max-width: 600px) {
+      .sd-sample-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
     }
 
     .sd-list-head b {
@@ -2364,8 +2384,9 @@
       font: inherit;
       text-align: left;
       display: grid;
-      gap: 2px;
-      padding: 9px 12px;
+      align-content: start;
+      gap: 3px;
+      padding: 12px 14px;
       border-radius: 10px;
       border: 1px solid var(--border-strong);
       background: var(--surface-2);
@@ -2384,7 +2405,7 @@
     }
 
     .sd-sample b {
-      font-size: 14px;
+      font-size: 16px;
     }
 
     .sd-sample small {
@@ -2799,7 +2820,10 @@
       <span class="app-badge" title="試用中のツールです。うまく動かないところがあれば、お問い合わせから教えてください">β版・試用中</span>
       <p>鼻歌や楽器の音を MIDI に。ピアノロールや楽譜で直して、伴奏や歌声もつけて DAW へ。音はどこにも送信しません。</p>
     </div>
-    <a class="btn btn-sm guide-link" href="guide/" target="_blank" rel="noopener" title="使い方・VOICEVOX のつなぎ方・DAW への読み込み・うまくいかないとき（新しいタブで開きます）">📖 説明書</a>
+    <span class="app-title-acts">
+      <button class="btn btn-sm guide-link" type="button" id="open-samples" title="このツールで作った見本の曲（ポップス・ロック・バラード・和風など）を聞いて、開いてまねできます" aria-haspopup="dialog">🎧 見本の曲</button>
+      <a class="btn btn-sm guide-link" href="guide/" target="_blank" rel="noopener" title="使い方・VOICEVOX のつなぎ方・DAW への読み込み・うまくいかないとき（新しいタブで開きます）">📖 説明書</a>
+    </span>
   </header>
 
   <div class="app" id="app">
@@ -2921,7 +2945,7 @@
           </div>
           <div class="tp-row"><b>③ 見本の曲</b>
             <button class="btn btn-sm" type="button" id="tpl-samples">🎵 見本の曲を開く…</button>
-            <span class="tp-info">ポップス・ロック・バラード・ボサノバ・和風・8bit など。「🎵 曲の名前」の画面からも開けます</span>
+            <span class="tp-info">ポップス・ロック・バラード・ボサノバ・和風・8bit など。画面の上の「🎧 見本の曲」からも開けます</span>
           </div>
           <p class="hint">テンポは今の BPM のままです（見本はその曲のテンポにします）。ワルツは3拍子にします。作ったコードは上のコード名をクリックで替えられ、伴奏も作り直します。見本の曲はこのツールのために作ったオリジナルで、自由に使って大丈夫です（VOICEVOX の声で公開するときは「VOICEVOX:ずんだもん」などのクレジットを）。</p>
         </div>
@@ -3366,6 +3390,19 @@
     </div>
   </dialog>
 
+  <!-- 見本の曲 -->
+  <dialog class="song-dlg sample-dlg" id="sample-dlg" aria-labelledby="sample-dlg-h">
+    <div class="sd-head">
+      <h2 id="sample-dlg-h">🎧 見本の曲</h2>
+      <button class="sd-x" type="button" id="sample-close" aria-label="閉じる">×</button>
+    </div>
+    <div class="sd-body">
+      <p class="hint" style="margin:0">このツールのために作ったオリジナルの曲です。開いて聞いたり、まねして作り替えたり、自由に使ってください。開くと今の曲と入れ替わります（保存していない変更があれば先に聞きます）。</p>
+      <div class="sd-sample-grid" id="sample-grid"></div>
+      <p class="hint" style="margin:0">VOICEVOX につながっていると、ずんだもんたちが歌います（公開するときは「VOICEVOX:ずんだもん」などのクレジットを）。楽器の音は本物の音（FluidR3 GM）です。</p>
+    </div>
+  </dialog>
+
   <!-- 曲の保存・呼び出し -->
   <dialog class="song-dlg" id="song-dlg" aria-labelledby="song-dlg-h">
     <div class="sd-head">
@@ -3389,11 +3426,6 @@
           <button class="btn" type="button" id="lib-new">＋ 新しい曲</button>
         </div>
         <p class="hint" id="lib-state"></p>
-      </section>
-      <section class="sd-samples" aria-label="見本の曲">
-        <div class="sd-list-head"><b>見本の曲</b><span class="sd-count">このツールのために作ったオリジナル。自由に使えます</span></div>
-        <div class="sd-sample-grid" id="sample-grid"></div>
-        <p class="hint" style="margin:6px 0 0">VOICEVOX につながっていると、ずんだもんたちが歌います（公開するときは「VOICEVOX:ずんだもん」などのクレジットを）。</p>
       </section>
       <section class="sd-list" aria-label="保存した曲">
         <div class="sd-list-head">
@@ -4234,7 +4266,7 @@
         if (!st.rawLen && !st.notes.length && !G.recording) {
           g2.fillStyle = COL.rulerText; g2.font = '700 13px "Zen Maru Gothic", sans-serif'; g2.textAlign = 'center';
           const msg = L.drum ? 'クリックで音を置けます。録音すると、口で「ドッ」「パッ」「ツッ」とやったのをドラムにします'
-            : '録音するか音声ファイルを開くと、ここに音が並びます（ダブルクリックで音を置く、「🎵 無題の曲」から見本の曲も開けます）';
+            : '録音するか音声ファイルを開くと、ここに音が並びます（ダブルクリックで音を置く、画面の上の「🎧 見本の曲」から見本も開けます）';
           g2.fillText(msg, KW + (W - KW) / 2, RULER + 14);
           g2.textAlign = 'start';
         }
@@ -6721,22 +6753,22 @@ registerProcessor('hum-rec',R);`;
       const SAMPLE_ORDER = ['pop', 'rock', 'ballad', 'waltz', 'bossa', 'wafu', 'chip', 'choir'];
       const SAMPLES = {
         pop: {
-          genre: 'ポップス', desc: 'ピアノ・エレキベース・8ビート', bassInst: 'sf_ebass',
+          mood: '明るく前向きな、歌いやすい曲', genre: 'ポップス', desc: 'ピアノ・エレキベース・8ビート', bassInst: 'sf_ebass',
           name: 'そらをみて', key: 0, bpm: 116, beats: 4, drum: 'b8', acc: 'quarter', accInst: 'sf_piano', chords: [[0, 'M'], [7, 'M'], [9, 'm'], [5, 'M'], [0, 'M'], [7, 'M'], [5, 'M'], [0, 'M']],
           mel: [[64, 2], [67, 2], [64, 1], [62, 1], [60, 2], [62, 2], [62, 1], [64, 1], [62, 2], [59, 2], [60, 2], [60, 1], [62, 1], [64, 2], [69, 2], [67, 2], [65, 1], [64, 1], [65, 4],
             [64, 2], [67, 2], [72, 2], [71, 1], [69, 1], [67, 2], [67, 1], [69, 1], [67, 2], [62, 2], [64, 2], [64, 1], [65, 1], [64, 2], [62, 1], [60, 1], [60, 6], [0, 2]],
           lyric: 'そらをみて あるきだす ちいさなて ゆれても うたうたび かぜがふく いっしょにゆこ う',
         },
-        choir: { choir: true, genre: 'アカペラ', desc: 'VOICEVOX の4人の声だけ（ずんだもん・四国めたん・春日部つむぎ・玄野武宏）', name: 'そらをみて', key: 0, bpm: 108, beats: 4, drum: 'b8', acc: 'none', accInst: 'piano', chords: [[0, 'M'], [7, 'M'], [9, 'm'], [5, 'M'], [0, 'M'], [7, 'M'], [5, 'M'], [0, 'M']] },
+        choir: { mood: '楽器なし、声だけのハーモニー', choir: true, genre: 'アカペラ', desc: 'VOICEVOX の4人の声だけ（ずんだもん・四国めたん・春日部つむぎ・玄野武宏）', name: 'そらをみて', key: 0, bpm: 108, beats: 4, drum: 'b8', acc: 'none', accInst: 'piano', chords: [[0, 'M'], [7, 'M'], [9, 'm'], [5, 'M'], [0, 'M'], [7, 'M'], [5, 'M'], [0, 'M']] },
         waltz: {
-          genre: 'ワルツ（3拍子）', desc: 'エレピのアルペジオ・ウッドベース', bassInst: 'sf_wbass',
+          mood: 'ゆったり揺れる3拍子', genre: 'ワルツ（3拍子）', desc: 'エレピのアルペジオ・ウッドベース', bassInst: 'sf_wbass',
           name: 'あかいそら', key: 7, bpm: 138, beats: 3, drum: 'waltz', acc: 'arp', accInst: 'sf_epiano', chords: [[7, 'M'], [2, 'M'], [4, 'm'], [0, 'M'], [7, 'M'], [2, 'M'], [0, 'M'], [7, 'M']],
           mel: [[67, 3], [71, 1], [74, 2], [72, 2], [71, 1], [69, 3], [71, 3], [67, 1], [64, 2], [67, 5], [0, 1],
             [62, 2], [64, 1], [66, 1], [67, 2], [69, 3], [67, 1], [66, 2], [64, 3], [62, 1], [60, 2], [67, 5], [0, 1]],
           lyric: 'あかい そらに とけてく かえろう ふたり うたって',
         },
         rock: {
-          genre: 'ロック', desc: 'エレキギター（歪み）・エレキベース・8ビート', bassInst: 'sf_ebass',
+          mood: '走り出したくなる、疾走感のある曲', genre: 'ロック', desc: 'エレキギター（歪み）・エレキベース・8ビート', bassInst: 'sf_ebass',
           name: 'はしれ', key: 9, minor: true, bpm: 148, beats: 4, drum: 'b8', acc: 'quarter', accInst: 'sf_dist',
           chords: [[9, 'm'], [5, 'M'], [0, 'M'], [7, 'M'], [9, 'm'], [5, 'M'], [7, 'M'], [4, 'M']],
           mel: [[69, 1], [69, 1], [72, 2], [67, 1], [67, 1], [69, 2], [69, 1], [72, 1], [74, 1], [76, 1], [74, 1], [72, 3],
@@ -6746,7 +6778,7 @@ registerProcessor('hum-rec',R);`;
           lyric: 'はしれはしれ かぜをこえて とまらない このきもち はしれはしれ よるをこえて あしたへ とどけ',
         },
         ballad: {
-          genre: 'バラード', desc: 'ピアノのアルペジオ・ストリングス・エレキベース（ドラムなし）', bassInst: 'sf_ebass',
+          mood: '夜にしっとり聞きたい、ゆっくりな曲', genre: 'バラード', desc: 'ピアノのアルペジオ・ストリングス・エレキベース（ドラムなし）', bassInst: 'sf_ebass',
           extra: [{ name: 'ストリングス', inst: 'sf_strings', pat: 'whole', vol: 50 }],
           name: 'よるのうた', key: 5, bpm: 72, beats: 4, drum: 'none', acc: 'arp', accInst: 'sf_piano',
           chords: [[5, 'M'], [0, 'M'], [2, 'm'], [10, 'M'], [5, 'M'], [0, 'M'], [10, 'M'], [5, 'M']],
@@ -6757,7 +6789,7 @@ registerProcessor('hum-rec',R);`;
           lyric: 'しずかなよるに ほしがひかるよ きみのこえが ききたくて そばにいてね',
         },
         bossa: {
-          genre: 'ボサノバ', desc: 'ナイロンギター・ウッドベース・ボサノバのリズム', bassInst: 'sf_wbass',
+          mood: '雨の日の街を歩くような、おしゃれな曲', genre: 'ボサノバ', desc: 'ナイロンギター・ウッドベース・ボサノバのリズム', bassInst: 'sf_wbass',
           name: 'あめのまち', key: 2, minor: true, bpm: 124, beats: 4, drum: 'bossa', acc: 'quarter', accInst: 'sf_nylon',
           chords: [[2, 'm'], [7, 'm'], [0, 'M'], [5, 'M'], [10, 'M'], [7, 'm'], [9, 'M'], [2, 'm']],
           mel: [[69, 1], [69, 1], [72, 1], [74, 2], [72, 1], [69, 2], [70, 1], [70, 2], [67, 1], [70, 3], [0, 1],
@@ -6767,7 +6799,7 @@ registerProcessor('hum-rec',R);`;
           lyric: 'あめのまちを あるけば かさのはなが さいてる ぬれたみちに ひかりが ゆれてきえる',
         },
         wafu: {
-          genre: '和風', desc: '琴のアルペジオ・三味線（ドラムなし）', bass: false,
+          mood: '春の道を歩くような、和の音階の曲', genre: '和風', desc: '琴のアルペジオ・三味線（ドラムなし）', bass: false,
           extra: [{ name: '三味線', inst: 'sf_shamisen', pat: 'quarter', vol: 55 }],
           name: 'さくらみち', key: 2, minor: true, bpm: 92, beats: 4, drum: 'none', acc: 'arp', accInst: 'sf_koto',
           chords: [[2, 'm'], [2, 'm'], [10, 'M'], [2, 'm'], [2, 'm'], [10, 'M'], [9, 'm'], [2, 'm']],
@@ -6778,7 +6810,7 @@ registerProcessor('hum-rec',R);`;
           lyric: 'さくらさくら はなのみちを ゆけば かぜにまう はなびら はるのひかり つつむ',
         },
         chip: {
-          genre: '8bit・ゲーム風', desc: 'ピコピコの音だけ（歌なし）・16ビート', bassInst: 'simple', melInst: 'square',
+          mood: 'ゲームの冒険が始まりそうな曲', genre: '8bit・ゲーム風', desc: 'ピコピコの音だけ（歌なし）・16ビート', bassInst: 'simple', melInst: 'square',
           name: 'ぼうけん', key: 0, bpm: 150, beats: 4, drum: 'b16', acc: 'arp', accInst: 'square',
           chords: [[0, 'M'], [9, 'm'], [5, 'M'], [7, 'M'], [0, 'M'], [9, 'm'], [5, 'M'], [7, 'M']],
           mel: [[67, 1], [72, 1], [76, 1], [79, 1], [76, 1], [72, 1], [76, 1], [79, 1],
@@ -6873,16 +6905,20 @@ registerProcessor('hum-rec',R);`;
       function renderSamples() {
         $('sample-grid').innerHTML = SAMPLE_ORDER.filter(k => SAMPLES[k]).map(k => {
           const sm = SAMPLES[k];
-          return `<button class="sd-sample" type="button" data-sample="${k}"><span class="sd-sample-g">${escH(sm.genre || '')}</span><b>${escH(sm.choir ? sm.name + '（アカペラ）' : sm.name)}</b><small>${escH(sm.desc || '')}・${sm.bpm} BPM</small></button>`;
+          return `<button class="sd-sample" type="button" data-sample="${k}"><span class="sd-sample-g">${escH(sm.genre || '')}</span><b>${escH(sm.choir ? sm.name + '（アカペラ）' : sm.name)}</b><span class="sd-sample-mood">${escH(sm.mood || '')}</span><small>${escH(sm.desc || '')}・${sm.bpm} BPM</small></button>`;
         }).join('');
       }
       renderSamples();
       $('sample-grid').addEventListener('click', async e => {
         const b = e.target.closest('[data-sample]');
         if (!b) return;
-        if (await loadSample(b.dataset.sample)) $('song-dlg').close();
+        if (await loadSample(b.dataset.sample)) $('sample-dlg').close();
       });
-      $('tpl-samples').addEventListener('click', () => { openSongDlg(false); $('sample-grid').scrollIntoView({ block: 'nearest' }); });
+      const openSamples = () => { if (G.recording || G.busy) return; stopPlay(); if (!$('sample-dlg').open) $('sample-dlg').showModal(); };
+      $('open-samples').addEventListener('click', openSamples);
+      $('tpl-samples').addEventListener('click', openSamples);
+      $('sample-close').addEventListener('click', () => $('sample-dlg').close());
+      $('sample-dlg').addEventListener('click', e => { if (e.target === $('sample-dlg')) $('sample-dlg').close(); });
 
       // ══════════════════════════════════════
       //  UTAU（.ust）。1つずつの音の並びにして、すき間は休み（R）。文字は Shift_JIS、改行は CRLF
