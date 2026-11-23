@@ -8077,10 +8077,42 @@ ${songJson(list)}
       const b64url = u => { let s1 = ''; for (let i = 0; i < u.length; i += 0x8000) s1 += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s1).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
       const unb64url = s1 => { const b = atob(s1.replace(/-/g, '+').replace(/_/g, '/')), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
       const zpipe = async (u, stream) => new Uint8Array(await new Response(new Blob([u]).stream().pipeThrough(stream)).arrayBuffer());
-      async function shareLink() {
+      // リンク用に詰める（v2）：時間は 1拍=96 の整数にして前の音からの差、高さ・強さも前の音からの差。項目は名前なしの配列
+      const LT = 96, LKINDS = ['melody', 'drum'], LQS = ['M', 'm', 'dim'];
+      const LINK_WARN = 2000, LINK_MAX = 8000;      // これより長いと Discord・LINE で切れやすい／リンクにしない
+      function packSong() {
         const d = songData();
-        for (const t of d.tracks) { t.hasAudio = false; delete t.uid; }
-        const o = { v: 1, meta: Object.fromEntries(Object.entries(meta).filter(([k, v]) => v && k !== 'memo')), bpm: S.bpm, beats: S.beats, song: d };
+        const q = x => Math.round(x * LT);
+        const r = [];
+        for (const t of d.tracks) {
+          if (t.kind === 'audio' || !t.notes.length) continue;
+          const ns = t.notes.slice().sort((a, b) => a[0] - b[0] || a[2] - b[2]);
+          const flat = [], ly = [];
+          let ps = 0, pp = 60, pv = 100;
+          ns.forEach((n, i) => {
+            const s0 = q(n[0]);
+            flat.push(s0 - ps, Math.max(1, q(n[1]) - s0), n[2] - pp, n[3] - pv);
+            ps = s0; pp = n[2]; pv = n[3];
+            if (n[4]) ly.push(i, n[4]);
+          });
+          r.push([t.name, Math.max(0, LKINDS.indexOf(t.kind)), t.inst, t.vol, (t.mute ? 1 : 0) | (t.solo ? 2 : 0) | (t.poly ? 4 : 0), t.octave || 0, t.semi || 0, t.vvStyle ?? null, t.auto || '', flat, ly]);
+        }
+        return { v: 2, m: [meta.title, meta.lyricist, meta.composer, meta.arranger].map(x => x.trim()), b: S.bpm, t: S.beats, k: songKey || 0, c: d.chords.map(c => [q(c.b), q(c.len), c.root, Math.max(0, LQS.indexOf(c.q))]), r };
+      }
+      function unpackSong(o) {
+        const tracks1 = (o.r || []).map(a => {
+          const [name, ki, inst, vol, fl, octave, semi, vv, auto, flat, ly] = a;
+          const notes = [];
+          let ps = 0, pp = 60, pv = 100;
+          for (let i = 0; i + 3 < (flat || []).length; i += 4) { ps += flat[i]; pp += flat[i + 2]; pv += flat[i + 3]; notes.push([ps / LT, (ps + flat[i + 1]) / LT, pp, pv]); }
+          for (let i = 0; i + 1 < (ly || []).length; i += 2) if (notes[ly[i]]) notes[ly[i]][4] = String(ly[i + 1]);
+          return { name, kind: LKINDS[ki] || 'melody', inst, vol, mute: !!(fl & 1), solo: !!(fl & 2), poly: !!(fl & 4), octave, semi, vvStyle: vv, auto, notes, hasAudio: false };
+        });
+        const m = Array.isArray(o.m) ? o.m : [];
+        return { meta: { title: m[0] || '', lyricist: m[1] || '', composer: m[2] || '', arranger: m[3] || '' }, bpm: o.b, beats: o.t, song: { v: 1, cur: 0, tracks: tracks1, chords: (o.c || []).map(c => ({ b: c[0] / LT, len: c[1] / LT, root: c[2], q: LQS[c[3]] || 'M', cands: [] })), key: o.k || 0 } };
+      }
+      async function shareLink() {
+        const o = packSong();
         const raw = new TextEncoder().encode(JSON.stringify(o));
         const z = await zpipe(raw, new CompressionStream('deflate-raw'));
         return TOOL_URL + '#s=' + b64url(z);
@@ -8092,7 +8124,8 @@ ${songJson(list)}
         let o = null;
         try { o = JSON.parse(new TextDecoder().decode(await zpipe(unb64url(m[1]), new DecompressionStream('deflate-raw')))); } catch (e) { }
         history.replaceState(null, '', location.pathname + location.search);
-        if (!o || !o.song || !Array.isArray(o.song.tracks)) { toast('共有された曲を読めませんでした（リンクが途中で切れているかもしれません）'); return; }
+        if (o && o.v === 2) { try { o = unpackSong(o); } catch (e) { o = null; } }
+        if (!o || !o.song || !Array.isArray(o.song.tracks) || !o.song.tracks.length) { toast('共有された曲を読めませんでした（リンクが途中で切れているかもしれません）'); return; }
         const title = (o.meta && o.meta.title) || '無題の曲';
         if (!(await askDiscard(`共有された曲「${title}」を開きます`, '保存しないで開く'))) return;
         if (await openSongRecord({ meta: o.meta, bpm: o.bpm, beats: o.beats, song: o.song, audio: [] }, false)) toast(`共有された曲「${title}」を開きました。▶ で聞けます。残すときは 🎵 曲の名前から「保存する」`);
@@ -8120,6 +8153,13 @@ ${songJson(list)}
         lines.push('#鼻歌MIDI変換 #どんまうんどTools');
         return lines.join('\n');
       }
+      // 長すぎるリンクは作らず、曲ファイルで渡してもらう
+      async function tooLong(url) {
+        if (url.length <= LINK_MAX) return false;
+        const a = await window.DonnmaAsk.ask(`この曲はリンクにすると長すぎます（${url.length.toLocaleString()} 文字）。長いリンクは LINE やメールで途中で切れてしまうので、曲ファイル（.json）で渡してください。受け取った人は「🎵 曲の名前 → 開く」で開けます。`, { yes: '曲ファイルを保存', no: 'やめる', danger: false });
+        if (a) $('song-export').click();
+        return true;
+      }
       async function copyTextSafe(txt) { try { await navigator.clipboard.writeText(txt); return true; } catch (e) { return typeof copyText === 'function' ? copyText(txt) : false; } }
       const hasNotes = () => tracks.some(t => t.notes.length);
       const shareMenu = $('share-menu');
@@ -8130,8 +8170,9 @@ ${songJson(list)}
         if (!hasNotes()) { toast('音の入っているトラックがありません'); return; }
         let url;
         try { url = await shareLink(); } catch (e) { toast('このブラウザではリンクを作れません'); return; }
+        if (await tooLong(url)) return;
         const ok = await copyTextSafe(shareText(url));
-        toast((ok ? 'リンク（と曲名・ハッシュタグ）をコピーしました。X や LINE に貼れます' : 'コピーできませんでした') + (url.length > 1800 ? `。リンクが長い（${url.length} 文字）ので、Discord には「Discord に貼る」（曲ファイル）がおすすめ` : ''));
+        toast((ok ? 'リンク（と曲名・ハッシュタグ）をコピーしました。X や LINE に貼れます' : 'コピーできませんでした') + (url.length > LINK_WARN ? `。少し長い（${url.length} 文字）ので、Discord では「Discord に貼る」（曲ファイル）を使ってください` : ''));
       });
       $('share-discord').addEventListener('click', async () => {
         if (!hasNotes() && !tracks.some(t => t.rawLen)) { toast('音の入っているトラックがありません'); return; }
@@ -8154,7 +8195,7 @@ ${songJson(list)}
         $('share-native').hidden = false;
         $('share-native').addEventListener('click', async () => {
           if (!hasNotes()) { toast('音の入っているトラックがありません'); return; }
-          try { const url = await shareLink(); await navigator.share({ title: meta.title.trim() || '鼻歌 MIDI 変換', text: shareText(''), url }); } catch (e) { }
+          try { const url = await shareLink(); if (await tooLong(url)) return; await navigator.share({ title: meta.title.trim() || '鼻歌 MIDI 変換', text: shareText(''), url }); } catch (e) { }
         });
       }
 
@@ -9334,6 +9375,7 @@ ${songJson(list)}
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        packSong, unpackSong,
         shareLink, shareText, openSharedLink,
         SAMPLES, SAMPLE_ORDER,
         SF, sfLoad, sfPrepare, INST, instOptions, gmToInst,
