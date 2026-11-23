@@ -2898,8 +2898,18 @@
           <div class="export">
             <button class="btn btn-sm" type="button" id="open-mid" title=".mid と .json（曲ファイル・AI 用の JSON）を開けます。画面に落としても開けます">MIDI を開く</button>
             <input type="file" id="mid-file" accept=".mid,.midi,audio/midi,audio/x-midi,.json,application/json" hidden>
+            <details class="menu" id="share-menu">
+              <summary class="btn btn-sm">📤 共有 ▾</summary>
+              <div class="menu-list">
+                <button type="button" id="share-video">🎬 動画にして X に投稿<small>MIDI が流れる画面の MP4 を作って、投稿画面を開く</small></button>
+                <button type="button" id="share-link">🔗 リンクをコピー<small>開くとこの曲が入る（声の録音は入らない）。X・LINE に</small></button>
+                <button type="button" id="share-discord">💬 Discord に貼る<small>曲ファイルを保存・文をコピーして、どんまうんど総合の Discord を開く</small></button>
+                <button type="button" id="share-file">💾 曲ファイルを保存<small>.json（録音まで）。友だちに渡す・バックアップ</small></button>
+                <button type="button" id="share-native" hidden>📱 ほかのアプリで共有<small>スマホの共有メニューで、リンクを送る</small></button>
+              </div>
+            </details>
             <details class="menu" id="save-menu">
-              <summary class="btn btn-sm">その他の保存 ▾</summary>
+              <summary class="btn btn-sm" title="音（WAV・M4A・MP3・FLAC）・動画・声の録音・歌声ソフト用・楽譜・AI 用の JSON">書き出し ▾</summary>
               <div class="menu-list">
                 <button type="button" id="export-wav" disabled>🔊 音で書き出す（WAV・M4A・MP3・FLAC）<small>全部のトラックを、再生と同じ音で1つに</small></button>
                 <button type="button" id="save-wav" disabled>🎤 声の録音を保存（.wav）<small>選んでいるトラックの、録った声そのまま</small></button>
@@ -2909,7 +2919,7 @@
                 <button type="button" id="video-open">🎬 動画にする（X・YouTube 用）<small>MIDI が流れる画面を、音つきの MP4 に</small></button>
               </div>
             </details>
-            <button class="btn btn-primary" type="button" id="save-mid" disabled>MIDI を保存（.mid）</button>
+            <button class="btn btn-primary" type="button" id="save-mid" disabled title="MIDI ファイル（.mid）を保存して、DAW に読み込む">MIDI を保存</button>
           </div>
         </div>
         <div class="tracks" id="tracks"></div>
@@ -3493,7 +3503,7 @@
       <div class="sd-file">
         <button class="btn btn-sm" type="button" id="song-export" title="今の曲をまるごと（録音・音色の設定まで）1つのファイルに。開くと元通りに戻ります">今の曲を書き出す（.json）</button>
         <button class="btn btn-sm" type="button" id="song-export-all" title="保存した曲を全部、1曲ずつの曲ファイルにして ZIP にまとめます（録音も）">全部の曲を書き出す（.zip）</button>
-        <button class="btn btn-sm" type="button" id="song-import" title="曲ファイル（.json）・「その他の保存」の JSON・全部の曲の ZIP を開けます">開く（.json・.zip）</button>
+        <button class="btn btn-sm" type="button" id="song-import" title="曲ファイル（.json）・「書き出し」の JSON・全部の曲の ZIP を開けます">開く（.json・.zip）</button>
         <input type="file" id="song-file" accept=".json,application/json,.zip,application/zip" hidden>
         <p class="hint">保存した曲は<b>このブラウザの中</b>に残ります。ブラウザのデータを消すと消えるので、パソコンを替えるときやバックアップは「全部の曲を書き出す（.zip）」で（タイトル・トラック・歌詞・録音まで入ります）。ZIP を開くと、中の曲が全部この一覧に入ります。<kbd>Ctrl</kbd>+<kbd>S</kbd> で保存。</p>
       </div>
@@ -5884,7 +5894,7 @@ registerProcessor('hum-rec',R);`;
         if (panel === 'score') renderScore();
       }
       document.querySelectorAll('[data-panel]').forEach(b => b.addEventListener('click', () => openPanel(b.dataset.panel)));
-      // 「その他の保存」：選んだら閉じる・外をクリックで閉じる
+      // 「書き出し」：選んだら閉じる・外をクリックで閉じる
       const saveMenu = $('save-menu');
       saveMenu.querySelectorAll('.menu-list button').forEach(b => b.addEventListener('click', () => {
         saveMenu.open = false;
@@ -8059,6 +8069,96 @@ ${songJson(list)}
       }
 
       // ══════════════════════════════════════
+      //  共有：動画・リンク・Discord・曲ファイル
+      //  リンクは曲（音・歌詞・コード・楽器。録音は入れない）を縮めて URL の # のうしろに入れる（サーバーには送られない）
+      // ══════════════════════════════════════
+      const DISCORD_INVITE = 'https://discord.com/invite/GYftDR6C9D';
+      const TOOL_URL = 'https://donnma.com/tool/hum-midi/';
+      const b64url = u => { let s1 = ''; for (let i = 0; i < u.length; i += 0x8000) s1 += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s1).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+      const unb64url = s1 => { const b = atob(s1.replace(/-/g, '+').replace(/_/g, '/')), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
+      const zpipe = async (u, stream) => new Uint8Array(await new Response(new Blob([u]).stream().pipeThrough(stream)).arrayBuffer());
+      async function shareLink() {
+        const d = songData();
+        for (const t of d.tracks) { t.hasAudio = false; delete t.uid; }
+        const o = { v: 1, meta: Object.fromEntries(Object.entries(meta).filter(([k, v]) => v && k !== 'memo')), bpm: S.bpm, beats: S.beats, song: d };
+        const raw = new TextEncoder().encode(JSON.stringify(o));
+        const z = await zpipe(raw, new CompressionStream('deflate-raw'));
+        return TOOL_URL + '#s=' + b64url(z);
+      }
+      // 開いたときに # に曲があれば読む
+      async function openSharedLink() {
+        const m = location.hash.match(/^#s=([A-Za-z0-9_-]+)$/);
+        if (!m) return;
+        let o = null;
+        try { o = JSON.parse(new TextDecoder().decode(await zpipe(unb64url(m[1]), new DecompressionStream('deflate-raw')))); } catch (e) { }
+        history.replaceState(null, '', location.pathname + location.search);
+        if (!o || !o.song || !Array.isArray(o.song.tracks)) { toast('共有された曲を読めませんでした（リンクが途中で切れているかもしれません）'); return; }
+        const title = (o.meta && o.meta.title) || '無題の曲';
+        if (!(await askDiscard(`共有された曲「${title}」を開きます`, '保存しないで開く'))) return;
+        if (await openSongRecord({ meta: o.meta, bpm: o.bpm, beats: o.beats, song: o.song, audio: [] }, false)) toast(`共有された曲「${title}」を開きました。▶ で聞けます。残すときは 🎵 曲の名前から「保存する」`);
+      }
+      // 使った VOICEVOX の声（クレジット用）
+      function vvCredits() {
+        const names = new Set();
+        for (const t of tracks) if (INST[t.inst] && INST[t.inst].vvox && t.notes.length) {
+          const st1 = VV.styles.find(x => x.id === t.vvStyle);
+          names.add(st1 ? st1.name.replace(/（.*$/, '') : 'VOICEVOX の声');
+        }
+        return [...names].map(n => 'VOICEVOX:' + n);
+      }
+      function shareText(withLink) {
+        const t = meta.title.trim() || '無題の曲';
+        const cr = [meta.lyricist.trim() && '作詞：' + meta.lyricist.trim(), meta.composer.trim() && '作曲：' + meta.composer.trim(), meta.arranger.trim() && '編曲：' + meta.arranger.trim()].filter(Boolean).join('／');
+        const lines = [`🎵「${t}」`];
+        if (cr) lines.push(cr);
+        if (/AI を使って作詞・作曲/.test(meta.memo)) lines.push('（AI で作った見本の曲をもとにしています）');
+        const vv = vvCredits();
+        if (vv.length) lines.push('声：' + vv.join('・'));
+        lines.push(`♩=${S.bpm}・${S.beats}/4・${tracks.filter(x => x.notes.length || x.rawLen).length} トラック`);
+        if (withLink) lines.push(withLink);
+        lines.push('鼻歌 MIDI 変換で作りました ' + TOOL_URL);
+        lines.push('#鼻歌MIDI変換 #どんまうんどTools');
+        return lines.join('\n');
+      }
+      async function copyTextSafe(txt) { try { await navigator.clipboard.writeText(txt); return true; } catch (e) { return typeof copyText === 'function' ? copyText(txt) : false; } }
+      const hasNotes = () => tracks.some(t => t.notes.length);
+      const shareMenu = $('share-menu');
+      shareMenu.querySelectorAll('.menu-list button').forEach(b => b.addEventListener('click', () => { shareMenu.open = false; }));
+      document.addEventListener('pointerdown', e => { if (shareMenu.open && !shareMenu.contains(e.target)) shareMenu.open = false; });
+      $('share-video').addEventListener('click', () => openVideoDlg());
+      $('share-link').addEventListener('click', async () => {
+        if (!hasNotes()) { toast('音の入っているトラックがありません'); return; }
+        let url;
+        try { url = await shareLink(); } catch (e) { toast('このブラウザではリンクを作れません'); return; }
+        const ok = await copyTextSafe(shareText(url));
+        toast((ok ? 'リンク（と曲名・ハッシュタグ）をコピーしました。X や LINE に貼れます' : 'コピーできませんでした') + (url.length > 1800 ? `。リンクが長い（${url.length} 文字）ので、Discord には「Discord に貼る」（曲ファイル）がおすすめ` : ''));
+      });
+      $('share-discord').addEventListener('click', async () => {
+        if (!hasNotes() && !tracks.some(t => t.rawLen)) { toast('音の入っているトラックがありません'); return; }
+        // 1) 曲ファイル（録った声は入れない。音声のトラックは入れる）
+        const audio = (await currentAudio(true)).map(a => ({ ...a, pcm: b64(a.pcm) }));
+        const data = songData();
+        for (const t of data.tracks) if (t.kind !== 'audio') t.hasAudio = false;
+        const out = { app: 'donnma-hum-midi', format: 1, saved: new Date().toISOString(), meta, bpm: S.bpm, beats: S.beats, song: data, audio };
+        const json = JSON.stringify(out);
+        if (json.length > 9.5 * 1024 * 1024) { toast('曲ファイルが大きすぎて Discord に貼れません（10MB まで）。音声のトラックを短くしてください'); return; }
+        download(json, 'application/json', meta.title.trim() || 'hum-song', '.json');
+        // 2) 貼る文
+        await copyTextSafe(shareText(''));
+        // 3) Discord を開く
+        window.open(DISCORD_INVITE, '_blank', 'noopener');
+        await window.DonnmaAsk.notice('Discord に貼る準備ができました。\n\n① 曲ファイル（.json）を保存しました\n② 貼る文（曲名・クレジット・ハッシュタグ）をコピーしました\n③ どんまうんど総合の Discord を開きました\n\n曲の話ができるチャンネルに、保存した曲ファイルを落として、コピーした文を貼ってください。見た人は、ファイルを「🎵 曲の名前 → 開く」で開くと中身を見られます。聞いてほしいときは「🎬 動画にする」で作った MP4 もいっしょにどうぞ。', 'わかった');
+      });
+      $('share-file').addEventListener('click', () => $('song-export').click());
+      if (navigator.share) {
+        $('share-native').hidden = false;
+        $('share-native').addEventListener('click', async () => {
+          if (!hasNotes()) { toast('音の入っているトラックがありません'); return; }
+          try { const url = await shareLink(); await navigator.share({ title: meta.title.trim() || '鼻歌 MIDI 変換', text: shareText(''), url }); } catch (e) { }
+        });
+      }
+
+      // ══════════════════════════════════════
       //  トラックの一覧
       // ══════════════════════════════════════
       const instOptions = sel => INST_GROUPS.map(([g, label]) => {
@@ -9227,9 +9327,14 @@ ${songJson(list)}
       $('device').addEventListener('focus', listDevices, { once: true });
       restoreAudio();
       if (tracks.some(t => INST[t.inst] && INST[t.inst].vvox)) vvConnect(true);
+      // 共有リンク（#s=…）で開いたとき：録音の読み戻しが終わってから
+      if (location.hash.startsWith('#s=')) (async () => { while (G.busy) await new Promise(r => setTimeout(r, 100)); openSharedLink(); })();
+      // 開いているタブに共有リンクを貼ったとき（# だけ変わるので読み直されない）
+      window.addEventListener('hashchange', () => { if (location.hash.startsWith('#s=') && !G.recording && !G.busy) openSharedLink(); });
 
       // 確かめ用（ブラウザのコンソール・自動テストから）
       window.__humMidi = {
+        shareLink, shareText, openSharedLink,
         SAMPLES, SAMPLE_ORDER,
         SF, sfLoad, sfPrepare, INST, instOptions, gmToInst,
         voxNext,
