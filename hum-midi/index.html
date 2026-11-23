@@ -2360,6 +2360,52 @@
       gap: 10px;
     }
 
+    .sd-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sd-tab {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 7px 14px;
+      border: 1px solid transparent;
+      border-bottom: 0;
+      border-radius: 10px 10px 0 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      margin-bottom: -1px;
+    }
+
+    .sd-tab.on {
+      color: var(--text);
+      background: var(--surface-2);
+      border-color: var(--border);
+    }
+
+    .sd-tabpane {
+      display: grid;
+      gap: 12px;
+    }
+
+    .sd-tabpane[hidden] {
+      display: none;
+    }
+
+    .sd-sample-ai {
+      justify-self: start;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 99px;
+      background: var(--bg-deep, #1a0a14);
+      color: var(--muted);
+    }
+
     .sd-sample-mood {
       font-size: 12px;
       color: var(--label);
@@ -2947,7 +2993,7 @@
             <button class="btn btn-sm" type="button" id="tpl-samples">🎵 見本の曲を開く…</button>
             <span class="tp-info">ポップス・ロック・バラード・ボサノバ・和風・8bit など。画面の上の「🎧 見本の曲」からも開けます</span>
           </div>
-          <p class="hint">テンポは今の BPM のままです（見本はその曲のテンポにします）。ワルツは3拍子にします。作ったコードは上のコード名をクリックで替えられ、伴奏も作り直します。見本の曲はこのツールのために作ったオリジナルで、自由に使って大丈夫です（VOICEVOX の声で公開するときは「VOICEVOX:ずんだもん」などのクレジットを）。</p>
+          <p class="hint">テンポは今の BPM のままです（見本はその曲のテンポにします）。ワルツは3拍子にします。作ったコードは上のコード名をクリックで替えられ、伴奏も作り直します。見本の曲は AI を使って作ったオリジナルで、自由に使って大丈夫です（VOICEVOX の声で公開するときは「VOICEVOX:ずんだもん」などのクレジットを）。</p>
         </div>
         <div class="tool-panel" id="panel-text" hidden>
           <textarea id="txt-src" rows="3" spellcheck="false" placeholder="例：ドレミー ミレドー ・ ドレミレ ドーー&#10;CDE- EDC- r G^C-"></textarea>
@@ -3397,9 +3443,18 @@
       <button class="sd-x" type="button" id="sample-close" aria-label="閉じる">×</button>
     </div>
     <div class="sd-body">
-      <p class="hint" style="margin:0">このツールのために作ったオリジナルの曲です。開いて聞いたり、まねして作り替えたり、自由に使ってください。開くと今の曲と入れ替わります（保存していない変更があれば先に聞きます）。</p>
-      <div class="sd-sample-grid" id="sample-grid"></div>
-      <p class="hint" style="margin:0">VOICEVOX につながっていると、ずんだもんたちが歌います（公開するときは「VOICEVOX:ずんだもん」などのクレジットを）。楽器の音は本物の音（FluidR3 GM）です。</p>
+      <div class="sd-tabs" role="tablist" aria-label="見本の種類">
+        <button class="sd-tab on" type="button" role="tab" data-stab="ai" aria-selected="true">🤖 AI で作った見本</button>
+        <button class="sd-tab" type="button" role="tab" data-stab="donnma" aria-selected="false">✍ どんま作詞作曲</button>
+      </div>
+      <div class="sd-tabpane" id="stab-ai">
+        <p class="hint" style="margin:0">ツールの使い方を見せるために、<b>AI を使って作った</b>オリジナルの曲です（作詞・作曲とも AI）。開いて聞いたり、まねして作り替えたり、自由に使ってください。開くと今の曲と入れ替わります（保存していない変更があれば先に聞きます）。</p>
+        <div class="sd-sample-grid" id="sample-grid"></div>
+        <p class="hint" style="margin:0">VOICEVOX につながっていると、ずんだもんたちが歌います（公開するときは「VOICEVOX:ずんだもん」などのクレジットを）。楽器の音は本物の音（FluidR3 GM）です。</p>
+      </div>
+      <div class="sd-tabpane" id="stab-donnma" hidden>
+        <div class="sd-empty">どんまが作詞・作曲して、手で打ち込んだ曲を、順次公開する予定です。お楽しみに。</div>
+      </div>
     </div>
   </dialog>
 
@@ -6830,7 +6885,7 @@ registerProcessor('hum-rec',R);`;
         if (!(await askDiscard(`見本「${sm.name}」を開きます`, '保存しないで開く'))) return false;
         stopPlay();
         for (const t of tracks) delAudio(t.uid);
-        meta = blankMeta(); meta.title = sm.name; libId = ''; savedSig = ''; songKey = 0; showSong();
+        meta = blankMeta(); meta.title = sm.name; meta.memo = `鼻歌 MIDI 変換の見本の曲（${sm.genre || ''}）。AI を使って作詞・作曲したオリジナルです。`; libId = ''; savedSig = ''; songKey = 0; showSong();
         S.bpm = sm.bpm; S.beats = sm.beats; S.key = 'off'; S.accPat = sm.acc; S.accInst = sm.accInst; S.accBass = sm.bass !== false;
         save();
         const vv = sm.melInst ? false : VV.ok || await vvConnect(true);
@@ -6905,7 +6960,7 @@ registerProcessor('hum-rec',R);`;
       function renderSamples() {
         $('sample-grid').innerHTML = SAMPLE_ORDER.filter(k => SAMPLES[k]).map(k => {
           const sm = SAMPLES[k];
-          return `<button class="sd-sample" type="button" data-sample="${k}"><span class="sd-sample-g">${escH(sm.genre || '')}</span><b>${escH(sm.choir ? sm.name + '（アカペラ）' : sm.name)}</b><span class="sd-sample-mood">${escH(sm.mood || '')}</span><small>${escH(sm.desc || '')}・${sm.bpm} BPM</small></button>`;
+          return `<button class="sd-sample" type="button" data-sample="${k}"><span class="sd-sample-g">${escH(sm.genre || '')}</span><b>${escH(sm.choir ? sm.name + '（アカペラ）' : sm.name)}</b><span class="sd-sample-mood">${escH(sm.mood || '')}</span><small>${escH(sm.desc || '')}・${sm.bpm} BPM</small><span class="sd-sample-ai">🤖 AI 作詞作曲</span></button>`;
         }).join('');
       }
       renderSamples();
@@ -6918,6 +6973,13 @@ registerProcessor('hum-rec',R);`;
       $('open-samples').addEventListener('click', openSamples);
       $('tpl-samples').addEventListener('click', openSamples);
       $('sample-close').addEventListener('click', () => $('sample-dlg').close());
+      $('sample-dlg').querySelector('.sd-tabs').addEventListener('click', e => {
+        const b = e.target.closest('[data-stab]');
+        if (!b) return;
+        for (const x of $('sample-dlg').querySelectorAll('[data-stab]')) { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', String(on)); }
+        $('stab-ai').hidden = b.dataset.stab !== 'ai';
+        $('stab-donnma').hidden = b.dataset.stab !== 'donnma';
+      });
       $('sample-dlg').addEventListener('click', e => { if (e.target === $('sample-dlg')) $('sample-dlg').close(); });
 
       // ══════════════════════════════════════
