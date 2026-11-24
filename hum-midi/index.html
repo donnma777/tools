@@ -3111,6 +3111,7 @@
               </select>
             </label>
             <span class="kb-oct" id="kb-oct">オクターブ <button class="trk-btn" type="button" id="kb-down" title="下げる（−）">−</button><b id="kb-base">C4</b><button class="trk-btn" type="button" id="kb-up" title="上げる（＾）">＋</button></span>
+            <span class="kb-oct" id="vox-semi-box" hidden title="声で入れる音を、オクターブとは別に半音ずつ上げ下げします">半音 <button class="trk-btn" type="button" id="vox-sd" title="半音下げる">−</button><b id="vox-semi">±0</b><button class="trk-btn" type="button" id="vox-su" title="半音上げる">＋</button></span>
             <span class="sp"></span>
             <button class="btn btn-sm" type="button" id="kb-close">終わる（Esc）</button>
           </div>
@@ -3268,6 +3269,33 @@
                 <option value="0">そのまま</option>
                 <option value="1">1つ上げる</option>
                 <option value="2">2つ上げる</option>
+              </select>
+            </label>
+            <label class="opt" title="オクターブとは別に、半音ずつ上げ下げします（歌いやすい高さで歌って、曲のキーに合わせるときなど）"><span>半音</span>
+              <select id="semiAdj">
+                <option value="-11">半音 11 下げる</option>
+                <option value="-10">半音 10 下げる</option>
+                <option value="-9">半音 9 下げる</option>
+                <option value="-8">半音 8 下げる</option>
+                <option value="-7">半音 7 下げる</option>
+                <option value="-6">半音 6 下げる</option>
+                <option value="-5">半音 5 下げる</option>
+                <option value="-4">半音 4 下げる</option>
+                <option value="-3">半音 3 下げる</option>
+                <option value="-2">半音 2 下げる</option>
+                <option value="-1">半音 1 下げる</option>
+                <option value="0">そのまま</option>
+                <option value="1">半音 1 上げる</option>
+                <option value="2">半音 2 上げる</option>
+                <option value="3">半音 3 上げる</option>
+                <option value="4">半音 4 上げる</option>
+                <option value="5">半音 5 上げる</option>
+                <option value="6">半音 6 上げる</option>
+                <option value="7">半音 7 上げる</option>
+                <option value="8">半音 8 上げる</option>
+                <option value="9">半音 9 上げる</option>
+                <option value="10">半音 10 上げる</option>
+                <option value="11">半音 11 上げる</option>
               </select>
             </label>
             <label class="opt"><span>クオンタイズ（タイミング）</span>
@@ -3607,7 +3635,7 @@
 
       // ── 設定 ──
       const DEF = {
-        device: '', bpm: 120, beats: 4, countIn: 1, clickVol: 60, metro: true, recOthers: true, micGain: 0, micAgc: false, monitor: false, monLo: null, monHi: null, recPunch: false, voxRange: false, voxStack: false,
+        device: '', bpm: 120, beats: 4, countIn: 1, clickVol: 60, metro: true, recOthers: true, micGain: 0, micAgc: false, monitor: false, monLo: null, monHi: null, recPunch: false, voxRange: false, voxStack: false, voxSemi: 0,
         range: 'voice', sens: 2, gate: -50, minMs: 80, split: true, autoTune: true,
         key: 'off', scale: 'major', quant: '16', quantLen: true, vel: 'dyn',
         names: 'en', naming: '4', playMode: 'both', playClick: false, zoom: 60, repeat: false, kbOct: 4, stepLen: '0.5',
@@ -3875,7 +3903,7 @@
         for (const s of segs) {
           if (s.drop || s.end - s.start < minF) continue;
           const vals = s.vals.slice().sort((a, b) => a - b);
-          const p = clamp(snapPitch(vals[vals.length >> 1] + (st.semi || 0)) + 12 * Number(st.octave), 0, 127);
+          const p = clamp(snapPitch(vals[vals.length >> 1] + (st.semi || 0) + (st.adj || 0)) + 12 * Number(st.octave), 0, 127);
           const vel = velOf(s.peak);
           const note = { s: frameTime(s.start) - hopS / 2, e: frameTime(s.end - 1) + hopS / 2, p, v: vel, onset: s.onset };
           const prev = out[out.length - 1];
@@ -4093,7 +4121,7 @@
           if (lo === Infinity) for (const t of ghostTracks()) for (const n of t.notes) { lo = Math.min(lo, n.p); hi = Math.max(hi, n.p); }
           if (st.fm.length) {
             const th = SENS[S.sens];
-            for (let i = 0; i < st.fm.length; i += 3) if (voicedAt(i, th, S.gate)) { const p = Math.round(st.fm[i]) + 12 * Number(st.octave) + (st.semi || 0); lo = Math.min(lo, p); hi = Math.max(hi, p); }
+            for (let i = 0; i < st.fm.length; i += 3) if (voicedAt(i, th, S.gate)) { const p = Math.round(st.fm[i]) + 12 * Number(st.octave) + (st.semi || 0) + (st.adj || 0); lo = Math.min(lo, p); hi = Math.max(hi, p); }
           }
           if (lo === Infinity) { lo = 58; hi = 76; }
           lo -= 3; hi += 3;
@@ -4211,7 +4239,7 @@
         if (st.kind === 'audio') drawWave(st, X, vb1);
         // 読み取った音の高さ（点）
         if (!L.drum && st.kind !== 'audio' && st.fm.length) {
-          const th = SENS[S.sens], oct = 12 * Number(st.octave) + (st.semi || 0);
+          const th = SENS[S.sens], oct = 12 * Number(st.octave) + (st.semi || 0) + (st.adj || 0);
           const t0 = toTime(st, L.vb0), t1 = toTime(st, vb1);
           const i0 = Math.max(0, Math.floor((t0 * st.dsr - st.W / 2) / st.hop) - 1);
           const i1 = Math.min(st.fm.length - 1, Math.ceil((t1 * st.dsr - st.W / 2) / st.hop) + 1);
@@ -5400,7 +5428,7 @@ registerProcessor('hum-rec',R);`;
         }
         if (voicedAt(i, SENS[S.sens], S.gate)) {
           const m = st.fm[i] - st.tuneOff, p = Math.round(m), cents = Math.round((m - p) * 100);
-          $('live-note').textContent = noteName(p + 12 * Number(st.octave));
+          $('live-note').textContent = noteName(p + 12 * Number(st.octave) + (st.adj || 0));
           $('live-sub').textContent = `${hz(m).toFixed(1)} Hz ・ ${cents >= 0 ? '+' : ''}${cents} セント`;
           dot.style.left = (50 + cents) + '%';
           dot.style.opacity = 1;
@@ -5592,7 +5620,7 @@ registerProcessor('hum-rec',R);`;
       }
       function voxTick(p, db) {
         if (!VOX.on || st.kind !== 'melody' || G.recording || G.busy) return;
-        const pr = p == null ? null : clamp(Math.round(p) + 12 * (Number(S.kbOct) - 4), 0, 127);
+        const pr = p == null ? null : clamp(Math.round(p) + 12 * (Number(S.kbOct) - 4) + (Number(S.voxSemi) || 0), 0, 127);
         if (pr == null) { VOX.cand = null; VOX.candN = 0; if (VOX.held && ++VOX.gap >= 2) voxRelease(); return; }
         VOX.gap = 0;
         if (VOX.cand === pr) VOX.candN++; else { VOX.cand = pr; VOX.candN = 1; }
@@ -5610,6 +5638,9 @@ registerProcessor('hum-rec',R);`;
         VOX.held = true; VOX.heldP = pr;
       }
       $('vox').addEventListener('click', () => setVox(!VOX.on));
+      const voxSemi = d => { S.voxSemi = clamp((Number(S.voxSemi) || 0) + d, -11, 11); save(); syncKbPanel(); };
+      $('vox-sd').addEventListener('click', () => voxSemi(-1));
+      $('vox-su').addEventListener('click', () => voxSemi(1));
       // 和音を重ねる：→ か Tab で、今の位置の音のいちばん長いぶん（なければ「長さ」）進む
       function voxNext() {
         const b = snapBeat(G.cursor);
@@ -7560,7 +7591,7 @@ ${songJson(list)}
           v: 1, cur: tracks.indexOf(st),
           tracks: tracks.map(t => ({
             name: t.name, kind: t.kind, inst: t.inst, vol: t.vol, mute: t.mute, solo: t.solo, poly: t.poly, auto: t.auto, uid: t.uid,
-            align: t.align, latency: t.latency, octave: t.octave, hasAudio: !!t.rawLen || t.hasAudio, vvStyle: t.vvStyle, audioOff: t.kind === 'audio' ? Math.round((t.audioOff || 0) * 10000) / 10000 : undefined, semi: t.semi || undefined,
+            align: t.align, latency: t.latency, octave: t.octave, hasAudio: !!t.rawLen || t.hasAudio, vvStyle: t.vvStyle, audioOff: t.kind === 'audio' ? Math.round((t.audioOff || 0) * 10000) / 10000 : undefined, semi: t.semi || undefined, adj: t.adj || undefined,
             notes: t.notes.map(n => {
               const a = [r(toBeat(t, n.s)), r(toBeat(t, n.e)), n.p, n.v];
               if (n.lyric) a.push(n.lyric);
@@ -7608,6 +7639,7 @@ ${songJson(list)}
             const t = newTrack(o.kind === 'drum' ? 'drum' : o.kind === 'audio' ? 'audio' : 'melody');
             if (t.kind === 'audio') t.audioOff = Number(o.audioOff) || 0;
             if (Number.isInteger(o.semi)) t.semi = clamp(o.semi, -48, 48);
+            if (Number.isInteger(o.adj)) t.adj = clamp(o.adj, -11, 11);
             if (typeof o.name === 'string') t.name = o.name.slice(0, 24);
             if (t.kind !== 'drum' && INST[o.inst]) t.inst = o.inst;
             t.vol = clamp(Number(o.vol) || 0, 0, 100);
@@ -8421,6 +8453,7 @@ ${songJson(list)}
         }
         for (const k of TRACK) $(k).value = String(st[k]);
         $('octave').value = String(st.octave);
+        $('semiAdj').value = String(st.adj || 0);
         $('gate-v').textContent = S.gate + ' dB';
         $('micGain-v').textContent = S.micGain ? `+${S.micGain} dB` : 'そのまま';
       }
@@ -8463,6 +8496,13 @@ ${songJson(list)}
         const v = Number($('octave').value), d = v - Number(st.octave);
         st.octave = v;
         if (st.kind !== 'drum' && st.notes.length) { pushUndo(); for (const n of st.notes) n.p = clamp(n.p + 12 * d, 0, 127); }
+        refresh();
+      });
+      $('semiAdj').addEventListener('change', () => {
+        const v = Number($('semiAdj').value), d = v - (st.adj || 0);
+        st.adj = v;
+        if (st.kind !== 'drum' && st.notes.length) { pushUndo(); for (const n of st.notes) n.p = clamp(n.p + d, 0, 127); }
+        saveSong();
         refresh();
       });
       $('guess-key').addEventListener('click', () => {
@@ -9266,6 +9306,8 @@ ${songJson(list)}
         $('kb-title').textContent = [KB.on && '⌨ キーボード', MIDI.on && '🎹 MIDI', VOX.on && '🎤 声'].filter(Boolean).join('・') + ' で入力中';
         $('vox-hint').hidden = !VOX.on;
         $('vox-opts').hidden = !VOX.on;
+        $('vox-semi-box').hidden = !VOX.on;
+        $('vox-semi').textContent = (S.voxSemi > 0 ? '+' : S.voxSemi < 0 ? '−' : '±') + Math.abs(S.voxSemi || 0);
       }
 
       // ══════════════════════════════════════
